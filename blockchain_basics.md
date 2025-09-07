@@ -267,9 +267,9 @@ Smart Contract punya beberapa sifat dasar yang membuatnya jauh berbeda dari perj
 
 ### 1. Desentralisasi (Tidak Terpusat)
 
-Smart Contract tidak berjalan di satu server milik satu perusahaan. Sebaliknya,
-ia berjalan di jaringan blockchain yang dikelola oleh ribuan komputer di seluruh
-dunia (disebut node). Karena dijalankan secara gotong royong oleh banyak pihak,
+Seperti yg sudah digambarkan sebelumnya, Smart Contract tidak berjalan di satu server milik satu
+perusahaan. Sebaliknya, ia berjalan di jaringan blockchain yang dikelola oleh ribuan komputer
+di seluruh dunia (disebut node). Karena dijalankan secara gotong royong oleh banyak pihak,
 tidak ada satu "bos" pun yang bisa mengendalikannya.
 
 **Analogi:** Bayangkan sebuah aplikasi. Di Web2, aplikasi itu berjalan di server Google.
