@@ -19,7 +19,7 @@ penyimpan nilai yang baik.
 ## Ethereum dan Smart Contract
 Beberapa tahun setelah Bitcoin, muncullah Ethereum. Kalau Bitcoin itu ibarat kalkulator
 yang fungsinya spesifik untuk transaksi keuangan, maka Ethereum itu ibarat smartphone.
-Kamu tidak hanya bisa menggunakannya untuk transaksi, tapi juga bisa "meng-install"
+Kita tidak hanya bisa menggunakannya untuk transaksi, tapi juga bisa "meng-install"
 berbagai macam aplikasi di atas teknologinya.
 
 * Aplikasi-aplikasi inilah yang dijalankan oleh Smart Contract (Kontrak Pintar).
@@ -28,7 +28,7 @@ berbagai macam aplikasi di atas teknologinya.
 	aksi B (kalo programmer pasti tau, ini semacam if-else statement salah satu bagian
 	kecil dari suatu program)". Perjanjian ini berjalan sendiri tanpa perlu perantara.
 	
-		Contoh: JIKA kamu transfer 1 ETH (mata uang Ethereum) ke alamat A, MAKA sebuah aset
+		Contoh: JIKA kita transfer 1 ETH (mata uang Ethereum) ke alamat A, MAKA sebuah aset
 		digital otomatis akan terkirim ke alamatmu. Semua terjadi otomatis, tanpa perlu campur
 		tangan manusia.
 	
@@ -92,14 +92,14 @@ macet dan mahal (biaya transaksi/gas fee jadi tinggi). Layer 2 adalah solusi unt
 ---
 
 ## Apa itu Web3?
-Ini adalah cara paling gampang untuk membedakannya dengan yang sudah kamu kenal:
-* Web1 (Era 90-an): Read-Only. Internet isinya situs statis. Kamu cuma bisa baca, tidak bisa
+Ini adalah cara paling gampang untuk membedakannya dengan yang sudah kita kenal:
+* Web1 (Era 90-an): Read-Only. Internet isinya situs statis. Kita cuma bisa baca, tidak bisa
 	banyak berinteraksi.
-* Web2 (Era 2000-an - sekarang): Read-Write. Kamu bisa berinteraksi, membuat konten, dan
+* Web2 (Era 2000-an - sekarang): Read-Write. Kita bisa berinteraksi, membuat konten, dan
 	menggunakan aplikasi (Sosmed, E-commerce). TAPI, semua data dan platform dikontrol oleh
 	perusahaan besar (Google, Meta, Amazon). Kita adalah produknya.
-* Web3 (Era Baru): Read-Write-Own. Kamu bisa berinteraksi seperti di Web2, TAPI kamu juga bisa
-	memiliki sebagian dari aplikasi atau platform yang kamu gunakan. Semuanya berjalan di
+* Web3 (Era Baru): Read-Write-Own. Kita bisa berinteraksi seperti di Web2, TAPI Kita juga bisa
+	memiliki sebagian dari aplikasi atau platform yang Kita gunakan. Semuanya berjalan di
 	jaringan terdesentralisasi (blockchain), bukan server milik satu perusahaan. Ini tentang
 	kepemilikan pengguna (ownership economy).
 	
@@ -110,7 +110,7 @@ di perusahaan raksasa.
 
 ## Inti dari Blockchain dan Smart Contract
 Hampir semua hal dalam hidup kita melibatkan "perjanjian" atau "janji". Beli pulsa, bayar
-listrik, servis motor—semuanya adalah bentuk perjanjian. Kamu bayar, dan kamu berharap pihak
+listrik, servis motor—semuanya adalah bentuk perjanjian. Kita bayar, dan Kita berharap pihak
 lain menepati janjinya (memberi pulsa, listrik, atau servis yang benar).
 
 Masalahnya, perjanjian tradisional ini sangat bergantung pada rasa percaya. Dan seperti yang
@@ -156,7 +156,7 @@ total, dan bagaimana Smart Contract bisa mengatasinya.
 ## Rangkuman Singkat
 * Perjanjian Tradisional: Butuh percaya pada satu pihak terpusat (perusahaan, bank, pemerintah).
 	Risikonya, kepercayaan itu bisa dikhianati.
-* Smart Contract: Tidak perlu percaya. Kamu hanya perlu yakin pada kode matematika yang transparan,
+* Smart Contract: Tidak perlu percaya. Kita hanya perlu yakin pada kode matematika yang transparan,
 	tidak bisa diubah, dan berjalan otomatis.
 Smart Contract adalah solusi untuk meminimalkan ketergantungan kita pada sistem berbasis
 kepercayaan yang sudah berkali-kali gagal dalam sejarah.
