@@ -1,6 +1,6 @@
 # Web3 Lernen
-#### Repo ini berisi materi-materi belajar terkait dunia web3, menurut pemahaman saya saja
-#### (yg saya pelajari dari Cyfrin Updraft)
+Repo ini berisi materi-materi belajar terkait dunia web3, menurut pemahaman saya saja
+(yg saya pelajari dari Cyfrin Updraft)
 
 1. Blockchain Foundations
 	* Blockchain Basics
