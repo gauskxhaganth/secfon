@@ -23,13 +23,14 @@ Kamu tidak hanya bisa menggunakannya untuk transaksi, tapi juga bisa "meng-insta
 berbagai macam aplikasi di atas teknologinya.
 
 * Aplikasi-aplikasi inilah yang dijalankan oleh Smart Contract (Kontrak Pintar).
-	Apa itu Smart Contract?: Ini adalah program komputer sederhana yang berjalan di atas
-	blockchain. Logikanya seperti ini: "JIKA kondisi A terpenuhi, MAKA otomatis lakukan
-	aksi B". Perjanjian ini berjalan sendiri tanpa perlu perantara.
+	Nah Smart Contract adalah program komputer sederhana yang berjalan di atas
+	blockchain. Logikanya seperti: "JIKA kondisi A terpenuhi, MAKA otomatis lakukan
+	aksi B (kalo programmer pasti tau, ini semacam if-else statement salah satu bagian
+	kecil dari suatu program)". Perjanjian ini berjalan sendiri tanpa perlu perantara.
 	
-* Contoh: JIKA kamu transfer 1 ETH (mata uang Ethereum) ke alamat A, MAKA sebuah aset
-	digital otomatis akan terkirim ke alamatmu. Semua terjadi otomatis, tanpa perlu campur
-	tangan manusia.
+		Contoh: JIKA kamu transfer 1 ETH (mata uang Ethereum) ke alamat A, MAKA sebuah aset
+		digital otomatis akan terkirim ke alamatmu. Semua terjadi otomatis, tanpa perlu campur
+		tangan manusia.
 	
 * Perbedaan Utama: Kemampuan menjalankan Smart Contract inilah yang jadi pembeda utama
 	antara Ethereum dan Bitcoin.
