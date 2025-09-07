@@ -208,3 +208,61 @@ proyek yang benar-benar membangun sistem terdesentralisasi yang adil, dan mana y
 
 ---
 
+## RECAP
+### 🚀 Pendahuluan
+
+Teknologi **blockchain** telah mengubah cara transaksi dan perjanjian digital.
+💰 **Bitcoin** adalah protokol pertama yang mempopulerkan blockchain, memungkinkan transaksi tanpa perantara.
+⚙️ Berdasarkan pondasi ini, **Ethereum** dan platform smart contract lainnya mengembangkan teknologi dengan memungkinkan pembuatan **smart contract** dan **dApps**.
+🔗 Platform ini berinteraksi dengan dunia nyata melalui jaringan terdesentralisasi seperti **Chainlink**, yang memperluas kemampuan blockchain.
+💡 Hal ini menantang sistem keuangan tradisional dengan menawarkan cara baru mengelola dan memindahkan kekayaan.
+
+---
+
+### 🪙 Bitcoin dan Ethereum
+
+* **Bitcoin**
+  🔑 Memperkenalkan konsep mata uang digital **terdesentralisasi**.
+  💎 Berfungsi sebagai **store of value** dan memungkinkan transaksi **peer-to-peer** tanpa otoritas pusat.
+  🛡️ Desentralisasi membuatnya tahan sensor dan kegagalan terpusat.
+
+* **Ethereum**
+  🧾 Mengembangkan teknologi Bitcoin dengan **smart contract**.
+  🤖 Smart contract = kontrak otomatis dengan syarat & ketentuan ditulis jelas dalam kode.
+  🙅 Menghilangkan kebutuhan perantara, meminimalkan risiko trust.
+  📱 Memungkinkan pembuatan **dApps** yang bisa berinteraksi dengan blockchain + data dunia nyata lewat jaringan terdesentralisasi.
+
+---
+
+### 🔗 Chainlink
+
+**Chainlink** = jaringan terdesentralisasi yang memungkinkan **hybrid smart contract**.
+⚖️ Menggabungkan logika **on-chain** + data/komputasi **off-chain**, sambil tetap terdesentralisasi.
+
+---
+
+### 🌟 Fitur Utama & Manfaat
+
+✅ **Desentralisasi** → jaringan node menghilangkan perantara pusat.
+👀 **Transparansi & Fleksibilitas** → transaksi & kontrak terbuka untuk semua, dengan **privasi** lewat pseudo-anonimitas.
+⚡ **Kecepatan & Efisiensi** → transaksi instan, tanpa lembaga kliring.
+🔒 **Keamanan & Immutability** → smart contract tidak bisa diubah; blockchain sulit diretas.
+🤝 **Mengurangi Risiko Pihak Ketiga** → kontrak berjalan sesuai kode, tanpa campur tangan manusia/fraud.
+
+---
+
+### 📝 Kesimpulan
+
+🌍 Blockchain telah merevolusi transaksi & perjanjian digital:
+
+* 💰 Bitcoin → mata uang digital terdesentralisasi.
+* ⚙️ Ethereum → smart contract & dApps.
+* 🔗 Chainlink → hybrid smart contract dengan data dunia nyata.
+
+🚀 Inovasi ini menantang keuangan tradisional dengan solusi **aman, transparan, efisien**, membuka era baru perjanjian yang minim kebutuhan kepercayaan.
+
+---
+
+🧑‍💻 **Tes Diri**
+📕 Jelaskan singkat apa itu **Bitcoin, Ethereum, Chainlink**.
+📕 Sebutkan keunggulan utama **smart contract** dibanding sistem keuangan tradisional.
