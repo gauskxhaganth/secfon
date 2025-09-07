@@ -37,7 +37,7 @@ berbagai macam aplikasi di atas teknologinya.
 ---
 
 ## Masalah Oracle (The Oracle Problem)
-Ada satu kelemahan besar dari Smart Contract, yaitu mereka itu "buta" dan "tuli" terhadap dunia
+Ada satu kelemahan besar dari Smart Contract yaitu mereka itu "buta" dan "tuli" terhadap dunia
 luar. Mereka hanya tahu apa yang terjadi di dalam blockchain itu sendiri.
 
 *  Masalahnya: Bagaimana sebuah smart contract untuk asuransi pertanian bisa tahu apakah
