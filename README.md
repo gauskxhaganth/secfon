@@ -1,6 +1,5 @@
 # Web3 Lernen
-Repo ini berisi materi belajar seputar dunia Web3, isinya berdasarkan pemahaman pribadi saya,
-
+Repo ini berisi materi belajar seputar dunia Web3, isinya berdasarkan pemahaman pribadi saya, <br>
 karena setiap orang punya daya tangkap yang berbeda.
 
 ***(yg saya pelajari dari Cyfrin Updraft, learnweb3, dan platform belajar lainnya)***
