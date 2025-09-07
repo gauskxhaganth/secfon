@@ -51,6 +51,10 @@ luar. Mereka hanya tahu apa yang terjadi di dalam blockchain itu sendiri.
 * Hybrid Smart Contract: Ketika sebuah smart contract menggunakan data dari Oracle, ia
 	disebut Hybrid Smart Contract (gabungan logika on-chain di blockchain dan data off-chain 
 	dari dunia luar).
+	
+		* **On-chain** = semua data dan aktivitas yang **langsung tercatat di blockchain**.
+		* **Off-chain** = semua data dan aktivitas yang **terjadi di luar blockchain**.
+		
 
 ---
 
