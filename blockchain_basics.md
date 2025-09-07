@@ -13,6 +13,7 @@ Kenapa Penting?: Karena tidak ada satu pihak pun (misalnya pemerintah atau bank)
 mengontrolnya, transaksi jadi tahan sensor dan lebih aman. Bitcoin sering disebut
 "emas digital" karena jumlahnya terbatas (langka seperti emas) dan dianggap sebagai
 penyimpan nilai yang baik.
+
 ---
 
 ## Ethereum dan Smart Contract\
@@ -32,6 +33,7 @@ berbagai macam aplikasi di atas teknologinya.
 	
 * Perbedaan Utama: Kemampuan menjalankan Smart Contract inilah yang jadi pembeda utama
 	antara Ethereum dan Bitcoin.
+
 ---
 
 ## Masalah Oracle (The Oracle Problem)
@@ -49,6 +51,7 @@ luar. Mereka hanya tahu apa yang terjadi di dalam blockchain itu sendiri.
 * Hybrid Smart Contract: Ketika sebuah smart contract menggunakan data dari Oracle, ia
 	disebut Hybrid Smart Contract (gabungan logika on-chain di blockchain dan data off-chain 
 	dari dunia luar).
+
 ---
 
 ## Chainlink & Solusi Skalabilitas (Layer 2)	
@@ -66,6 +69,7 @@ Layer 2 (L2): Bayangkan blockchain utama (seperti Ethereum) itu adalah jalan ray
 	dilaporkan secara berkala ke jalan raya utama (L1).
 
 	* Contoh L2: Optimism, Arbitrum, ZKsync. (Tidak perlu pusing soal detail teknisnya sekarang).
+
 ---
 
 ## Rangkuman Istilah Penting
@@ -80,6 +84,7 @@ Ini kamus singkatnya versi gampang:
 * Ethereum/EVM: Ethereum adalah nama blockchain-nya. EVM (Ethereum Virtual Machine) adalah
 	"mesin" atau lingkungan komputasi di dalam Ethereum yang tugasnya menjalankan kode
 	Smart Contract.
+
 ---
 
 ## Apa itu Web3?
@@ -96,5 +101,4 @@ Ini adalah cara paling gampang untuk membedakannya dengan yang sudah kamu kenal:
 	
 Intinya, Web3 mengembalikan kontrol dan kepemilikan data ke tangan pengguna, bukan lagi terpusat
 di perusahaan raksasa.
-
 
