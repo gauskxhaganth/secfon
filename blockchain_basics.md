@@ -195,6 +195,8 @@ Sebagai developer atau user di dunia Web3, sangat penting untuk bisa membedakan 
 proyek yang benar-benar membangun sistem terdesentralisasi yang adil, dan mana yang hanya
 "berkedok" Web3 untuk mencari keuntungan.
 
+## Rangkuman Singkat
+
 1. Hampir semua masalah dalam perjanjian konvensional bersumber dari kebutuhan akan kepercayaan
 	pada pihak ketiga.
 2. Smart Contract memecahkan masalah ini dengan menyediakan sistem perjanjian yang transparan,
