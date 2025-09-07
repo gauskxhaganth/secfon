@@ -6,16 +6,16 @@ Repo ini berisi materi-materi belajar terkait dunia web3, menurut pemahaman saya
 1. Blockchain Foundations
 	* Blockchain Basics
 	* Chainlink Fundamentals
-
-2. Solidity Smart Contract Development
-	* Solidity Smart Contract Development
-	* Foundry Fundamentals
-	* Advanced Foundry
-
-3. Vyper Smart Contract Develoment
+	
+2. Vyper Smart Contract Develoment
 	* Introduction to Python and Vyper
 	* Intermediate Python and Vyper
 	* Advanced Python and Vyper Smart Contract Development
+	
+3. Solidity Smart Contract Development
+	* Solidity Smart Contract Development
+	* Foundry Fundamentals
+	* Advanced Foundry
 
 4. Web3 Wallet Security
 	* Web3 Wallet Security Basics
