@@ -59,14 +59,14 @@ luar. Mereka hanya tahu apa yang terjadi di dalam blockchain itu sendiri.
 ---
 
 ## Chainlink & Solusi Skalabilitas (Layer 2)	
-Chainlink: Ini adalah salah satu jaringan Oracle terdesentralisasi yang paling populer.
+Chainlink adalah salah satu jaringan Oracle terdesentralisasi yang paling populer.
 "Terdesentralisasi" artinya datanya tidak diambil dari satu sumber saja, melainkan dari
 banyak sumber agar lebih akurat dan tidak mudah dimanipulasi. Chainlink juga bisa bekerja
 di blockchain mana saja (blockchain agnostic).
 
-Layer 2 (L2): Bayangkan blockchain utama (seperti Ethereum) itu adalah jalan raya utama
-(disebut Layer 1). Kalau terlalu banyak mobil (transaksi), jalanan itu bakal macet dan mahal
-(biaya transaksi/gas fee jadi tinggi). Layer 2 adalah solusi untuk masalah ini.
+Pengertian mengenai Layer 2 (L2) itu Bayangkan blockchain utama (seperti Ethereum) itu adalah
+jalan raya utama (disebut Layer 1). Kalau terlalu banyak mobil (transaksi), jalanan itu bakal
+macet dan mahal (biaya transaksi/gas fee jadi tinggi). Layer 2 adalah solusi untuk masalah ini.
 
 	* Analogi: L2 itu seperti membangun "jalan tol" di samping jalan raya utama. Sebagian
 	besar transaksi diproses di jalan tol (L2) yang lebih cepat dan murah, lalu hasil akhirnya
