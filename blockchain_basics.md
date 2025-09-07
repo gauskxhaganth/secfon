@@ -32,8 +32,7 @@ berbagai macam aplikasi di atas teknologinya.
 		digital otomatis akan terkirim ke alamatmu. Semua terjadi otomatis, tanpa perlu campur
 		tangan manusia.
 	
-* Perbedaan Utama: Kemampuan menjalankan Smart Contract inilah yang jadi pembeda utama
-	antara Ethereum dan Bitcoin.
+* Kemampuan menjalankan Smart Contract inilah yang jadi pembeda utama antara Ethereum dan Bitcoin.
 
 ---
 
