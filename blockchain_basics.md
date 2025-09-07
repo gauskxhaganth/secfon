@@ -70,7 +70,8 @@ macet dan mahal (biaya transaksi/gas fee jadi tinggi). Layer 2 adalah solusi unt
 
 	* Analogi: L2 itu seperti membangun "jalan tol" di samping jalan raya utama. Sebagian
 	besar transaksi diproses di jalan tol (L2) yang lebih cepat dan murah, lalu hasil akhirnya
-	dilaporkan secara berkala ke jalan raya utama (L1).
+	(harus melalui gate pembayaran tol final buat gabung lagi ke jalan raya) dilaporkan secara
+	berkala ke jalan raya utama (L1).
 
 	* Contoh L2: Optimism, Arbitrum, ZKsync. (Tidak perlu pusing soal detail teknisnya sekarang).
 
