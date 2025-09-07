@@ -9,7 +9,7 @@ dilihat semua orang, tapi tidak bisa dihapus atau diubah seenaknya. Setiap trans
 dicatat dalam sebuah "blok" dan disambungkan ke blok sebelumnya, membentuk rantai
 (makanya disebut block-chain).
 
-Kenapa Penting?: Karena tidak ada satu pihak pun (misalnya pemerintah atau bank) yang
+Kenapa Penting? Karena tidak ada satu pihak pun (misalnya pemerintah atau bank) yang
 mengontrolnya, transaksi jadi tahan sensor dan lebih aman. Bitcoin sering disebut
 "emas digital" karena jumlahnya terbatas (langka seperti emas) dan dianggap sebagai
 penyimpan nilai yang baik.
