@@ -265,4 +265,5 @@ Teknologi **blockchain** telah mengubah cara transaksi dan perjanjian digital.
 
 🧑‍💻 **Tes Diri**
 📕 Jelaskan singkat apa itu **Bitcoin, Ethereum, Chainlink**.
+
 📕 Sebutkan keunggulan utama **smart contract** dibanding sistem keuangan tradisional.
