@@ -166,12 +166,13 @@ kepercayaan yang sudah berkali-kali gagal dalam sejarah.
 
 ---
 
-## Cara Kerjanya: "Janji yang Tidak Bisa Diingkari"
-1. Secara sederhana, Smart Contract itu:
-2. Mengubah sebuah "janji" atau perjanjian menjadi barisan kode.
-3. Kode tersebut di-deploy (diletakkan) di atas blockchain.
-4. Setelah di-deploy, kode itu tidak bisa diubah atau dihapus oleh siapapun.
-5. Kode itu akan berjalan/dieksekusi secara otomatis oleh jaringan komputer terdesentralisasi
+## Cara Kerjanya Smart Contract si "Janji yang Tidak Bisa Diingkari"
+Secara sederhana, Smart Contract itu:
+
+1. Mengubah sebuah "janji" atau perjanjian menjadi barisan kode.
+2. Kode tersebut di-deploy (diletakkan) di atas blockchain.
+3. Setelah di-deploy, kode itu tidak bisa diubah atau dihapus oleh siapapun.
+4. Kode itu akan berjalan/dieksekusi secara otomatis oleh jaringan komputer terdesentralisasi
 	ketika syaratnya terpenuhi.
 
 Karena sifatnya yang seperti ini, perjanjian yang dibuat di atas Smart Contract sering disebut
