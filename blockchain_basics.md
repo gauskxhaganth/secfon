@@ -217,8 +217,6 @@ Teknologi **blockchain** telah mengubah cara transaksi dan perjanjian digital.
 🔗 Platform ini berinteraksi dengan dunia nyata melalui jaringan terdesentralisasi seperti **Chainlink**, yang memperluas kemampuan blockchain.
 💡 Hal ini menantang sistem keuangan tradisional dengan menawarkan cara baru mengelola dan memindahkan kekayaan.
 
----
-
 ### 🪙 Bitcoin dan Ethereum
 
 * **Bitcoin**
@@ -232,14 +230,10 @@ Teknologi **blockchain** telah mengubah cara transaksi dan perjanjian digital.
   🙅 Menghilangkan kebutuhan perantara, meminimalkan risiko trust.
   📱 Memungkinkan pembuatan **dApps** yang bisa berinteraksi dengan blockchain + data dunia nyata lewat jaringan terdesentralisasi.
 
----
-
 ### 🔗 Chainlink
 
 **Chainlink** = jaringan terdesentralisasi yang memungkinkan **hybrid smart contract**.
 ⚖️ Menggabungkan logika **on-chain** + data/komputasi **off-chain**, sambil tetap terdesentralisasi.
-
----
 
 ### 🌟 Fitur Utama & Manfaat
 
@@ -248,8 +242,6 @@ Teknologi **blockchain** telah mengubah cara transaksi dan perjanjian digital.
 ⚡ **Kecepatan & Efisiensi** → transaksi instan, tanpa lembaga kliring.
 🔒 **Keamanan & Immutability** → smart contract tidak bisa diubah; blockchain sulit diretas.
 🤝 **Mengurangi Risiko Pihak Ketiga** → kontrak berjalan sesuai kode, tanpa campur tangan manusia/fraud.
-
----
 
 ### 📝 Kesimpulan
 
@@ -261,10 +253,153 @@ Teknologi **blockchain** telah mengubah cara transaksi dan perjanjian digital.
 
 🚀 Inovasi ini menantang keuangan tradisional dengan solusi **aman, transparan, efisien**, membuka era baru perjanjian yang minim kebutuhan kepercayaan.
 
----
-
 🧑‍💻 **Tes Diri**
 
 📕 Jelaskan singkat apa itu **Bitcoin, Ethereum, Chainlink**.
 
 📕 Sebutkan keunggulan utama **smart contract** dibanding sistem keuangan tradisional.
+
+---
+
+## Fitur-Fitur Utama Smart Contract
+Smart Contract punya beberapa sifat dasar yang membuatnya jauh berbeda dari
+perjanjian biasa.
+
+**1. Desentralisasi (Tidak Terpusat) decentralization**
+Smart Contract tidak berjalan di satu server milik satu perusahaan. Sebaliknya, ia
+berjalan di jaringan blockchain yang dikelola oleh ribuan komputer di seluruh dunia
+(yang disebut node). Karena dijalankan secara gotong royong oleh banyak pihak, tidak
+ada satu "bos" pun yang bisa mengendalikannya.
+	
+	* Analogi: Bayangkan sebuah aplikasi. Di Web2, aplikasi itu berjalan di server Google.
+	Jika server Google down, aplikasinya mati. Di Web3, aplikasi (Smart Contract) itu
+	berjalan di ribuan komputer sekaligus. Jika satu komputer mati, 999 lainnya tetap
+	menjalankannya. Sistemnya jadi jauh lebih kuat.
+	
+**2. Transparansi & Fleksibilitas**
+Semua aturan dalam Smart Contract dan semua transaksi yang terjadi di blockchain bersifat
+terbuka dan bisa dilihat oleh siapa saja. Tidak ada lagi "perjanjian di bawah meja" atau
+syarat dan ketentuan yang disembunyikan.
+	
+	* Apakah ini mengorbankan privasi? Tidak juga. Walaupun transaksinya transparan, identitasmu
+	tidak terhubung langsung. Kamu dikenal melalui alamat dompet digitalmu (misalnya: 0x123...abc),
+	bukan nama aslimu. Ini disebut pseudo-anonim (samar-samar anonim).
+	
+**3. Kecepatan dan Efisiensi**⚡
+Dibandingkan sistem perbankan tradisional, transaksi menggunakan Smart Contract jauh
+lebih cepat.
+	
+	* Contoh: Transfer uang ke luar negeri via bank bisa memakan waktu berhari-hari. Dengan
+	blockchain, transaksi yang sama bisa selesai dalam hitungan detik atau menit. Ini membuat
+	semua interaksi jadi jauh lebih efisien.
+	
+**4. Keamanan dan Immutability (Tidak Bisa Diubah)**
+Ini adalah fitur paling penting.
+
+	* Immutable: Sekali sebuah Smart Contract di-deploy (diterbitkan) di blockchain, aturannya
+	tidak bisa diubah, dihapus, atau diedit oleh siapapun. Aturan itu terkunci selamanya. Ini
+	seperti mengukir perjanjian di atas batu, bukan menuliskannya di papan tulis yang bisa dihapus.
+	
+	* Aman dari Hacker: Untuk meretas server terpusat (Web2), hacker hanya perlu membobol satu
+	target. Untuk meretas blockchain, hacker harus mengambil alih lebih dari setengah dari
+	ribuan komputer (node) di jaringan secara bersamaan. Ini secara praktis mustahil dilakukan.
+	
+	* Data Tahan Banting: Di sistem biasa, jika komputermu dan backup-nya rusak, datamu hilang.
+	Di blockchain, datamu disalin ke ribuan node. Bahkan jika ratusan node hancur, datamu akan
+	tetap aman karena salinannya masih ada di mana-mana.
+	
+**5. Menghilangkan Risiko Pihak Ketiga (Counterparty Risk)**
+Karena Smart Contract berjalan otomatis sesuai kode yang tidak bisa diubah, kamu tidak perlu
+lagi percaya bahwa pihak lain akan menepati janjinya. Kode yang akan memaksanya.
+
+	* Analogi: Smart Contract itu seperti vending machine. Kamu masukkan uang (memenuhi syarat),
+	mesin itu pasti akan mengeluarkan minuman (melaksanakan kewajibannya). Mesin tidak punya
+	niat jahat atau keinginan untuk menipumu; ia hanya menjalankan programnya.
+	
+
+Oke, sekarang kita akan bahas fitur-fitur keren dari Smart Contract dan apa saja kegunaannya
+di dunia nyata. Ini akan menjelaskan kenapa teknologi ini begitu revolusioner.
+
+Fitur-Fitur Utama Smart Contract
+Smart Contract punya beberapa sifat dasar yang membuatnya jauh berbeda dari perjanjian biasa.
+
+1. Desentralisasi (Tidak Terpusat) decentralization
+Smart Contract tidak berjalan di satu server milik satu perusahaan. Sebaliknya, ia berjalan
+di jaringan blockchain yang dikelola oleh ribuan komputer di seluruh dunia (yang disebut node).
+Karena dijalankan secara gotong royong oleh banyak pihak, tidak ada satu "bos" pun yang bisa
+mengendalikannya.
+
+Analogi: Bayangkan sebuah aplikasi. Di Web2, aplikasi itu berjalan di server Google. Jika
+server Google down, aplikasinya mati. Di Web3, aplikasi (Smart Contract) itu berjalan di ribuan
+komputer sekaligus. Jika satu komputer mati, 999 lainnya tetap menjalankannya. Sistemnya jadi
+jauh lebih kuat.
+
+2. Transparansi & Fleksibilitas 🧐
+Semua aturan dalam Smart Contract dan semua transaksi yang terjadi di blockchain bersifat terbuka
+dan bisa dilihat oleh siapa saja. Tidak ada lagi "perjanjian di bawah meja" atau syarat dan
+ketentuan yang disembunyikan.
+
+Apakah ini mengorbankan privasi? Tidak juga. Walaupun transaksinya transparan, identitasmu tidak
+terhubung langsung. Kamu dikenal melalui alamat dompet digitalmu (misalnya: 0x123...abc), bukan
+nama aslimu. Ini disebut pseudo-anonim (samar-samar anonim).
+
+3. Kecepatan dan Efisiensi ⚡
+Dibandingkan sistem perbankan tradisional, transaksi menggunakan Smart Contract jauh lebih cepat.
+
+Contoh: Transfer uang ke luar negeri via bank bisa memakan waktu berhari-hari. Dengan blockchain,
+transaksi yang sama bisa selesai dalam hitungan detik atau menit. Ini membuat semua interaksi
+jadi jauh lebih efisien.
+
+4. Keamanan dan Immutability (Tidak Bisa Diubah) 🔐
+Ini adalah fitur paling penting.
+
+Immutable: Sekali sebuah Smart Contract di-deploy (diterbitkan) di blockchain, aturannya tidak
+bisa diubah, dihapus, atau diedit oleh siapapun. Aturan itu terkunci selamanya. Ini seperti
+mengukir perjanjian di atas batu, bukan menuliskannya di papan tulis yang bisa dihapus.
+
+Aman dari Hacker: Untuk meretas server terpusat (Web2), hacker hanya perlu membobol satu target.
+Untuk meretas blockchain, hacker harus mengambil alih lebih dari setengah dari ribuan komputer
+(node) di jaringan secara bersamaan. Ini secara praktis mustahil dilakukan.
+
+Data Tahan Banting: Di sistem biasa, jika komputermu dan backup-nya rusak, datamu hilang.
+Di blockchain, datamu disalin ke ribuan node. Bahkan jika ratusan node hancur, datamu akan
+tetap aman karena salinannya masih ada di mana-mana.
+
+5. Menghilangkan Risiko Pihak Ketiga (Counterparty Risk) 👍
+Karena Smart Contract berjalan otomatis sesuai kode yang tidak bisa diubah, kamu tidak perlu lagi
+percaya bahwa pihak lain akan menepati janjinya. Kode yang akan memaksanya.
+
+Analogi: Smart Contract itu seperti vending machine. Kamu masukkan uang (memenuhi syarat), mesin
+itu pasti akan mengeluarkan minuman (melaksanakan kewajibannya). Mesin tidak punya niat jahat
+atau keinginan untuk menipumu; ia hanya menjalankan programnya.
+
+## Contoh Penerapan Smart Contract
+Teknologi ini telah melahirkan industri-industri baru yang luar biasa. Berikut beberapa contohnya:
+
+**1. DeFi (Decentralized Finance)**
+Ini adalah layanan keuangan (meminjam, menabung, trading) yang berjalan di atas Smart Contract,
+tanpa perantara seperti bank. Siapapun bisa mengakses layanan keuangan global secara adil dan
+transparan, langsung dari dompet digital mereka.
+
+**2. DAO (Decentralized Autonomous Organization)**
+Ini adalah sebuah organisasi atau perusahaan yang dijalankan sepenuhnya oleh kode (Smart Contract)
+dan keputusan komunitas melalui voting. Tidak ada CEO atau hierarki tradisional. Semua aturan
+dan pengelolaan dana diatur secara transparan oleh kode.
+
+**3. NFT (Non-Fungible Token)**
+NFT adalah sertifikat kepemilikan digital yang unik untuk sebuah aset (bisa berupa karya seni,
+item game, musik, dll) yang tercatat di blockchain. Smart Contract digunakan untuk mengatur
+kepemilikan, penjualan, dan royalti dari NFT tersebut secara otomatis.
+
+	* Analogi: NFT itu seperti sertifikat keaslian digital untuk sebuah file. Siapapun bisa
+	mengunduh gambar Monalisa, tapi hanya museum Louvre yang punya lukisan aslinya. NFT memberikan
+	bukti kepemilikan "asli" versi digital.
+
+## Melakukan Transaksi Pertamamu
+
+Kamu sudah mendapatkan pemahaman tingkat tinggi tentang smart contract dan penerapannya. Sekarang
+saatnya masuk ke aspek praktis. Pada bagian berikutnya, kami akan memandu kamu untuk menyiapkan
+sebuah wallet dan melakukan transaksi pertamamu. Mari kita menyelami dunia baru ini.
+
+---
+
