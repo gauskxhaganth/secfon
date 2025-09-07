@@ -78,7 +78,6 @@ macet dan mahal (biaya transaksi/gas fee jadi tinggi). Layer 2 adalah solusi unt
 ---
 
 ## Rangkuman Istilah Penting
-Ini kamus singkatnya versi gampang:
 
 * Blockchain: Buku kas digital yang tersebar dan tidak bisa diubah.
 * Smart Contract: Kode program "Jika-Maka" yang berjalan otomatis di blockchain.
