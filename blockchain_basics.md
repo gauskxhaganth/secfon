@@ -283,7 +283,7 @@ Semua aturan dalam Smart Contract dan semua transaksi di blockchain bersifat ter
 bisa dilihat oleh siapa saja. Tidak ada lagi "perjanjian di bawah meja" atau syarat dan
 ketentuan yang disembunyikan.
 
-**Privasi:** Walaupun transaksinya transparan, identitasmu tidak terhubung langsung. Kamu
+**Privasi:** Walaupun transaksinya transparan, identitasmu tidak terhubung langsung. Kita
 dikenal melalui alamat dompet digital (contoh: 0x123...abc), bukan nama asli. Ini disebut
 *pseudo-anonim* (samar-samar anonim).
 
@@ -310,10 +310,10 @@ blockchain, data disalin ke ribuan node. Bahkan jika ratusan node rusak, datamu 
 
 ### 5. Menghilangkan Risiko Pihak Ketiga (*Counterparty Risk*)
 
-Smart Contract berjalan otomatis sesuai kode yang tidak bisa diubah. Kamu tidak perlu percaya
+Smart Contract berjalan otomatis sesuai kode yang tidak bisa diubah. Kita tidak perlu percaya
 pihak lain akan menepati janji — kodenya sendiri yang memaksa itu terjadi.
 
-**Analogi:** Smart Contract seperti mesin vending. Kamu masukkan uang (memenuhi syarat), mesin
+**Analogi:** Smart Contract seperti mesin vending. Kita masukkan uang (memenuhi syarat), mesin
 pasti mengeluarkan minuman (melaksanakan kewajibannya). Mesin tidak bisa berbohong atau menipumu;
 ia hanya menjalankan program.
 
@@ -344,10 +344,10 @@ ia hanya menjalankan program.
 
 ## Melakukan Transaksi Pertamamu
 
-Kamu sudah mendapatkan pemahaman tingkat tinggi tentang Smart Contract dan penerapannya.
+Kita sudah mendapatkan pemahaman tingkat tinggi tentang Smart Contract dan penerapannya.
 Sekarang saatnya masuk ke aspek praktis.
 
-Pada bagian berikutnya, kamu akan dipandu untuk menyiapkan sebuah wallet dan melakukan
+Pada bagian berikutnya, Kita akan dipandu untuk menyiapkan sebuah wallet dan melakukan
 transaksi pertamamu. Mari kita menyelami dunia baru ini.
 
 ---
