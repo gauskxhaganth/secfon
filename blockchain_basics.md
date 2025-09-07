@@ -153,6 +153,9 @@ total, dan bagaimana Smart Contract bisa mengatasinya.
 	yang bisa menghentikan atau melarang perdagangan. Aturannya sama untuk semua orang,
 	menciptakan pasar yang lebih adil dan terbuka.
 	
+		DEX = tempat tukar-menukar crypto di blockchain, tanpa perusahaan pusat. Semua diatur otomatis
+		pakai smart contract.
+	
 ## Rangkuman Singkat
 * Perjanjian Tradisional: Butuh percaya pada satu pihak terpusat (perusahaan, bank, pemerintah).
 	Risikonya, kepercayaan itu bisa dikhianati.
