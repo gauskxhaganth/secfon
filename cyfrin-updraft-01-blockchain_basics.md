@@ -1,5 +1,6 @@
 # Blockchain Basic
 ## Bitcoin dan Blockchain
+
 Bitcoin itu adalah mata uang digital pertama yang memungkinkan orang kirim uang langsung
 ke orang lain (peer-to-peer) tanpa perantara seperti bank. Teknologi di baliknya disebut
 Blockchain.
