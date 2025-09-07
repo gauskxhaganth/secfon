@@ -1,0 +1,40 @@
+# Web3
+#### Repo ini berisi materi-materi belajar terkait dunia web3, menurut pemahaman saya saja (yg saya pelajari dari Cyfrin Updraft)
+
+1. Blockchain Foundations
+	* Blockchain Basics
+	* Chainlink Fundamentals
+
+2. Solidity Smart Contract Development
+	* Solidity Smart Contract Development
+	* Foundry Fundamentals
+	* Advanced Foundry
+
+3. Vyper Smart Contract Develoment
+	* Introduction to Python and Vyper
+	* Intermediate Python and Vyper
+	* Advanced Python and Vyper Smart Contract Development
+
+4. Web3 Wallet Security
+	* Web3 Wallet Security Basics
+	* Advanced Web3 Wallet Security
+
+5. Smart Contract Security Audit
+	* Smart Contract Security
+	* Assembly and Formal Verification
+
+6. Zero Knowledge (ZK) Development
+	* Fundamentals of Zero-Knowledge Proofs (ZKPs)
+	* Noir Programming And ZK Circuits
+	* Full-Stack Web3 Development Crash Course
+
+7. 	DeFi Development
+	* Curve Cryptoswap
+	* Curve Stableswap
+	* Uniswap V2
+	* Uniswap V3
+	* Rocket Pool rETH Integration
+	* GMX Perpetuals Trading
+	* Aave V3 Protocol Development
+	* Rust Programming Basics
+	
