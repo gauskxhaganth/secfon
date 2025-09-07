@@ -16,7 +16,7 @@ penyimpan nilai yang baik.
 
 ---
 
-## Ethereum dan Smart Contract\
+## Ethereum dan Smart Contract
 Beberapa tahun setelah Bitcoin, muncullah Ethereum. Kalau Bitcoin itu ibarat kalkulator
 yang fungsinya spesifik untuk transaksi keuangan, maka Ethereum itu ibarat smartphone.
 Kamu tidak hanya bisa menggunakannya untuk transaksi, tapi juga bisa "meng-install"
