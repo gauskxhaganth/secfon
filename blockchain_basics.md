@@ -351,6 +351,7 @@ transaksi yang sama bisa selesai dalam hitungan detik atau menit. Ini membuat se
 jadi jauh lebih efisien.
 
 4. Keamanan dan Immutability (Tidak Bisa Diubah) 🔐
+
 Ini adalah fitur paling penting.
 
 Immutable: Sekali sebuah Smart Contract di-deploy (diterbitkan) di blockchain, aturannya tidak
