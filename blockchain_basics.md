@@ -191,7 +191,7 @@ marketing.
 	Mereka tidak menggunakan Smart Contract untuk mengelola dana nasabah. Hasilnya? Dana nasabah
 	disalahgunakan oleh segelintir orang di dalamnya.
 	
-Sebagai developer atau pengguna di dunia Web3, sangat penting untuk bisa membedakan mana
+Sebagai developer atau user di dunia Web3, sangat penting untuk bisa membedakan mana
 proyek yang benar-benar membangun sistem terdesentralisasi yang adil, dan mana yang hanya
 "berkedok" Web3 untuk mencari keuntungan.
 
