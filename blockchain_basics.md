@@ -102,3 +102,99 @@ Ini adalah cara paling gampang untuk membedakannya dengan yang sudah kamu kenal:
 Intinya, Web3 mengembalikan kontrol dan kepemilikan data ke tangan pengguna, bukan lagi terpusat
 di perusahaan raksasa.
 
+---
+
+## Inti dari Blockchain dan Smart Contract
+Hampir semua hal dalam hidup kita melibatkan "perjanjian" atau "janji". Beli pulsa, bayar
+listrik, servis motor—semuanya adalah bentuk perjanjian. Kamu bayar, dan kamu berharap pihak
+lain menepati janjinya (memberi pulsa, listrik, atau servis yang benar).
+
+Masalahnya, perjanjian tradisional ini sangat bergantung pada rasa percaya. Dan seperti yang
+kita tahu, rasa percaya itu bisa disalahgunakan.
+
+### Masalah dengan Perjanjian Tradisional (Berbasis Kepercayaan)
+
+Mari kita lihat beberapa contoh di dunia nyata di mana sistem berbasis kepercayaan ini gagal
+total, dan bagaimana Smart Contract bisa mengatasinya.
+
+#### 1. Kepercayaan Konsumen: Kasus Game Monopoli McDonald's
+* Masalah: Dulu di tahun 80-90an, McDonald's punya undian berhadiah besar lewat game Monopoli.
+	Janjinya, semua pelanggan punya kesempatan yang sama untuk menang.
+
+* Kenyataan: Ternyata, game itu dicurangi oleh orang dalam. Hadiah-hadiah utama sudah diatur
+	untuk orang-orang tertentu. Janji McDonald's kepada jutaan pelanggannya diingkari.
+
+* Solusi dengan Smart Contract: Coba bayangkan jika undian itu dijalankan di atas blockchain
+	pakai Smart Contract. Aturan mainnya (misalnya, tiket mana yang menang) akan ditulis dalam
+	kode yang transparan, tidak bisa diubah, dan dieksekusi otomatis. Kecurangan oleh orang dalam
+	menjadi mustahil dilakukan.
+
+#### 2. Kepercayaan pada Bank: Krisis Keuangan
+* Masalah: Bank berjanji untuk menjaga uang kita dengan aman. Tapi sejarah membuktikan
+	sebaliknya. Saat krisis ekonomi parah (Great Depression di AS), banyak bank bangkrut dan uang
+	nasabah hilang begitu saja.
+
+* Solusi dengan Smart Contract: Di sistem keuangan berbasis blockchain (DeFi - Decentralized Finance),
+	semua transaksi dan kondisi keuangan bisa dibuat transparan. Bisa dibuat aturan otomatis
+	yang mencegah sebuah institusi meminjamkan uang lebih banyak dari aset yang mereka miliki.
+	Tidak ada lagi rahasia "dapur" yang ditutup-tutupi.
+	
+#### 3. Akses Pasar Keuangan: Kasus Robinhood & GameStop
+* Masalah: Pada tahun 2021, aplikasi trading saham Robinhood tiba-tiba melarang penggunanya
+	untuk membeli saham tertentu (GameStop, $GME) yang sedang viral. Ini menunjukkan bahwa platform
+	terpusat punya kuasa penuh untuk mengubah aturan main seenaknya demi kepentingan mereka.
+
+* Solusi dengan Smart Contract: Bandingkan dengan platform Decentralized Exchange (DEX)
+	seperti Uniswap yang berjalan di atas Smart Contract. Di sana, tidak ada satu pun pihak
+	yang bisa menghentikan atau melarang perdagangan. Aturannya sama untuk semua orang,
+	menciptakan pasar yang lebih adil dan terbuka.
+	
+## Rangkuman Singkat
+* Perjanjian Tradisional: Butuh percaya pada satu pihak terpusat (perusahaan, bank, pemerintah).
+	Risikonya, kepercayaan itu bisa dikhianati.
+* Smart Contract: Tidak perlu percaya. Kamu hanya perlu yakin pada kode matematika yang transparan,
+	tidak bisa diubah, dan berjalan otomatis.
+Smart Contract adalah solusi untuk meminimalkan ketergantungan kita pada sistem berbasis
+kepercayaan yang sudah berkali-kali gagal dalam sejarah.
+
+---
+
+## Cara Kerjanya: "Janji yang Tidak Bisa Diingkari"
+1. Secara sederhana, Smart Contract itu:
+2. Mengubah sebuah "janji" atau perjanjian menjadi barisan kode.
+3. Kode tersebut di-deploy (diletakkan) di atas blockchain.
+4. Setelah di-deploy, kode itu tidak bisa diubah atau dihapus oleh siapapun.
+5. Kode itu akan berjalan/dieksekusi secara otomatis oleh jaringan komputer terdesentralisasi
+	ketika syaratnya terpenuhi.
+
+Karena sifatnya yang seperti ini, perjanjian yang dibuat di atas Smart Contract sering disebut
+"unbreakable promises" atau janji yang tidak bisa diingkari.
+
+---
+
+> Peringatan Penting: Tidak Semuanya Sama!
+
+**HATI-HATI!** Seiring populernya Web3, banyak platform yang pura-pura terdesentralisasi
+padahal aslinya tidak. Mereka hanya menggunakan istilah "crypto" atau "blockchain" untuk
+marketing.
+
+* Contoh Paling Fatal: FTX. Platform ini mempromosikan diri sebagai bursa kripto Web3 yang
+	canggih. Kenyataannya, di belakang layar, mereka adalah perusahaan Web2 yang sangat terpusat.
+	Mereka tidak menggunakan Smart Contract untuk mengelola dana nasabah. Hasilnya? Dana nasabah
+	disalahgunakan oleh segelintir orang di dalamnya.
+	
+Sebagai developer atau pengguna di dunia Web3, sangat penting untuk bisa membedakan mana
+proyek yang benar-benar membangun sistem terdesentralisasi yang adil, dan mana yang hanya
+"berkedok" Web3 untuk mencari keuntungan.
+
+1. Hampir semua masalah dalam perjanjian konvensional bersumber dari kebutuhan akan kepercayaan
+	pada pihak ketiga.
+2. Smart Contract memecahkan masalah ini dengan menyediakan sistem perjanjian yang transparan,
+	adil, dan tidak bisa diubah (immutable).
+3. Ini memungkinkan kita membuat "janji yang tidak bisa diingkari" tanpa perlu bergantung pada
+	reputasi atau niat baik orang lain.
+4. Selalu waspada terhadap platform yang mengaku Web3 tapi praktiknya terpusat, seperti kasus
+	**FTX**.
+
+---
+
