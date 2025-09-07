@@ -73,7 +73,8 @@ macet dan mahal (biaya transaksi/gas fee jadi tinggi). Layer 2 adalah solusi unt
 	(harus melalui gate pembayaran tol final buat gabung lagi ke jalan raya) dilaporkan secara
 	berkala ke jalan raya utama (L1).
 
-	* Contoh L2: Optimism, Arbitrum, ZKsync. (Tidak perlu pusing soal detail teknisnya sekarang).
+	* Contoh L2: Optimism, Arbitrum, ZKsync. (buat sekarang gausah pusing2 dulu terkail detail
+		teknis).
 
 ---
 
