@@ -4,7 +4,7 @@ Bitcoin itu adalah mata uang digital pertama yang memungkinkan orang kirim uang 
 ke orang lain (peer-to-peer) tanpa perantara seperti bank. Teknologi di baliknya disebut
 Blockchain.
 
-Analoginya, Bayangkan Blockchain itu seperti buku kas digital raksasa yang bisa
+Bayangkan Blockchain itu seperti buku kas digital raksasa yang bisa
 dilihat semua orang, tapi tidak bisa dihapus atau diubah seenaknya. Setiap transaksi
 dicatat dalam sebuah "blok" dan disambungkan ke blok sebelumnya, membentuk rantai
 (makanya disebut block-chain).
