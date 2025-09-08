@@ -411,8 +411,77 @@ Mudah dipasang dan dipakai.
 * Saldo awal biasanya 0 Sepolia ETH — nanti kita akan isi dari faucet testnet di pelajaran
 berikutnya.
 
-Sip! Dompet latihanmu siap. Di pelajaran selanjutnya kita akan belajar cara mendapatkan ETH
+Sip! Dompet latihanmu siap. selanjutnya kita akan belajar cara mendapatkan ETH
 gratis untuk Testnet dan melakukan transaksi pertama.
+
+---
+
+Sebelumnya kita sudah menambahkan jaringan uji coba publik **Sepolia** di MetaMask. Masalahnya, untuk dapat “uang mainan” (test ETH) kadang kita harus antre di *faucet*. Untuk latihan, itu bisa merepotkan.
+
+Supaya lebih lancar, kita akan pakai **Tenderly**.
+
+> **Analogi sederhana:**
+>
+> * **Sepolia (Testnet Publik)** = lapangan futsal umum: harus antre, bolanya terbatas, kadang penuh.
+> * **Tenderly Virtual TestNet** = lapangan futsal pribadi: bebas antre, bola (ETH) melimpah, nyaman buat latihan.
+
+## Bagian 1 — Menyiapkan Virtual TestNet di Tenderly
+
+**1. Daftar Akun Tenderly**
+
+* Buka `tenderly.co` → klik **Sign Up**.
+* Daftar pakai email, buat username & password.
+* Masuk ke *dashboard* (kalau ada personalisasi, klik **Skip**).
+
+**2. Buat Virtual TestNet**
+
+* Di menu kiri pilih **Virtual TestNets** → **Create Virtual TestNet**.
+* Isi pengaturan:
+
+  * **Parent network**: Sepolia
+  * **Name**: bebas, misalnya `latihan-chain`
+  * **Chain ID**: `111555111`
+  * **Public Explorer**: Off
+  * **State Sync**: Use latest block
+* Klik **Create**.
+
+**3. Hubungkan ke MetaMask**
+
+* Klik tombol **Add to Wallet** di jaringan yang baru dibuat.
+* MetaMask muncul → klik **Approve** lalu **Switch network**.
+
+Sekarang MetaMask sudah terhubung ke jaringan pribadimu. Akun utamamu langsung terisi **1000 ETH mainan** 🎉.
+
+## Bagian 2 — Mengirim Transaksi Pertama
+
+**1. Buat Akun Kedua**
+
+* Di MetaMask, klik nama akun → **Create account**.
+* Beri nama (contoh: `Account 2`).
+
+**2. Kirim ETH**
+
+* Pastikan kamu berada di **Account 1**.
+* Klik **Send** → pilih alamat `Account 2` (atau gunakan “Transfer between my accounts”).
+* Masukkan jumlah, misalnya `1` ETH → klik **Next** → **Confirm**.
+
+**3. Lihat Hasil**
+
+* Tunggu sebentar, status transaksi berubah dari *Pending* ke *Confirmed*.
+* Saldo **Account 1** jadi 999 ETH, saldo **Account 2** jadi 1 ETH.
+
+## Bagian 3 — Melihat Transaksi di Explorer
+
+Blockchain selalu mencatat semua transaksi. Di jaringan kita, catatan itu bisa dilihat lewat **Explorer**.
+
+* Di dashboard Tenderly → buka tab **Explorer**.
+* Lihat daftar transaksi, klik transaksi terbaru.
+* Kamu bisa cek detail: pengirim, penerima, jumlah, waktu, sampai data teknis.
+
+**Selamat!** 🚀
+Kamu baru saja berhasil mengirim transaksi pertamamu di blockchain. Walaupun ini simulasi, prosesnya **sama persis** dengan di Ethereum Mainnet.
+
+Di pelajaran selanjutnya, kita akan masuk ke inti Web3: **Smart Contract**.
 
 ---
 
