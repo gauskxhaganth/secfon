@@ -2,7 +2,12 @@
 Repo ini berisi materi belajar seputar dunia Web3, isinya berdasarkan pemahaman pribadi saya, <br>
 karena setiap orang punya daya tangkap yang berbeda.
 
-***(yg saya pelajari dari Cyfrin Updraft, learnweb3, dan platform belajar lainnya)***
+***(yg saya pelajari dari Buku-buku, Cyfrin Updraft, learnweb3, dan platform belajar lainnya)***
+Books:
+
+01. grokking Bitcoin by Kalle Rosenbaum
+
+Cyfrin Updraft:
 
 1. Blockchain Foundations
 	* Blockchain Basics
@@ -40,4 +45,3 @@ karena setiap orang punya daya tangkap yang berbeda.
 	* GMX Perpetuals Trading
 	* Aave V3 Protocol Development
 	* Rust Programming Basics
-	
