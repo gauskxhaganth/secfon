@@ -1253,3 +1253,385 @@ Pemahaman ini sangat penting untuk menganalisis keamanan kontrak-kontrak yang di
 
 ---
 
+# Bab 10
+## Segregated Witness (Segwit)
+
+Bab ini membahas salah satu pembaruan (*upgrade*) teknis paling signifikan dan kompleks dalam sejarah Bitcoin. Memahaminya sangat penting karena Segwit tidak hanya memperbaiki beberapa masalah fundamental, tetapi juga membuka jalan bagi inovasi di masa depan seperti Lightning Network.
+
+
+## Masalah-Masalah yang Dipecahkan oleh Segwit
+
+Meskipun Bitcoin adalah sistem yang tangguh, ia memiliki beberapa kekurangan teknis yang sudah lama diketahui. Segwit dirancang untuk mengatasi masalah-masalah ini.
+
+### 1. Transaction Malleability (Keliatan Transaksi)
+
+* **Masalah:** Ini adalah masalah yang paling kritis. Data tanda tangan (*signature*) di dalam sebuah transaksi bisa diubah sedikit (**dilekatkan** atau *malleated*) oleh pihak ketiga (misalnya, sebuah *node* di jaringan) tanpa membuat tanda tangan itu menjadi tidak valid. Namun, perubahan kecil ini menyebabkan **txid** (Transaction ID) dari transaksi tersebut ikut berubah.
+* **Dampak:** Ini sangat merusak untuk kontrak pintar. Bayangkan skenario warisan dari Bab 9: jika `Tx2` (yang membatalkan `Tx1`) diubah menjadi `Tx2M` (dengan *txid* baru), maka `Tx3` (warisan baru untuk putri Anda) yang merujuk ke `txid` dari `Tx2` akan menjadi tidak valid selamanya. Ini menghambat pengembangan lapisan kedua (*second-layer protocols*) di atas Bitcoin.
+
+### 2. Verifikasi Tanda Tangan yang Tidak Efisien
+
+* **Masalah:** Algoritma verifikasi tanda tangan pada transaksi lawas (*legacy*) memiliki kompleksitas kuadratik, atau `O(N^2)`. Artinya, jika jumlah *input* dalam sebuah transaksi berlipat ganda, waktu yang dibutuhkan untuk verifikasi berlipat empat.
+* **Dampak:** Penyerang bisa membuat transaksi raksasa dengan ribuan *input* yang, meskipun valid, akan membutuhkan waktu sangat lama (bisa beberapa menit) untuk diverifikasi. Ini bisa digunakan sebagai serangan DoS (*Denial-of-Service*) untuk melumpuhkan *node-node* di jaringan.
+
+### 3. Pemborosan Bandwidth untuk Wallet Ringan
+
+* **Masalah:** *Wallet* ringan (SPV) tidak bisa memverifikasi tanda tangan. Namun, untuk memverifikasi *Merkle Proof*, mereka tetap harus mengunduh seluruh data transaksi, termasuk data tanda tangan yang bisa mencapai 50-70% dari total ukuran transaksi.
+* **Dampak:** Ini adalah pemborosan *bandwidth* yang signifikan, terutama untuk pengguna perangkat seluler.
+
+### 4. Kesulitan untuk Melakukan Upgrade pada Script
+
+* **Masalah:** Menambahkan fungsionalitas baru ke bahasa Script sangat sulit. Selama ini, para pengembang harus "mendaur ulang" *opcode* `OP_NOP` yang tidak berfungsi, seperti yang dilakukan untuk `OP_CLTV` dan `OP_CSV`.
+* **Dampak:** Ruang untuk inovasi terbatas karena hanya ada sedikit `OP_NOP` yang tersisa, dan cara kerjanya pun sangat kaku.
+
+## Solusi Inti – Memisahkan "Saksi" (Segregating the Witness)
+
+* **Istilah Teknis:** **Segregated Witness (Segwit)**, adalah sebuah pembaruan protokol di mana data tanda tangan dan data lain yang diperlukan untuk validasi (secara kolektif disebut **witness** atau "saksi") **dipisahkan** (*segregated*) dari data transaksi utama.
+
+Data *witness* ini dipindahkan ke struktur data terpisah yang melekat pada transaksi, bukan lagi di dalam `scriptSig`.
+
+* **Dampak Langsung:**
+
+  * **Transaction Malleability Teratasi:** Karena data *witness* tidak lagi menjadi bagian dari data yang di-*hash* untuk membuat **txid**, maka *txid* sebuah transaksi Segwit tidak bisa lagi diubah oleh pihak ketiga. Ini adalah perbaikan fundamental.
+  * **Verifikasi Efisien:** Algoritma *hashing* untuk tanda tangan di Segwit didesain ulang. Bagian-bagian transaksi yang sama untuk semua *input* hanya di-*hash* satu kali. Ini mengubah kompleksitas verifikasi dari kuadratik (`O(N^2)`) menjadi linear (`O(N)`), membuatnya jauh lebih cepat dan tahan terhadap serangan DoS.
+
+## Bagaimana Segwit Bekerja (Implementasi Teknis)
+
+Segwit diimplementasikan sebagai **soft fork**, yang berarti *node* lama tetap bisa beroperasi di jaringan meskipun mereka tidak memahami aturan baru Segwit.
+
+### Alamat dan Output Segwit
+
+* **Alamat Baru (Bech32):** Segwit memperkenalkan format alamat baru yang disebut **Bech32**, yang dimulai dengan `bc1`. Alamat ini lebih unggul karena memiliki deteksi kesalahan yang lebih baik dan tidak *case-sensitive*.
+* **Format `scriptPubKey` Baru:** Output Segwit memiliki format yang sangat sederhana: `<Version Byte> <Witness Program>`. Tidak ada *opcode* sama sekali.
+
+  * Untuk **P2WPKH** (Pay-to-Witness-Public-Key-Hash), *witness program*-nya adalah PKH 20-*byte*.
+  * Untuk **P2WSH** (Pay-to-Witness-Script-Hash), *witness program*-nya adalah *hash* SHA256 32-*byte* dari *witness script*.
+
+### Verifikasi Transaksi Segwit
+
+* **Node Baru (Segwit-aware):** Ketika melihat format output `<versi> <program>`, ia tahu ini adalah output Segwit. Ia kemudian akan mencari data *witness* yang terpisah untuk memvalidasi tanda tangan sesuai aturan Segwit.
+* **Node Lama (Legacy):** Node lama melihat `scriptSig` yang kosong dan `scriptPubKey` yang hanya berisi data. Menurut aturan lama, setiap skrip yang selesai dengan nilai non-nol di *stack* dianggap valid. Karena itu, *node* lama menganggap transaksi ini **valid** dan bisa dibelanjakan oleh siapa saja (*anyone-can-spend*). Meskipun terlihat tidak aman, ini tidak menjadi masalah karena mayoritas *hashrate* jaringan menjalankan aturan Segwit yang lebih ketat, sehingga setiap upaya pencurian akan ditolak oleh jaringan.
+
+### Komitmen di dalam Blok
+
+Untuk memastikan data *witness* tetap aman dan tidak bisa diubah, *hash*-nya tetap harus dimasukkan ke dalam blok.
+
+* **Witness Merkle Root:** Sebuah Pohon Merkle baru dibuat dari *hash* semua data *witness* di dalam blok. *Root* dari pohon ini disebut **Witness Merkle Root**.
+* **Witness Commitment:** *Hash* ini kemudian dimasukkan ke dalam sebuah *output* `OP_RETURN` di dalam *coinbase transaction* di blok tersebut. *Node* lama akan mengabaikan *output* ini, tetapi *node* baru akan memverifikasinya.
+
+## Peningkatan Kapasitas Blok – Konsep Block Weight
+
+Segwit secara cerdik meningkatkan kapasitas blok tanpa memerlukan *hard fork*.
+
+* **Aturan Lama:** Ukuran blok maksimal 1 MB.
+* **Aturan Baru (Segwit):** Muncul konsep baru, **Block Weight**, dengan batas maksimal 4 juta *Weight Units* (WU).
+
+  * 1 *byte* data non-witness (data transaksi inti) dihitung sebagai **4 WU**.
+  * 1 *byte* data witness (tanda tangan, dll.) dihitung sebagai **1 WU**.
+
+Karena data *witness* diberi "diskon", memindahkan data ke *witness* memungkinkan lebih banyak transaksi masuk ke dalam satu blok. Ini secara efektif menaikkan batas ukuran blok menjadi sekitar 1.7–2.2 MB secara praktis, tergantung pada seberapa banyak transaksi Segwit di dalam blok tersebut.
+
+## Kompatibilitas Wallet – Nested Segwit
+
+Banyak *wallet* lama yang tidak mengenali alamat `bc1` (Bech32). Untuk mengatasi ini, dibuatlah **Nested Segwit**.
+
+* **Cara Kerja:** Alamat P2WPKH atau P2WSH "dibungkus" di dalam alamat P2SH (Pay-to-Script-Hash) yang sudah ada sebelumnya. Hasilnya adalah sebuah alamat yang dimulai dengan angka `3`, yang bisa dikenali oleh *wallet* lama. *Wallet* baru akan memahami bahwa ini adalah alamat Segwit yang terbungkus.
+
+---
+
+## Kesimpulan Bab 10
+
+Segwit adalah pembaruan yang sangat canggih dan multifaset:
+
+1. **Memperbaiki Transaction Malleability** secara fundamental dengan memisahkan *witness*.
+2. **Meningkatkan efisiensi** verifikasi tanda tangan dan **menghemat bandwidth** untuk *wallet* ringan.
+3. Menyediakan mekanisme **upgrade skrip yang fleksibel** melalui *witness version*.
+4. **Meningkatkan kapasitas blok** melalui konsep *Block Weight* tanpa memerlukan *hard fork*.
+5. Menjaga **kompatibilitas** dengan *node* dan *wallet* lama melalui desain *soft fork* yang cerdas dan *nested segwit*.
+
+Ini adalah salah satu contoh terbaik dari rekayasa protokol terdesentralisasi yang cermat dan aman.
+
+---
+
+# Bab 11
+## Bitcoin Upgrades
+
+Bab ini membahas topik yang sangat krusial dan seringkali kontroversial: bagaimana cara mengubah aturan main Bitcoin. Memahami ini adalah kunci untuk mengerti dinamika kekuatan dalam jaringan terdesentralisasi dan potensi risiko keamanan yang muncul saat melakukan pembaruan.
+
+## 1. Perkenalan: Apa itu "Fork"?
+
+Dalam konteks Bitcoin, **fork** bukanlah sekadar penyalinan kode seperti pada proyek *open-source* biasa.
+
+* **Istilah Teknis:** **Fork** adalah sebuah **perubahan pada aturan konsensus (*consensus rules*)** jaringan. Aturan konsensus adalah seperangkat aturan yang ditaati oleh semua *node* untuk menentukan blok dan transaksi mana yang valid. Mengubah aturan ini sama seperti mengubah "undang-undang dasar" Bitcoin.
+
+Ada dua jenis *fork* yang fundamental berbeda:
+
+### A. Hard Fork: Melonggarkan Aturan
+
+* **Konsep:** *Hard fork* adalah perubahan yang membuat blok yang sebelumnya tidak valid menjadi valid. Aturan menjadi lebih longgar.
+* **Analogi Restoran (dari buku):** Jika sebuah restoran vegetarian (aturan lama) mulai menyajikan daging (aturan baru yang lebih longgar), maka para tamu vegetarian (node lama) tidak akan lagi mau makan di sana. Mereka akan menolak makanan (blok) baru tersebut.
+* **Contoh:** Menaikkan batas ukuran blok dari 1 MB menjadi 8 MB. Blok sebesar 5 MB akan valid menurut aturan baru, tetapi akan ditolak mentah-mentah oleh *node* lama.
+* **Konsekuensi:** Sangat berisiko menyebabkan **chain split** permanen, di mana jaringan terbelah menjadi dua mata uang kripto yang berbeda karena *node* lama dan baru tidak lagi bisa mencapai kesepakatan.
+
+### B. Soft Fork: Memperketat Aturan
+
+* **Konsep:** *Soft fork* adalah perubahan yang membuat blok yang sebelumnya valid menjadi tidak valid. Aturan menjadi lebih ketat.
+* **Analogi Restoran:** Jika restoran vegetarian (aturan lama) memutuskan untuk menjadi restoran vegan (aturan baru yang lebih ketat), para tamu vegetarian (node lama) masih bisa makan di sana karena makanan vegan juga vegetarian.
+* **Contoh:** Segwit (Bab 10) adalah sebuah *soft fork*. *Node* lama tetap menerima blok yang dibuat oleh *node* baru, meskipun mereka tidak memvalidasi data *witness*-nya.
+* **Konsekuensi:** *Soft fork* bersifat *backward-compatible* (kompatibel dengan versi sebelumnya). *Node* baru bisa hidup berdampingan dengan *node* lama. Namun, jika mayoritas *miner* tidak mengadopsi aturan baru, *node* lama bisa saja membuat blok yang dianggap tidak valid oleh *node* baru, yang juga berisiko menyebabkan *chain split* sementara.
+
+## 2. Bahaya Chain Split: Replay dan Wipeout
+
+Ketika *chain split* terjadi, ada dua risiko besar:
+
+### 1. Transaction Replay (Pemutaran Ulang Transaksi)
+
+* **Masalah:** Setelah *split*, UTXO Anda ada di kedua rantai. Jika Anda mengirim transaksi di rantai A, transaksi tersebut bisa saja "diputar ulang" oleh seseorang di rantai B karena secara teknis masih valid di kedua sisi. Akibatnya, Anda bisa tanpa sengaja membelanjakan koin di kedua rantai.
+* **Solusi:** **Replay Protection**. Transaksi di rantai baru dibuat agar memiliki format yang sedikit berbeda, sehingga tidak valid di rantai lama, dan sebaliknya. Bitcoin Cash menerapkan ini saat berpisah dari Bitcoin.
+
+### 2. Chain Reorganization (Wipeout)
+
+* **Masalah:** Dalam sebuah *split*, rantai dengan akumulasi *Proof of Work* terbanyak dianggap sebagai rantai yang "benar".
+
+  * Pada **hard fork**, rantai baru (New) berisiko terhapus (*wiped out*) jika rantai lama (Old) tiba-tiba mendapatkan lebih banyak *hashrate* dan menjadi lebih kuat.
+  * Pada **soft fork**, justru rantai lama (Old) yang berisiko terhapus jika mayoritas *hashrate* pindah ke aturan baru dan membuat rantai baru menjadi lebih kuat.
+* **Solusi:** **Wipeout Protection**. Ini adalah aturan tambahan dalam *hard fork* yang membuat blok di rantai baru menjadi tidak kompatibel sama sekali dengan rantai lama, mencegah terjadinya *reorg*.
+
+## 3. Evolusi Mekanisme Upgrade (Soft Fork)
+
+Menyebarkan *soft fork* dengan aman adalah tantangan besar. Mekanismenya telah berevolusi seiring waktu.
+
+### A. Coinbase Signaling (BIP16 untuk P2SH)
+
+* **Cara Kerja:** Para *miner* yang mendukung pembaruan akan menambahkan penanda khusus (misalnya, string `/P2SH/`) di dalam *coinbase transaction* mereka.
+* **Aktivasi:** Pada tanggal yang ditentukan (*flag day*), para pengembang akan menghitung persentase dukungan. Jika cukup tinggi (misalnya, >55%), maka aturan baru akan diaktifkan pada tanggal *flag day* berikutnya. Ini adalah proses yang cukup manual.
+
+### B. Incremented Block Version Signaling (BIP34, 66, 65)
+
+* **Cara Kerja:** *Miner* yang mendukung akan menaikkan nomor versi blok mereka (misalnya, dari versi 1 menjadi 2).
+* **Aktivasi:** Pembaruan diaktifkan melalui beberapa tahap:
+
+  1. Tunggu hingga 75% dari 1000 blok terakhir memiliki versi 2.
+  2. Setelah itu, tunggu lagi hingga 95% memiliki versi 2.
+  3. Ketika ambang batas 95% tercapai, semua blok dengan versi 1 akan ditolak oleh jaringan.
+* **Kelemahan:** Hanya bisa melakukan satu pembaruan dalam satu waktu dan nomor versi tidak bisa digunakan kembali.
+
+### C. Version Bits Signaling (BIP9)
+
+* **Cara Kerja:** Ini adalah mekanisme yang lebih canggih. 29 bit dari *field* versi blok bisa digunakan sebagai "saklar" untuk 29 pembaruan berbeda secara bersamaan. *Miner* menyalakan bit tertentu untuk menunjukkan dukungan.
+* **Aktivasi:** Sebuah pembaruan dianggap **LOCKED\_IN** jika 95% blok dalam satu periode *difficulty adjustment* (2.016 blok) menyalakan bit yang sesuai. Setelah periode berikutnya, statusnya menjadi **ACTIVE** dan aturan baru mulai diberlakukan. Jika dukungan tidak mencapai 95% sebelum batas waktu (*timeout*), pembaruan tersebut dianggap **FAILED**.
+
+## 4. Studi Kasus Kompleks: Aktivasi Segwit
+
+Aktivasi Segwit adalah contoh nyata dari betapa rumitnya politik dan teknis dalam upgrade Bitcoin.
+
+1. **Stagnasi:** Upaya aktivasi Segwit menggunakan BIP9 (bit 1) macet di sekitar 30% dukungan *miner*. Banyak yang khawatir pembaruan ini akan gagal (*timeout*).
+2. **Proposal Tandingan:** Muncul proposal Segwit2x yang didukung banyak *miner*, yang ingin mengaktifkan Segwit DAN melakukan *hard fork* untuk menaikkan ukuran blok.
+3. **Tekanan dari Pengguna (BIP148 - UASF):** Sebagian pengguna yang frustrasi mengusulkan **User-Activated Soft Fork (UASF)**. Mereka mengancam akan menolak semua blok yang *tidak* memberi sinyal dukungan untuk Segwit mulai 1 Agustus 2017. Ini adalah langkah berisiko yang bisa memecah jaringan.
+4. **Solusi Jembatan (BIP91):** Untuk menghindari kekacauan, muncul BIP91 yang diadopsi oleh para *miner*. BIP91 pada dasarnya adalah kompromi yang memaksa para *miner* untuk memberi sinyal dukungan bagi Segwit (bit 1). Ini berhasil, dan dukungan untuk Segwit meroket hingga 95%, yang akhirnya mengaktifkannya secara resmi.
+
+## 5. User-Activated Soft Fork (UASF) – Kekuatan di Tangan Pengguna
+
+Kisah Segwit menyoroti sebuah konsep fundamental: **pada akhirnya, penggunalah yang menentukan aturan, bukan *miner***.
+
+* **Istilah Teknis:** **User-Activated Soft Fork (UASF)**, adalah sebuah mekanisme di mana mayoritas ekonomi (pengguna, bursa, pedagang yang menjalankan *full node*) memutuskan untuk memberlakukan aturan *soft fork* baru pada tanggal tertentu, terlepas dari dukungan *miner*.
+* **Bagaimana Cara Kerjanya?**
+
+  * Pengguna yang menjalankan *node* dengan aturan UASF akan mulai menolak blok dari *miner* yang tidak mematuhi aturan baru.
+  * Meskipun para *miner* awalnya bisa menambang di rantai mereka sendiri, koin yang mereka dapatkan akan menjadi tidak berharga karena tidak diterima oleh mayoritas ekonomi (tidak bisa dijual di bursa, tidak bisa dipakai belanja).
+  * Insentif ekonomi akan memaksa para *miner* untuk beralih dan menambang di rantai yang diterima oleh pengguna, karena di sanalah *block reward* mereka memiliki nilai.
+
+UASF adalah penegasan tertinggi bahwa Bitcoin diatur oleh konsensus pengguna, dan para *miner* hanyalah penyedia layanan keamanan yang dibayar untuk mengikuti aturan tersebut.
+
+## Kesimpulan Bab 11
+
+Bab ini menunjukkan bahwa mengubah Bitcoin adalah proses yang kompleks dan penuh pertimbangan:
+
+1. **Soft fork** adalah metode yang lebih disukai karena lebih aman dan tidak memecah jaringan secara permanen.
+2. Mekanisme aktivasi telah berevolusi untuk memungkinkan pembaruan yang lebih terkoordinasi, seperti **BIP9**.
+3. Kisah aktivasi **Segwit** membuktikan bahwa dinamika kekuatan antara *miner* dan pengguna itu nyata.
+4. **UASF** adalah mekanisme pamungkas yang memastikan bahwa kedaulatan atas aturan protokol Bitcoin tetap berada di tangan para penggunanya.
+
+---
+
+# Apendiks A
+## Using bitcoin-cli
+
+Ini adalah panduan langsung untuk berinteraksi dengan *node* Bitcoin Anda sendiri. Ini adalah keterampilan fundamental bagi seorang auditor keamanan atau *bug bounty hunter*.
+
+### Pendahuluan: Berkomunikasi dengan `bitcoind`
+
+Apendiks ini melanjutkan dari Bab 8 di mana Anda sudah berhasil menjalankan *node* Bitcoin Core. Sekarang, kita akan belajar cara "berbicara" dengan *node* tersebut menggunakan `bitcoin-cli`.
+
+* **Istilah Teknis:** **`bitcoind`**, adalah program inti Bitcoin (*daemon*) yang berjalan di latar belakang. Ia melakukan semua pekerjaan berat seperti mengunduh *blockchain*, memvalidasi transaksi, dan terhubung ke jaringan P2P.
+* **Istilah Teknis:** **`bitcoin-cli`** (*Command-Line Interface*), adalah program alat bantu yang Anda gunakan untuk mengirim perintah ke `bitcoind` yang sedang berjalan.
+
+#### Bagaimana Cara Kerjanya?
+
+Saat `bitcoind` berjalan, ia juga menjalankan sebuah *web server* mini di komputer Anda (biasanya di port 8332). `bitcoin-cli` berkomunikasi dengan *server* ini menggunakan protokol **JSON-RPC**.
+
+* **JSON-RPC:** Sebuah cara standar untuk sebuah program (klien) memanggil fungsi di program lain (server) melalui jaringan.
+
+**Contoh dari buku:**
+Saat Anda mengetik:
+
+```bash
+$ ./bitcoin-cli getblockhash 0
+```
+
+`bitcoin-cli` sebenarnya mengirim pesan JSON seperti ini ke `bitcoind`:
+
+```json
+{"method":"getblockhash","params":[0],"id":1}
+```
+
+`bitcoind` memprosesnya dan merespons dengan:
+
+```json
+{"result":"0000...ce26f", "error":null, "id":"1"}
+```
+
+`bitcoin-cli` kemudian hanya menampilkan bagian `"result"` kepada Anda.
+
+### Berinteraksi dengan Alat Lain (Contoh: `curl`)
+
+Karena komunikasinya menggunakan HTTP standar, Anda bisa menggunakan alat lain seperti `curl` untuk mengirim perintah. Namun, ini memerlukan sedikit konfigurasi.
+
+1. **Stop `bitcoind` Anda:**
+
+   ```bash
+   $ ./bitcoin-cli stop
+   ```
+2. **Edit file konfigurasi:**
+   Buka file `~/.bitcoin/bitcoin.conf` (buat jika belum ada).
+3. **Tambahkan kredensial RPC:**
+
+   ```ini
+   rpcuser=nama_user_anda
+   rpcpassword=password_super_rahasia_anda
+   ```
+4. **Jalankan kembali `bitcoind`:**
+
+   ```bash
+   $ ./bitcoind -daemon
+   ```
+
+Sekarang Anda bisa menggunakan `curl` untuk mengirim perintah, meskipun `bitcoin-cli` jauh lebih praktis.
+
+### Antarmuka Grafis (`bitcoin-qt`)
+
+Bitcoin Core juga menyediakan versi dengan antarmuka grafis (GUI) yang disebut **`bitcoin-qt`**. Program ini lebih ramah pengguna untuk fungsi *wallet* dasar, tetapi untuk analisis mendalam, `bitcoin-cli` tetap superior. Anda bisa menjalankan `bitcoin-qt` dengan mode server:
+
+```bash
+./bitcoin-qt -server &
+```
+
+Sehingga tetap bisa menggunakan `bitcoin-cli` bersamanya.
+
+### Tutorial Praktis dengan `bitcoin-cli`
+
+Ini adalah bagian inti dari apendiks. Mari kita lakukan langkah demi langkah.
+
+#### 1. Membuat Wallet Terenkripsi
+
+Saat pertama kali dijalankan, Bitcoin Core membuat *wallet* (`wallet.dat`) yang **tidak terenkripsi**. Ini berarti *private key* Anda tersimpan dalam bentuk teks biasa di *hard drive*, yang sangat tidak aman. Kita akan mengenkripsinya.
+
+* **Perintah:** `encryptwallet`
+* **Langkah-langkah:**
+
+```bash
+# Gunakan -stdin agar password tidak tersimpan di riwayat command line
+$ ./bitcoin-cli -stdin encryptwallet
+masukkan_password_anda
+```
+
+Tekan Enter, lalu Ctrl+D untuk selesai.
+`bitcoind` akan berhenti setelah mengenkripsi *wallet*. Anda perlu menjalankannya kembali.
+Setelah itu, `getwalletinfo` akan menunjukkan field `"unlocked_until": 0`, yang berarti *wallet* Anda sekarang terkunci.
+
+#### 2. Mencadangkan (Backup) Wallet
+
+Bitcoin Core tidak menggunakan *mnemonic sentence* (BIP39) seperti *wallet* lain karena beberapa alasan teknis (misalnya, kurangnya metadata seperti tanggal pembuatan *seed*). Cara backup yang benar untuk Bitcoin Core adalah dengan menyalin file `wallet.dat`.
+
+* **Perintah:** `backupwallet`
+* **Langkah-langkah:**
+
+```bash
+# Perintah ini akan membuat salinan wallet.dat yang aman saat node sedang berjalan
+$ ./bitcoin-cli backupwallet ~/backup-wallet-aman.dat
+```
+
+Simpan file `backup-wallet-aman.dat` ini di lokasi yang sangat aman (misalnya, USB *stick* yang disimpan di brankas).
+
+#### 3. Menerima Uang
+
+Untuk menerima bitcoin, Anda perlu membuat alamat baru.
+
+* **Perintah:** `getnewaddress`
+* **Langkah-langkah:**
+
+```bash
+# Membuat alamat Segwit Bech32 (format modern)
+$ ./bitcoin-cli -named getnewaddress address_type=bech32
+bc1q2r9mql4mkz3z7yfxvef76yxjd637r429620j75
+```
+
+Gunakan alamat yang Anda hasilkan ini untuk menerima sejumlah bitcoin (misalnya dari bursa atau teman). Setelah transaksi dikirim, Anda bisa memeriksanya.
+
+* **Memeriksa Transaksi Masuk:**
+
+  * `getunconfirmedbalance`: Melihat saldo yang belum terkonfirmasi.
+  * `listtransactions`: Melihat daftar semua transaksi di *wallet* Anda.
+  * `getrawtransaction <txid> 1`: **Perintah paling penting untuk auditor.** Ini akan menampilkan seluruh data mentah dari sebuah transaksi dalam format JSON yang sangat detail, termasuk *input*, *output*, *script*, *locktime*, dll..
+
+#### 4. Mengirim Uang
+
+Untuk mengirim bitcoin, *wallet* Anda harus dalam keadaan "tidak terkunci" (*unlocked*).
+
+* **Perintah:** `walletpassphrase`, `sendtoaddress`, `walletlock`
+* **Langkah-langkah:**
+
+1. **Buka Kunci Wallet:**
+
+```bash
+# Buka kunci wallet selama 300 detik (5 menit)
+$ ./bitcoin-cli -stdin walletpassphrase
+masukkan_password_anda
+300
+```
+
+2. **Kirim Bitcoin:**
+
+```bash
+# Mengirim 0.001 BTC ke sebuah alamat
+# conf_target=20 artinya kita menargetkan konfirmasi dalam 20 blok
+# estimate_mode=ECONOMICAL untuk biaya yang lebih rendah
+$ ./bitcoin-cli -named sendtoaddress \
+  address="bc1qu456...5t7uulqm" \
+  amount=0.001 conf_target=20 estimate_mode=ECONOMICAL
+a13bcb16d8f41851cab8e939c017f1e05cc3e2a3c7735bf72f3dc5ef4a5893a2
+```
+
+Perintah ini akan mengembalikan **txid** dari transaksi yang baru Anda buat.
+
+3. **Kunci Kembali Wallet:**
+
+```bash
+# Mengunci kembali wallet untuk keamanan
+$ ./bitcoin-cli walletlock
+```
+
+Setelah itu, Anda bisa menggunakan `listtransactions` dan `getrawtransaction` lagi untuk menganalisis transaksi keluar yang baru saja Anda buat.
+
+### Kesimpulan Apendiks A
+
+Apendiks ini adalah gerbang Anda untuk menjadi pengguna Bitcoin tingkat lanjut. Dengan menguasai `bitcoin-cli`, Anda dapat:
+
+* Melihat "di balik layar" dari apa yang dilakukan oleh *wallet* GUI.
+* Menganalisis transaksi dan blok secara mendalam.
+* Membuat transaksi kustom yang kompleks.
+* Mengelola *node* dan *wallet* Anda dengan kontrol penuh.
+
+Ini adalah keterampilan dasar yang mutlak diperlukan untuk audit keamanan dan perburuan *bug* di ekosistem Bitcoin.
+
+---
+
