@@ -1,6 +1,6 @@
 # Bab 1
 
-## Pengantar Bitcoin (Introduction to Bitcoin)
+## (Introduction to Bitcoin)
 
 Tujuan utama buku ini adalah membantu kita memutuskan sendiri apakah kita mempercayai **Bitcoin**. Untuk memulai, diasumsikan kita memahami secara garis besar istilah-istilah berikut:
 
@@ -11,7 +11,7 @@ Tujuan utama buku ini adalah membantu kita memutuskan sendiri apakah kita memper
 
 ---
 
-## Apa itu Bitcoin? (What is Bitcoin?)
+## (What is Bitcoin?)
 
 **Bitcoin** adalah **sistem uang tunai digital** (*digital cash system*) yang memungkinkan orang untuk **mengirimkan bitcoin** (unit mata uang Bitcoin, ditulis dengan huruf *b* kecil) satu sama lain tanpa menggunakan bank atau **pihak ketiga terpercaya** (*trusted third party*) lainnya.
 
@@ -33,11 +33,11 @@ Jaringan ini terdiri dari ribuan komputer di seluruh dunia yang disebut **Bitcoi
 
 ---
 
-## Gambaran Besar (The Big Picture)
+## (The Big Picture)
 
 Mari kita ikuti proses pembayaran **Bitcoin** dalam empat langkah:
 
-### 1. Transaksi (Transactions)
+### 1. (Transactions)
 
 * Alice membuat **transaksi** untuk mengirim 1 bitcoin ke Bob.
 * Transaksi ini berisi:
@@ -47,20 +47,20 @@ Mari kita ikuti proses pembayaran **Bitcoin** dalam empat langkah:
   * **Tanda tangan digital** (*digital signature*) yang dibuat dengan **private key** (kunci pribadi) Alice.
 * Aplikasi *wallet* Alice terhubung ke satu atau lebih *node* di jaringan, lalu mengirim transaksi tersebut.
 
-### 2. Jaringan Bitcoin (The Bitcoin network)
+### 2. (The Bitcoin network)
 
 * Node yang menerima transaksi memverifikasi apakah transaksi valid (Alice punya saldo cukup dan tanda tangan digitalnya sah).
 * Jika valid, node akan **meneruskan** transaksi ke node lain (*relaying*).
 * Transaksi menyebar ke seluruh jaringan, meskipun **blockchain** belum diperbarui pada tahap ini.
 
-### 3. Blockchain (The Blockchain)
+### 3. (The Blockchain)
 
 * Node-node memperbarui salinan lokal **Bitcoin blockchain** dengan transaksi Alice.
 * Karena ribuan transaksi bisa terjadi bersamaan, satu node membuat **blok** berisi transaksi-transaksi terbaru dalam urutan tertentu.
 * Blok ini dikirim ke jaringan, diverifikasi oleh node lain, lalu ditambahkan ke blockchain.
 * Nama **blockchain** berasal dari struktur data berupa blok-blok yang dirantai sehingga modifikasi bisa dideteksi.
 
-### 4. Wallet (Dompet)
+### 4. (Wallet)
 
 * Wallet Bob terhubung ke node-node di jaringan.
 * Begitu transaksi Alice masuk ke blockchain, wallet Bob akan diberi tahu bahwa ia menerima 1 bitcoin.
@@ -68,7 +68,7 @@ Mari kita ikuti proses pembayaran **Bitcoin** dalam empat langkah:
 
 ---
 
-## Masalah dengan Uang Saat Ini (Problems with Money Today)
+## (Problems with Money Today)
 
 Bitcoin hadir karena memecahkan masalah nyata dalam sistem keuangan tradisional:
 
@@ -94,7 +94,7 @@ Bitcoin hadir karena memecahkan masalah nyata dalam sistem keuangan tradisional:
 
 ---
 
-## Pendekatan Bitcoin (The Bitcoin Approach)
+## (The Bitcoin Approach)
 
 Bitcoin menawarkan solusi yang berbeda dari sistem tradisional:
 
@@ -116,7 +116,7 @@ Bitcoin menawarkan solusi yang berbeda dari sistem tradisional:
 
 ---
 
-## Bagaimana Bitcoin Digunakan? (How is Bitcoin Used?)
+## (How is Bitcoin Used?)
 
 * **Tabungan (Savings):**
 
@@ -143,7 +143,7 @@ Bitcoin menawarkan solusi yang berbeda dari sistem tradisional:
 
 ---
 
-## Kapan Tidak Menggunakan Bitcoin? (When Not to Use Bitcoin)
+## (When Not to Use Bitcoin?)
 
 * **Pembayaran Kecil (Tiny Payments):**
 
@@ -158,7 +158,7 @@ Bitcoin menawarkan solusi yang berbeda dari sistem tradisional:
 
 ---
 
-## Cryptocurrency Lain (Other Cryptocurrencies)
+## (Other Cryptocurrencies)
 
 Selain Bitcoin, ada ribuan **altcoin** (alternative coins) seperti **Ethereum**, **Zcash**, dan **Namecoin**.
 
@@ -166,7 +166,7 @@ Nilai suatu cryptocurrency sangat dipengaruhi oleh **efek jaringan** (*network e
 
 ---
 
-## Ringkasan (Summary)
+## (Summary)
 
 * **Bitcoin** adalah uang global tanpa batas yang dapat digunakan oleh siapa saja dengan koneksi internet.
 * Jaringan **Bitcoin** memverifikasi dan menyimpan catatan semua transaksi.
@@ -175,3 +175,4 @@ Nilai suatu cryptocurrency sangat dipengaruhi oleh **efek jaringan** (*network e
 * Ada cryptocurrency lain, tapi Bitcoin tetap paling dominan berkat efek jaringan.
 
 ---
+
