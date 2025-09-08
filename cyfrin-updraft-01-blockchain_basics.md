@@ -352,3 +352,69 @@ Pada bagian berikutnya, Kita akan dipandu untuk menyiapkan sebuah wallet dan mel
 transaksi pertamamu. Mari kita menyelami dunia baru ini.
 
 ---
+
+## Menyiapkan Dompet MetaMask
+
+**Apa itu MetaMask?**
+MetaMask adalah ekstensi browser yang jadi jembatan untuk berinteraksi dengan blockchain.
+Mudah dipasang dan dipakai.
+
+**Langkah 1 — Pasang MetaMask**
+
+1. Buka browser (Chrome, Brave, Firefox, dll).
+2. Cari “MetaMask” atau kunjungi `metamask.io`.
+3. Klik **Download / Add to Chrome (Brave)** dan ikuti instalasi ekstensi.
+
+**Langkah 2 — Buat Wallet Baru**
+
+1. Buka ekstensi MetaMask lalu klik **Get started**.
+2. Pilih **Create a new wallet**.
+3. Buat password untuk membuka MetaMask di browser ini.
+
+* Catatan: password ini hanya untuk membuka aplikasi di perangkat ini. Jika lupa, kamu
+   tidak bisa “reset password” seperti Web2 — kamu perlu SRP untuk memulihkan wallet.
+
+**Langkah 3 — Amankan Secret Recovery Phrase (SRP)**
+
+> Ini bagian paling penting — jangan disepelekan.
+
+1. MetaMask akan menampilkan **12 kata (SRP)**.
+2. **TULIS** 12 kata tersebut di kertas sesuai urutan.
+3. **SIMPAN** kertas di tempat sangat aman (mis. brankas).
+4. **JANGAN PERNAH** bagikan SRP atau simpan dalam bentuk digital (screenshot, file, email,
+	chat). Tim MetaMask tidak akan pernah meminta SRP.
+5. MetaMask akan meminta konfirmasi dengan memilih kata sesuai urutan — selesaikan proses itu
+	lalu klik **Confirm**.
+
+> Analogi cepat: password = kunci pintu; SRP = sertifikat kepemilikan rumah. Siapa pun yang
+> punya SRP bisa mengakses dompet dari mana saja.
+
+(Tempat untuk gambar: \[Create a new wallet], \[Confirmation screen])
+
+---
+
+## Mengenal Tampilan MetaMask (singkat)
+
+* **Alamat (0x...)** = nomor rekening untuk menerima aset.
+* **Akun** = bisa buat beberapa akun/alamat di satu wallet.
+* **Jaringan (Network)** = pilih jaringan yang tepat sebelum transaksi.
+
+**Mainnet vs Testnet (penting):**
+
+* **Mainnet** = jaringan nyata, pakai uang asli (biaya nyata).
+* **Testnet** = jaringan latihan; asetnya tidak bernilai nyata — gunakan ini untuk belajar.
+
+**Langkah 4 — Beralih ke Testnet**
+
+1. Klik tulisan jaringan (mis. **Ethereum Mainnet**).
+2. Aktifkan pilihan test networks (Show/Enable test networks).
+3. Pilih **Sepolia test network**.
+
+* Saldo awal biasanya 0 Sepolia ETH — nanti kita akan isi dari faucet testnet di pelajaran
+berikutnya.
+
+Sip! Dompet latihanmu siap. Di pelajaran selanjutnya kita akan belajar cara mendapatkan ETH
+gratis untuk Testnet dan melakukan transaksi pertama.
+
+---
+
