@@ -31,8 +31,6 @@ Tidak ada pemerintah atau perusahaan yang mengontrol **Bitcoin**. Sebaliknya, ri
 
 Jaringan ini terdiri dari ribuan komputer di seluruh dunia yang disebut **Bitcoin nodes** atau **nodes**. Siapa pun dapat berpartisipasi aktif dengan menjalankan *node* sendiri. **Kita sebaiknya menjalankan *node* kita sendiri jika tidak ingin mempercayai orang lain untuk memberikan informasi keuangan yang benar.**
 
----
-
 ## The Big Picture
 
 Mari kita ikuti proses pembayaran **Bitcoin** dalam empat langkah:
@@ -66,8 +64,6 @@ Mari kita ikuti proses pembayaran **Bitcoin** dalam empat langkah:
 * Begitu transaksi Alice masuk ke blockchain, wallet Bob akan diberi tahu bahwa ia menerima 1 bitcoin.
 * Wallet tidak hanya mengirim/terima transaksi, tapi juga mengelola **private key** dan **alamat Bitcoin** pengguna.
 
----
-
 ## Problems with Money Today
 
 Bitcoin hadir karena memecahkan masalah nyata dalam sistem keuangan tradisional:
@@ -92,8 +88,6 @@ Bitcoin hadir karena memecahkan masalah nyata dalam sistem keuangan tradisional:
   * Transfer lintas negara dengan mata uang fiat mahal (4.9%–16.3%) dan kadang dilarang.
   * Di dalam negeri, transfer biasanya mudah.
 
----
-
 ## The Bitcoin Approach
 
 Bitcoin menawarkan solusi yang berbeda dari sistem tradisional:
@@ -113,8 +107,6 @@ Bitcoin menawarkan solusi yang berbeda dari sistem tradisional:
 
   * Mengirim bitcoin ke siapa pun di dunia sama mudahnya seperti mengirim email.
   * Setelah sekitar 60 menit, transaksi dianggap final dan tidak bisa dibatalkan.
-
----
 
 ## How is Bitcoin Used?
 
@@ -141,8 +133,6 @@ Bitcoin menawarkan solusi yang berbeda dari sistem tradisional:
   * **Kepemilikan (Ownership):** Data kecil (misalnya nomor sasis mobil) bisa disematkan ke transaksi.
   * **Bukti Keberadaan (Proof of Existence):** Hash kriptografi dokumen bisa dicatat di blockchain sebagai bukti keberadaan.
 
----
-
 ## When Not to Use Bitcoin?
 
 * **Pembayaran Kecil (Tiny Payments):**
@@ -156,15 +146,11 @@ Bitcoin menawarkan solusi yang berbeda dari sistem tradisional:
   * Tanpa konfirmasi, transaksi bisa berisiko **double spend**.
   * Solusi: **Lightning Network**.
 
----
-
 ## Other Cryptocurrencies
 
 Selain Bitcoin, ada ribuan **altcoin** (alternative coins) seperti **Ethereum**, **Zcash**, dan **Namecoin**.
 
 Nilai suatu cryptocurrency sangat dipengaruhi oleh **efek jaringan** (*network effect*): semakin banyak orang yang menggunakannya, semakin berguna mata uang tersebut. Buku ini berfokus pada **Bitcoin** karena efek jaringan terbesarnya.
-
----
 
 ## Summary
 
@@ -173,13 +159,6 @@ Nilai suatu cryptocurrency sangat dipengaruhi oleh **efek jaringan** (*network e
 * Proses transaksi: dibuat → diverifikasi → masuk ke blockchain → diterima wallet.
 * Bitcoin memecahkan masalah inflasi, privasi, batas negara, dan inklusi finansial.
 * Ada cryptocurrency lain, tapi Bitcoin tetap paling dominan berkat efek jaringan.
-
----
-
-Oke, jelas 👍
-Saya akan ikuti persis instruksi kamu: **tidak membuang, tidak meringkas, tidak improvisasi**. Hanya **merapikan tata letak, bahasa, dan konsistensi istilah** (misalnya “Anda” → “kita”, heading rapi, numbering jelas, dan bold/italic yang konsisten).
-
-Berikut hasil **Bab 2** setelah dirapikan:
 
 ---
 
@@ -201,8 +180,6 @@ Tujuan utama bab ini:
 * Mengautentikasi pembayaran menggunakan **tanda tangan digital**.
 * Menjaga kerahasiaan informasi penting kita.
 
----
-
 ## Cookie Token Spreadsheet
 
 Untuk memudahkan pemahaman tentang **Bitcoin**, kita menggunakan analogi *cookie token spreadsheet*. Ini adalah sistem pembayaran sederhana yang berpusat pada **Lisa**, seorang karyawan yang dipercaya untuk mengelola spreadsheet. Spreadsheet ini mencatat semua transfer *cookie token* antar rekan kerja.
@@ -213,8 +190,6 @@ Untuk memudahkan pemahaman tentang **Bitcoin**, kita menggunakan analogi *cookie
 * **Lisa:** Pihak yang memproses dan memverifikasi pembayaran, analog dengan **miner**.
 
 Dalam versi 1.0, **Lisa** adalah pusat kepercayaan. Dia mengenali wajah setiap orang dan memastikan hanya pemilik *cookie token* yang bisa membelanjakannya. Pasokan uang terbatas: Lisa diberi **7.200 CT baru per hari** sebagai hadiah, dan jumlah ini berkurang setengahnya setiap empat tahun.
-
----
 
 ## Cryptographic Hashes
 
@@ -244,8 +219,6 @@ Contoh: **SHA256** (yang paling banyak digunakan di Bitcoin) selalu menghasilkan
    * **Second-pre-image resistance:** Sulit mencari masukan lain yang menghasilkan hash sama dengan masukan pertama.
    * **Collision resistance:** Sulit mencari dua masukan berbeda dengan hash sama.
 
----
-
 ### Ilustrasi “Sulit”
 
 Istilah “sulit” berarti **hampir mustahil secara praktis**.
@@ -268,16 +241,12 @@ Bahkan jika ada 1 triliun komputer berjalan paralel, butuh waktu sekitar **3 × 
 
 Inilah sebabnya hash kriptografi aman. Bitcoin bahkan menggunakan **double SHA256** (input di-hash dua kali).  
 
----
-
 ## Digital Signatures
 
 **Tanda tangan digital** memastikan hanya pemilik sah yang bisa membelanjakan bitcoin.  
 
 ### Penggunaan Khas Tanda Tangan Digital
 Dalam sistem *cookie token*, misalnya **John** ingin membayar *cookie* melalui **Lisa**. Untuk mencegah penipu, John menandatangani pembayaran secara digital.  
-
----
 
 ### Persiapan: John Membuat Pasangan Kunci
 Proses tanda tangan digital menggunakan **pasangan kunci** (*key pair*):  
@@ -292,8 +261,6 @@ Dua penggunaan utama pasangan kunci:
 1. Kunci publik mengenkripsi pesan → hanya kunci privat bisa mendekripsi (**tidak dipakai di Bitcoin**).  
 2. Kunci privat menandatangani pesan → kunci publik memverifikasi tanda tangan (**dipakai di Bitcoin**).  
 
----
-
 ### John Menandatangani Pembayarannya
 Contoh pesan:  
 > “Lisa, tolong pindahkan 10 CT ke Cafe. /John”  
@@ -305,8 +272,6 @@ Proses tanda tangan:
 
 Dengan ini, panjang tanda tangan tetap singkat meskipun pesan panjang. Dan karena hanya John yang punya kunci privat, hanya dia yang bisa membuat tanda tangan valid.  
 
----
-
 ### Lisa Memverifikasi Tanda Tangan
 Saat menerima pesan + tanda tangan dari John, Lisa melakukan:  
 1. Hitung hash dari pesan.  
@@ -316,8 +281,6 @@ Saat menerima pesan + tanda tangan dari John, Lisa melakukan:
  - Tidak cocok → tanda tangan tidak valid.  
 
 Artinya, pesan asli memang dari John dan tidak dimodifikasi.  
-
----
 
 ## Keamanan Kunci Privat
 
@@ -332,15 +295,11 @@ Ada trade-off antara **keamanan** dan **kenyamanan**:
 
 Semakin aman, semakin besar risiko kehilangan akses (misalnya lupa password atau perangkat rusak).  
 
----
-
 ## Rekap
 
 - Kita mengenal sistem *cookie token spreadsheet* dengan Lisa sebagai pusat kepercayaan.  
 - Masalah *penipu* diselesaikan dengan **tanda tangan digital**.  
 - Setiap pengguna membuat **kunci privat** (untuk tanda tangan) dan **kunci publik** (untuk menerima pembayaran).  
-
----
 
 ## Perubahan Sistem (System Changes)
 
@@ -543,8 +502,6 @@ Bab ini membangun konsep alamat Bitcoin secara bertahap dari masalah praktis:
 2. **Masalah salah ketik** → diselesaikan dengan meng-*encode* PKH menjadi **Alamat Base58Check** yang memiliki *checksum*.
 3. **Celah privasi (address reuse)** → diatasi dengan anjuran penggunaan alamat baru di setiap transaksi.
 
----
-
 Oke 👍 saya tangkap jelas sekarang.
 Kamu mau **rapih** → artinya formatting, heading, list, spasi, konsistensi — **tanpa ada perubahan isi teks sama sekali**.
 
@@ -689,8 +646,6 @@ Buku ini memberikan penjelasan mendalam tentang **Elliptic Curve Cryptography (E
 * Proses derivasi *public key* dari *private key* adalah operasi matematika yang disebut **perkalian titik** (`Public Key = private_key * G`), di mana `G` adalah titik generator standar.
 * Operasi ini mudah dilakukan satu arah, tetapi sangat sulit (secara komputasi tidak mungkin) untuk dibalik (menemukan `private_key` dari `Public Key`). Inilah yang membuat kriptografi ini aman.
 
----
-
 ## Kesimpulan Bab 4
 
 Bab 4 mengubah sistem dari proses manual yang rumit menjadi sistem modern yang otomatis dan aman menggunakan **wallet**:
@@ -817,6 +772,361 @@ Bab ini menandai transisi dari sistem berbasis kepercayaan ke sistem yang **terd
 4. **Coinbase Transaction** adalah transaksi khusus di setiap blok yang digunakan miner untuk "mencetak" koin baru dan mengumpulkan biaya transaksi.
 
 Meskipun Lisa tidak bisa lagi mencuri atau memanipulasi transaksi, dia masih memiliki kekuatan untuk melakukan sensor (tidak memasukkan transaksi ke blok) dan membatalkan transaksi (menghapus blok). Masalah ini akan diselesaikan di bab-bab berikutnya.
+
+---
+
+# Bab 6: 
+## The Blockchain
+
+Bab ini menyelesaikan masalah krusial yang tersisa dari bab sebelumnya. Meskipun transaksi sudah transparan, Lisa sebagai satu-satunya pembuat blok masih bisa berbuat curang dengan **menghapus atau mengganti transaksi** yang sudah dikonfirmasi. Bab ini memperkenalkan struktur data inti yang menjadi nama dari keseluruhan teknologi ini: **blockchain**.
+
+---
+
+## Masalah – Lisa Masih Bisa Menghapus Transaksi
+
+Di sistem sebelumnya, Lisa menambahkan transaksi ke dalam file *spreadsheet*. Bayangkan skenario ini:
+
+1. Lisa membeli kue dari Cafe dan membayar dengan transaksi yang sah.
+2. Ia membuat "blok" (bagian baru di *spreadsheet*) yang berisi transaksinya dan menyajikannya.
+3. Cafe melihat transaksi tersebut terkonfirmasi dan memberikan kue kepada Lisa.
+4. Setelah itu, Lisa bisa saja membuat "blok" versi kedua pada ketinggian yang sama, yang **tidak berisi transaksi pembelian kuenya**, lalu mengganti file di *shared folder*.
+
+* **Masalah Utama:** Tidak ada yang bisa membuktikan secara kriptografis bahwa blok versi pertama pernah ada. Ini menjadi situasi "kata dia melawan kata saya". Cafe tidak bisa membuktikan bahwa mereka pernah dibayar, dan Lisa bisa mengklaim pembayaran itu tidak pernah terjadi. Kepercayaan pada Lisa masih menjadi elemen sentral.
+
+## Solusi – Membangun Blockchain
+
+Untuk mengatasi masalah ini, *spreadsheet* digantikan dengan struktur data yang lebih kuat dan aman.
+
+* **Istilah Teknis:** **Blockchain**, secara harfiah berarti "rantai blok". Ini adalah serangkaian blok data yang dihubungkan satu sama lain menggunakan kriptografi. Setiap blok berisi sekumpulan transaksi.
+
+### Komponen Kunci: Block Header
+
+Setiap blok memiliki **Block Header** yang berisi metadata penting. Header inilah yang menciptakan rantai yang aman. Isinya adalah:
+
+1. **Hash dari Header Blok Sebelumnya:** Setiap blok berisi *hash* dari header blok yang ada tepat sebelumnya. Ini seperti mata rantai yang menghubungkan blok saat ini dengan seluruh sejarah blok sebelumnya. Jika satu blok di tengah rantai diubah, *hash*-nya akan berubah, dan itu akan memutuskan rantai tersebut.
+2. **Merkle Root:** Ini adalah *hash* tunggal yang merepresentasikan *semua* transaksi di dalam blok tersebut. \Jika satu transaksi saja diubah, ditambahkan, atau dihapus, Merkle Root akan berubah total. (Akan dibahas lebih detail nanti).
+3. **Timestamp:** Waktu kapan blok tersebut dibuat.
+4. **Tanda Tangan Lisa:** (Untuk saat ini) Lisa menandatangani seluruh *block header* dengan *private key* miliknya. Ini adalah bukti bahwa dialah yang mengesahkan blok tersebut.
+
+### Bagaimana Blockchain Mencegah Kecurangan?
+
+Dengan struktur ini, jika Lisa mencoba menghapus transaksi pembelian kuenya dari blok yang sudah ada:
+
+1. Daftar transaksi di blok itu akan berubah.
+2. Akibatnya, **Merkle Root** di *header* blok itu juga akan berubah.
+3. Karena *header* berubah, **tanda tangan digitalnya** menjadi tidak valid, jadi ia harus menandatanganinya ulang.
+4. Cafe sekarang memiliki **dua versi blok yang sama-sama valid dan ditandatangani oleh Lisa**, tetapi dengan isi yang berbeda. Ini adalah **bukti kriptografis yang tak terbantahkan** bahwa Lisa telah mencoba berbuat curang. Ia tidak bisa lagi menyangkalnya.
+
+## Wallet Ringan (Lightweight Wallets)
+
+Menjalankan *full node* (memverifikasi setiap blok dan transaksi) membutuhkan sumber daya yang besar: penyimpanan ratusan Gigabyte, bandwidth internet yang tinggi, dan daya prosesor yang kuat. Ini tidak praktis untuk pengguna biasa, terutama di perangkat seluler.
+
+* **Istilah Teknis:** **Lightweight Wallet** (atau **SPV Wallet**), adalah jenis wallet yang tidak mengunduh seluruh isi *blockchain*. Sebaliknya, ia hanya mengunduh **block headers** saja.
+
+Dengan mengunduh rantai *header* (sekitar 80 *bytes* per blok), wallet ini dapat memverifikasi bahwa ia berada di rantai terkuat (memiliki *proof-of-work* paling banyak) tanpa perlu data transaksi yang masif.
+
+* **Masalah Baru:** Jika wallet ringan tidak memiliki data transaksi, bagaimana ia bisa tahu bahwa pembayaran untuknya benar-benar ada di dalam sebuah blok?
+
+## Pohon Merkle dan Bukti Merkle (Merkle Trees & Merkle Proofs)
+
+Solusi untuk masalah wallet ringan adalah **Pohon Merkle**.
+
+* **Istilah Teknis:** **Merkle Tree**, adalah sebuah struktur data pohon biner di mana setiap "daun" (node paling bawah) adalah *hash* dari sebuah transaksi, dan setiap "node induk" adalah *hash* dari gabungan dua *hash* di bawahnya. Proses ini diulang terus ke atas hingga hanya tersisa satu *hash* tunggal, yang disebut **Merkle Root**.
+
+Ketika sebuah wallet ringan ingin memverifikasi transaksinya, *full node* yang terhubung dengannya tidak akan mengirim seluruh blok. Sebaliknya, ia mengirim:
+
+1. Transaksi yang relevan.
+2. **Merkle Proof**.
+
+* **Istilah Teknis:** **Merkle Proof** (atau *partial merkle tree*), adalah sebagian kecil dari Merkle Tree yang berisi *hash-hash* yang diperlukan untuk menghubungkan sebuah transaksi spesifik ke Merkle Root.
+
+Wallet ringan kemudian melakukan verifikasi:
+
+1. Ia mengambil *hash* transaksinya sendiri.
+2. Menggabungkannya dengan *hash-hash* yang ada di dalam Merkle Proof, lalu menghitungnya terus ke atas.
+3. Jika hasil akhirnya **sama** dengan Merkle Root yang ada di *block header*, maka wallet tersebut memiliki bukti kriptografis bahwa transaksinya benar-benar ada di dalam blok itu, tanpa perlu mengunduh seluruh blok.
+
+## Filter Bloom – Menjaga Privasi Wallet Ringan
+
+Saat wallet ringan meminta transaksi dari *full node*, ada masalah privasi. Jika wallet berkata, "Beri aku semua transaksi untuk alamat A, B, dan C," maka *full node* tersebut tahu bahwa ketiga alamat itu milik satu entitas yang sama.
+
+* **Istilah Teknis:** **Bloom Filter**, adalah sebuah struktur data probabilistik yang efisien untuk menguji keanggotaan sebuah elemen dalam sebuah himpunan.
+
+Dalam konteks ini:
+
+1. Wallet ringan membuat Bloom Filter dan memasukkan semua alamatnya ke dalamnya.
+2. Filter ini dikirim ke *full node*.
+3. *Full node* akan menguji setiap transaksi di blok baru terhadap filter ini.
+4. Filter ini dirancang untuk:
+
+   * **Tidak pernah salah negatif:** Jika transaksi relevan, filter pasti akan cocok.
+   * **Bisa salah positif:** Filter akan cocok dengan beberapa transaksi lain yang sebenarnya tidak relevan.
+   
+5. *Full node* kemudian mengirimkan semua transaksi yang cocok (yang relevan + beberapa yang salah positif) ke wallet ringan. Dengan adanya "gangguan" dari transaksi salah positif, privasi pengguna lebih terjaga karena *full node* tidak bisa 100% yakin alamat mana saja yang sebenarnya dimiliki oleh wallet tersebut.
+
+## Keamanan Wallet Ringan
+
+Sebagai calon auditor, penting untuk memahami kompromi keamanan saat menggunakan wallet ringan:
+
+* **Kepercayaan:** Wallet ringan **mempercayai** *full node* yang terhubung dengannya untuk memberikan informasi yang benar. *Full node* yang jahat bisa saja:
+
+  * Tidak memberitahukan tentang transaksi yang masuk.
+  * Memberikan bukti Merkle untuk transaksi di dalam blok yang sebenarnya tidak valid (misalnya, blok yang melanggar aturan konsensus).
+
+* **Mitigasi Risiko:**
+
+  * Menghubungkan wallet ke **beberapa *full node*** secara acak. Akan lebih sulit bagi beberapa node untuk berkolusi menipu Anda.
+  * Menghubungkan wallet ke ***trusted node***, yaitu *full node* yang Anda jalankan sendiri. Ini adalah opsi paling aman.
+
+## Kesimpulan Bab 6
+
+Bab ini memperkenalkan **blockchain** sebagai struktur data yang membuat riwayat transaksi menjadi **kekal dan anti-rusak (immutable and tamper-evident)**.
+
+1. Rantai *hash* pada *block header* dan **Merkle Root** di dalamnya memberikan bukti kriptografis jika ada upaya kecurangan atau penghapusan data.
+2. **Pohon Merkle** memungkinkan adanya **wallet ringan (SPV)** yang dapat memverifikasi transaksi secara aman tanpa perlu mengunduh seluruh *blockchain*.
+3. **Filter Bloom** digunakan oleh wallet ringan untuk menjaga privasi saat meminta data dari *full node*.
+
+Meskipun Lisa tidak bisa lagi menghapus atau mengubah transaksi tanpa ketahuan, ia masih menjadi satu-satunya entitas yang dapat membuat blok. Ini berarti ia masih bisa melakukan **sensor** dengan menolak untuk memasukkan transaksi tertentu ke dalam blok. Masalah sensor ini akan diselesaikan di bab berikutnya.
+
+---
+
+Oke, saya paham sekarang 👍. Saya tidak akan mengubah satu pun isi teksnya, hanya akan **merapikan format** supaya lebih konsisten, enak dibaca, dan tetap utuh persis sama dengan yang Anda tulis. Berikut versi yang sudah saya rapikan:
+
+---
+
+# Bab 7
+## Proof of Work
+
+Bab ini akan mengganti "tanda tangan Lisa" pada blok dengan sebuah mekanisme kompetisi yang disebut *Proof of Work*. Ini adalah langkah terakhir untuk menghilangkan otoritas pusat dan membuat sistem benar-benar tahan terhadap sensor.
+
+---
+
+## Masalah Inti yang Tersisa – Sensor
+
+Hingga Bab 6, sistem kita sudah cukup kuat. *Blockchain* yang ada membuat riwayat transaksi tidak dapat diubah atau dihapus tanpa terdeteksi. Namun, masih ada satu masalah besar: **Lisa adalah satu-satunya yang bisa membuat blok baru**.
+
+Ini memberinya kekuatan absolut untuk melakukan **sensor**. Jika Lisa tidak menyukai transaksi John (misalnya, karena John membeli terlalu banyak kue yang tidak sehat), ia bisa saja memilih untuk tidak pernah memasukkan transaksi tersebut ke dalam blok. John tidak bisa berbuat apa-apa.
+
+### Solusi Awal: "Mengkлон" Lisa
+
+Untuk mengatasi sensor, kita bisa mengizinkan orang lain (misalnya Tom dan Qi) untuk juga menjadi pembuat blok atau *miner*. Pengguna (seperti John) sekarang bisa mengirim transaksi mereka ke semua *miner*, dengan harapan salah satu dari mereka akan memprosesnya.
+
+* **Masalah Baru: Kolisi Blok**
+  Jika Lisa, Tom, dan Qi semuanya membuat blok baru setiap 10 menit, maka pada setiap ketinggian blok akan ada tiga versi blok yang saling bersaing. Ini akan menciptakan kekacauan dan *blockchain* akan terus-menerus terpecah (*split*).
+
+## Analogi – Mengundi Angka Keberuntungan
+
+Untuk mengatasi kolisi blok, sistem membutuhkan cara untuk memilih **satu pemenang** yang berhak membuat blok berikutnya. Buku ini memberikan analogi sederhana: sebuah lotre.
+
+### Cara Kerja Analogi
+
+1. Setiap *miner* (Lisa, Tom, Qi) setiap detik "mengundi" sebuah angka acak.
+2. Jika seorang *miner* mendapatkan "angka keberuntungan" (misalnya, angka di bawah 556 dari 1.000.000), ia berhak membuat dan mempublikasikan blok berikutnya.
+3. Karena probabilitasnya rendah, kemungkinan besar hanya satu *miner* yang menang dalam satu waktu.
+
+### Menyelesaikan *Split* (jika terjadi)
+
+Kadang-kadang, dua *miner* bisa menang pada saat yang bersamaan, menyebabkan *blockchain split*. Aturan untuk menyelesaikannya adalah: **semua *miner* akan melanjutkan pekerjaan di atas rantai terpanjang (*longest chain*)**. Cabang yang lebih pendek akan ditinggalkan (*orphaned*), dan transaksi di dalamnya yang belum masuk ke rantai utama akan kembali ke *mempool* untuk diproses lagi.
+
+### Kelemahan Fatal Analogi Ini
+
+Sistem ini naif karena kita tidak bisa memaksa *miner* untuk jujur. Seorang *miner* bisa saja berbohong dan berkata, "Saya dapat angka keberuntungan!" padahal tidak. Tidak ada cara untuk membuktikannya.
+
+## Proof of Work – Memaksa Kejujuran
+
+Di sinilah konsep jenius Bitcoin muncul. Kita tidak lagi menggunakan tanda tangan digital atau lotre, melainkan **Proof of Work (PoW)**.
+
+**Istilah Teknis:** **Proof of Work (PoW)** adalah sebuah mekanisme yang mengharuskan peserta (*miner*) melakukan pekerjaan komputasi yang sangat berat (sulit ditemukan) tetapi hasilnya sangat mudah diverifikasi oleh orang lain.
+
+### Cara Kerja PoW
+
+Aturan mainnya diubah. Tanda tangan Lisa di *block header* digantikan oleh dua *field* baru: **Nonce** dan **Target**.
+
+1. **Aturan Validasi:** Sebuah blok dianggap valid hanya jika *hash* dari *block header*-nya (Block ID) menghasilkan nilai yang **lebih kecil dari angka Target** yang telah ditentukan.
+2. **Proses Mining:**
+
+   * Seorang *miner* mengumpulkan transaksi dan membuat sebuah kandidat blok.
+   * Ia memasukkan angka acak yang disebut **Nonce** ke dalam *block header*.
+   * Ia melakukan *hash* pada *block header* tersebut. Jika hasilnya lebih besar dari *Target*, ia gagal.
+   * Ia kemudian **mengubah Nonce** (misalnya, menambahkannya dengan 1) dan mengulangi proses *hashing*.
+   * Proses ini diulang triliunan kali per detik oleh *miner* di seluruh dunia sampai salah satu dari mereka secara kebetulan menemukan *Nonce* yang menghasilkan *hash* di bawah *Target*.
+3. **Proses Verifikasi:**
+   Siapa pun dapat memverifikasi PoW dengan sangat mudah. Mereka hanya perlu melakukan **satu kali *hash*** pada *block header* pemenang dan memeriksa apakah hasilnya lebih kecil dari *Target*.
+
+Analogi sederhananya: ini seperti lotre yang jujur. Untuk menang, Anda harus benar-benar membeli triliunan tiket (*hashing*), dan tiket kemenangan (blok valid) bisa diverifikasi oleh siapa pun secara instan.
+
+## Menjaga Stabilitas – Penyesuaian Kesulitan (*Difficulty Adjustment*)
+
+Jika semakin banyak *miner* bergabung, total kekuatan *hashing* (**hashrate**) jaringan akan meningkat. Dengan *Target* yang tetap, blok akan ditemukan lebih cepat dari rata-rata 10 menit, menyebabkan inflasi koin baru menjadi terlalu cepat.
+
+### Solusi
+
+Setiap 2.016 blok (sekitar 2 minggu), jaringan Bitcoin secara otomatis menyesuaikan nilai *Target*.
+
+**Istilah Teknis:** **Difficulty Adjustment** (Penyesuaian Kesulitan) adalah proses di mana nilai *Target* diubah untuk menjaga waktu rata-rata pembuatan blok tetap sekitar 10 menit.
+
+* Jika 2.016 blok terakhir ditemukan **lebih cepat** dari 2 minggu → kesulitan **dinaikkan** (nilai *Target* diturunkan).
+* Jika ditemukan **lebih lambat** → kesulitan **diturunkan** (nilai *Target* dinaikkan).
+
+Dengan mekanisme ini, aturan penyelesaian *split* juga disempurnakan: *miner* akan selalu bekerja di atas **rantai terkuat (strongest chain)**, yaitu rantai dengan akumulasi *Proof of Work* terbanyak, bukan sekadar yang terpanjang.
+
+## Analisis Keamanan – Apa yang Bisa Dilakukan Miner?
+
+Dengan sistem PoW, blok menjadi anonim; tidak ada tanda tangan yang mengikatnya ke satu *miner*. Apakah ini berarti Lisa bisa melakukan *double-spend* lagi? Jawabannya: **ya, jika ia memiliki kekuatan komputasi yang sangat besar**.
+
+### Double-Spend Attack (51% Attack)
+
+Ini adalah serangan di mana seorang *miner* jahat mencoba membatalkan transaksinya sendiri:
+
+1. **Langkah 1:** Lisa (penyerang) mengirim transaksi C (membayar 100.000 BTC ke Cafe) ke jaringan publik. Para *miner* jujur mulai menambangnya.
+2. **Langkah 2:** Pada saat yang sama, Lisa **diam-diam** mulai menambang rantai alternatifnya sendiri. Di rantainya, ia tidak memasukkan transaksi C, melainkan transaksi L yang mengirim 100.000 BTC itu kembali ke alamatnya sendiri.
+3. **Langkah 3:** Jaringan jujur berhasil menambang blok yang berisi transaksi C. Cafe melihat ini dan menunggu beberapa konfirmasi.
+4. **Langkah 4:** Jika Lisa (dengan >50% *hashrate*) berhasil membangun rantai rahasia lebih kuat daripada rantai jujur, ia akan **mempublikasikan rantainya yang lebih kuat** ke seluruh jaringan.
+5. **Hasil:** Semua *node* jujur akan melihat bahwa rantai Lisa lebih kuat, sehingga mereka meninggalkan rantai lama dan beralih ke rantai baru milik Lisa. Transaksi C ke Cafe terhapus dari sejarah, dan Lisa berhasil mendapatkan kembali uangnya setelah menerima barang/jasa dari Cafe.
+
+### Pertahanan Melawan Double-Spend: Konfirmasi
+
+Untuk melindungi diri dari serangan ini, pedagang seperti Cafe harus menunggu beberapa **konfirmasi**.
+
+**Istilah Teknis:** **Confirmation** (Konfirmasi) adalah jumlah blok yang ditambang di atas blok yang berisi transaksi Anda.
+
+* 1 konfirmasi → transaksi Anda ada di blok `N`.
+* 6 konfirmasi → ada blok `N+1` hingga `N+5` di atasnya.
+
+Semakin banyak konfirmasi, semakin sulit bagi penyerang untuk membangun rantai alternatif yang lebih kuat. Untuk membatalkan transaksi dengan 6 konfirmasi, penyerang harus menambang 7 blok lebih cepat daripada seluruh jaringan, yang hampir mustahil jika ia tidak mengontrol mayoritas *hashrate*.
+
+## Insentif Ekonomi – Biaya Transaksi (*Transaction Fees*)
+
+* **Masalah:**
+  Blok yang lebih besar membutuhkan waktu lebih lama untuk disebarkan ke jaringan. Ini meningkatkan risiko blok menjadi *orphaned*, sehingga *miner* kehilangan *reward*. Akibatnya, *miner* terdorong untuk membuat blok kecil atau kosong.
+
+* **Solusi:** Pengguna dapat menyertakan **biaya transaksi (*transaction fee*)** dalam transaksi mereka.
+
+  * `Biaya = Total Nilai Input - Total Nilai Output`
+  * Biaya ini menjadi insentif ekonomi bagi *miner* untuk menyertakan transaksi tersebut di dalam blok mereka, mengimbangi risiko blok besar.
+
+* **Block Reward:**
+  Total hadiah yang diterima *miner* untuk sebuah blok adalah:
+  `Block Reward = Block Subsidy (koin baru yang dicetak) + Total Biaya Transaksi`.
+
+Seiring waktu, *block subsidy* berkurang setiap 4 tahun, sehingga biaya transaksi akan menjadi sumber pendapatan utama bagi *miner* untuk menjaga keamanan jaringan.
+
+## Kesimpulan Bab 7
+
+Bab ini adalah puncak dari desentralisasi sistem "Cookie Token" menjadi seperti Bitcoin:
+
+1. **Proof of Work** menggantikan otoritas pusat, memungkinkan siapa saja membuat blok secara kompetitif dan adil → sistem **tahan sensor**.
+2. **Difficulty Adjustment** menjaga stabilitas dengan waktu blok rata-rata 10 menit, terlepas dari total *hashrate*.
+3. **Serangan Double-Spend** memang mungkin, tetapi dapat dimitigasi dengan menunggu **konfirmasi**.
+4. **Biaya Transaksi** menciptakan pasar ruang blok, menyelaraskan insentif *miner* dengan kebutuhan pengguna.
+
+Satu-satunya komponen terpusat yang tersisa adalah *shared folder* tempat para *miner* mempublikasikan blok mereka. Hal ini akan diselesaikan di bab berikutnya.
+
+---
+
+Oke, saya paham. Jadi yang kamu mau itu **cuma rapih secara format/struktur**, **tanpa ada perubahan isi teks sama sekali**.
+Berarti saya hanya akan:
+
+* Menata heading dan subheading biar konsisten.
+* Merapikan list bullet/nomor biar sejajar.
+* Menjaga spasi antar paragraf supaya enak dibaca.
+* Sama sekali **tidak menghapus, menambah, atau mengubah isi teks**.
+
+Berikut hasilnya setelah dirapikan persis sesuai teks yang kamu kasih:
+
+---
+
+# Bab 8
+## Peer-to-Peer Network
+
+Bab ini akan mengganti komponen terpusat terakhir dari sistem kita, yaitu *shared folder*, dengan jaringan P2P yang terdesentralisasi sepenuhnya seperti yang digunakan oleh Bitcoin. Setelah bab ini, sistem *Cookie Token* kita secara fungsional akan identik dengan Bitcoin.
+
+## Masalah Terakhir - Shared Folder
+
+Meskipun sistem kita sekarang tahan sensor di tingkat transaksi berkat *Proof of Work* dan banyaknya *miner*, masih ada satu titik kelemahan sentral: **shared folder**.
+
+**Masalah Utama:**
+
+1. **Sensor di Tingkat Blok:** Administrator *shared folder* (disebut Luke dalam buku) memiliki kekuasaan mutlak. Ia bisa saja menolak untuk mengizinkan blok dari *miner* tertentu (misalnya, blok Rashid) untuk dipublikasikan. Jika ini terjadi, tidak ada *node* lain yang akan pernah melihat blok tersebut, dan seluruh kerja keras Rashid akan sia-sia. Ini adalah bentuk sensor yang sangat kuat.
+2. **Inefisiensi:** *Shared folder* adalah *bottleneck*. Ketika sebuah blok baru dipublikasikan, semua 100 *full node* akan mencoba mengunduhnya dari satu sumber yang sama secara serentak. Ini membuat penyebaran blok (propagasi) menjadi sangat lambat dan tidak efisien seiring bertambahnya jumlah *node*.
+
+## Solusi - Membangun Jaringan Peer-to-Peer (P2P)
+
+Solusinya adalah menghilangkan perantara dan membiarkan *node-node* berbicara langsung satu sama lain.
+
+**Istilah Teknis:** **Peer-to-Peer (P2P) Network**, adalah sebuah jaringan di mana para pesertanya (*peers* atau *node*) terhubung dan berbagi informasi secara langsung satu sama lain tanpa memerlukan server pusat.
+
+### Cara Kerja Jaringan P2P Bitcoin
+
+* **Jaringan Gosip:** Informasi menyebar seperti gosip. Ketika sebuah *node* menerima informasi baru (seperti transaksi atau blok), ia akan memverifikasinya dan meneruskannya (*relay*) ke beberapa *node* lain yang terhubung dengannya (*peers*). *Node-node* tersebut kemudian akan meneruskannya lagi ke *peers* mereka, dan begitu seterusnya hingga informasi menyebar ke seluruh jaringan.
+* **Ketahanan Sensor:** Dalam model ini, sensor menjadi sangat sulit. Jika satu *node* (misalnya, Cafe) menolak untuk meneruskan blok dari Rashid ke Lisa, Lisa akan tetap menerimanya dari *peer* lain yang terhubung dengannya (misalnya, dari Tom atau Qi).
+
+## Melacak Alur Transaksi dan Blok di Jaringan P2P
+
+Buku ini menjelaskan alur lengkap sebuah transaksi, mulai dari dompet pengirim hingga terkonfirmasi di dompet penerima.
+
+### Langkah 1: Pengiriman Transaksi Awal
+
+* Dompet John (pengirim) terhubung ke salah satu *full node* di jaringan (misalnya, *node* milik Tom).
+* Dompet John tidak langsung mengirim seluruh data transaksi. Ia menggunakan protokol 3 langkah untuk efisiensi:
+
+  1. **`inv` (Inventory):** Dompet John mengirim pesan `inv` yang berisi *txid* dari transaksinya, memberitahu Tom, "Saya punya transaksi ini".
+  2. **`getdata`:** *Node* Tom memeriksa apakah ia sudah memiliki transaksi tersebut. Jika belum, ia merespons dengan pesan `getdata`, "Tolong kirimkan saya transaksi itu".
+  3. **`tx`:** Dompet John mengirimkan data transaksi lengkap dalam pesan `tx`.
+
+### Langkah 2: Propagasi Transaksi ke Seluruh Jaringan
+
+* Setelah menerima dan memvalidasi transaksi John, *node* Tom akan menyebarkannya ke *peers*-nya (Lisa, Qi, Rashid) menggunakan protokol `inv` yang sama. Proses ini berlanjut hingga transaksi menyebar ke seluruh jaringan, termasuk ke semua *miner* dan *node* milik Cafe (penerima).
+* *Wallet* ringan milik Cafe, yang terhubung ke *full node*-nya sendiri, akan diberitahu tentang transaksi ini. Ia akan menampilkan notifikasi bahwa ada pembayaran masuk yang masih *pending* (0 konfirmasi).
+
+### Langkah 3: Transaksi Dimasukkan ke dalam Blok
+
+* Salah satu *miner* (misalnya, Rashid) berhasil menemukan *Proof of Work* untuk blok baru yang berisi transaksi John.
+
+### Langkah 4: Propagasi Blok
+
+* Menyebarkan blok yang ukurannya bisa mencapai beberapa Megabyte harus dilakukan seefisien mungkin.
+* Alih-alih `inv`, untuk blok digunakan pesan **`headers`**. Rashid mengirim *header* blok barunya ke semua *peers*-nya.
+* Para *peers* yang belum memiliki blok tersebut akan merespons dengan `getdata` untuk meminta data blok lengkap.
+* Rashid kemudian mengirimkan data blok penuh dalam pesan **`block`**.
+* Proses ini berulang hingga blok baru menyebar ke seluruh jaringan.
+
+### Langkah 5: Konfirmasi di Wallet Penerima
+
+* *Wallet* ringan John dan Cafe akan menerima pesan `headers` dari *full node* yang terhubung dengannya.
+* Mereka kemudian meminta **`merkleblock`**, yang berisi *header* blok dan *Merkle Proof* yang membuktikan bahwa transaksi mereka ada di dalam blok tersebut.
+* Setelah verifikasi berhasil, *wallet* akan menampilkan bahwa transaksi tersebut telah mendapat 1 konfirmasi.
+
+## Meninggalkan Sistem Cookie Token
+
+Pada titik ini, sistem yang telah kita bangun—dengan transaksi, *blockchain*, PoW, *miner*, dan jaringan P2P—secara fungsional sudah identik dengan Bitcoin. Analogi *Cookie Token* telah mencapai tujuannya. Mulai sekarang, kita akan membahas **Bitcoin** secara langsung.
+
+## Bootstrapping - Bagaimana Node Baru Bergabung?
+
+Bagaimana sebuah *node* yang baru diaktifkan bisa menemukan *peers* dan mengunduh seluruh *blockchain*? Proses ini disebut **Bootstrapping**.
+
+1. **Menjalankan Perangkat Lunak:** Pengguna mengunduh perangkat lunak *full node* seperti Bitcoin Core. **Langkah keamanan yang sangat penting** adalah memverifikasi tanda tangan digital dari rilis perangkat lunak tersebut untuk memastikan itu asli dan tidak disusupi *malware*.
+2. **Menemukan Peers Awal:** *Node* baru tidak tahu harus terhubung ke mana. Ia menemukan *peers* pertamanya melalui beberapa cara:
+
+   * **DNS Seeds:** Bitcoin Core memiliki daftar nama domain (*hardcoded*) di dalam kodenya. Ia akan menanyakan ke server DNS untuk mendapatkan daftar alamat IP dari *node-node* lain yang sedang aktif.
+   * **Alamat IP Hardcoded:** Sebagai cadangan, ada juga beberapa alamat IP yang di-*hardcode*.
+   * **Konfigurasi Manual:** Pengguna bisa menambahkan alamat IP *peer* secara manual.
+3. **Sinkronisasi (Initial Block Download - IBD):** Setelah terhubung, *node* baru harus mengunduh seluruh riwayat *blockchain*.
+
+   * Ia akan mengunduh semua **header blok** terlebih dahulu dari satu *peer* untuk memvalidasi rantai PoW.
+   * Setelah itu, ia akan mengunduh **data blok penuh** secara paralel dari beberapa *peer* untuk membangun UTXO Set-nya.
+   * Proses ini bisa memakan waktu berjam-jam hingga berhari-hari dan membutuhkan ruang penyimpanan lebih dari 210 GB (per buku ini ditulis).
+4. **Operasi Normal:** Setelah sinkronisasi selesai, *node* tersebut menjadi peserta penuh dalam jaringan, ikut serta dalam memvalidasi dan menyebarkan transaksi dan blok baru.
+
+## Kesimpulan Bab 8
+
+Bab ini adalah puncak dari perjalanan desentralisasi kita.
+
+1. **Jaringan P2P** menggantikan *shared folder*, menghilangkan titik pusat kegagalan dan sensor terakhir.
+2. **Protokol jaringan** yang efisien (menggunakan `inv`, `headers`, dll.) memungkinkan transaksi dan blok menyebar dengan cepat ke seluruh dunia.
+3. Proses **bootstrapping** memungkinkan *node-node* baru untuk bergabung dengan jaringan secara *trustless* (tanpa perlu percaya) dan memverifikasi seluruh sejarah *blockchain* untuk diri mereka sendiri.
+
+Dengan ini, kita telah membangun semua pilar fundamental Bitcoin. Sistem ini kini benar-benar terdesentralisasi, tahan sensor, dan dapat diaudit oleh siapa saja.
 
 ---
 
