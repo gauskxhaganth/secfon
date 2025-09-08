@@ -1130,3 +1130,126 @@ Dengan ini, kita telah membangun semua pilar fundamental Bitcoin. Sistem ini kin
 
 ---
 
+# Bab 9
+## Transactions Revisited
+
+Setelah memahami dasar-dasar Bitcoin, bab ini akan membawa kita lebih dalam untuk menjelajahi fitur-fitur canggih yang dapat dilakukan dengan transaksi. Fitur-fitur ini mengubah transaksi dari sekadar alat transfer uang menjadi fondasi untuk kontrak digital yang kompleks.
+
+## Time-locked Transactions
+
+Biasanya, sebuah transaksi yang sudah ditandatangani bisa langsung dimasukkan ke dalam blok kapan saja. Namun, Bitcoin memungkinkan kita untuk membuat transaksi yang baru akan valid di masa depan. Ini disebut *time lock* dan bisa diterapkan dengan beberapa cara.
+
+### a. Kunci Waktu Absolut (`nLockTime`)
+
+Anda bisa mengatur agar sebuah **transaksi secara keseluruhan** tidak valid sebelum mencapai tinggi blok (*block height*) tertentu atau waktu (*timestamp*) tertentu.
+
+* **Cara Kerja:**
+  Ini diatur melalui *field* **`locktime`** pada transaksi. Agar `locktime` ini aktif, setidaknya salah satu *input*-nya harus memiliki *field* **`sequence number`** yang nilainya kurang dari `0xffffffff`.
+
+* **Contoh Penggunaan:**
+  Anda ingin memberikan warisan 100 BTC kepada putri Anda, tetapi ia baru bisa mengklaimnya setelah 30 April 2025. Anda bisa membuat transaksi dengan `locktime` di tanggal tersebut dan memberikannya sekarang. Transaksi itu baru bisa disiarkan dan dikonfirmasi setelah tanggal yang ditentukan tiba.
+
+### b. Kunci Waktu Relatif (`sequence number`)
+
+Anda juga bisa mengatur agar sebuah **input** tidak bisa dibelanjakan sebelum sejumlah blok atau periode waktu tertentu telah berlalu **sejak output yang dibelanjakannya itu terkonfirmasi**.
+
+* **Istilah Teknis:**
+  **Relative Time Lock (BIP68)**, adalah sebuah kunci waktu yang diukur relatif terhadap waktu konfirmasi dari UTXO yang sedang dibelanjakan.
+
+* **Cara Kerja:**
+  Ini diatur melalui *field* **`sequence number`** pada setiap *input*. Fitur ini memerlukan versi transaksi minimal 2.
+
+## Time-locked Outputs
+
+Selain mengunci seluruh transaksi, Anda juga bisa mengunci sebuah **output** secara spesifik, sehingga output tersebut tidak dapat dibelanjakan sebelum syarat waktunya terpenuhi. Ini dilakukan menggunakan operator khusus di dalam `scriptPubKey`.
+
+* **`OP_CHECKLOCKTIMEVERIFY` (CLTV / BIP65):**
+  Menerapkan kunci waktu absolut pada sebuah output. Skripnya akan memeriksa *field* `locktime` dari transaksi yang **mencoba membelanjakannya**. Transaksi pembelanja tersebut harus memiliki `locktime` yang sama atau lebih besar dari waktu yang ditentukan di dalam skrip.
+
+* **`OP_CHECKSEQUENCEVERIFY` (CSV / BIP112):**
+  Menerapkan kunci waktu relatif pada sebuah output. Skripnya akan memeriksa *field* `sequence number` dari *input* yang membelanjakannya untuk memastikan sejumlah waktu/blok telah berlalu.
+
+## 3. Studi Kasus: Atomic Swaps
+
+*Atomic swap* adalah salah satu contoh kontrak digital paling kuat yang menggunakan kunci waktu dan kunci *hash*.
+
+* **Istilah Teknis:** **Atomic Swap**, adalah sebuah metode untuk menukar satu jenis mata uang kripto dengan jenis lain (misalnya, Bitcoin dengan Namecoin) secara langsung antara dua pihak tanpa memerlukan perantara terpercaya seperti bursa (*exchange*).
+  "Atomik" berarti pertukaran ini **berhasil sepenuhnya atau gagal sepenuhnya**, tidak ada kemungkinan salah satu pihak kehilangan dana sementara pihak lain tidak.
+
+### Mekanisme Sederhana
+
+1. John dan Fadime ingin bertukar 2 BTC milik John dengan 100 NMC (Namecoin) milik Fadime.
+2. John membuat sebuah angka rahasia (S) dan memberikan *hash* dari angka tersebut (H) kepada Fadime.
+3. **John (di blockchain Bitcoin):** Membuat transaksi yang mengirim 2 BTC ke sebuah alamat kontrak. Dana ini bisa diambil oleh:
+
+   * Fadime, jika ia bisa memberikan rahasia (S) **DAN** tanda tangannya.
+   * John, jika ia ingin uangnya kembali (*refund*), tetapi hanya **setelah 48 jam** (menggunakan *time lock*).
+4. **Fadime (di blockchain Namecoin):** Setelah melihat transaksi John terkonfirmasi, ia membuat transaksi yang mengirim 100 NMC ke alamat kontrak. Dana ini bisa diambil oleh:
+
+   * John, jika ia bisa memberikan rahasia (S) **DAN** tanda tangannya.
+   * Fadime, jika ia ingin uangnya kembali, tetapi hanya **setelah 24 jam**.
+5. **Eksekusi:** John mengambil 100 NMC milik Fadime dengan menyertakan tanda tangannya dan **mengungkapkan rahasia (S)** di *blockchain* Namecoin.
+6. **Penyelesaian:** Fadime melihat rahasia (S) di *blockchain* Namecoin, lalu menggunakannya untuk mengambil 2 BTC milik John di *blockchain* Bitcoin.
+
+Perbedaan waktu *refund* (48 jam vs 24 jam) memastikan bahwa jika salah satu pihak tidak responsif, pihak lainnya memiliki cukup waktu untuk mengamankan dananya.
+
+## 4. Menyimpan Data di Blockchain
+
+Terkadang pengguna ingin menyimpan data arbitrer (sembarang) di *blockchain*.
+
+* **Metode Lama (Buruk):**
+  Pengguna menyisipkan data dengan menyamarkannya sebagai PKH palsu di dalam output. Ini menciptakan UTXO yang tidak akan pernah bisa dibelanjakan (*unspendable*).
+  Masalahnya, *node-node* di jaringan tidak tahu kalau UTXO ini tidak bisa dibelanjakan, sehingga mereka harus menyimpannya di UTXO set selamanya.
+  Ini menyebabkan **pembengkakan UTXO set (*UTXO set bloat*)** yang membebani semua peserta jaringan.
+
+* **Metode Modern (Baik): `OP_RETURN`**
+
+  * `OP_RETURN` adalah sebuah operator skrip yang secara otomatis membuat sebuah output menjadi **terbukti tidak dapat dibelanjakan (*provably unspendable*)**.
+  * Ketika *full node* melihat output `OP_RETURN`, ia tahu bahwa output ini tidak perlu disimpan di UTXO set, sehingga mencegah pembengkakan.
+  * Ini adalah cara standar yang diterima untuk menyimpan sejumlah kecil data di *blockchain* saat ini.
+
+## 5. Mengganti Transaksi yang Tertunda (Fee Bumping)
+
+Terkadang, transaksi Anda bisa "macet" (*stuck*) di *mempool* dan tidak kunjung dikonfirmasi karena biaya (`fee`) yang Anda bayarkan terlalu rendah. Ada dua cara utama untuk menaikkan biaya transaksi yang sudah terlanjur dikirim.
+
+### a. Opt-in Replace-by-Fee (RBF)
+
+* **Istilah Teknis:**
+  **Replace-by-Fee (RBF / BIP125)**, adalah sebuah metode di mana pengirim secara eksplisit menandai transaksinya sebagai "dapat diganti" (*replaceable*). Ini memungkinkan mereka untuk mengirim ulang transaksi yang sama dengan biaya yang lebih tinggi.
+
+* **Cara Kerja:**
+  Pengirim menandai transaksi dengan mengatur `sequence number` di salah satu *input*-nya ke nilai yang lebih kecil dari `0xfffffffe`.
+  *Node* di jaringan yang mendukung RBF akan menerima transaksi pengganti (dengan *fee* lebih tinggi) dan membuang transaksi yang lama.
+
+### b. Child Pays for Parent (CPFP)
+
+* **Istilah Teknis:**
+  **Child Pays for Parent (CPFP)**, adalah metode di mana Anda membuat transaksi "anak" baru yang membelanjakan salah satu output (biasanya output kembalian) dari transaksi "induk" yang macet.
+
+* **Cara Kerja:**
+  Anda membuat transaksi anak ini dengan biaya yang **sangat tinggi**.
+  Seorang *miner* yang ingin mengklaim biaya tinggi dari transaksi anak **harus** terlebih dahulu memasukkan transaksi induknya ke dalam blok agar transaksi anak menjadi valid.
+  Dengan demikian, biaya tinggi dari anak secara efektif "membayar" untuk konfirmasi induknya.
+
+## 6. Tipe Tanda Tangan yang Berbeda (SIGHASH Flags)
+
+Secara *default*, tanda tangan dalam sebuah transaksi mengunci semua *input* dan *output*, artinya tidak ada bagian dari transaksi yang bisa diubah. Namun, ada cara untuk membuat tanda tangan yang lebih fleksibel dengan menggunakan **SIGHASH flags**.
+
+Ini memungkinkan tanda tangan untuk hanya mengunci bagian-bagian tertentu dari transaksi, misalnya:
+
+* `SIGHASH_ALL`: Mengunci semua *input* dan *output* (standar).
+* `SIGHASH_NONE`: Mengunci semua *input*, tetapi tidak ada *output* yang dikunci.
+* `SIGHASH_SINGLE`: Mengunci semua *input*, tetapi hanya satu *output* (yang memiliki indeks sama dengan *input* yang ditandatangani).
+* `SIGHASH_ANYONECANPAY`: Hanya mengunci *input* saat ini, membiarkan *input-input* lain untuk ditambahkan atau diubah oleh orang lain.
+
+Kombinasi *flag* ini sangat berguna untuk skenario kontrak digital yang kompleks.
+
+## Kesimpulan Bab 9
+
+Bab ini menunjukkan bahwa transaksi Bitcoin jauh lebih dari sekadar transfer uang.
+Fitur-fitur seperti **time locks**, **OP\_RETURN**, **RBF/CPFP**, dan **SIGHASH flags** memberikan fleksibilitas luar biasa, menjadikan transaksi sebagai blok bangunan yang dapat diprogram untuk berbagai aplikasi terdesentralisasi yang canggih.
+
+Pemahaman ini sangat penting untuk menganalisis keamanan kontrak-kontrak yang dibangun di atas Bitcoin.
+
+---
+
