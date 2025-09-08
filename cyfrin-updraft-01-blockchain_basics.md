@@ -341,8 +341,6 @@ ia hanya menjalankan program.
    mengunduh gambar Monalisa, tapi hanya museum Louvre yang punya lukisan aslinya. NFT
    memberikan bukti kepemilikan "asli" versi digital.
 
----
-
 ## Melakukan Transaksi Pertamamu
 
 Kita sudah mendapatkan pemahaman tingkat tinggi tentang Smart Contract dan penerapannya.
