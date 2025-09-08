@@ -1632,6 +1632,3 @@ Apendiks ini adalah gerbang Anda untuk menjadi pengguna Bitcoin tingkat lanjut. 
 * Mengelola *node* dan *wallet* Anda dengan kontrol penuh.
 
 Ini adalah keterampilan dasar yang mutlak diperlukan untuk audit keamanan dan perburuan *bug* di ekosistem Bitcoin.
-
----
-
