@@ -191,12 +191,12 @@ Setiap transaksi terhubung dengan transaksi sebelumnya. *Input* dari sebuah tran
 
 ##### **Membuat Kembalian (*Making Change*)**
 
-*Input* transaksi harus dihabiskan seluruhnya, mirip seperti Anda tidak bisa menyobek selembar uang kertas untuk membayar. Jika Anda ingin membayar 5 BTC tetapi hanya memiliki *input* senilai 20 BTC, transaksi Anda akan memiliki dua *output*:
+*Input* transaksi harus dihabiskan seluruhnya, mirip seperti Kita tidak bisa menyobek selembar uang kertas untuk membayar. Jika Kita ingin membayar 5 BTC tetapi hanya memiliki *input* senilai 20 BTC, transaksi Kita akan memiliki dua *output*:
 
 1. Satu *output* sebesar 5 BTC untuk si penerima.
-2. Satu *output* sebesar 15 BTC (dikurangi biaya transaksi) yang kembali ke alamat Anda sendiri. Ini disebut ***change output***.
+2. Satu *output* sebesar 15 BTC (dikurangi biaya transaksi) yang kembali ke alamat Kita sendiri. Ini disebut ***change output***.
 
-Untuk privasi, alamat kembalian ini biasanya adalah alamat baru yang belum pernah digunakan, yang juga dibuat oleh dompet Anda.
+Untuk privasi, alamat kembalian ini biasanya adalah alamat baru yang belum pernah digunakan, yang juga dibuat oleh dompet Kita.
 
 ##### **Bentuk-Bentuk Transaksi Umum**
 
@@ -670,7 +670,7 @@ Banyak orang keliru mengira dompet Bitcoin berisi bitcoin. Faktanya, dompet hany
 
 Dompet modern tidak lagi menghasilkan kunci secara acak dan independen. Sebaliknya, mereka menggunakan **generasi kunci deterministik**. Artinya, semua kunci di dalam dompet diturunkan (*derived*) dari satu sumber acak utama yang disebut **seed**.
 
-**Konsepnya:** Sebuah *hash function* akan selalu menghasilkan output yang sama jika diberi input yang sama. Kita bisa menggunakan *seed* sebagai input awal, lalu secara berulang-ulang meng-*hash*-nya (dengan sedikit modifikasi, seperti menambahkan angka urut) untuk menghasilkan serangkaian angka yang terlihat acak tetapi sebenarnya dapat diprediksi jika Anda mengetahui *seed*-nya.
+**Konsepnya:** Sebuah *hash function* akan selalu menghasilkan output yang sama jika diberi input yang sama. Kita bisa menggunakan *seed* sebagai input awal, lalu secara berulang-ulang meng-*hash*-nya (dengan sedikit modifikasi, seperti menambahkan angka urut) untuk menghasilkan serangkaian angka yang terlihat acak tetapi sebenarnya dapat diprediksi jika Kita mengetahui *seed*-nya.
 
 ```bash
 # Contoh konseptual menggunakan command-line
@@ -725,21 +725,21 @@ Ada beberapa standar kode pemulihan yang populer:
 * **BIP39:** Standar yang paling banyak digunakan. Menghasilkan 12-24 kata dari *entropy* acak ditambah *checksum*.
 * **Electrum v2:** Standar yang digunakan oleh dompet Electrum. Memiliki beberapa keunggulan seperti nomor versi internal.
 * **Aezeed:** Digunakan oleh dompet LND. Menyertakan nomor versi dan "tanggal lahir dompet" (*wallet birthday*) untuk mempercepat pemulihan.
-* **SLIP39:** Memungkinkan satu *seed* untuk dibagi menjadi beberapa kode pemulihan (*shares*). Anda bisa menentukan berapa banyak *shares* yang dibutuhkan untuk memulihkan dompet (misalnya, 3 dari 5 *shares*). Ini disebut **Shamir's Secret Sharing Scheme (SSSS)**.
+* **SLIP39:** Memungkinkan satu *seed* untuk dibagi menjadi beberapa kode pemulihan (*shares*). Kita bisa menentukan berapa banyak *shares* yang dibutuhkan untuk memulihkan dompet (misalnya, 3 dari 5 *shares*). Ini disebut **Shamir's Secret Sharing Scheme (SSSS)**.
 * **Codex32:** Proposal baru yang mirip SLIP39, memungkinkan pembuatan dan validasi *shares* bahkan tanpa komputer, hanya dengan kertas dan pulpen.
 
 **Passphrase Kode Pemulihan:**
-Standar seperti BIP39 dan SLIP39 mendukung **passphrase opsional**. Ini adalah kata sandi tambahan yang Anda buat.
+Standar seperti BIP39 dan SLIP39 mendukung **passphrase opsional**. Ini adalah kata sandi tambahan yang Kita buat.
 
 * **Keuntungan:** Jika seseorang menemukan kertas berisi 12 kata Anda, mereka tetap tidak bisa mengakses dana Anda tanpa *passphrase* ini (keamanan faktor kedua). Ini juga menciptakan **plausible deniability**, di mana dompet tanpa *passphrase* bisa berisi sedikit dana sebagai umpan, sementara dana utama ada di dompet dengan *passphrase*.
-* **Kerugian (khususnya BIP39):** Tidak ada *passphrase* yang "salah". Setiap *passphrase* akan menghasilkan dompet yang valid (tetapi kosong jika belum pernah digunakan). Jika Anda salah ketik *passphrase* saat pemulihan, dompet tidak akan memberitahu Anda—Anda hanya akan melihat saldo nol dan mungkin mengira dana Anda hilang.
+* **Kerugian (khususnya BIP39):** Tidak ada *passphrase* yang "salah". Setiap *passphrase* akan menghasilkan dompet yang valid (tetapi kosong jika belum pernah digunakan). Jika Kita salah ketik *passphrase* saat pemulihan, dompet tidak akan memberitahu Kita—Kita hanya akan melihat saldo nol dan mungkin mengira dana Kita hilang.
 
 #### **Mencadangkan Data Non-Kunci**
 
-Kode pemulihan **hanya** mencadangkan kunci Anda. Ia tidak mencadangkan metadata lain seperti:
+Kode pemulihan **hanya** mencadangkan kunci Kita. Ia tidak mencadangkan metadata lain seperti:
 
-* **Label Transaksi:** Catatan yang Anda buat untuk setiap transaksi (misalnya, "Pembayaran dari Bob untuk podcast").
-* **Status Channel Lightning Network:** Jika Anda menggunakan *Lightning Network*, status *channel* Anda tidak bisa dipulihkan hanya dari *seed*.
+* **Label Transaksi:** Catatan yang Kita buat untuk setiap transaksi (misalnya, "Pembayaran dari Bob untuk podcast").
+* **Status Channel Lightning Network:** Jika Kita menggunakan *Lightning Network*, status *channel* Kita tidak bisa dipulihkan hanya dari *seed*.
 
 Kehilangan data ini tidak sama dengan kehilangan dana, tetapi bisa sangat merepotkan. Dompet yang baik seharusnya menyediakan cara untuk mencadangkan seluruh data dompet (biasanya dalam file terenkripsi) selain hanya kode pemulihan.
 
@@ -747,7 +747,7 @@ Kehilangan data ini tidak sama dengan kehilangan dana, tetapi bisa sangat merepo
 
 Dalam dompet HD, setiap kunci memiliki "alamat" unik dalam struktur pohon, yang disebut **derivation path**. Contoh: `m/84'/0'/0'/0/5` adalah kunci kelima untuk menerima pembayaran di akun utama untuk alamat SegWit P2WPKH.
 
-Saat memulihkan dompet, aplikasi harus tahu *path* mana yang harus diperiksa untuk menemukan dana Anda. Ada dua pendekatan untuk ini:
+Saat memulihkan dompet, aplikasi harus tahu *path* mana yang harus diperiksa untuk menemukan dana Kita. Ada dua pendekatan untuk ini:
 
 1. **Implicit Paths:** Menggunakan standar yang sudah disepakati, seperti **BIP44, BIP49, BIP84, BIP86**. Dompet akan secara otomatis memindai *path-path* standar ini saat pemulihan.
 2. **Explicit Paths:** Menyimpan deskripsi eksplisit tentang *script* dan *path* yang digunakan. Standar modern untuk ini adalah **Output Script Descriptors**. Ini jauh lebih fleksibel dan andal, terutama untuk pengaturan yang rumit seperti *multisignature*.
@@ -765,7 +765,7 @@ Proses pembuatan kode pemulihan BIP39:
 3. Gabungkan *entropy* dan *checksum*.
 4. Bagi hasilnya menjadi segmen-segmen 11-bit.
 5. Setiap segmen 11-bit dipetakan ke satu kata dari daftar 2048 kata yang telah ditentukan.
-6. Urutan kata-kata inilah yang menjadi kode pemulihan Anda.
+6. Urutan kata-kata inilah yang menjadi kode pemulihan Kita.
 
 ![gambar](images/books-02-mastering_bitcoin/gambar_5-4.png)
 
@@ -773,7 +773,7 @@ Proses pembuatan kode pemulihan BIP39:
 
 Proses mengubah kode pemulihan menjadi *seed*:
 7\. Kata-kata kode pemulihan diambil.
-8\. Sebuah *salt* dibuat dengan menggabungkan string `"mnemonic"` dengan *passphrase* opsional Anda.
+8\. Sebuah *salt* dibuat dengan menggabungkan string `"mnemonic"` dengan *passphrase* opsional Kita.
 9\. Kode pemulihan dan *salt* dimasukkan ke dalam **fungsi peregangan kunci (key-stretching function)** bernama **PBKDF2**. Fungsi ini menjalankan proses *hashing* sebanyak 2048 kali untuk membuatnya lebih tahan terhadap serangan *brute-force*.
 10\. Output akhir adalah **seed 512-bit**. *Seed* inilah yang digunakan untuk membuat dompet HD BIP32.
 
@@ -804,6 +804,190 @@ Derivasi normal (`m/0`) memungkinkan penurunan *public key* anak dari *public ke
 * Praktik terbaik adalah selalu menggunakan *hardened derivation* untuk tingkat "akun" (`m/44'/0'/0'`), dan menggunakan derivasi normal setelahnya (`.../0/5`).
 
 Bab ini menunjukkan betapa canggihnya sistem di balik kode pemulihan 12 kata yang sederhana. Mekanisme ini dirancang untuk memberikan keseimbangan antara kemudahan penggunaan untuk *backup* dan keamanan yang kuat, sambil memungkinkan kasus penggunaan yang fleksibel seperti server e-commerce yang aman dan *multisignature wallets*.
+
+---
+
+# Bab 6
+## Transaksi (*Transactions*)**
+
+Bitcoin tidak seperti uang tunai yang bisa diserahkan secara fisik. Sebaliknya, Bitcoin lebih mirip seperti catatan kepemilikan tanah. Alice tidak bisa memberikan tanahnya kepada Bob secara fisik; ia harus meyakinkan pemerintah untuk memperbarui catatan yang menyatakan bahwa Bob sekarang adalah pemiliknya.
+
+Di Bitcoin, semua *full node* menyimpan database kepemilikan. Alice membayar Bob dengan meyakinkan ribuan *node* ini untuk memperbarui database mereka. Data yang digunakan Alice untuk meyakinkan mereka disebut **transaksi**. Bab ini akan menguraikan setiap bagian dari transaksi tersebut.
+
+---
+
+#### **Transaksi yang Diserialisasi (*A Serialized Bitcoin Transaction*)**
+
+Saat kita meminta data transaksi mentah dari Bitcoin Core, kita akan mendapatkan serangkaian data heksadesimal. Ini adalah format **serialisasi**—cara data diatur untuk transmisi atau penyimpanan. Format ini sangat padat dan efisien.
+
+**Contoh Kode (Transaksi Alice ke Bob dari Bab Sebelumnya):**
+
+```bash
+$ bitcoin-cli getrawtransaction 466200308696215bbc949d5141a49a4138ecdfdfaa2a8029c1f9bcecd1f96177
+```
+
+**Output (Data Heksadesimal Mentah):**
+
+```
+01000000000101eb3ae38f27191aa5f3850dc9cad00492b88b72404f9da135698679268041c54a0100000000ffffffff02204e0000000000002251203b41daba4c9ace578369740f15e5ec880c28279ee7f51b07dca69c7061e07068f8240100000000001600147752c165ea7be772b2c0acb7f4d6047ae6f4768e0141cf5efe2d8ef13ed0af21d4f4cb82422d6252d70324f6f4576b727b7d918e521c00b51be739df2f899c49dc267c0ad280aca6dab0d2fa2b42a45182fc83e817130100000000
+```
+
+![gambar](images/books-02-mastering_bitcoin/gambar_6-1.png)
+
+*Gambar 6-1 di buku adalah peta byte dari data heksadesimal ini, yang secara visual membaginya menjadi beberapa bagian utama. Kita akan membahas setiap bagian secara berurutan.*
+
+---
+
+#### **Version (Versi)**
+
+* **Ukuran:** 4 byte
+* **Contoh:** `01000000`
+
+Bagian pertama dari setiap transaksi adalah nomor versinya.
+
+* **Versi 1:** Versi asli transaksi Bitcoin.
+* **Versi 2:** Diperkenalkan di **BIP68**. Versi ini menambahkan batasan baru pada *field* `sequence` untuk memungkinkan *relative timelocks*. Transaksi versi 1 tidak terpengaruh oleh aturan baru ini.
+* **Versi 3 (Diusulkan):** Diusulkan untuk mengubah kebijakan *relay* transaksi (bukan aturan konsensus) untuk mencegah serangan *denial-of-service* tertentu yang terkait dengan *transaction pinning*.
+
+---
+
+#### **Extended Marker and Flag**
+
+* **Ukuran:** 2 byte
+* **Contoh:** `0001`
+
+Dua *field* ini diperkenalkan oleh **Segregated Witness (SegWit)**.
+
+* **Marker (`00`):** Harus bernilai nol. Dalam format transaksi lama (*legacy*), posisi ini adalah untuk jumlah *input*. Karena transaksi tidak boleh memiliki nol *input*, nilai `00` ini memberitahu *node* modern bahwa ini adalah transaksi format *extended* (SegWit).
+* **Flag (`01`):** Harus bernilai bukan nol (saat ini selalu `01`).
+
+Jika transaksi tidak menggunakan SegWit (format *legacy*), kedua *field* ini tidak ada.
+
+---
+
+#### **Inputs**
+
+Bagian ini berisi daftar semua sumber dana untuk transaksi.
+
+##### **Panjang Daftar Input**
+
+* **Ukuran:** 1–9 byte
+* **Contoh:** `01`
+
+Angka pertama adalah jumlah *input* dalam transaksi, yang di-encode sebagai **compactSize unsigned integer** (tipe data yang ukurannya bervariasi untuk menghemat ruang). Contoh kita memiliki `01`, yang berarti 1 *input*.
+
+Setiap *input* terdiri dari tiga *field* utama: `outpoint`, `input script`, dan `sequence`.
+
+##### **Outpoint**
+
+* **Ukuran:** 36 byte
+
+*Outpoint* adalah penunjuk (*pointer*) ke **UTXO** (*Unspent Transaction Output*) yang akan dibelanjakan. Ia terdiri dari dua bagian:
+
+1. **Previous output txid** (32 byte): ID transaksi dari mana UTXO ini berasal. **Penting:** *txid* di sini disimpan dalam urutan *byte* internal (*little-endian*), yang terbalik dari urutan yang biasanya ditampilkan di *blockchain explorer* (*big-endian*).
+2. **Previous output index** (4 byte): Nomor urut *output* dalam transaksi sebelumnya (dimulai dari 0).
+
+Saat *node* memvalidasi *input*, ia akan menggunakan *outpoint* untuk menemukan UTXO yang dirujuk. Dari UTXO tersebut, *node* mendapatkan informasi penting: jumlah (nilai) bitcoin yang dibelanjakan dan kondisi (*script*) yang harus dipenuhi untuk membelanjakannya.
+
+##### **Input Script**
+
+* **Ukuran:** Bervariasi
+
+Dalam format transaksi *legacy*, *field* ini berisi data (seperti tanda tangan digital) yang memenuhi kondisi dari *output script* UTXO yang dibelanjakan. Namun, dalam transaksi SegWit asli (seperti contoh kita), *field* ini kosong. Oleh karena itu, panjangnya adalah `00`. Data otentikasi dipindahkan ke *field* `witness` di akhir transaksi.
+
+##### **Sequence**
+
+* **Ukuran:** 4 byte
+* **Contoh:** `ffffffff`
+
+*Field* ini memiliki beberapa fungsi yang telah berevolusi dari waktu ke waktu:
+
+1. **Penggantian Transaksi Awal:** Awalnya, dimaksudkan untuk memungkinkan pembaruan transaksi yang belum dikonfirmasi dengan menaikkan nomor `sequence`. Fitur ini dinonaktifkan karena potensi penyalahgunaan.
+2. **Sinyal Replace-By-Fee (RBF) (BIP125):** Nilai `sequence` yang lebih rendah dari `0xfffffffe` menandakan bahwa transaksi ini "opt-in" untuk RBF, yang berarti pengirim dapat menggantinya dengan versi baru yang membayar *fee* lebih tinggi.
+3. **Relative Timelock (BIP68):** Untuk transaksi v2 atau lebih tinggi, `sequence` dapat digunakan untuk mengunci sebuah *input* agar tidak dapat dibelanjakan sampai UTXO-nya telah berumur sejumlah *block* atau detik tertentu.
+
+---
+
+#### **Outputs**
+
+Bagian ini mendefinisikan tujuan dana.
+
+##### **Jumlah Output**
+
+* **Ukuran:** 1–9 byte
+* **Contoh:** `02`
+
+Mirip seperti *input*, ini adalah jumlah *output* dalam transaksi. Contoh kita memiliki `02`, yang berarti 2 *output*.
+
+Setiap *output* terdiri dari dua *field*: `amount` dan `output script`.
+
+##### **Amount (Jumlah)**
+
+* **Ukuran:** 8 byte
+
+Nilai yang ditransfer dalam satuan **satoshi**. Aturan konsensus mengizinkan nilai dari 0 hingga 21 juta bitcoin. *Output* dengan nilai yang sangat kecil sehingga biaya untuk membelanjakannya lebih besar dari nilainya disebut **dust**. *Node* biasanya akan menolak untuk me-*relay* transaksi yang membuat *dust* untuk mencegah "sampah" di database UTXO.
+
+##### **Output Script (scriptPubKey)**
+
+* **Ukuran:** Bervariasi
+
+Ini adalah *script* yang menetapkan kondisi yang harus dipenuhi untuk membelanjakan *output* ini di masa depan. Ini adalah bagian terpenting yang mengunci dana ke pemilik baru. Kita akan membahas *script* secara mendalam di Bab 7.
+
+---
+
+#### **Witness Structure**
+
+* **Ukuran:** Bervariasi
+
+Ini adalah *field* yang ditambahkan oleh **SegWit**. Ia berisi data yang dipisahkan (*segregated*) dari bagian utama transaksi, seperti tanda tangan digital dan *redeem scripts*.
+
+**Mengapa Witness Dipisahkan?**
+Memisahkan data saksi (*witness*) dari data yang digunakan untuk menghitung `txid` menyelesaikan masalah kritis yang disebut **transaction malleability**.
+
+* **Transaction Malleability:** Di format *legacy*, siapa pun bisa sedikit mengubah data tanda tangan tanpa membuatnya tidak valid. Perubahan kecil ini akan menghasilkan `txid` yang sama sekali berbeda. Ini menjadi masalah besar untuk kontrak-kontrak kompleks (seperti di Lightning Network) yang bergantung pada `txid` yang stabil dan tidak dapat diubah.
+* **Solusi SegWit:** Dengan memindahkan tanda tangan ke *field* `witness`, `txid` dihitung tanpa data ini. Akibatnya, `txid` menjadi tetap dan tidak bisa diubah oleh pihak ketiga setelah ditandatangani. Ini adalah salah satu peningkatan keamanan terpenting dalam sejarah Bitcoin.
+
+Struktur *witness* berisi satu *witness stack* untuk setiap *input*. Contoh kita memiliki satu *input*, jadi ada satu *stack* yang berisi satu item: tanda tangan Alice.
+
+---
+
+#### **Lock Time**
+
+* **Ukuran:** 4 byte
+* **Contoh:** `00000000`
+
+*Field* terakhir dalam transaksi ini menetapkan waktu paling awal di mana transaksi dapat dimasukkan ke dalam *block*.
+
+* Jika nilainya `0`, transaksi bisa dimasukkan kapan saja.
+* Jika nilainya `< 500,000,000`, ia diartikan sebagai **nomor block**. Transaksi hanya valid di *block* dengan ketinggian tersebut atau lebih tinggi.
+* Jika nilainya `≥ 500,000,000`, ia diartikan sebagai **Unix timestamp**. Transaksi hanya valid jika MTP (*Median Time Past*) dari *block* lebih besar dari *timestamp* tersebut.
+
+---
+
+#### **Coinbase Transactions**
+
+Transaksi pertama dalam setiap *block* adalah **coinbase transaction** yang spesial. Ini adalah transaksi yang dibuat oleh *miner* untuk mengklaim *block reward* (*block subsidy* + *transaction fees*). Ia memiliki aturan khusus:
+
+* Hanya punya satu *input*.
+* *Input*-nya memiliki `txid` null (`00...00`) dan `output index` maksimal (`ffffffff`), karena tidak membelanjakan UTXO apa pun.
+* *Field* `input script`-nya digantikan oleh *field* `coinbase` yang bisa berisi data arbitrer (dan harus berisi tinggi *block* sesuai BIP34).
+* *Output*-nya tidak boleh melebihi total *reward* yang diizinkan.
+* *Output* dari *coinbase transaction* tidak dapat dibelanjakan sampai **100 konfirmasi** (aturan *maturity*).
+
+---
+
+#### **Weight dan Vbytes**
+
+Dengan SegWit, cara mengukur ukuran transaksi berubah. Alih-alih hanya menghitung *byte*, kita sekarang menggunakan **weight units**.
+
+* Data non-witness (seperti *version*, *outpoints*, *outputs*) dihitung **4 weight unit per byte**.
+* Data witness (tanda tangan) dihitung **1 weight unit per byte**.
+
+Total *weight* sebuah *block* dibatasi hingga 4 juta unit. Skema ini secara efektif membuat data *witness* "lebih murah", memberikan insentif untuk mengadopsi SegWit yang membantu meningkatkan kapasitas jaringan.
+
+**Vbytes (virtual bytes):** `Vbytes = Weight / 4`. Ini adalah unit yang lebih mudah dipahami karena kira-kira setara dengan ukuran transaksi *legacy* dalam *byte*.
+
+Memahami struktur transaksi di level *byte* ini memungkinkan Kita untuk menganalisis transaksi apa pun di *blockchain* secara mendalam, mengidentifikasi jenisnya (legacy, P2SH, SegWit), dan memvalidasi setiap komponennya—sebuah keharusan bagi seorang auditor.
 
 ---
 
