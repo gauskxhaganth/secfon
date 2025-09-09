@@ -483,3 +483,171 @@ for output in decoded_tx['vout']:
 Bab 3 ini memberikan Kita alat dan pemahaman dasar untuk mulai "membongkar" *blockchain*. Dengan menjalankan *full node* Kita sendiri dan menggunakan API-nya, Kita bisa memverifikasi, menganalisis, dan membangun aplikasi di atas Bitcoin dengan tingkat keamanan dan kepercayaan tertinggi. Keterampilan ini adalah fondasi mutlak untuk menjadi seorang auditor keamanan *blockchain*.
 
 ---
+
+# Bab 4
+## Kunci dan Alamat (*Keys and Addresses*)**
+
+Bab ini menjelaskan bagaimana Bitcoin menggunakan kriptografi kunci publik untuk mengontrol kepemilikan dana. Kita akan mempelajari bagaimana *private keys*, *public keys*, tanda tangan (*signatures*), dan alamat (*addresses*) dibuat serta bagaimana mereka bekerja sama untuk mengamankan bitcoin.
+
+#### **Kriptografi Kunci Publik (*Public Key Cryptography*)**
+
+*Public Key Cryptography* (juga dikenal sebagai kriptografi asimetris) adalah fondasi keamanan Bitcoin. Ia menggunakan sepasang kunci matematika: sebuah **private key** dan sebuah **public key**.
+
+* **Private Key (Kunci Privat):** Sebuah angka rahasia yang hanya diketahui oleh pemiliknya. Digunakan untuk membuat tanda tangan digital (*digital signatures*) yang mengotorisasi pengeluaran dana. Kehilangan *private key* berarti kehilangan akses ke dana Kita selamanya.
+* **Public Key (Kunci Publik):** Sebuah angka yang dapat dibagikan secara bebas kepada siapa pun. Digunakan untuk menerima dana. *Public key* dibuat dari *private key* melalui proses matematika satu arah.
+
+**Proses Satu Arah (*One-way function*):** Kita bisa dengan mudah membuat *public key* dari *private key*, tetapi secara komputasi **tidak mungkin** untuk mendapatkan *private key* dari *public key*. Sifat ini disebut *trap door function* dan menjadi dasar keamanan Bitcoin.
+
+Dalam Bitcoin, kriptografi asimetris tidak digunakan untuk mengenkripsi transaksi, melainkan untuk **membuat tanda tangan digital**. Tanda tangan membuktikan:
+
+1. **Kepemilikan:** Hanya orang yang memiliki *private key* yang bisa membuat tanda tangan valid.
+2. **Integritas:** Tanda tangan mengunci data transaksi sehingga tidak bisa diubah oleh pihak lain.
+
+#### **Private Keys**
+
+Sebuah *private key* Bitcoin hanyalah angka 256-bit yang dipilih secara acak. Sangat penting bahwa angka ini dihasilkan dari sumber keacakan (*entropy*) yang benar-benar aman. Menggunakan metode acak yang lemah dapat membahayakan keamanan dana Kita.
+
+**Istilah Penting:**
+
+* **Entropy:** Ukuran ketidakpastian atau keacakan. Dalam kriptografi, sumber *entropy* yang baik sangat penting untuk menghasilkan kunci yang tidak dapat ditebak.
+
+Ukuran ruang kunci privat Bitcoin (\$2^{256}\$) sangatlah besar, kira-kira setara dengan jumlah atom di alam semesta yang teramati. Hal ini membuat penebakan *private key* secara acak (*brute-force*) menjadi mustahil.
+
+Contoh *private key* (heksadesimal):
+
+```
+1E99423A4ED27608A15A2616A2B0E9E52CED330AC530EDCC32C8FFC6A526AEDD
+```
+
+#### **Elliptic Curve Cryptography (ECC)**
+
+Bitcoin menggunakan jenis kriptografi kunci publik yang disebut **Elliptic Curve Cryptography (ECC)**. Dasarnya adalah operasi matematika (penjumlahan dan perkalian) pada titik-titik di kurva eliptik. Bitcoin menggunakan kurva khusus bernama **secp256k1**.
+
+Persamaan kurva secp256k1:
+
+$y^2 \mod p = (x^3 + 7) \mod p$
+
+dengan \$p = 2^{256} - 2^{32} - 2^9 - 2^8 - 2^7 - 2^6 - 2^4 - 1\$.
+
+![gambar_2-1](images/books-02-mastering_bitcoin/gambar_4-2.png)
+
+lalu
+
+![gambar_2-1](images/books-02-mastering_bitcoin/gambar_4-3.png)
+
+*Gambar 4-2 dan 4-3 di buku mengilustrasikan bentuk kurva eliptik di bilangan real (mulus) dan di *finite field* (titik-titik acak).*
+
+**Contoh Kode Python (Verifikasi Titik pada Kurva):**
+
+```python
+# p adalah bilangan prima secp256k1
+p = 115792089237316195423570985008687907853269984665640564039457584007908834671663
+
+# x dan y adalah koordinat public key
+x = 55066263022277343669578718895168534326250603453777594175500187360389116729240
+y = 32670510020758816978083085130507043184471273380659243275938904335757337482424
+
+# Verifikasi
+print((y**2 - (x**3 + 7)) % p)  # Output: 0 → titik valid
+```
+
+#### **Public Keys**
+
+Sebuah *public key* (\$K\$) dihasilkan dari *private key* (\$k\$) melalui perkalian kurva eliptik dengan titik konstan **generator point** (\$G\$):
+
+$K = k \times G$
+
+* \$k\$: *private key* (angka).
+* \$G\$: *generator point* (konstan di kurva).
+* \$K\$: *public key* (titik \$(x,y)\$ di kurva).
+
+![gambar_2-1](images/books-02-mastering_bitcoin/gambar_4-4.png)
+
+*Gambar 4-4 memperlihatkan perkalian ini dengan “penjumlahan titik” berulang.*
+
+#### **Script Input dan Output**
+
+Bitcoin tidak langsung mengirim dana ke *public key*. Dana dikunci dalam sebuah **output script**. Untuk membelanjakannya, seseorang harus memberikan **input script** yang memenuhi syarat dalam *output script*. Mekanisme ini mendasari *smart contracts* di Bitcoin.
+
+#### **Alamat Bitcoin dan Evolusinya**
+
+##### **P2PKH (Pay-to-Public-Key-Hash)**
+
+Karena *public key* panjang (65 byte), Bitcoin memperkenalkan **hash function** untuk membuat alamat.
+
+**Istilah Penting:**
+
+* **Hash Function:** Algoritma yang menghasilkan sidik jari digital tetap dari input apa pun. Mustahil membalikkan hasilnya atau menemukan dua input berbeda dengan hasil sama.
+
+Alamat dihitung:
+$A = \text{RIPEMD160}(\text{SHA256}(K))$
+
+Hasilnya adalah hash 160-bit (20-byte).
+
+*Output script P2PKH:*
+
+```
+OP_DUP OP_HASH160 <Public Key Hash> OP_EQUALVERIFY OP_CHECKSIG
+```
+
+*Input script:*
+
+```
+<Signature> <Public Key>
+```
+
+##### **Base58Check Encoding**
+
+* **Base58:** Seperti Base64, tapi tanpa karakter ambigu (0, O, l, I).
+* **Check:** Tambah 4-byte checksum untuk deteksi salah ketik.
+
+Struktur: `[Version Byte] + [Public Key Hash] + [Checksum]`.
+Untuk mainnet, *version byte* = `0x00`, sehingga alamat diawali **1**.
+
+##### **Compressed Public Keys**
+
+Dari titik \$(x,y)\$, cukup simpan \$x\$ dan 1 bit (ganjil/genap \$y\$). Ukuran turun dari 65 byte → 33 byte. Transaksi lebih kecil dan murah. Hampir semua dompet modern memakai ini.
+
+##### **P2SH (Pay-to-Script-Hash)**
+
+Untuk kondisi kompleks (misalnya multisignature 2-of-3):
+
+1. Buat *redeem script*.
+2. Hash dengan `HASH160`.
+3. *Output script:*
+
+   ```
+   OP_HASH160 <Script Hash> OP_EQUAL
+   ```
+
+Saat membelanjakan, *input script* menyediakan tanda tangan + *redeem script* asli.
+
+*Version byte* = `0x05`, alamat diawali **3**.
+
+##### **Bech32 & Bech32m (SegWit Addresses)**
+
+Diperkenalkan lewat SegWit (2017):
+
+* Huruf kecil, mudah dibaca.
+* Deteksi & koreksi kesalahan lebih baik.
+* Lebih efisien untuk QR code.
+* Diawali **bc1**.
+
+Bech32 untuk SegWit v0, Bech32m untuk SegWit v1/Taproot. Standar modern yang direkomendasikan.
+
+#### **Format Kunci Privat**
+
+Format umum: **WIF (Wallet Import Format)**.
+
+* **WIF:** Base58Check dari private key 256-bit. Biasanya diawali `5`.
+* **WIF-Compressed:** Tambah byte `0x01` di akhir, biasanya diawali `K` atau `L`.
+
+> **Penting:** Dompet modern memakai BIP32/BIP39 (deterministic wallets). Impor private key tunggal tidak disarankan. WIF hanya untuk kompatibilitas lama.
+
+#### **Kunci dan Alamat Lanjutan**
+
+* **Vanity Addresses:** Alamat dengan pola khusus (contoh: `1KidsCharity...`). Dibuat dengan brute-force miliaran kunci. Sama amannya, tetapi jarang dipakai karena privasi dan ketidakcocokan dengan dompet modern.
+* **Paper Wallets:** Private key dicetak di kertas. **Berbahaya dan usang.** Rentan kesalahan dan kehilangan dana. **Jangan gunakan paper wallets.** Gunakan *recovery code* dompet modern.
+
+---
+
