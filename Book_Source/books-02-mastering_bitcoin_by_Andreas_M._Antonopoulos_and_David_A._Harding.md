@@ -201,10 +201,15 @@ Untuk privasi, alamat kembalian ini biasanya adalah alamat baru yang belum perna
 ##### **Bentuk-Bentuk Transaksi Umum**
 
 * **Transaksi Umum (*Common Transaction*):** Satu *input* dan dua *output* (satu untuk pembayaran, satu untuk kembalian). Ini adalah bentuk yang paling sering ditemui. *Digambarkan di Gambar 2-4*.
+
 ![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-4.png)
+
 * **Transaksi Agregasi (*Aggregating Transaction*):** Beberapa *input* digabungkan menjadi satu *output* tunggal. Mirip seperti menukar banyak uang koin menjadi selembar uang kertas besar. *Digambarkan di Gambar 2-5*.
+
 ![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-5.png)
+
 * **Transaksi Distribusi (*Distributing Transaction*):** Satu *input* yang membayar ke banyak *output* (banyak penerima). Sering digunakan oleh bisnis, misalnya untuk membayar gaji. *Digambarkan di Gambar 2-6*.
+
 ![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-6.png)
 
 #### **Membangun Sebuah Transaksi (*Constructing a Transaction*)**
