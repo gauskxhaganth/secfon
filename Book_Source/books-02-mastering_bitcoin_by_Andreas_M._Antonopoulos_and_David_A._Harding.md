@@ -991,3 +991,313 @@ Memahami struktur transaksi di level *byte* ini memungkinkan Kita untuk menganal
 
 ---
 
+# Bab 7
+## Otorisasi dan Otentikasi (*Authorization and Authentication*)
+
+Ketika Kita menerima bitcoin, Kita menentukan siapa yang berhak (*authorized*) membelanjakannya. Saat dana tersebut dibelanjakan, si pembelanja harus membuktikan identitas kriptografisnya (*authenticated*). Proses ini diperiksa oleh ribuan *full node* yang independen.
+
+Bab ini akan menjelajahi bahasa pemrograman di balik transaksi Bitcoin, yang disebut **Script**, dan bagaimana ia digunakan untuk menciptakan kondisi pembelanjaan yang fleksibel dan aman.
+
+#### **Skrip Transaksi dan Bahasa Script (*Transaction Scripts and Script Language*)**
+
+Validasi transaksi Bitcoin tidak didasarkan pada pola statis, melainkan pada eksekusi sebuah bahasa pemrograman berbasis tumpukan (*stack-based*) yang disebut **Script**.
+
+**Karakteristik Utama Bahasa Script:**
+
+* **Turing Incomplete (Tidak Turing Lengkap):** Bahasa Script sengaja dibuat terbatas. Terutama, ia **tidak memiliki perulangan (*loops*)**. Hal ini memastikan bahwa setiap *script* akan selesai dieksekusi dalam waktu yang dapat diprediksi. Ini mencegah serangan *Denial-of-Service* di mana sebuah transaksi bisa membuat *node* macet dalam perulangan tak terbatas.
+* **Stateless Verification (Verifikasi Tanpa Status):** Eksekusi sebuah *script* tidak bergantung pada kondisi apa pun di luar transaksi itu sendiri. Semua informasi yang dibutuhkan sudah ada di dalam *script*. Ini menjamin bahwa jika *script* valid di *node* Kita, maka ia akan valid di semua *node* lain di seluruh jaringan.
+
+##### **Konstruksi Script**
+
+Validasi transaksi *legacy* (non-SegWit) melibatkan dua bagian:
+
+1. **Output Script (juga disebut `scriptPubKey`):** Ditempatkan di dalam *output* sebuah transaksi. Ini menentukan kondisi yang harus dipenuhi untuk membelanjakan UTXO tersebut di masa depan. Ini adalah "kunci" atau "gembok".
+2. **Input Script (juga disebut `scriptSig`):** Ditempatkan di dalam *input* dari transaksi yang membelanjakan. Ini berisi data yang "membuka" gembok dari *output script*. Ini adalah "kunci" untuk gembok tersebut.
+
+Untuk memvalidasi, sebuah *node* akan mengeksekusi `input script` terlebih dahulu, lalu mengambil tumpukan (*stack*) yang dihasilkan dan mengeksekusi `output script` di atasnya. Jika hasil akhirnya `TRUE` (nilai bukan nol), transaksi dianggap valid.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_7-1.png)
+
+*Gambar 7-1 di buku mengilustrasikan ini: `input script` + `output script` digabungkan untuk dievaluasi.*
+
+##### **Stack Eksekusi Script**
+
+Bahasa Script menggunakan struktur data yang disebut **stack** (tumpukan). Bayangkan sebuah tumpukan kartu. Kita hanya bisa melakukan dua hal:
+
+* **Push:** Menambahkan kartu baru ke **atas** tumpukan.
+* **Pop:** Mengambil kartu dari **atas** tumpukan.
+
+Script dieksekusi dari kiri ke kanan:
+
+* Jika item adalah **data** (misalnya angka atau *public key*), ia di-*push* ke atas *stack*.
+* Jika item adalah **operator** (misalnya `OP_ADD`), ia akan me-*pop* satu atau lebih item dari *stack*, melakukan operasi, dan mungkin me-*push* hasilnya kembali ke *stack*.
+
+**Contoh Script Sederhana:**
+Script ini menghitung `2 + 3` dan memeriksa apakah hasilnya sama dengan `5`.
+`2 3 OP_ADD 5 OP_EQUAL`
+
+**Eksekusi Langkah-demi-Langkah:**
+
+1. `2`: Angka 2 di-*push* ke *stack*. → *Stack: `[2]`*
+2. `3`: Angka 3 di-*push* ke *stack*. → *Stack: `[2, 3]`*
+3. `OP_ADD`: Me-*pop* dua item teratas (3 dan 2), menjumlahkannya (5), lalu me-*push* hasilnya. → *Stack: `[5]`*
+4. `5`: Angka 5 di-*push* ke *stack*. → *Stack: `[5, 5]`*
+5. `OP_EQUAL`: Me-*pop* dua item teratas (5 dan 5), membandingkannya. Karena sama, ia me-*push* `TRUE` (direpresentasikan sebagai `1`). → *Stack: `[1]`*
+
+Karena item teratas di akhir eksekusi adalah `TRUE`, script ini valid.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_7-2.png)
+
+*Gambar 7-2 di buku memvisualisasikan proses ini dengan sangat baik.*
+
+#### **Jenis-Jenis Script Standar**
+
+##### **Pay-to-Public-Key-Hash (P2PKH)**
+
+Ini adalah *script* di balik alamat *legacy* yang dimulai dengan `1`.
+
+* **Output Script:** `OP_DUP OP_HASH160 <Key Hash> OP_EQUALVERIFY OP_CHECKSIG`
+* **Input Script:** `<Signature> <Public Key>`
+
+**Eksekusi:**
+
+1. `<Signature>` dan `<Public Key>` di-*push* ke *stack*.
+2. `OP_DUP` menduplikasi `<Public Key>` di puncak *stack*.
+3. `OP_HASH160` mengambil satu `<Public Key>`, menghitung *hash*-nya.
+4. `<Key Hash>` dari *output script* di-*push* ke *stack*.
+5. `OP_EQUALVERIFY` membandingkan dua *hash* di puncak *stack*. Jika cocok, ia me-*pop* keduanya dan lanjut. Jika tidak, eksekusi gagal. `VERIFY` artinya "gagal jika tidak benar".
+6. `OP_CHECKSIG` memeriksa apakah `<Signature>` valid untuk `<Public Key>` yang tersisa. Jika ya, ia me-*push* `TRUE`.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_7-3.png)
+
+lalu
+
+![gambar](images/books-02-mastering_bitcoin/gambar_7-4.png)
+
+*Gambar 7-3 dan 7-4 memvisualisasikan eksekusi P2PKH ini.*
+
+##### **Scripted Multisignatures (Multisig)**
+
+Membutuhkan lebih dari satu tanda tangan untuk membelanjakan dana. Formatnya adalah **t-of-k**, di mana `t` adalah jumlah tanda tangan yang dibutuhkan dari total `k` *public key* yang memungkinkan.
+
+* **Output Script (contoh 2-of-3):**
+  `2 <PubKeyA> <PubKeyB> <PubKeyC> 3 OP_CHECKMULTISIG`
+* **Input Script:**
+  `OP_0 <SigB> <SigC>`
+
+**Keanehan `OP_CHECKMULTISIG`:**
+Karena bug atau desain awal yang tidak dilanjutkan, `OP_CHECKMULTISIG` mengambil satu item tambahan dari *stack* (disebut *dummy element*). Oleh karena itu, *input script* untuk *multisig* **harus** diawali dengan `OP_0` (atau data lain) untuk memenuhi item tambahan ini. Ini adalah detail teknis penting yang harus diketahui.
+
+##### **Pay-to-Script-Hash (P2SH)**
+
+Seperti yang dibahas di Bab 4, ini adalah cara untuk "menyembunyikan" *script* yang rumit di balik sebuah *hash*. Ini digunakan untuk alamat yang dimulai dengan `3`.
+
+* **Redeem Script:** Script yang sebenarnya (misalnya, *script multisig* di atas).
+* **Output Script:** `OP_HASH160 <Hash of Redeem Script> OP_EQUAL`
+* **Input Script:** `<Signatures ...> <Redeem Script>`
+
+**Validasi P2SH terjadi dalam dua tahap:**
+
+1. *Node* memeriksa apakah *hash* dari `<Redeem Script>` yang diberikan di *input* cocok dengan *hash* di *output*.
+2. Jika cocok, `<Redeem Script>` dieksekusi dengan sisa data di *stack* (yaitu, tanda tangan).
+
+##### **Data Recording Output (OP\_RETURN)**
+
+Ini adalah cara untuk menyimpan sejumlah kecil data (hingga 80 byte) di *blockchain*. *Output* `OP_RETURN` **terbukti tidak dapat dibelanjakan (*provably unspendable*)**. Artinya, ia tidak disimpan di set UTXO dan tidak "mengotori" database *node*. Biasanya digunakan untuk layanan notaris digital, pembuktian keberadaan, dll.
+
+##### **Timelocks**
+
+* **OP\_CHECKLOCKTIMEVERIFY (CLTV - BIP65):** Ini adalah **absolute timelock**. Ia memastikan sebuah UTXO tidak dapat dibelanjakan **sebelum** waktu atau tinggi *block* tertentu di masa depan. Waktunya bersifat absolut (misal: setelah 1 Januari 2026).
+* **OP\_CHECKSEQUENCEVERIFY (CSV - BIP112):** Ini adalah **relative timelock**. Ia memastikan sebuah UTXO tidak dapat dibelanjakan sampai sejumlah *block* atau detik tertentu telah berlalu **sejak UTXO tersebut dikonfirmasi di *blockchain***. Waktunya bersifat relatif terhadap konfirmasi *input*.
+
+##### **Kontrol Alur dengan Klausa Kondisional (IF/ELSE)**
+
+Script Bitcoin mendukung logika kondisional `IF...ELSE...ENDIF`. Ini memungkinkan pembuatan *script* dengan beberapa jalur pembelanjaan.
+
+* **Sintaks:**
+  Berbeda dari bahasa pemrograman umum, kondisinya diletakkan di *stack* **sebelum** `OP_IF`.
+  `<condition> OP_IF <script if TRUE> OP_ELSE <script if FALSE> OP_ENDIF`
+
+* **Penggunaan:**
+  Ini sangat kuat untuk membuat kontrak yang kompleks. Misalnya, sebuah UTXO bisa dibelanjakan oleh 2 dari 3 partner, ATAU oleh 1 partner + 1 pengacara setelah 30 hari, ATAU hanya oleh pengacara setelah 90 hari.
+  *Contoh script kompleks di buku pada halaman 165 mengilustrasikan ini.*
+
+#### **Contoh Script Segregated Witness (SegWit)**
+
+SegWit menyederhanakan banyak *script* ini.
+
+* **Pay-to-Witness-Public-Key-Hash (P2WPKH):** Versi SegWit dari P2PKH.
+
+  * **Output Script:** `0 <20-byte Public Key Hash>`
+    `0` adalah versi *witness*.
+  * **Input Script:** Kosong (`""`).
+  * **Witness:** `<Signature> <Public Key>`
+
+* **Pay-to-Witness-Script-Hash (P2WSH):** Versi SegWit dari P2SH.
+
+  * **Output Script:** `0 <32-byte Script Hash>`
+    Menggunakan `SHA256` tunggal (32-byte), bukan `HASH160` (20-byte) seperti P2SH, untuk keamanan yang lebih baik terhadap *collision attacks*.
+  * **Input Script:** Kosong.
+  * **Witness:** `<Signatures...> <Witness Script>`
+
+* **Nested SegWit:**
+  Untuk kompatibilitas mundur, *script* P2WPKH atau P2WSH bisa "dibungkus" di dalam P2SH. Dompet lama akan melihatnya sebagai alamat P2SH biasa (`3...`), sementara dompet baru bisa membelanjakannya dengan lebih efisien menggunakan SegWit.
+
+#### **Konsep Lanjutan: MAST, Taproot, dan Tapscript**
+
+##### **Merklized Alternative Script Trees (MAST)**
+
+Jika sebuah *script* memiliki banyak kondisi (`IF/ELSE`), saat dibelanjakan, seluruh *script* harus diungkap di *blockchain*. Ini tidak efisien dan buruk untuk privasi. **MAST** memecahkan ini dengan menempatkan setiap kondisi/jalur pembelanjaan sebagai "daun" (*leaf*) dari sebuah **Merkle Tree**.
+
+* **Keuntungan:** Saat membelanjakan, Kita hanya perlu mengungkapkan **satu** kondisi yang Kita gunakan dan *merkle path*-nya. Semua kondisi lain tetap tersembunyi dan tidak memakan ruang di *blockchain*. Ini sangat meningkatkan efisiensi dan privasi.
+
+##### **Taproot (BIP341)**
+
+**Taproot** adalah peningkatan besar yang mengkombinasikan ide MAST dengan *scriptless multisignatures*. Idenya adalah bahwa sebagian besar kontrak kompleks memiliki "jalur utama" di mana semua pihak setuju (misalnya, penutupan *channel* secara kooperatif).
+
+* **Keypath Spending:** Jalur utama ini dapat dieksekusi dengan satu tanda tangan agregat (Schnorr) yang terlihat seperti transaksi *single-sig* biasa di *blockchain*. Ini memberikan privasi maksimal.
+* **Scriptpath Spending:** Jika para pihak tidak setuju, mereka bisa menggunakan salah satu kondisi alternatif yang tersembunyi di dalam *tweak* dari *public key*, mirip seperti MAST.
+* **Hasil:** Transaksi kompleks dan transaksi sederhana terlihat **identik** di *blockchain*, sebuah keuntungan besar untuk privasi dan *fungibility*.
+
+##### **Tapscript (BIP342)**
+
+Ini adalah versi upgrade dari bahasa Script yang digunakan bersama Taproot. Ia menghapus `OP_CHECKMULTISIG` dan menggantinya dengan `OP_CHECKSIGADD` yang lebih efisien, serta mewajibkan penggunaan **Schnorr signatures**, yang akan dibahas di bab berikutnya.
+
+📌 Bab 7 ini adalah inti dari "pemrograman" di Bitcoin. Dengan menggabungkan operator, kriptografi, dan struktur data seperti Merkle Tree, Bitcoin memungkinkan pembuatan kontrak keuangan yang sangat kompleks dan aman.
+
+---
+
+Berikut hasil versi yang sudah **dirapikan** tanpa mengubah isi teks sama sekali:
+
+---
+
+# Bab 8
+## Tanda Tangan Digital (*Digital Signatures*)**
+
+Di Bitcoin, ada dua algoritma tanda tangan yang digunakan: **ECDSA** (*Elliptic Curve Digital Signature Algorithm*) dan **Schnorr signatures**. Keduanya digunakan untuk membuktikan kepemilikan *private key* tanpa harus mengungkapkannya. Setiap kali *script* mengeksekusi operator seperti `OP_CHECKSIG`, sebuah tanda tangan harus disediakan.
+
+Tanda tangan digital di Bitcoin memiliki tiga tujuan utama:
+
+1. **Otorisasi:** Membuktikan bahwa pemilik *private key* (dan dengan demikian, pemilik dana) telah menyetujui pembelanjaan tersebut.
+2. **Tidak Dapat Disangkal (*Non-repudiation*):** Bukti otorisasi ini tidak dapat disangkal. Pengirim tidak bisa mengklaim bahwa ia tidak mengirim transaksi tersebut.
+3. **Integritas:** Memastikan bahwa transaksi tidak dapat diubah oleh pihak ketiga setelah ditandatangani.
+
+#### **Cara Kerja Tanda Tangan Digital**
+
+Tanda tangan digital terdiri dari dua bagian: algoritma untuk **membuat** tanda tangan dan algoritma untuk **memverifikasi** tanda tangan.
+
+##### **Membuat Tanda Tangan Digital**
+
+Untuk membuat tanda tangan, Kita memerlukan dua hal:
+
+1. **Pesan (*Message*):** Dalam konteks Bitcoin, "pesan" ini adalah *hash* dari data transaksi itu sendiri. Ini disebut **commitment hash**.
+2. **Kunci Penandatanganan (*Signing Key*):** Ini adalah *private key* pengguna.
+
+Prosesnya dapat direpresentasikan sebagai:
+
+$Sig = F_{sig}(F_{hash}(m), k)$
+
+* \$k\$: *private key* penandatangan.
+* \$m\$: pesan yang ditandatangani (data transaksi).
+* \$F\_{hash}\$: fungsi *hash* (misalnya, SHA256).
+* \$F\_{sig}\$: algoritma penandatanganan (ECDSA atau Schnorr).
+* \$Sig\$: tanda tangan yang dihasilkan, yang biasanya terdiri dari dua nilai (misalnya, \$R\$ dan \$s\$).
+
+##### **Memverifikasi Tanda Tangan**
+
+Untuk memverifikasi, Kita memerlukan **pesan**, **tanda tangan**, dan **public key** yang sesuai dengan *private key* yang digunakan untuk menandatangani. Proses verifikasi pada dasarnya menjawab pertanyaan:
+
+*"Apakah tanda tangan ini benar-benar dibuat oleh pemilik *public key* ini untuk pesan spesifik ini?"*
+
+Jika ya, verifikasi berhasil.
+
+#### **Jenis-Jenis Signature Hash (SIGHASH)**
+
+Tanda tangan tidak selalu mengunci *seluruh* data transaksi. Pengirim bisa memilih bagian mana dari transaksi yang ingin ia "kunci". Ini dikontrol oleh sebuah *flag* satu *byte* yang ditambahkan di akhir tanda tangan, yang disebut **SIGHASH flag**.
+
+Ini memungkinkan skenario multi-pihak yang canggih, di mana satu orang menandatangani bagiannya, lalu meneruskan transaksi setengah jadi ke orang lain untuk ditandatangani.
+
+**Jenis-jenis SIGHASH Flag Utama:**
+
+* **`ALL` (0x01):** Ini adalah yang paling umum. Tanda tangan berlaku untuk semua *input* dan semua *output*. Ini pada dasarnya mengunci seluruh transaksi dan mencegah modifikasi apa pun.
+* **`NONE` (0x02):** Tanda tangan berlaku untuk semua *input*, tetapi **tidak ada** *output* yang dikunci. Siapa pun bisa mengubah tujuan dana. Ini berguna untuk membuat semacam "cek kosong".
+* **`SINGLE` (0x03):** Tanda tangan berlaku untuk semua *input*, tetapi hanya mengunci **satu** *output* yang memiliki nomor indeks yang sama dengan *input* yang ditandatangani.
+
+**Modifier Flag:**
+
+* **`ANYONECANPAY` (0x80):** *Flag* ini dapat digabungkan dengan tiga jenis di atas. Jika digunakan, tanda tangan hanya mengunci *input* milik si penandatangan. *Input* lain dapat ditambahkan atau diubah oleh orang lain.
+
+**Contoh Penggunaan SIGHASH:**
+
+* **`ALL | ANYONECANPAY`:** Berguna untuk **crowdfunding**. Seseorang membuat transaksi dengan satu *output* (tujuan dana) tetapi tanpa *input*. Orang lain kemudian bisa menambahkan *input* mereka sendiri (donasi) dan menandatanganinya dengan *flag* ini. Transaksi baru menjadi valid jika total *input* mencapai jumlah *output*.
+* **`NONE | ANYONECANPAY`:** Berguna untuk membuat "pengumpul debu" (*dust collector*). Pengguna yang memiliki banyak UTXO bernilai sangat kecil (*dust*) bisa menandatangani *input* mereka dengan *flag* ini, memungkinkan siapa pun untuk mengumpulkan *input-input* tersebut, menambahkan *output* tujuan mereka sendiri, dan mengklaim dana gabungannya.
+
+#### **Tanda Tangan Schnorr (*Schnorr Signatures*)**
+
+Diperkenalkan ke Bitcoin melalui *soft fork* **Taproot** (2021), tanda tangan Schnorr memiliki beberapa keunggulan signifikan dibandingkan ECDSA.
+
+**Properti Tanda Tangan Schnorr:**
+
+1. **Keamanan yang Terbukti (*Provable Security*):** Keamanannya dapat dibuktikan secara matematis hanya dengan dua asumsi: kesulitan memecahkan *Elliptic Curve Discrete Logarithm Problem* (ECDLP) dan *hash function* yang baik.
+2. **Linearitas (*Linearity*):** Ini adalah properti "ajaib"-nya. Sederhananya, beberapa *public key* dapat dijumlahkan untuk membuat satu *public key* agregat. Tanda tangan parsial dari masing-masing pihak juga dapat dijumlahkan untuk membuat satu tanda tangan agregat yang valid untuk *public key* agregat tersebut. Ini memungkinkan fitur-fitur canggih tanpa memerlukan *script* yang rumit.
+3. **Verifikasi Batch (*Batch Verification*):** Memungkinkan verifikasi banyak tanda tangan Schnorr sekaligus dengan lebih cepat daripada memverifikasinya satu per satu. Ini mempercepat sinkronisasi *block* awal untuk *node* baru.
+
+##### **Multisignatures Tanpa Script (*Scriptless Multisignatures*) Berbasis Schnorr**
+
+Berkat sifat **linearitas**, beberapa pihak (misalnya, Alice dan Bob) dapat melakukan hal berikut:
+
+1. Alice memiliki *private key* \$k\_A\$ dan *public key* \$P\_A\$.
+2. Bob memiliki *private key* \$k\_B\$ dan *public key* \$P\_B\$.
+3. Mereka dapat membuat *public key* agregat bersama: \$P\_{agg} = P\_A + P\_B\$.
+4. Untuk menandatangani transaksi, mereka berkolaborasi (tanpa membocorkan *private key* masing-masing) untuk menghasilkan satu tanda tangan agregat \$Sig\_{agg}\$.
+5. Tanda tangan \$Sig\_{agg}\$ ini valid untuk *public key* \$P\_{agg}\$.
+
+Bagi dunia luar (di *blockchain*), transaksi ini terlihat seperti transaksi *single-signature* biasa. Tidak ada yang tahu bahwa di baliknya ada dua (atau lebih) pihak yang terlibat. Ini adalah kemenangan besar untuk **privasi** dan **efisiensi** (karena lebih hemat ruang). Protokol yang populer untuk ini adalah keluarga **MuSig** (terutama **MuSig2**).
+
+##### **Threshold Signatures Tanpa Script Berbasis Schnorr**
+
+Ini adalah evolusi dari *multisignatures*. Alih-alih membutuhkan semua pihak (`k-of-k`), ini memungkinkan `t-of-k` (misalnya, 2 dari 3) pihak untuk menghasilkan tanda tangan agregat. Mekanismenya lebih kompleks, biasanya melibatkan *secret sharing*, tetapi hasilnya sama: di *blockchain*, ia terlihat seperti transaksi *single-signature* biasa.
+
+#### **Tanda Tangan ECDSA**
+
+Ini adalah algoritma tanda tangan asli Bitcoin, digunakan dari 2009 hingga sekarang untuk semua transaksi non-Taproot.
+
+**Mengapa ECDSA?** Algoritma Schnorr dipatenkan hingga tahun 2008, sehingga saat Bitcoin dikembangkan, ECDSA adalah alternatif standar terbuka yang paling matang.
+
+**Kelemahan Dibandingkan Schnorr:**
+
+* **Lebih Kompleks:** Matematikanya lebih rumit.
+* **Keamanan Kurang Terbukti:** Bukti keamanannya tidak sekuat Schnorr.
+* **Tidak Linear:** Sifatnya yang non-linear membuat *scriptless multisignatures* sangat sulit dan berisiko untuk diimplementasikan dengan ECDSA.
+
+##### **Serialisasi Tanda Tangan ECDSA (DER)**
+
+Tanda tangan ECDSA diserialisasi menggunakan standar yang disebut **DER (*Distinguished Encoding Rules*)**. Format ini memiliki *overhead* yang membuatnya lebih besar dan ukurannya bervariasi (biasanya 70-72 byte), dibandingkan dengan tanda tangan Schnorr yang ukurannya tetap 64 byte.
+
+**Contoh Tanda Tangan DER yang Dipecah:**
+`304502210088...cb02204b...1301`
+
+* `30`: Awal dari urutan DER.
+* `45`: Panjang urutan (69 byte).
+* `02`: Tipe data (integer).
+* `21`: Panjang nilai R (33 byte).
+* `0088...cb`: Nilai R.
+* `02`: Tipe data (integer).
+* `20`: Panjang nilai S (32 byte).
+* `4b...13`: Nilai S.
+* `01`: SIGHASH flag (SIGHASH\_ALL).
+
+#### **Pentingnya Keacakan dalam Tanda Tangan (Nonce)**
+
+Kedua algoritma (ECDSA dan Schnorr) menggunakan angka acak rahasia sekali pakai yang disebut **nonce** (`k`) dalam proses pembuatan tanda tangan.
+
+> **VULNERABILITAS KRITIS:** Jika Kita menggunakan **nonce yang sama** untuk menandatangani **dua pesan yang berbeda** dengan **private key yang sama**, seorang penyerang dapat **menghitung private key Kita**.
+
+Ini bukan hanya teori; banyak kasus pencurian dana di masa lalu terjadi karena implementasi generator angka acak yang buruk.
+
+**Solusi:** Jangan mengandalkan keacakan murni. Gunakan **generasi nonce deterministik** seperti yang didefinisikan dalam **RFC6979** (untuk ECDSA) dan **BIP340** (untuk Schnorr). Metode ini menghasilkan *nonce* yang unik dan tidak dapat diprediksi dengan meng-hash data transaksi itu sendiri bersama dengan *private key*. Ini memastikan *nonce* yang berbeda untuk setiap tanda tangan yang berbeda, sehingga menghilangkan risiko penggunaan ulang *nonce*.
+
+Bab ini menunjukkan bagaimana tanda tangan digital berfungsi sebagai fondasi otentikasi di Bitcoin. Peralihan ke tanda tangan Schnorr dengan Taproot bukan hanya peningkatan efisiensi, tetapi juga membuka pintu untuk skema privasi dan skalabilitas canggih melalui *scriptless multisignatures* dan *threshold signatures*.
+
+---
+
