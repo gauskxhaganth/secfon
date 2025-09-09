@@ -2059,3 +2059,222 @@ Untuk menjaga privasi, LN menggunakan **onion routing**. Alice mengenkripsi inst
 
 ---
 
+# Appendix A
+## Whitepaper Bitcoin oleh Satoshi Nakamoto
+
+Ini adalah terjemahan dan penjelasan dari naskah asli berjudul **"Bitcoin: A Peer-to-Peer Electronic Cash System"** yang dipublikasikan oleh Satoshi Nakamoto pada Oktober 2008.
+
+#### **Abstrak (*Abstract*)**
+
+*Abstrak adalah ringkasan singkat dari seluruh isi makalah.*
+
+Satoshi memulai dengan menyatakan masalah utama: pembayaran online bergantung pada lembaga keuangan (pihak ketiga tepercaya). Ketergantungan ini memiliki kelemahan, seperti transaksi yang tidak bisa benar-benar permanen (karena ada mediasi sengketa) dan biaya yang tinggi.
+
+Solusi yang diusulkan adalah sistem uang elektronik *peer-to-peer* murni yang memungkinkan pembayaran dikirim langsung dari satu pihak ke pihak lain tanpa perantara. Tanda tangan digital (*digital signatures*) adalah bagian dari solusi, tetapi masalah utamanya adalah **pengeluaran ganda (*double-spending*)**.
+
+Bitcoin memecahkan masalah *double-spending* menggunakan jaringan P2P untuk memberi stempel waktu (*timestamp*) pada transaksi dengan menggabungkannya ke dalam sebuah rantai berkelanjutan berbasis **Proof-of-Work (PoW)**. Rantai ini membentuk sebuah catatan yang tidak dapat diubah tanpa harus mengulang seluruh kerja komputasi yang sangat besar. Rantai terpanjang tidak hanya membuktikan urutan kejadian, tetapi juga membuktikan bahwa ia berasal dari kumpulan daya komputasi (CPU) terbesar. Selama mayoritas daya CPU dikendalikan oleh *node* yang jujur, mereka akan menghasilkan rantai terpanjang dan mengalahkan para penyerang.
+
+#### **1. Pendahuluan (*Introduction*)**
+
+Bagian ini menguraikan masalah yang ada pada sistem perdagangan elektronik konvensional. Sistem ini sangat bergantung pada lembaga keuangan sebagai pihak ketiga tepercaya. Kepercayaan ini menimbulkan beberapa masalah:
+
+* **Transaksi Tidak Bisa Sepenuhnya Permanen (*Non-Reversible*):** Karena bank harus memediasi sengketa, selalu ada kemungkinan transaksi dibatalkan.
+* **Biaya Tinggi:** Biaya mediasi meningkatkan biaya transaksi, sehingga membatasi ukuran transaksi minimum dan menghilangkan kemungkinan adanya transaksi mikro (*micropayments*).
+* **Kebutuhan akan Kepercayaan Menyebar:** Pedagang harus waspada terhadap penipuan dari pelanggan, sehingga meminta lebih banyak informasi pribadi dari yang seharusnya diperlukan.
+* **Tidak Ada Mekanisme Tanpa Kepercayaan:** Tidak ada cara untuk melakukan pembayaran melalui saluran komunikasi (seperti internet) tanpa pihak ketiga tepercaya, tidak seperti uang tunai fisik.
+
+Yang dibutuhkan adalah sistem pembayaran elektronik yang didasarkan pada **bukti kriptografis (*cryptographic proof*)** bukan kepercayaan. Sistem semacam itu akan memungkinkan dua pihak untuk bertransaksi secara langsung, melindungi penjual dari penipuan dengan transaksi yang secara komputasi tidak praktis untuk dibatalkan, dan memungkinkan mekanisme *escrow* (rekening penampung) untuk melindungi pembeli.
+
+#### **2. Transaksi (*Transactions*)**
+
+Satoshi mendefinisikan "koin elektronik" sebagai **sebuah rantai tanda tangan digital**:
+
+* Setiap pemilik mentransfer koin ke pemilik berikutnya dengan menandatangani secara digital sebuah *hash* dari transaksi sebelumnya dan *public key* dari pemilik berikutnya.
+* Penerima pembayaran (*payee*) dapat memverifikasi rantai tanda tangan ini untuk memastikan keabsahan kepemilikan.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_apx-1-1.png)
+
+**Deskripsi Gambar di Bagian 2 (halaman 340):**
+
+* Gambar ini mengilustrasikan konsep "rantai tanda tangan". Terdapat tiga kotak berurutan yang diberi label "Transaction".
+
+  * **Transaksi Pertama:** Berisi *Public Key* Pemilik 1 dan Tanda Tangan dari Pemilik 0.
+  * **Transaksi Kedua:** Panah dari transaksi pertama menunjuk ke sini. Ia berisi *Public Key* Pemilik 2 dan Tanda Tangan dari Pemilik 1. Tanda tangan ini dibuat menggunakan *Private Key* Pemilik 1. Garis putus-putus menunjukkan proses "Verifikasi" tanda tangan ini terhadap *Public Key* Pemilik 1 dari transaksi sebelumnya.
+  * **Transaksi Ketiga:** Proses berlanjut dengan cara yang sama.
+* Ini menunjukkan bagaimana kepemilikan koin secara kriptografis ditransfer dari satu pemilik ke pemilik berikutnya dalam sebuah rantai yang dapat diverifikasi.
+
+Masalahnya, tentu saja, adalah **double-spending**. Si penerima tidak bisa tahu apakah pemilik sebelumnya tidak menandatangani transaksi lain untuk membelanjakan koin yang sama. Solusi tanpa pihak tepercaya adalah dengan **mengumumkan semua transaksi secara publik** dan memiliki sistem di mana semua peserta menyetujui satu sejarah tunggal tentang urutan transaksi tersebut.
+
+#### **3. Server Stempel Waktu (*Timestamp Server*)**
+
+Solusi yang diusulkan dimulai dengan konsep *timestamp server*:
+
+* Sebuah *timestamp server* bekerja dengan mengambil *hash* dari sekelompok item (*block*) yang akan diberi stempel waktu.
+* *Hash* ini kemudian dipublikasikan secara luas (misalnya, di koran atau Usenet).
+* Setiap *timestamp* baru menyertakan *timestamp* sebelumnya di dalam *hash*-nya, membentuk sebuah **rantai**. Setiap stempel waktu tambahan akan memperkuat stempel waktu sebelumnya.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_apx-1-2.png)
+
+**Deskripsi Gambar di Bagian 3 (halaman 341):**
+
+* Gambar ini menunjukkan serangkaian kotak berurutan yang diberi label "Block".
+* Setiap *block* berisi "Hash" dari *block* sebelumnya. Panah-panah menghubungkan *hash* dari satu *block* ke *block* berikutnya, secara visual membentuk sebuah rantai.
+* Ini mengilustrasikan bagaimana setiap *block* baru secara kriptografis terhubung dan memperkuat *block* sebelumnya.
+
+#### **4. Proof-of-Work (PoW)**
+
+Untuk mengimplementasikan *timestamp server* terdistribusi, Bitcoin menggunakan sistem **Proof-of-Work**, mirip dengan Hashcash Adam Back.
+
+* PoW melibatkan pencarian sebuah nilai (disebut **Nonce**) yang, ketika di-hash bersama dengan data *block*, akan menghasilkan sebuah *hash* yang diawali dengan sejumlah bit nol tertentu.
+* Pekerjaan rata-rata yang dibutuhkan untuk menemukan PoW bersifat eksponensial terhadap jumlah bit nol yang disyaratkan, tetapi hasilnya dapat diverifikasi dengan sangat mudah hanya dengan satu kali perhitungan *hash*.
+* Setelah PoW ditemukan, *block* tersebut tidak dapat diubah tanpa harus mengulang seluruh pekerjaan komputasi yang besar itu.
+
+PoW juga memecahkan masalah representasi dalam pengambilan keputusan mayoritas: **satu-CPU-satu-suara (*one-CPU-one-vote*)**. Keputusan mayoritas direpresentasikan oleh rantai terpanjang, yang memiliki usaha PoW terbesar yang diinvestasikan di dalamnya.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_apx-1-3.png)
+
+**Deskripsi Gambar di Bagian 4 (halaman 342):**
+
+* Gambar ini menunjukkan struktur sebuah *block*.
+* *Block* berisi *hash* dari *block* sebelumnya (*Prev. Hash*), *Nonce*, dan daftar transaksi (*Tx*, *Tx*, ...).
+* Semua data ini di-hash bersama-sama untuk menghasilkan *Hash* dari *block* saat ini. Panah menunjukkan bagaimana *Nonce* adalah satu-satunya bagian yang dapat diubah-ubah oleh *miner* untuk mencoba menemukan *hash* yang memenuhi syarat.
+
+---
+
+# Appendix B
+## Errata pada Whitepaper Bitcoin (*Errata to the Bitcoin Whitepaper*)**
+
+Appendix ini berisi deskripsi masalah yang diketahui dalam makalah Satoshi Nakamoto, serta catatan tentang perubahan terminologi dan bagaimana implementasi Bitcoin berbeda dari yang dijelaskan di dalam makalah tersebut.
+
+#### **Abstrak (*Abstract*)**
+
+* **Kutipan Whitepaper:**
+  *"Rantai terpanjang tidak hanya berfungsi sebagai bukti urutan kejadian yang disaksikan, tetapi juga bukti bahwa ia berasal dari kumpulan daya CPU terbesar."*
+
+  * **Errata/Detail Implementasi:** Konsep "rantai terpanjang" (*longest chain*) hanya benar jika setiap *block* memiliki tingkat kesulitan *Proof-of-Work* (PoW) yang sama. Namun, kesulitan PoW di Bitcoin bisa bervariasi. Oleh karena itu, implementasi sebenarnya tidak mencari rantai terpanjang, melainkan **rantai dengan total PoW kumulatif terbanyak (*the chain demonstrating the most PoW*)**, yang sering disingkat menjadi ***most-work chain***. Perubahan penting ini terjadi pada Juli 2010.
+  * **Perubahan Terminologi:** Istilah "daya CPU" sudah tidak akurat. Saat ini, PoW dihasilkan oleh *hardware* khusus yang disebut **ASICs** (*Application Specific Integrated Circuits*). Istilah yang lebih tepat adalah "daya komputasi" (*computational power*) atau, yang paling umum, ***hash rate***.
+
+* **Kutipan Whitepaper:**
+  *"Selama mayoritas daya CPU dikendalikan oleh node yang tidak bekerja sama untuk menyerang jaringan, mereka akan menghasilkan rantai terpanjang dan mengalahkan penyerang."*
+
+  * **Perubahan Terminologi:** Saat ini, istilah **"nodes"** merujuk pada *full validation nodes* yang menegakkan semua aturan. Pihak yang memperpanjang rantai disebut **"miners"** (penambang). Satoshi awalnya mengasumsikan semua *miners* adalah *nodes*, tetapi sekarang mayoritas *nodes* bukanlah *miners*.
+  * **Penemuan Pasca-Publikasi:** Ditemukan adanya strategi serangan yang disebut **selfish mining**. Dengan serangan ini, seorang penyerang dengan *hash rate* sekitar **30%** (bukan 51%) sudah bisa mendapatkan keuntungan yang tidak adil dan berpotensi mengganggu jaringan. Jadi, ambang batas keamanan praktisnya lebih rendah dari "mayoritas".
+
+#### **Transaksi (*Transactions*)**
+
+* **Kutipan Whitepaper:**
+  *"Kami mendefinisikan koin elektronik sebagai sebuah rantai tanda tangan digital..."*
+
+  * **Errata/Detail Implementasi:** Implementasi Bitcoin lebih umum dari ini. Dana tidak dikunci langsung oleh tanda tangan, melainkan oleh sebuah "ekspresi deterministik" yang disebut **Script**. *Script* ini menetapkan syarat-syarat yang harus dipenuhi untuk membelanjakan koin, yang disebut **encumbrance** (beban). Meskipun hampir semua *encumbrance* hingga saat ini memang memerlukan setidaknya satu tanda tangan, secara teknis konsepnya lebih luas. Selain itu, karena transaksi bisa memiliki banyak *input* dan *output*, strukturnya bukanlah "rantai" linear, melainkan lebih akurat digambarkan sebagai **Directed Acyclic Graph (DAG)**.
+
+#### **Proof-of-Work (PoW)**
+
+* **Kutipan Whitepaper:**
+  *"...kami mengimplementasikan proof-of-work dengan menginkrementasi sebuah nonce di dalam block sampai sebuah nilai ditemukan yang memberikan hash block tersebut sejumlah bit nol yang disyaratkan."*
+
+  * **Errata/Detail Implementasi:** Hashcash Adam Back memang mencari *hash* dengan awalan bit nol. Namun, Bitcoin mengimplementasikannya dengan cara yang sedikit berbeda: ia memperlakukan *hash* sebagai sebuah **angka integer** dan mensyaratkan bahwa angka tersebut harus **lebih kecil dari sebuah angka target** tertentu. Ini secara efektif memungkinkan penyesuaian kesulitan yang lebih presisi (bisa dibilang "pecahan bit").
+
+* **Kutipan Whitepaper:**
+  *"Proof-of-work pada dasarnya adalah satu-CPU-satu-suara."*
+
+  * **Catatan Penting:** "Suara" di sini **bukanlah suara untuk mengubah aturan sistem**. Ini hanyalah suara untuk menentukan **urutan transaksi** demi mencegah *double-spending*. Seperti yang dijelaskan di bagian 11 *whitepaper*, bahkan jika penyerang berhasil membuat rantai alternatif, ia tetap tidak bisa menciptakan uang dari udara tipis atau mencuri uang yang bukan miliknya, karena *node-node* yang jujur tidak akan pernah menerima *block* yang berisi transaksi tidak valid.
+
+* **Kutipan Whitepaper:**
+  *"...kesulitan proof-of-work ditentukan oleh rata-rata bergerak (moving average) yang menargetkan jumlah rata-rata block per jam."*
+
+  * **Errata/Detail Implementasi:** Bitcoin tidak menggunakan *moving average*. Sebaliknya, penyesuaian kesulitan terjadi **setiap 2016 block**. Sistem akan membandingkan total waktu yang dibutuhkan untuk menambang 2016 *block* terakhir dengan waktu ideal (2016 *block* × 10 menit = 2 minggu). Berdasarkan perbandingan ini, kesulitan akan disesuaikan.
+
+#### **Mengklaim Kembali Ruang Disk (*Reclaiming Disk Space*)**
+
+* **Kutipan Whitepaper:**
+  *"Setelah transaksi terbaru dalam sebuah koin terkubur di bawah cukup banyak block, transaksi-transaksi yang telah dibelanjakan sebelumnya dapat dibuang untuk menghemat ruang disk."*
+
+  * **Penemuan Pasca-Publikasi (Kemungkinan):** Meskipun struktur *Merkle Tree* bisa membuktikan sebuah transaksi **termasuk** dalam sebuah *block*, saat ini tidak ada cara di Bitcoin untuk membuktikan bahwa sebuah transaksi **belum dibelanjakan** kecuali dengan memproses seluruh data di *blockchain* setelahnya. Ini berarti *node* baru yang bergabung dengan jaringan tetap harus mengunduh dan memproses seluruh riwayat transaksi untuk membangun database UTXO yang valid. Jadi, ide untuk "membuang" transaksi lama secara universal tidak dapat diimplementasikan sepenuhnya oleh semua *node*.
+
+#### **Verifikasi Pembayaran yang Disederhanakan (*Simplified Payment Verification - SPV*)**
+
+* **Kutipan Whitepaper:**
+  *"Salah satu strategi untuk melindungi dari ini adalah dengan menerima peringatan (alerts) dari node jaringan ketika mereka mendeteksi block yang tidak valid..."*
+
+  * **Catatan Penting:** Meskipun banyak dompet ringan (*lightweight wallets*) mengimplementasikan beberapa bagian dari SPV, **tidak ada dari mereka saat ini yang menerima "alerts" dari *full node***. Ini membuat dompet SPV secara fundamental kurang aman dan pernah menempatkan dana pengguna dalam risiko di masa lalu.
+
+#### **Privasi (*Privacy*)**
+
+* **Kutipan Whitepaper:**
+  *"Beberapa keterkaitan masih tidak dapat dihindari dengan transaksi multi-input, yang secara pasti mengungkapkan bahwa input-inputnya dimiliki oleh pemilik yang sama."*
+
+  * **Penemuan Pasca-Publikasi:** Asumsi ini tidak selalu benar jika pemilik yang berbeda sering menggabungkan *input* mereka. Teknik yang dikenal sebagai **CoinJoin** secara eksplisit melakukan ini: Alice dan Bob, yang ingin melakukan pembayaran terpisah, bekerja sama untuk membuat satu transaksi besar di mana *input* dari Alice dan Bob digabungkan. Bagi pengamat luar, menjadi tidak jelas *input* mana yang membayar *output* mana, sehingga memutus asumsi "pemilik yang sama". Perangkat lunak yang mengimplementasikan CoinJoin telah digunakan sejak 2015.
+
+#### **Perhitungan (*Calculations*)**
+
+* **Kutipan Whitepaper:**
+  *"Penerima menghasilkan pasangan kunci baru dan memberikan kunci publik kepada pengirim sesaat sebelum penandatanganan. Ini mencegah pengirim mempersiapkan rantai block terlebih dahulu..."*
+
+  * **Penemuan Pasca-Publikasi:** Pernyataan ini **tidak benar**. Seorang penyerang masih bisa mempersiapkan rantai blok rahasia terlebih dahulu. Serangan ini, yang ditemukan oleh pengguna awal Hal Finney, dikenal sebagai **Finney Attack**:
+
+    1. Penyerang menambang sebuah *block* yang berisi transaksi yang membayar kembali ke dirinya sendiri, tetapi **tidak menyiarkan** *block* ini.
+    2. Penyerang pergi ke toko, melakukan pembayaran ke pedagang menggunakan *input* yang sama.
+    3. Pedagang, yang tidak melihat adanya transaksi yang bertentangan, menyerahkan barang (terutama untuk transaksi *zero-conf*).
+    4. Penyerang segera menyiarkan *block* rahasianya. Karena *block*-nya valid, jaringannya akan menerimanya, dan transaksi pembayaran ke pedagang menjadi tidak valid (*double-spent*).
+
+---
+
+# Appendix C
+## Proposal Peningkatan Bitcoin (*Bitcoin Improvement Proposals - BIPs*)
+
+**Bitcoin Improvement Proposals (BIPs)** adalah dokumen desain yang menyediakan informasi kepada komunitas Bitcoin atau mendeskripsikan fitur baru untuk Bitcoin, prosesnya, atau lingkungannya. BIP adalah cara formal untuk mengusulkan, mendiskusikan, dan mengadopsi perubahan pada protokol Bitcoin.
+
+Sesuai dengan **BIP1**, ada tiga jenis BIP:
+
+1. **Standard BIP**
+   Mendeskripsikan setiap perubahan yang memengaruhi sebagian besar atau semua implementasi Bitcoin. Ini termasuk perubahan pada protokol jaringan, aturan validitas *block* atau transaksi, atau perubahan apa pun yang memengaruhi interoperabilitas (kemampuan aplikasi yang berbeda untuk bekerja sama). Ini adalah jenis BIP yang paling penting.
+
+2. **Informational BIP**
+   Mendeskripsikan masalah desain Bitcoin, memberikan pedoman umum, atau informasi kepada komunitas, tetapi tidak mengusulkan fitur baru. BIP ini tidak selalu mewakili konsensus dan bisa diabaikan jika tidak relevan.
+
+3. **Process BIP**
+   Mendeskripsikan sebuah proses di dalam ekosistem Bitcoin atau mengusulkan perubahan pada proses tersebut. Ini mirip seperti *Standard BIP* tetapi berlaku untuk area di luar protokol inti, seperti prosedur pengembangan, pedoman, atau perubahan pada proses pengambilan keputusan.
+
+---
+
+#### **BIPs yang Diimplementasikan oleh Bitcoin Core**
+
+Berikut adalah daftar (yang telah diedit dari buku) dari BIPs penting yang telah diimplementasikan dalam perangkat lunak Bitcoin Core, beserta deskripsi singkat dan versi di mana dukungan ditambahkan. Ini adalah "sejarah evolusi" teknis dari Bitcoin.
+
+* **BIP9:** Perubahan yang memungkinkan beberapa *soft fork* untuk diaktifkan secara paralel. Diimplementasikan sejak v0.12.1.
+* **BIP11:** Menjadikan *output multisig* sebagai standar. Diimplementasikan sejak v0.6.0.
+* **BIP13:** Format alamat untuk **P2SH (Pay-to-Script-Hash)**. Diimplementasikan sejak v0.6.0 (alamat yang diawali dengan `3`).
+* **BIP14:** Penggunaan string *subversion* sebagai *User Agent* untuk identifikasi klien di jaringan. Diimplementasikan sejak v0.6.0.
+* **BIP16:** Aturan evaluasi untuk **P2SH**. Diimplementasikan sejak v0.6.0 dan berlaku efektif pada 1 April 2012.
+* **BIP21:** Format URI (`bitcoin:...`) untuk pembayaran Bitcoin. Diimplementasikan sejak v0.6.0.
+* **BIP22:** Protokol RPC `getblocktemplate` (GBT) untuk *mining*. Diimplementasikan sejak v0.7.0.
+* **BIP30:** Aturan untuk melarang pembuatan transaksi baru dengan `txid` yang sama dengan transaksi sebelumnya yang belum sepenuhnya dibelanjakan. Diimplementasikan sejak v0.6.0.
+* **BIP31:** Pesan protokol `pong` untuk memeriksa koneksi *peer*. Diimplementasikan sejak v0.6.1.
+* **BIP32:** **Hierarchical Deterministic Wallets (HD Wallets)**. Diimplementasikan sejak v0.13.0. Ini adalah standar fundamental untuk dompet modern.
+* **BIP34:** Aturan yang mengharuskan *block* untuk menyertakan tingginya (*height*) di dalam *coinbase transaction*. Diimplementasikan sejak v0.7.0.
+* **BIP37:** *Bloom filtering* untuk klien ringan (*lightweight clients*). Diimplementasikan sejak v0.8.0.
+  **Catatan:** Fitur ini sekarang dianggap usang dan tidak aman, dinonaktifkan secara default sejak v0.19.0.
+* **BIP42:** Memperbaiki bug yang akan menyebabkan jadwal subsidi (imbalan *block*) dimulai kembali setelah *block* 13.440.000. Diperbaiki di v0.9.2.
+* **BIP43, 44, 49, 84, 86:** Standar *derivation path* untuk HD Wallets untuk berbagai jenis *script* (Legacy, P2SH-SegWit, Native SegWit, Taproot). Diimplementasikan secara bertahap, menjadi dasar bagi dompet modern.
+* **BIP65:** *Soft fork* untuk `OP_CHECKLOCKTIMEVERIFY` (CLTV), memungkinkan *absolute timelocks*. Digabungkan di v0.12.0.
+* **BIP66:** Aturan *Strict DER* untuk memastikan serialisasi tanda tangan ECDSA yang kanonis, mencegah *transaction malleability*. Diimplementasikan sejak v0.10.0.
+* **BIP68:** *Sequence locks*, memungkinkan *relative timelocks*. Diimplementasikan sejak v0.12.1.
+* **BIP70:** Protokol Pembayaran (*Payment Protocol*).
+  **Catatan:** Fitur ini telah dihapus dari Bitcoin Core sejak v0.20.0 karena masalah keamanan dan kompleksitas.
+* **BIP111:** Service bit `NODE_BLOOM` untuk menandakan dukungan terhadap BIP37.
+* **BIP112:** Opcode `OP_CHECKSEQUENCEVERIFY` (CSV). Diimplementasikan sejak v0.12.1.
+* **BIP113:** Perhitungan *lock-time* berbasis *Median Time Past* (MTP). Diimplementasikan sejak v0.12.1.
+* **BIP125:** Sinyal untuk **Opt-in Replace-by-Fee (RBF)**.
+* **BIP141, 143, 144, 145, 147:** Kumpulan BIPs untuk **Segregated Witness (SegWit)**, termasuk aturan konsensus, verifikasi tanda tangan, format serialisasi, dan pembaruan GBT. Diimplementasikan di v0.13.0.
+* **BIP152:** **Compact block transfer** untuk relai *block* yang lebih cepat dan efisien. Diimplementasikan sejak v0.13.0.
+* **BIP157, 158:** **Compact Block Filters** untuk klien ringan. Ini adalah pengganti modern yang lebih privat dan aman untuk *bloom filters* (BIP37). Dapat dibuat sejak v0.19.0.
+* **BIP173:** Alamat **Bech32** untuk *output* SegWit asli (diawali dengan `bc1`). Didukung sejak v0.16.0.
+* **BIP174:** **Partially Signed Bitcoin Transactions (PSBT)**, format standar untuk transaksi yang belum selesai ditandatangani, sangat penting untuk *multisig* dan *hardware wallets*. Didukung sejak v0.17.0.
+* **BIP325:** Dukungan untuk jaringan uji coba **Signet**. Didukung sejak v0.21.0.
+* **BIP340, 341, 342:** Kumpulan BIPs untuk **Taproot**, termasuk **Schnorr signatures** dan **Tapscript**. Diimplementasikan di v0.21.0 dan diaktifkan di mainnet.
+* **BIP350:** Alamat **Bech32m** untuk *output* SegWit v1+ (Taproot). Digunakan sejak v22.0.
+* **BIP380-386:** **Output Script Descriptors**, cara standar untuk mendeskripsikan *output script* yang digunakan oleh dompet. Sangat penting untuk interoperabilitas dan *backup*. Diimplementasikan sejak v0.17.0.
+
+---
+
+Appendix ini berfungsi sebagai peta jalan teknis dari evolusi Bitcoin. Setiap kali Anda menganalisis sebuah transaksi atau dompet, Anda dapat merujuk kembali ke BIP yang relevan untuk memahami aturan dan tujuan di balik fitur yang digunakannya.
