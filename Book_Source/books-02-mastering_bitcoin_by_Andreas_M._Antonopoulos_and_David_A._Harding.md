@@ -138,7 +138,7 @@ Kita akan melanjutkan kisah Alice dari Bab 1. Alice kini ingin membeli episode *
 Toko Bob menerima pembayaran Bitcoin. Saat *checkout*, sistem Bob secara otomatis membuat sebuah **faktur (*invoice*)** dalam bentuk **QR code**.
 
 <p align="center">
-  <img src="images/books-02-mastering_bitcoin/gambar_2-1.png" alt="gambar" width="400"/>
+  <img src="images/books-02-mastering_bitcoin/gambar_2-1.png" alt="gambar" width="300"/>
 </p>
 
 
@@ -180,7 +180,9 @@ Total nilai dari *input* harus sedikit lebih besar dari total nilai *output*. Se
 
 Setiap transaksi terhubung dengan transaksi sebelumnya. *Input* dari sebuah transaksi sebenarnya adalah *output* dari transaksi sebelumnya. Inilah yang membentuk "rantai" kepemilikan.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_2-3.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_2-3.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 2-3 di buku menunjukkan ini secara visual. Transaksi 1 (Tx1) mengirimkan 100,000 satoshi ke Alice. Transaksi Alice ke Bob (Tx2) menggunakan output dari Tx1 sebagai input-nya. Output dari Tx2 kemudian bisa menjadi input untuk transaksi Bob berikutnya (Tx3).*
 
@@ -200,16 +202,21 @@ Untuk privasi, alamat kembalian ini biasanya adalah alamat baru yang belum perna
 ##### **Bentuk-Bentuk Transaksi Umum**
 
 * **Transaksi Umum (*Common Transaction*):** Satu *input* dan dua *output* (satu untuk pembayaran, satu untuk kembalian). Ini adalah bentuk yang paling sering ditemui. *Digambarkan di Gambar 2-4*.
-
-![gambar](images/books-02-mastering_bitcoin/gambar_2-4.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_2-4.png" alt="gambar" width="400"/>
+</p>
 
 * **Transaksi Agregasi (*Aggregating Transaction*):** Beberapa *input* digabungkan menjadi satu *output* tunggal. Mirip seperti menukar banyak uang koin menjadi selembar uang kertas besar. *Digambarkan di Gambar 2-5*.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_2-5.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_2-5.png" alt="gambar" width="400"/>
+</p>
 
 * **Transaksi Distribusi (*Distributing Transaction*):** Satu *input* yang membayar ke banyak *output* (banyak penerima). Sering digunakan oleh bisnis, misalnya untuk membayar gaji. *Digambarkan di Gambar 2-6*.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_2-6.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_2-6.png" alt="gambar" width="400"/>
+</p>
 
 #### **Membangun Sebuah Transaksi (*Constructing a Transaction*)**
 
@@ -240,7 +247,9 @@ Sekitar lima menit setelah Alice mengirim transaksinya, seorang *miner* (misalny
 
 Saat *block* yang berisi transaksi Alice ditambahkan ke *blockchain*, transaksi tersebut mendapatkan **1 konfirmasi**. Setiap *block* baru yang ditambahkan di atasnya memberikan konfirmasi tambahan. Semakin banyak konfirmasi, semakin sulit (secara komputasi) untuk membatalkan transaksi tersebut.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_2-7.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_2-7.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 2-7 di buku menggambarkan tumpukan block, dengan block yang berisi transaksi Alice berada di tengah. Tumpukan block di bawahnya menunjukkan sejarah (block height), sementara tumpukan block di atasnya menunjukkan tingkat keamanan atau kedalaman (block depth).*
 
@@ -248,7 +257,9 @@ Saat *block* yang berisi transaksi Alice ditambahkan ke *blockchain*, transaksi 
 
 Setelah transaksi Alice terkonfirmasi, Bob kini adalah pemilik sah dari dana tersebut. *Output* dari transaksi Alice menjadi UTXO baru yang dikontrol oleh kunci milik Bob. Bob sekarang bisa menggunakan UTXO ini sebagai *input* untuk transaksi berikutnya, misalnya untuk membayar desainer web-nya, Gopesh.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_2-8.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_2-8.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 2-8 mengilustrasikan rantai transaksi lengkap: Joe membayar Alice (Transaksi #1), Alice membayar Bob (Transaksi #2), dan Bob membayar Gopesh (Transaksi #3). Ini menunjukkan bagaimana nilai berpindah dari satu pemilik ke pemilik berikutnya melalui rantai transaksi yang saling terhubung.*
 
@@ -267,7 +278,9 @@ Bitcoin adalah proyek *open source* dengan lisensi MIT, artinya kodenya gratis u
 
 Bitcoin Core adalah **implementasi referensi** (*reference implementation*), artinya ia menjadi acuan standar bagaimana setiap bagian dari teknologi Bitcoin harus diimplementasikan. Ia mencakup semua aspek: dompet, mesin validasi transaksi dan *block*, serta komunikasi P2P.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_3-1.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_3-1.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 3-1 di buku menunjukkan arsitektur Bitcoin Core, yang terdiri dari berbagai komponen seperti Peer Discovery, Connection Manager, Wallet, RPC, Mempool, Validation Engine, dll. Ini adalah gambaran teknis dari "mesin" Bitcoin Core.*
 
@@ -528,11 +541,15 @@ $y^2 \mod p = (x^3 + 7) \mod p$
 
 dengan \$p = 2^{256} - 2^{32} - 2^9 - 2^8 - 2^7 - 2^6 - 2^4 - 1\$.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_4-2.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_4-2.png" alt="gambar" width="400"/>
+</p>
 
 lalu
 
-![gambar](images/books-02-mastering_bitcoin/gambar_4-3.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_4-3.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 4-2 dan 4-3 di buku mengilustrasikan bentuk kurva eliptik di bilangan real (mulus) dan di *finite field* (titik-titik acak).*
 
@@ -560,7 +577,9 @@ $K = k \times G$
 * \$G\$: *generator point* (konstan di kurva).
 * \$K\$: *public key* (titik \$(x,y)\$ di kurva).
 
-![gambar](images/books-02-mastering_bitcoin/gambar_4-4.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_4-4.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 4-4 memperlihatkan perkalian ini dengan “penjumlahan titik” berulang.*
 
@@ -661,7 +680,9 @@ Banyak orang keliru mengira dompet Bitcoin berisi bitcoin. Faktanya, dompet hany
 
 **Masalahnya:** Setiap kali dompet menghasilkan kunci baru (misalnya, untuk alamat penerima baru), pengguna harus membuat cadangan (*backup*) baru dari file dompetnya. Jika mereka lupa membuat *backup* dan perangkat mereka rusak, dana yang diterima di alamat-alamat baru tersebut akan hilang selamanya. Metode ini tidak praktis dan berisiko tinggi.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_5-1.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_5-1.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 5-1 di buku mengilustrasikan ini sebagai sebuah dompet yang berisi kumpulan kunci yang tidak saling berhubungan.*
 
@@ -684,7 +705,9 @@ Angka-angka hasil *hash* ini bisa digunakan sebagai *private keys*.
 
 **Keuntungannya:** Pengguna hanya perlu mencadangkan **satu kali**, yaitu *seed* itu sendiri. Dari *seed* tersebut, seluruh dompet (bahkan jutaan kunci) dapat dipulihkan kapan saja.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_5-2.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_5-2.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 5-2 di buku menunjukkan ini sebagai sebuah seed yang menghasilkan rantai kunci secara berurutan: k₀, k₁, k₂, ..., kₙ.*
 
@@ -709,7 +732,9 @@ Hampir semua dompet modern menggunakan standar yang disebut **Hierarchical Deter
 * **Struktur Pohon (*Tree Structure*):** Kunci-kunci tidak hanya dihasilkan dalam satu barisan, tetapi dalam struktur seperti pohon yang bisa bercabang. Setiap kunci bisa menjadi "induk" dari cabang kunci "anak" baru.
 * **Organisasi:** Struktur pohon ini memungkinkan organisasi yang lebih baik. Misalnya, satu cabang (`m/0`) bisa digunakan untuk menerima pembayaran, dan cabang lain (`m/1`) untuk menerima kembalian (*change*). Perusahaan bisa menggunakan cabang yang berbeda untuk setiap departemen.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_5-3.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_5-3.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 5-3 di buku mengilustrasikan ini, menunjukkan sebuah pohon kunci yang bercabang dari satu `seed`.*
 
@@ -766,7 +791,9 @@ Proses pembuatan kode pemulihan BIP39:
 5. Setiap segmen 11-bit dipetakan ke satu kata dari daftar 2048 kata yang telah ditentukan.
 6. Urutan kata-kata inilah yang menjadi kode pemulihan Kita.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_5-4.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_5-4.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 5-4 di buku menggambarkan proses ini secara visual.*
 
@@ -776,11 +803,15 @@ Proses mengubah kode pemulihan menjadi *seed*:
 9\. Kode pemulihan dan *salt* dimasukkan ke dalam **fungsi peregangan kunci (key-stretching function)** bernama **PBKDF2**. Fungsi ini menjalankan proses *hashing* sebanyak 2048 kali untuk membuatnya lebih tahan terhadap serangan *brute-force*.
 10\. Output akhir adalah **seed 512-bit**. *Seed* inilah yang digunakan untuk membuat dompet HD BIP32.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_5-5.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_5-5.png" alt="gambar" width="400"/>
+</p>
 
 lalu
 
-![gambar](images/books-02-mastering_bitcoin/gambar_5-6.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_5-6.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 5-5 dan 5-6 mengilustrasikan alur ini.*
 
@@ -831,7 +862,9 @@ $ bitcoin-cli getrawtransaction 466200308696215bbc949d5141a49a4138ecdfdfaa2a8029
 01000000000101eb3ae38f27191aa5f3850dc9cad00492b88b72404f9da135698679268041c54a0100000000ffffffff02204e0000000000002251203b41daba4c9ace578369740f15e5ec880c28279ee7f51b07dca69c7061e07068f8240100000000001600147752c165ea7be772b2c0acb7f4d6047ae6f4768e0141cf5efe2d8ef13ed0af21d4f4cb82422d6252d70324f6f4576b727b7d918e521c00b51be739df2f899c49dc267c0ad280aca6dab0d2fa2b42a45182fc83e817130100000000
 ```
 
-![gambar](images/books-02-mastering_bitcoin/gambar_6-1.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_6-1.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 6-1 di buku adalah peta byte dari data heksadesimal ini, yang secara visual membaginya menjadi beberapa bagian utama. Kita akan membahas setiap bagian secara berurutan.*
 
@@ -1015,7 +1048,9 @@ Validasi transaksi *legacy* (non-SegWit) melibatkan dua bagian:
 
 Untuk memvalidasi, sebuah *node* akan mengeksekusi `input script` terlebih dahulu, lalu mengambil tumpukan (*stack*) yang dihasilkan dan mengeksekusi `output script` di atasnya. Jika hasil akhirnya `TRUE` (nilai bukan nol), transaksi dianggap valid.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_7-1.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_7-1.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 7-1 di buku mengilustrasikan ini: `input script` + `output script` digabungkan untuk dievaluasi.*
 
@@ -1045,7 +1080,9 @@ Script ini menghitung `2 + 3` dan memeriksa apakah hasilnya sama dengan `5`.
 
 Karena item teratas di akhir eksekusi adalah `TRUE`, script ini valid.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_7-2.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_7-2.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 7-2 di buku memvisualisasikan proses ini dengan sangat baik.*
 
@@ -1067,11 +1104,15 @@ Ini adalah *script* di balik alamat *legacy* yang dimulai dengan `1`.
 5. `OP_EQUALVERIFY` membandingkan dua *hash* di puncak *stack*. Jika cocok, ia me-*pop* keduanya dan lanjut. Jika tidak, eksekusi gagal. `VERIFY` artinya "gagal jika tidak benar".
 6. `OP_CHECKSIG` memeriksa apakah `<Signature>` valid untuk `<Public Key>` yang tersisa. Jika ya, ia me-*push* `TRUE`.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_7-3.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_7-3.png" alt="gambar" width="400"/>
+</p>
 
 lalu
 
-![gambar](images/books-02-mastering_bitcoin/gambar_7-4.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_7-4.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 7-3 dan 7-4 memvisualisasikan eksekusi P2PKH ini.*
 
@@ -1416,7 +1457,9 @@ Meskipun semua *full node* setara, mereka bisa mengambil peran yang berbeda terg
 
 Ketika seorang *miner* menemukan *block* baru, sangat penting agar *block* tersebut disebarkan ke seluruh *miner* lain secepat mungkin. Jika ada penundaan, *miner* lain mungkin akan menemukan *block* lain pada ketinggian yang sama, menyebabkan **blockchain fork**, di mana hanya satu dari dua *block* yang bersaing akan menjadi bagian dari rantai utama. Ini disebut **block-finding race** dan merugikan desentralisasi karena memberi keuntungan pada *miner* besar.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_10-1.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_10-1.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 10-1:** Gambar ini menunjukkan sebuah rantai *block* yang bercabang menjadi dua rantai yang bersaing. Kedua cabang tersebut kemudian memiliki tanda tanya di ujungnya, mengilustrasikan ketidakpastian tentang cabang mana yang akan diperpanjang dan menjadi rantai yang "benar".
 
@@ -1431,7 +1474,9 @@ Sebagai gantinya, *node* pengirim hanya mengirim **header block** dan **daftar p
 1. **Low-bandwidth mode (Default):** *Peer* hanya akan mengumumkan *hash* dari *block* baru. *Node* Kita hanya akan meminta *compact block* jika diperlukan, sehingga menghemat *bandwidth*.
 2. **High-bandwidth mode:** *Peer* akan langsung mengirimkan *compact block* bahkan sebelum memvalidasi isinya sepenuhnya (hanya memeriksa PoW). Ini meminimalkan latensi di setiap lompatan (*hop*) jaringan, sangat penting bagi para *miner*.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_10-2.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_10-2.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 10-2:** Gambar ini membandingkan tiga mode relai:
 
@@ -1451,13 +1496,17 @@ Bagaimana *node* baru menemukan *node* lain untuk terhubung? Prosesnya disebut *
 
 2. **Handshake:** Setelah mendapatkan satu alamat IP, *node* baru akan terhubung dan memulai "jabat tangan" (*handshake*). Ia mengirim pesan `version` yang berisi info seperti versi protokol, layanan yang didukung, dan tinggi *block* saat ini. *Peer* akan merespons dengan pesan `verack` (*version acknowledgement*).
 
-![gambar](images/books-02-mastering_bitcoin/gambar_10-3.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_10-3.png" alt="gambar" width="400"/>
+</p>
 
    * **Deskripsi Gambar 10-3:** Gambar ini mengilustrasikan alur jabat tangan awal. Node A mengirimkan pesan `version` ke Node B. Node B merespons dengan `verack` dan kemudian mengirimkan pesan `version`-nya sendiri ke Node A, yang juga direspons dengan `verack` oleh Node A.
 
 3. **Menemukan Peer Lain:** Setelah terhubung, *node* akan mengirim pesan `getaddr` untuk meminta daftar alamat IP *peer* lain. *Peer* akan merespons dengan pesan `addr` yang berisi daftar alamat. Dengan cara ini, *node* secara bertahap membangun daftar *peer*-nya dan menjadi bagian dari jaringan.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_10-4.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_10-4.png" alt="gambar" width="400"/>
+</p>
 
    * **Deskripsi Gambar 10-4:** Gambar ini menunjukkan Node A mengirim `getaddr` ke Node B. Node B merespons dengan beberapa pesan `addr`, memberikan Node A daftar *peer* baru untuk dihubungi.
 
@@ -1479,7 +1528,9 @@ Perintah ini akan menampilkan daftar *peer* yang sedang terhubung, beserta detai
 
 Klien SPV tidak mengunduh *block* penuh, melainkan hanya **block headers**. Ini membuat mereka jauh lebih "ringan".
 
-![gambar](images/books-02-mastering_bitcoin/gambar_10-5.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_10-5.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 10-5:** Gambar ini menunjukkan klien ringan (Node A) berulang kali mengirim pesan `getheaders` ke *full node* (Node B) dan menerima pesan `headers` sebagai balasan, memungkinkannya untuk menyinkronkan seluruh rantai *header* dengan cepat.
 
@@ -1498,15 +1549,33 @@ Untuk menemukan transaksi mereka di antara jutaan transaksi lain, klien SPV meme
   * Untuk memeriksa kecocokan, data baru di-*hash* dengan cara yang sama. Jika semua bit yang sesuai sudah menyala, maka "mungkin" cocok (*probabilistic match*).
   * Jika ada satu bit saja yang mati, maka "pasti tidak" cocok.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_10-6.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_10-6.png" alt="gambar" width="400"/>
+</p>
+
 lalu
-![gambar](images/books-02-mastering_bitcoin/gambar_10-7.png)
+
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_10-7.png" alt="gambar" width="400"/>
+</p>
+
 lalu
-![gambar](images/books-02-mastering_bitcoin/gambar_10-8.png)
+
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_10-8.png" alt="gambar" width="400"/>
+</p>
+
 lalu
-![gambar](images/books-02-mastering_bitcoin/gambar_10-9.png)
+
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_10-9.png" alt="gambar" width="400"/>
+</p>
+
 lalu
-![gambar](images/books-02-mastering_bitcoin/gambar_10-10.png)
+
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_10-10.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 10-6 hingga 10-10:** Gambar-gambar ini secara visual mengilustrasikan proses kerja *bloom filter* dengan array 16-bit sederhana: bagaimana menambahkan pola "A" dan "B" akan menyalakan bit-bit tertentu, dan bagaimana menguji pola "X" menghasilkan "mungkin cocok" sementara menguji pola "Y" menghasilkan "pasti tidak cocok".
 
@@ -1617,7 +1686,9 @@ yang mengacu pada krisis keuangan saat itu dan menegaskan tujuan Bitcoin.
 
 Setiap *block* baru terhubung ke *block* sebelumnya melalui *field* `Previous Block Hash` di dalam *header*-nya. *Field* ini berisi *hash* dari *header block* induknya.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_11-1.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_11-1.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 11-1 (halaman 251):**
   Menunjukkan tiga *block* berurutan (misalnya, 277314, 277315, 277316). Panah dari *header Block* 277316 menunjuk ke *header Block* 277315, menandakan bahwa *field* "Previous Block Hash" di 277316 berisi *hash* dari 277315. Hal yang sama berlaku untuk 277315 → 277314. Inilah yang membentuk "rantai" yang tidak bisa diputuskan. Mengubah satu *block* akan mengubah *hash*-nya, memutus tautan, dan mengharuskan penambangan ulang seluruh rantai berikutnya.
@@ -1636,11 +1707,15 @@ Proses dibangun dari bawah ke atas (*bottom-up*):
 3. **Level Atas:** Pasangan *hash* digabung (64-byte) lalu di-hash lagi (double-SHA256) → node induk.
 4. **Rekursif:** Ulangi hingga hanya tersisa satu node di puncak, yaitu **Merkle Root**.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_11-2.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_11-2.png" alt="gambar" width="400"/>
+</p>
 
 lalu
 
-![gambar](images/books-02-mastering_bitcoin/gambar_11-3.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_11-3.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 11-2 & 11-3 (halaman 253):**
 
@@ -1658,7 +1733,9 @@ Dengan *Merkle Path*, Kita bisa membuktikan transaksi K ada di *block* hanya den
 
 Klien dapat menghitung ulang jalur dan memverifikasi *Merkle Root* di *header block*. Dengan hanya 80-byte header + *Merkle Path* kecil, **SPV client** bisa memverifikasi transaksi tanpa mengunduh seluruh *block*.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_11-6.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_11-6.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 11-6 (halaman 256):**
   Untuk membuktikan transaksi K, cukup sertakan *hash* L, gabungan IJ, gabungan MNOP, dan gabungan ABCDEFGH. Dengan 4 *hash* ini, klien bisa merekonstruksi root dan memvalidasi transaksi K.
@@ -1699,7 +1776,9 @@ Bitcoin "dicetak" (*minted*) pada tingkat yang tetap dan terus menurun setiap ka
 
 * **Pasokan Terbatas:** Proses ini akan berlanjut hingga sekitar tahun 2140, ketika total pasokan akan mencapai hampir 21 juta BTC. Setelah itu, tidak ada BTC baru yang akan dibuat, dan para *miner* hanya akan diinsentifkan oleh biaya transaksi.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_12-1.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_12-1.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 12-1 (Kurva Pasokan Bitcoin):** Gambar ini adalah grafik yang sangat penting. Sumbu X adalah waktu (tahun), dan sumbu Y adalah total bitcoin yang beredar. Grafiknya berbentuk kurva logaritmik yang menanjak tajam di awal dan kemudian melandai secara bertahap, mendekati garis horizontal di angka 21 juta. Ini secara visual menunjukkan bagaimana tingkat emisi menurun secara eksponensial dan bagaimana pasokan total tidak akan pernah melebihi 21 juta.
 
@@ -1801,7 +1880,9 @@ Jika satu entitas menguasai mayoritas (misalnya >50%) dari total *hashrate* jari
 * **Hard Fork:** Perubahan yang **tidak kompatibel ke belakang (*backward-incompatible*)**. *Node* lama akan menolak *block* baru. Ini berisiko memecah jaringan menjadi dua *blockchain* yang terpisah.
 * **Soft Fork:** Perubahan yang **kompatibel ke belakang (*backward-compatible*)**. Aturan baru dibuat lebih ketat. *Node* lama masih akan melihat *block* baru sebagai valid (meskipun mereka tidak memvalidasi aturan baru tersebut).
 
-![gambar](images/books-02-mastering_bitcoin/gambar_12-2.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_12-2.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 12-2 (Blockchain dengan Forks):** Gambar ini menunjukkan dua jenis *fork*. Pada *block height* 4, terjadi *fork* alami satu *block* yang cepat terselesaikan. Namun, pada *block height* 6, terjadi *hard fork*. Rantai terpecah menjadi dua cabang (7a dan 7b) yang didasarkan pada aturan konsensus yang berbeda. Cabang-cabang ini akan terus tumbuh secara terpisah dan tidak akan pernah menyatu kembali.
 
@@ -1809,7 +1890,9 @@ Jika satu entitas menguasai mayoritas (misalnya >50%) dari total *hashrate* jari
 
 * **BIP9 (Version Bits):** Mekanisme di mana *miner* memberi sinyal kesiapan dengan mengatur *bit* tertentu di *field* `version` *block*. Aktivasi terjadi jika 95% *miner* memberi sinyal dalam satu periode retargeting.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_12-3.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_12-3.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 12-3 (Diagram Status BIP9):** Gambar ini adalah diagram alur yang menunjukkan siklus hidup proposal BIP9.
 
@@ -1967,7 +2050,9 @@ Dua protokol utama yang menggunakan konsep ini adalah:
 
 Hasilnya, ribuan transaksi *off-chain* diselesaikan hanya dengan **dua** transaksi *on-chain* (pembukaan dan penutupan).
 
-![gambar](images/books-02-mastering_bitcoin/gambar_14-1.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_14-1.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 14-1 (Lifecycle of a Payment Channel):**
   Gambar ini adalah diagram alur waktu yang sangat penting. Di bagian atas, kita melihat **Blockchain**. Dua transaksi, **Funding** dan **Settlement**, berada di dalam *blockchain* (on-chain). Di antara keduanya, di bagian "Off-Chain", terdapat serangkaian **Commitment Transactions** yang dipertukarkan antara Alice dan Bob. Panah-panah menunjukkan aliran waktu dan pertukaran state. Ini secara visual memisahkan apa yang terjadi di *blockchain* (jarang dan mahal) dari apa yang terjadi di dalam *channel* (sering dan murah).
@@ -1980,11 +2065,15 @@ Bayangkan Emma membayar Fabian 0.01 mBTC per detik untuk *streaming* video.
 2. **Commitment:** Setiap detik, dompet Emma membuat *commitment transaction* baru yang membagi saldo (misalnya, detik ke-1: 0.01 mBTC untuk Fabian, 35.99 mBTC untuk Emma; detik ke-2: 0.02 mBTC untuk Fabian, 35.98 mBTC untuk Emma, dst.) dan mengirimkannya ke Fabian untuk ditandatangani bersama.
 3. **Settlement:** Setelah Emma selesai menonton selama 10 menit (600 detik), transaksi terakhir (6 mBTC untuk Fabian, 30 mBTC untuk Emma) disiarkan ke *blockchain*.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_14-2.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_14-2.png" alt="gambar" width="400"/>
+</p>
 
 lalu
 
-![gambar](images/books-02-mastering_bitcoin/gambar_14-3.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_14-3.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 14-2 & 14-3 (Simple Payment Channel Example):**
   Gambar 14-2 menunjukkan antarmuka pengguna sederhana di mana Emma membayar per detik. Gambar 14-3 menguraikan alur transaksinya. Di sebelah kiri adalah **Funding Transaction** yang menciptakan UTXO *multisig*. Panah-panah kemudian menunjuk ke serangkaian **Commitment Transactions** (`#1`, `#2`, ... `#600`). Setiap transaksi komitmen ini membelanjakan UTXO *multisig* yang sama, tetapi dengan pembagian saldo yang berbeda-beda, mencerminkan pembayaran yang terakumulasi. Ini mengilustrasikan bagaimana satu input *on-chain* dapat "dibelanjakan" berkali-kali secara *off-chain*.
@@ -2004,7 +2093,9 @@ Ini adalah mekanisme canggih yang digunakan oleh Lightning Network. Idenya adala
 
    Ini menciptakan kerugian kecil bagi siapa pun yang ingin menutup *channel* secara sepihak.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_14-5.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_14-5.png" alt="gambar" width="400"/>
+</p>
 
    * **Deskripsi Gambar 14-5 (Asymmetric Commitment Transactions):**
      Gambar ini adalah inti dari mekanisme revocable. Ia menunjukkan dua kotak terpisah. **Kotak kiri** adalah "Commitment Transaction Held by Hitesh", yang ditandatangani oleh Irene. Ia memiliki dua output: satu membayar Irene segera, dan satu lagi membayar Hitesh setelah penundaan 1000 *block*. **Kotak kanan** adalah kebalikannya, dipegang oleh Irene dan ditandatangani oleh Hitesh. Ini secara visual menunjukkan asimetri yang krusial: setiap pihak memegang transaksi yang merugikan diri mereka sendiri (karena harus menunggu) tetapi menguntungkan pihak lain.
@@ -2036,12 +2127,15 @@ Ini adalah "lem" yang memungkinkan *channel-channel* dirangkai bersama. HTLC ada
 **Contoh Dasar (Alice -> Bob -> Carol -> Diana -> Eric):**
 Alice ingin membayar Eric 1 BTC, tetapi mereka tidak punya *channel* langsung.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_14-6.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_14-6.png" alt="gambar" width="400"/>
+</p>
 
 lalu
 
-![gambar](images/books-02-mastering_bitcoin/gambar_14-7.png)
-
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_14-7.png" alt="gambar" width="400"/>
+</p>
 
 * **Deskripsi Gambar 14-6 & 14-7 (Lightning Network Payment Routing):**
   Ini adalah visualisasi paling penting di bab ini.
@@ -2097,7 +2191,9 @@ Satoshi mendefinisikan "koin elektronik" sebagai **sebuah rantai tanda tangan di
 * Setiap pemilik mentransfer koin ke pemilik berikutnya dengan menandatangani secara digital sebuah *hash* dari transaksi sebelumnya dan *public key* dari pemilik berikutnya.
 * Penerima pembayaran (*payee*) dapat memverifikasi rantai tanda tangan ini untuk memastikan keabsahan kepemilikan.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_apx-1-1.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_apx-1-1.png" alt="gambar" width="400"/>
+</p>
 
 **Deskripsi Gambar di Bagian 2 (halaman 340):**
 
@@ -2118,7 +2214,9 @@ Solusi yang diusulkan dimulai dengan konsep *timestamp server*:
 * *Hash* ini kemudian dipublikasikan secara luas (misalnya, di koran atau Usenet).
 * Setiap *timestamp* baru menyertakan *timestamp* sebelumnya di dalam *hash*-nya, membentuk sebuah **rantai**. Setiap stempel waktu tambahan akan memperkuat stempel waktu sebelumnya.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_apx-1-2.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_apx-1-2.png" alt="gambar" width="400"/>
+</p>
 
 **Deskripsi Gambar di Bagian 3 (halaman 341):**
 
@@ -2136,7 +2234,9 @@ Untuk mengimplementasikan *timestamp server* terdistribusi, Bitcoin menggunakan 
 
 PoW juga memecahkan masalah representasi dalam pengambilan keputusan mayoritas: **satu-CPU-satu-suara (*one-CPU-one-vote*)**. Keputusan mayoritas direpresentasikan oleh rantai terpanjang, yang memiliki usaha PoW terbesar yang diinvestasikan di dalamnya.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_apx-1-3.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_apx-1-3.png" alt="gambar" width="400"/>
+</p>
 
 **Deskripsi Gambar di Bagian 4 (halaman 342):**
 
