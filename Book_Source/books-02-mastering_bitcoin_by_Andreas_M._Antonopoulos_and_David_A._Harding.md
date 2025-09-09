@@ -1818,3 +1818,244 @@ Bab 12 ini menjelaskan bagaimana kompetisi komputasi yang intens dalam *mining* 
 
 ---
 
+# Bab 13
+## Keamanan Bitcoin (*Bitcoin Security*)
+
+Bab ini membahas tantangan dalam mengamankan bitcoin dan prinsip-prinsip serta praktik terbaik untuk melakukannya. Mengamankan bitcoin berbeda dari mengamankan rekening bank. Bitcoin lebih mirip seperti uang tunai digital atau emas digital. Ada ungkapan, "Kepemilikan adalah sembilan per sepuluh dari hukum." Di Bitcoin, **kepemilikan kunci adalah sepuluh per sepuluh dari hukum**. Siapa pun yang memiliki *private key* memiliki kendali penuh dan mutlak atas dana tersebut, tanpa ada pihak yang bisa membatalkan transaksinya.
+
+#### **Prinsip-prinsip Keamanan (*Security Principles*)**
+
+Prinsip inti Bitcoin adalah **desentralisasi**, dan ini memiliki implikasi besar terhadap keamanan.
+
+* **Model Terpusat (Bank/Kartu Kredit):**
+  Keamanan bergantung pada **kontrol akses** dan penyaringan untuk mencegah pelaku jahat masuk ke dalam sistem. Jaringan ini harus diamankan dari ujung ke ujung dengan enkripsi karena data sensitif (seperti nomor kartu kredit) dapat digunakan berulang kali untuk "menarik" dana.
+
+* **Model Terdesentralisasi (Bitcoin):**
+  Keamanan didorong ke pengguna. Tanggung jawab dan kontrol ada di tangan pengguna. Jaringan itu sendiri terbuka.
+
+  * Sebuah transaksi Bitcoin **hanya mengotorisasi satu transfer spesifik** ke penerima tertentu. Transaksi tersebut tidak mengungkapkan informasi privat (seperti identitas) dan tidak dapat digunakan untuk otorisasi pembayaran tambahan.
+  * Karena itu, lalu lintas jaringan Bitcoin **tidak perlu dienkripsi**. Kita bisa menyiarkan transaksi melalui WiFi publik tanpa kehilangan keamanan pada transaksi itu sendiri, karena keamanannya terletak pada tanda tangan digital, bukan pada kerahasiaan salurannya.
+
+Model ini memberikan kekuatan besar kepada pengguna, tetapi juga tanggung jawab besar untuk menjaga kerahasiaan kunci mereka. Ini tidak mudah, terutama di perangkat komputasi umum seperti laptop atau ponsel yang selalu terhubung ke internet.
+
+#### **Mengembangkan Sistem Bitcoin dengan Aman**
+
+Bagi pengembang, prinsip utama yang harus dipegang adalah **desentralisasi**.
+
+> **Peringatan Kritis untuk Pengembang/Auditor:** Jangan mengambil alih kunci dari pengguna dan jangan mengalihdayakan (*outsource*) proses validasi.
+
+Banyak bursa (*exchange*) Bitcoin awal gagal karena mereka merancang sistem terpusat: semua dana pengguna disimpan dalam satu "hot wallet" di satu server. Desain ini menghilangkan keamanan desentralisasi Bitcoin dan memusatkan risiko. Akibatnya, banyak dari mereka yang diretas, dan dana nasabah hilang.
+
+Jika Kita tidak siap berinvestasi besar dalam keamanan operasional berlapis seperti bank tradisional, jangan pernah mengambil dana keluar dari konteks keamanan terdesentralisasi Bitcoin.
+Untuk memanfaatkan model keamanan unik Bitcoin, hindari godaan arsitektur terpusat yang mungkin terasa akrab tetapi pada akhirnya meniadakan keunggulan keamanan Bitcoin.
+#### **Akar Kepercayaan (*The Root of Trust*)**
+
+Arsitektur keamanan tradisional didasarkan pada konsep **akar kepercayaan (*root of trust*)**, yaitu sebuah inti tepercaya yang menjadi fondasi keamanan seluruh sistem. Keamanan dibangun dalam lapisan-lapisan konsentris (seperti bawang), di mana kepercayaan meluas keluar dari pusat. Komponen paling tepercaya (dan paling sederhana) ada di inti, sementara perangkat lunak yang lebih kompleks berada di lapisan luar.
+
+Arsitektur keamanan Bitcoin berbeda:
+
+* Di Bitcoin, sistem konsensus menciptakan sebuah **blockchain tepercaya yang sepenuhnya terdesentralisasi**.
+* Sebuah *blockchain* yang divalidasi dengan benar menggunakan **genesis block sebagai akar kepercayaannya**, membangun rantai kepercayaan hingga *block* saat ini.
+* Aplikasi Bitcoin yang aman **harus dan hanya boleh** menggunakan *blockchain* sebagai satu-satunya akar kepercayaan mereka.
+
+**Metode Evaluasi untuk Auditor:**
+Untuk mengevaluasi arsitektur keamanan sebuah aplikasi Bitcoin, gunakan skenario hipotetis:
+**"Anggap setiap komponen individual sepenuhnya diretas dan dikendalikan oleh penyerang."**
+
+* Jika aplikasi Kita menjadi tidak aman ketika satu komponen (misalnya, database server Kita, *hot wallet* Kita) diretas, itu menunjukkan bahwa Kita telah salah menempatkan kepercayaan pada komponen tersebut.
+* Aplikasi Bitcoin yang benar-benar tangguh seharusnya hanya rentan jika mekanisme konsensus Bitcoin itu sendiri yang diretas.
+  Akar kepercayaannya harus bersandar pada bagian terkuat dari arsitektur keamanan Bitcoin: *blockchain* yang divalidasi secara independen.
+
+#### **Praktik Terbaik Keamanan Pengguna (*User Security Best Practices*)**
+
+Komputer modern pada dasarnya tidak aman untuk menyimpan uang digital. Perangkat kita terus-menerus terhubung ke internet dan menjalankan ribuan komponen perangkat lunak yang bisa saja disusupi *malware* untuk mencuri kunci dompet kita. Bitcoin menciptakan insentif yang sangat besar bagi peretas. Berikut adalah beberapa praktik terbaik untuk melindungi diri.
+
+##### **Penyimpanan Bitcoin Fisik (*Physical Bitcoin Storage*)**
+
+Karena manusia lebih akrab dengan keamanan fisik, salah satu metode paling efektif adalah mengubah kunci digital menjadi bentuk fisik. *Seed* atau *private key* adalah angka, yang dapat dicetak di atas kertas (disebut *paper backup*), diukir di lempengan logam, atau disimpan di media digital seperti USB stick.
+Menyimpan kunci secara *offline* (tidak pernah terhubung ke internet) disebut **cold storage** dan merupakan salah satu teknik keamanan paling efektif.
+
+##### **Perangkat Penandatanganan Perangkat Keras (*Hardware Signing Devices*)**
+
+Ini adalah masa depan keamanan Bitcoin bagi pengguna non-ahli. *Hardware signing device* (sering disebut *hardware wallet*) adalah perangkat khusus yang dirancang hanya untuk satu tujuan: menyimpan kunci dan menandatangani transaksi. Perangkat ini memiliki antarmuka yang sangat terbatas dan tidak menjalankan perangkat lunak umum, sehingga sangat sulit untuk diretas. Kunci privat tidak pernah meninggalkan perangkat.
+
+##### **Memastikan Akses Anda Sendiri (*Ensuring Your Access*)**
+
+Risiko terbesar bagi banyak pengguna bukanlah pencurian, melainkan **kehilangan data**. Dalam upaya mengamankan bitcoin, jangan sampai Kita membuatnya terlalu aman sehingga Kita sendiri tidak bisa mengaksesnya.
+Buku ini menceritakan kisah nyata tentang sebuah proyek yang kehilangan hampir 7.000 bitcoin karena mereka kehilangan kunci enkripsi untuk *backup* mereka sendiri.
+
+> **Penting:** Seperti yang dibahas di Bab 5, untuk memulihkan dana, Kita mungkin perlu mencadangkan lebih dari sekadar *private key* atau *seed* Kita, terutama jika Kita menggunakan *multisignature* atau *script* yang rumit. Kita juga perlu mencadangkan informasi tentang *script* itu sendiri (misalnya, melalui *output script descriptors*).
+
+##### **Mendiversifikasi Risiko (*Diversifying Risk*)**
+
+Jangan simpan semua bitcoin Kita di satu tempat atau satu dompet. Perlakukan seperti uang di dunia nyata:
+
+* Simpan sebagian kecil (misalnya <5%) di dompet *online* atau seluler sebagai "uang jajan" (*hot wallet*).
+* Sebagian besar dana Kita harus disimpan dalam beberapa mekanisme penyimpanan yang berbeda, seperti dompet desktop dan beberapa bentuk *cold storage*.
+
+##### **Multisig dan Tata Kelola (*Multisig and Governance*)**
+
+Untuk menyimpan bitcoin dalam jumlah besar, pertimbangkan untuk menggunakan alamat **multisignature (multisig)**. Alamat ini memerlukan lebih dari satu tanda tangan untuk melakukan pembayaran (misalnya, 2 dari 3, atau 3 dari 5).
+
+* **Untuk Perusahaan:** Kunci dapat dipegang oleh beberapa eksekutif yang berbeda untuk mencegah penipuan internal atau satu titik kegagalan (*single point of failure*).
+* **Untuk Individu:** Kita bisa menggunakan *multisig* untuk redundansi, di mana Kita memegang beberapa kunci yang disimpan di lokasi fisik yang berbeda (misalnya, satu di rumah, satu di brankas bank).
+
+##### **Kelangsungan (*Survivability*)**
+
+Ini adalah aspek keamanan yang sering diabaikan: apa yang terjadi pada bitcoin Kita jika Kita meninggal dunia atau tidak mampu mengaksesnya? Jika tidak ada yang tahu *password* atau lokasi *seed phrase* Kita, dana tersebut akan hilang selamanya.
+
+* Pertimbangkan untuk membagikan detail akses dengan kerabat tepercaya atau pengacara melalui perencanaan warisan.
+* Skema yang lebih kompleks dapat diatur menggunakan *multisignature* dan perencanaan warisan dengan "pelaksana aset digital" (*digital asset executor*).
+
+Keamanan di Bitcoin adalah sebuah spektrum dan tanggung jawab pribadi. Dengan memahami prinsip-prinsip ini dan menerapkan praktik terbaik, pengguna dapat menikmati manfaat dari sistem keuangan yang terdesentralisasi ini dengan aman.
+
+---
+
+# Bab 14
+## Aplikasi Lapisan Kedua (*Second-Layer Applications*)
+
+Bab ini membahas bagaimana Bitcoin dapat berfungsi sebagai platform untuk aplikasi-aplikasi canggih lainnya, yang sering disebut sebagai **second-layer applications** (aplikasi lapisan kedua). Kita akan melihat bagaimana jaminan-jaminan fundamental dari Bitcoin dapat digunakan sebagai "blok pembangun" untuk menciptakan sistem yang lebih skalabel, privat, dan cepat.
+
+#### **Blok Pembangun (*Building Blocks / Primitives*)**
+
+Sistem Bitcoin, ketika beroperasi dengan benar, menawarkan serangkaian jaminan fundamental yang dapat dianggap sebagai "blok pembangun" untuk aplikasi yang lebih kompleks. Beberapa di antaranya yang paling penting adalah:
+
+* **No double-spend:** Jaminan paling dasar bahwa sebuah UTXO tidak bisa dibelanjakan dua kali.
+* **Immutability:** Setelah terkubur dalam, sebuah transaksi menjadi sangat sulit diubah.
+* **Neutrality:** Jaringan memproses transaksi yang valid tanpa memandang asalnya.
+* **Secure timestamping:** *Block* memiliki stempel waktu yang terpercaya.
+* **Authorization:** Tanda tangan digital memberikan otorisasi yang kuat.
+* **Auditability:** Semua transaksi bersifat publik dan dapat diaudit.
+* **Transaction atomicity:** Transaksi bersifat atomik—berhasil sepenuhnya atau gagal sepenuhnya, tidak ada status di antaranya.
+* **Quorum of control:** Skrip *multisignature* memberlakukan aturan kuorum.
+* **Timelock/aging:** *Script* dapat dikunci berdasarkan waktu absolut atau relatif.
+
+#### **Colored Coins**
+
+**Colored coins** adalah teknologi yang memungkinkan transaksi Bitcoin untuk mencatat kepemilikan dan transfer aset selain bitcoin itu sendiri. Idenya adalah "mewarnai" sejumlah kecil bitcoin (misalnya, satu satoshi) untuk merepresentasikan aset lain, seperti saham perusahaan, sertifikat emas, atau item dalam *game*.
+
+Metode modern untuk *colored coins* menggunakan tiga mekanisme utama:
+
+1. **Single-Use Seals (Segel Sekali Pakai):**
+   UTXO di Bitcoin secara alami berfungsi sebagai segel sekali pakai. Sebuah UTXO hanya bisa "dibuka" (dibelanjakan) satu kali dalam *blockchain* yang valid. Ketika UTXO yang "diwarnai" dibelanjakan, status kepemilikan aset eksternal tersebut diperbarui.
+
+2. **Pay to Contract (P2C):**
+   Seperti yang dibahas di bab sebelumnya, kita dapat membuat komitmen terhadap data (misalnya, kontrak transfer aset) dengan "mengutak-atik" (*tweaking*) *public key* penerima. Komitmen ini tidak terlihat oleh publik di *blockchain* tetapi dapat diungkapkan dan diverifikasi oleh pihak-pihak yang berkepentingan.
+
+3. **Client-Side Validation (Validasi di Sisi Klien):**
+   Ini adalah konsep kuncinya. *Full node* Bitcoin tidak tahu dan tidak peduli tentang aturan aset "berwarna" ini. Sebaliknya, **validasi** aturan transfer aset dilakukan oleh perangkat lunak klien (dompet) milik pengguna itu sendiri. Saat Alice ingin mentransfer aset berwarna ke Dan, ia harus memberikan "sejarah" kepemilikan aset tersebut kepada Dan. Perangkat lunak Dan kemudian akan memvalidasi seluruh sejarah tersebut untuk memastikan transfernya sah. Ini sangat meningkatkan privasi dan skalabilitas.
+
+Dua protokol utama yang menggunakan konsep ini adalah:
+
+* **RGB:** Protokol yang dirancang agar sangat kompatibel dengan *Lightning Network*.
+* **Taproot Assets (sebelumnya Taro):** Protokol yang sangat dipengaruhi oleh RGB tetapi menggunakan mekanisme komitmen yang sangat mirip dengan Taproot asli, membuatnya lebih mudah diimplementasikan oleh dompet yang sudah mendukung Taproot.
+
+#### **Payment Channels dan State Channels**
+
+**Payment channels** adalah mekanisme untuk melakukan banyak transaksi Bitcoin antara dua pihak di luar *blockchain* (*off-chain*). Ini memungkinkan transaksi yang sangat cepat (instan), sangat murah (hampir gratis), dan dalam jumlah sangat kecil (*micropayments*).
+
+**Konsep Inti State Channel:**
+
+* **Funding Transaction:** Dua pihak (misalnya, Alice dan Bob) bersama-sama membuat satu transaksi yang dikirim ke *blockchain*. Transaksi ini mengunci sejumlah dana (misalnya, 1 BTC dari Alice, 1 BTC dari Bob) ke dalam alamat *multisignature* 2-dari-2. Ini "membuka" *channel*.
+* **Commitment Transactions:** Setelah *channel* dibuka, Alice dan Bob dapat saling bertukar ribuan transaksi yang belum ditandatangani sepenuhnya atau belum disiarkan. Transaksi ini memperbarui saldo di dalam *channel* (misalnya, setelah transaksi pertama, saldo menjadi: Alice 0.9 BTC, Bob 1.1 BTC). Transaksi-transaksi ini terjadi secara *off-chain*.
+* **Settlement Transaction:** Ketika mereka selesai bertransaksi, mereka membuat satu transaksi terakhir yang mencerminkan saldo akhir dan mengirimkannya ke *blockchain*. Transaksi ini "menutup" *channel*.
+
+Hasilnya, ribuan transaksi *off-chain* diselesaikan hanya dengan **dua** transaksi *on-chain* (pembukaan dan penutupan).
+
+![gambar](images/books-02-mastering_bitcoin/gambar_14-1.png)
+
+* **Deskripsi Gambar 14-1 (Lifecycle of a Payment Channel):**
+  Gambar ini adalah diagram alur waktu yang sangat penting. Di bagian atas, kita melihat **Blockchain**. Dua transaksi, **Funding** dan **Settlement**, berada di dalam *blockchain* (on-chain). Di antara keduanya, di bagian "Off-Chain", terdapat serangkaian **Commitment Transactions** yang dipertukarkan antara Alice dan Bob. Panah-panah menunjukkan aliran waktu dan pertukaran state. Ini secara visual memisahkan apa yang terjadi di *blockchain* (jarang dan mahal) dari apa yang terjadi di dalam *channel* (sering dan murah).
+
+##### **Contoh Sederhana (dan Naif): Streaming Video**
+
+Bayangkan Emma membayar Fabian 0.01 mBTC per detik untuk *streaming* video.
+
+1. **Funding:** Emma mendepositkan 36 mBTC (untuk 1 jam) ke alamat *multisig* 2-dari-2 antara dia dan Fabian.
+2. **Commitment:** Setiap detik, dompet Emma membuat *commitment transaction* baru yang membagi saldo (misalnya, detik ke-1: 0.01 mBTC untuk Fabian, 35.99 mBTC untuk Emma; detik ke-2: 0.02 mBTC untuk Fabian, 35.98 mBTC untuk Emma, dst.) dan mengirimkannya ke Fabian untuk ditandatangani bersama.
+3. **Settlement:** Setelah Emma selesai menonton selama 10 menit (600 detik), transaksi terakhir (6 mBTC untuk Fabian, 30 mBTC untuk Emma) disiarkan ke *blockchain*.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_14-2.png)
+
+lalu
+
+![gambar](images/books-02-mastering_bitcoin/gambar_14-3.png)
+
+* **Deskripsi Gambar 14-2 & 14-3 (Simple Payment Channel Example):**
+  Gambar 14-2 menunjukkan antarmuka pengguna sederhana di mana Emma membayar per detik. Gambar 14-3 menguraikan alur transaksinya. Di sebelah kiri adalah **Funding Transaction** yang menciptakan UTXO *multisig*. Panah-panah kemudian menunjuk ke serangkaian **Commitment Transactions** (`#1`, `#2`, ... `#600`). Setiap transaksi komitmen ini membelanjakan UTXO *multisig* yang sama, tetapi dengan pembagian saldo yang berbeda-beda, mencerminkan pembayaran yang terakumulasi. Ini mengilustrasikan bagaimana satu input *on-chain* dapat "dibelanjakan" berkali-kali secara *off-chain*.
+
+##### **Membuat Channel menjadi Trustless (Tanpa Kepercayaan)**
+
+Contoh di atas naif karena salah satu pihak bisa berbuat curang (misalnya, Emma menyiarkan transaksi dari detik pertama untuk membayar lebih sedikit). Untuk membuatnya *trustless*, kita menggunakan mekanisme hukuman.
+
+**Asymmetric Revocable Commitments:**
+Ini adalah mekanisme canggih yang digunakan oleh Lightning Network. Idenya adalah membuat setiap pembaruan status menjadi **tidak dapat dibatalkan secara asimetris**.
+
+1. **Transaksi Komitmen Asimetris:**
+   Untuk setiap keadaan baru (misalnya, `State N`), Alice dan Bob tidak membuat satu transaksi komitmen bersama. Sebaliknya, mereka membuat **dua** transaksi yang berbeda:
+
+   * Transaksi yang dipegang Alice: Membayar Bob **segera**, tetapi membayar Alice kembali **setelah penundaan waktu** (misalnya, 1000 *block*), menggunakan `OP_CHECKSEQUENCEVERIFY`.
+   * Transaksi yang dipegang Bob: Membayar Alice **segera**, tetapi membayar Bob kembali **setelah penundaan waktu**.
+
+   Ini menciptakan kerugian kecil bagi siapa pun yang ingin menutup *channel* secara sepihak.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_14-5.png)
+
+   * **Deskripsi Gambar 14-5 (Asymmetric Commitment Transactions):**
+     Gambar ini adalah inti dari mekanisme revocable. Ia menunjukkan dua kotak terpisah. **Kotak kiri** adalah "Commitment Transaction Held by Hitesh", yang ditandatangani oleh Irene. Ia memiliki dua output: satu membayar Irene segera, dan satu lagi membayar Hitesh setelah penundaan 1000 *block*. **Kotak kanan** adalah kebalikannya, dipegang oleh Irene dan ditandatangani oleh Hitesh. Ini secara visual menunjukkan asimetri yang krusial: setiap pihak memegang transaksi yang merugikan diri mereka sendiri (karena harus menunggu) tetapi menguntungkan pihak lain.
+
+2. **Kunci Pencabutan (*Revocation Key*):**
+   Untuk setiap transaksi komitmen, ada "jalur hukuman". `Output` yang tertunda (misalnya, pembayaran kembali ke Alice) memiliki kondisi `IF/ELSE`:
+
+   * `IF <Bob punya revocation key> -> Bob bisa ambil semua dana Alice`
+   * `ELSE <setelah 1000 block> -> Alice bisa ambil dananya kembali`
+
+3. **Proses Pencabutan:**
+   Ketika Alice dan Bob ingin beralih dari `State N` ke `State N+1`, mereka pertama-tama saling bertukar **kunci pencabutan** untuk `State N`. Sekarang, jika Alice mencoba menyiarkan `State N` yang sudah usang, Bob memiliki kunci untuk mengambil **semua** dana Alice dari transaksi tersebut sebagai hukuman. Mekanisme hukuman yang berat ini membuat kecurangan menjadi sangat tidak menguntungkan.
+
+##### **Hash Time Lock Contracts (HTLC)**
+
+Ini adalah "lem" yang memungkinkan *channel-channel* dirangkai bersama. HTLC adalah kontrak bersyarat yang mengatakan:
+
+> "Saya akan membayar Kita jika Kita bisa memberikan sebuah data rahasia (`preimage`) sebelum batas waktu tertentu. Jika tidak, saya akan mengambil kembali uang saya setelah batas waktu tersebut berakhir."
+
+* **Hash Lock:** Penerima harus memberikan `preimage` yang jika di-hash akan menghasilkan nilai `hash` yang telah ditentukan dalam kontrak.
+* **Time Lock:** Jika `preimage` tidak diberikan dalam batas waktu, pengirim bisa mengklaim kembali dananya.
+
+---
+
+#### **Routed Payment Channels (Lightning Network)**
+
+**Lightning Network (LN)** adalah jaringan dari *payment channels* dua arah yang terhubung satu sama lain. Ini memungkinkan pembayaran dirutekan melalui beberapa perantara tanpa perlu mempercayai mereka.
+
+**Contoh Dasar (Alice -> Bob -> Carol -> Diana -> Eric):**
+Alice ingin membayar Eric 1 BTC, tetapi mereka tidak punya *channel* langsung.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_14-6.png)
+
+lalu
+
+![gambar](images/books-02-mastering_bitcoin/gambar_14-7.png)
+
+
+* **Deskripsi Gambar 14-6 & 14-7 (Lightning Network Payment Routing):**
+  Ini adalah visualisasi paling penting di bab ini.
+
+  * **Gambar 14-6** menunjukkan topologi jaringan: Alice terhubung ke Bob, Bob ke Carol, Carol ke Diana, dan Diana ke Eric.
+  * **Gambar 14-7** adalah diagram langkah-demi-langkah dari proses pembayaran:
+
+    1. **Langkah 1-5 (HTLC Maju):** Panah-panah bergerak dari kiri ke kanan (Alice ke Eric). Alice menawarkan HTLC ke Bob dengan batas waktu `T+10` blok. Bob menawarkannya ke Carol dengan `T+9`, Carol ke Diana dengan `T+8`, dan Diana ke Eric dengan `T+7`. Batas waktu yang semakin pendek ini memastikan ada cukup waktu untuk mengklaim mundur.
+    2. **Langkah 6-9 (Klaim Mundur):** Panah-panah bergerak dari kanan ke kiri (Eric ke Alice). Eric memiliki rahasia `R`, jadi ia mengklaim HTLC dari Diana. Dengan melakukan itu, ia **mengungkapkan `R` kepada Diana**. Diana sekarang punya `R` dan menggunakannya untuk mengklaim HTLC dari Carol, dan seterusnya, sampai Bob mengklaim dari Alice.
+
+**Pathfinding dan Onion Routing:**
+Untuk menjaga privasi, LN menggunakan **onion routing**. Alice mengenkripsi instruksi untuk setiap perantara dalam lapisan-lapisan (seperti bawang). Bob hanya bisa membuka lapisan terluar untuk melihat instruksi untuknya (yaitu, teruskan ke Carol). Ia tidak bisa melihat siapa pengirim asli (Alice) atau penerima akhir (Eric).
+
+**Manfaat Lightning Network:**
+
+* **Privasi:** Pembayaran tidak tercatat di *blockchain* publik.
+* **Kecepatan:** Penyelesaian dalam hitungan milidetik.
+* **Granularitas:** Memungkinkan pembayaran yang sangat kecil (*micropayments*).
+* **Kapasitas:** Secara drastis meningkatkan kapasitas transaksi sistem Bitcoin.
+
+---
+
