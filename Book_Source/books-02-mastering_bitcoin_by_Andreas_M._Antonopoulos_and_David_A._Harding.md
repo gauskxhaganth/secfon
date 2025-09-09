@@ -1,10 +1,4 @@
 # Bab 1
-## Pendahuluan**
-
-Bab ini memberikan gambaran umum tentang apa itu Bitcoin, sejarah singkatnya, dan langkah-langkah praktis untuk memulai, seperti memilih dompet dan melakukan transaksi pertama.
-
----
-
 #### **Pendahuluan**
 
 Bitcoin adalah sekumpulan konsep dan teknologi yang membentuk dasar dari ekosistem uang digital. Satuan mata uangnya disebut **bitcoin** (dengan 'b' kecil), digunakan untuk menyimpan dan mengirimkan nilai di antara para peserta dalam jaringan Bitcoin. Sebaliknya, sistemnya secara keseluruhan disebut **Bitcoin** (dengan 'B' besar).
@@ -1675,6 +1669,152 @@ Untuk pengembangan yang aman, ada beberapa jaringan Bitcoin selain jaringan utam
 * **Regtest (*Regression Testing*):** Lokal & privat, bisa buat blok instan dan mengatur waktu. Ideal untuk pengembangan awal & uji otomatis.
 
 Alur kerja terbaik: **Regtest → Signet/Testnet → Mainnet** untuk membangun aplikasi Bitcoin yang aman.
+
+---
+
+# Bab 12
+## Penambangan dan Konsensus (*Mining and Consensus*)
+
+Istilah "penambangan" (*mining*) seringkali disalahpahami. Ia lebih dari sekadar proses menciptakan bitcoin baru. Tujuan utama *mining* adalah sebagai mekanisme yang mendasari **konsensus terdesentralisasi**—cara jaringan menyetujui dan memvalidasi transaksi tanpa memerlukan otoritas pusat. *Mining* adalah proses yang mengamankan seluruh sistem Bitcoin dan memungkinkan munculnya konsensus di seluruh jaringan tanpa otoritas pusat.
+
+Imbalan berupa bitcoin baru (*block subsidy*) dan biaya transaksi (*transaction fees*) adalah skema insentif yang dirancang untuk menyelaraskan kepentingan para *miner* dengan keamanan jaringan, sambil secara bersamaan mengimplementasikan pasokan moneter.
+
+#### **Ekonomi Bitcoin dan Penciptaan Mata Uang**
+
+Bitcoin "dicetak" (*minted*) pada tingkat yang tetap dan terus menurun setiap kali sebuah *block* baru dibuat.
+
+* **Tingkat Emisi:** Awalnya, 50 BTC baru dibuat di setiap *block*.
+
+* **Halving:** Setiap 210.000 *block* (sekitar 4 tahun), jumlah ini dipotong setengah.
+
+  * November 2012: menjadi 25 BTC per *block*.
+  * Juli 2016: menjadi 12.5 BTC per *block*.
+  * Mei 2020: menjadi 6.25 BTC per *block*.
+  * *Halving* berikutnya diperkirakan terjadi pada April/Mei 2024.
+
+* **Pasokan Terbatas:** Proses ini akan berlanjut hingga sekitar tahun 2140, ketika total pasokan akan mencapai hampir 21 juta BTC. Setelah itu, tidak ada BTC baru yang akan dibuat, dan para *miner* hanya akan diinsentifkan oleh biaya transaksi.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_12-1.png)
+
+* **Deskripsi Gambar 12-1 (Kurva Pasokan Bitcoin):** Gambar ini adalah grafik yang sangat penting. Sumbu X adalah waktu (tahun), dan sumbu Y adalah total bitcoin yang beredar. Grafiknya berbentuk kurva logaritmik yang menanjak tajam di awal dan kemudian melandai secara bertahap, mendekati garis horizontal di angka 21 juta. Ini secara visual menunjukkan bagaimana tingkat emisi menurun secara eksponensial dan bagaimana pasokan total tidak akan pernah melebihi 21 juta.
+
+**Contoh Kode (Menghitung Total Bitcoin):**
+Kode Python ini menghitung jumlah total satoshi yang akan pernah dibuat, berdasarkan jadwal *halving*.
+
+```python
+# Imbalan blok asli untuk penambang adalah 50 BTC
+start_block_reward = 50
+# 210000 blok adalah sekitar setiap 4 tahun dengan interval blok 10 menit
+reward_interval = 210000
+
+def max_money():
+    # 50 BTC = 50 0000 0000 Satoshis
+    current_reward = 50 * 10**8
+    total = 0
+    while current_reward > 0:
+        total += reward_interval * current_reward
+        current_reward //= 2 # Menggunakan pembagian integer
+    return total
+
+print("Total BTC yang akan pernah dibuat:", max_money(), "Satoshis")
+```
+
+Outputnya akan menunjukkan 2099999997690000 Satoshis, yang sedikit di bawah 21 juta BTC.
+
+**Implikasi Ekonomi: Uang Deflasioner**
+Karena pasokannya tetap dan terbatas, Bitcoin cenderung bersifat **deflasioner**. Artinya, seiring waktu, daya beli setiap unit bitcoin cenderung meningkat. Ini berbeda dengan mata uang fiat yang bisa mengalami inflasi karena pencetakan tak terbatas.
+
+#### **Konsensus Terdesentralisasi (*Decentralized Consensus*)**
+
+Bagaimana ribuan *node* di seluruh dunia bisa menyetujui satu versi kebenaran (*blockchain*) tanpa ada pemimpin? Inilah kejeniusan dari mekanisme konsensus Bitcoin, yang muncul dari empat proses independen yang terjadi secara bersamaan di seluruh jaringan:
+
+1. **Verifikasi Independen Setiap Transaksi:** Setiap *full node* secara mandiri memeriksa setiap transaksi yang diterimanya berdasarkan serangkaian aturan yang ketat. Transaksi yang valid disimpan di **mempool**.
+2. **Agregasi Transaksi ke dalam Block oleh Miner:** Para *miner* mengumpulkan transaksi dari *mempool* mereka dan menyusunnya menjadi *candidate block*.
+3. **Proof-of-Work (PoW):** Para *miner* kemudian berkompetisi untuk menemukan "bukti kerja" untuk *candidate block* mereka, sebuah proses yang membutuhkan daya komputasi yang sangat besar.
+4. **Verifikasi dan Seleksi Rantai oleh Semua Node:** Ketika seorang *miner* menemukan PoW, ia menyiarkan *block*-nya. Semua *node* lain secara independen memverifikasi *block* tersebut. Mereka akan selalu menganggap rantai *block* yang valid dengan **total Proof-of-Work kumulatif terbanyak** sebagai rantai yang benar (*best blockchain*).
+
+#### **Node Penambang (*Mining Nodes*) dan Konstruksi Block**
+
+Mari kita ikuti proses yang dilakukan oleh seorang *miner* bernama Jing:
+
+1. **Membangun Candidate Block:** Jing membuat *candidate block* baru dengan mengisinya dengan transaksi-transaksi dari *mempool*-nya, biasanya memprioritaskan yang memiliki *fee rate* tertinggi.
+
+2. **Coinbase Transaction:** Transaksi **pertama** di setiap *block* adalah *coinbase transaction* yang spesial. Transaksi ini "menciptakan" bitcoin baru dan memberikan *reward* kepada Jing.
+
+   * **Reward = Block Subsidy + Total Transaction Fees.**
+   * **Perhitungan Reward:** Untuk menghitung *subsidy*, *node* akan memeriksa tinggi *block* saat ini dan menghitung berapa kali *halving* telah terjadi, seperti yang ditunjukkan dalam cuplikan kode C++ dari Bitcoin Core.
+   * **Struktur Coinbase Input:** Berbeda dari transaksi biasa, *coinbase input* tidak merujuk pada UTXO. *Field* `txid`-nya diisi dengan nol, dan *field* `output index`-nya diisi dengan `0xFFFFFFFF`.
+   * **Coinbase Data:** *Field* `scriptSig` digantikan oleh `coinbase data` (2–100 *byte*). **BIP34** mengharuskan *data* ini diawali dengan tinggi *block* saat ini.
+
+3. **Membangun Block Header:** Jing kemudian mengisi 6 *field* di *header block*-nya:
+
+   * **Version:** Diatur sesuai dengan signaling soft fork yang sedang aktif.
+   * **Previous Block Hash:** *Hash* dari *block* terakhir yang ia terima. Ini adalah komitmennya untuk memperpanjang rantai tersebut.
+   * **Merkle Root:** Ia mengambil semua `txid` dari transaksi di dalam *block*-nya dan membangun *Merkle Tree* untuk menghasilkan satu *hash* 32-*byte*.
+   * **Timestamp:** Waktu saat ini.
+   * **Target (nBits):** Tingkat kesulitan yang harus dipecahkan.
+   * **Nonce:** Diinisialisasi ke 0.
+
+#### **Proses Penambangan (*Mining the Block*)**
+
+##### **Algoritma Proof-of-Work (PoW)**
+
+*Mining* adalah proses mencari *hash* dari *header block* yang secara numerik **lebih kecil** dari nilai `Target`.
+
+* **Cara Kerja:** *Miner* berulang kali mengubah **Nonce** di dalam *header*, menghitung *hash*-nya, dan memeriksa apakah hasilnya di bawah `Target`.
+
+* **Retargeting:** Kesulitan disesuaikan **setiap 2016 block** (sekitar 2 minggu) untuk menjaga agar waktu rata-rata antar *block* tetap sekitar **10 menit**. Rumusnya adalah:
+
+  ```
+  Target Baru = Target Lama * (Waktu Aktual 2015 Block Terakhir / 20160 menit)
+  ```
+
+  Penyesuaian dibatasi maksimal faktor 4 untuk mencegah volatilitas ekstrem.
+
+* **Median Time Past (MTP):** Untuk mencegah *miner* memanipulasi *timestamp*, aturan konsensus menggunakan **Median Time Past (MTP)**, yaitu median dari *timestamp* 11 *block* terakhir.
+
+##### **Solusi Extra Nonce**
+
+*Field* `Nonce` di *header* hanya 32-bit (\~4.3 miliar kemungkinan). Dengan *hardware* modern, angka ini bisa dihabiskan dalam sekejap. Untuk mendapatkan lebih banyak variasi, *miner* menggunakan *field* `coinbase data` sebagai **extra nonce**.
+
+#### **Mining Pools**
+
+Karena *mining* sangat kompetitif, hampir semua *miner* bergabung dalam **mining pools**.
+
+* **Cara Kerja:** Sebuah *pool* menetapkan tingkat kesulitan yang jauh lebih rendah (disebut *share difficulty*). Para *miner* di dalam *pool* mengirimkan bukti kerja (*shares*) yang memenuhi kesulitan yang lebih rendah ini ke operator *pool*.
+* **Pembagian Reward:** Sesekali, salah satu *share* secara kebetulan juga akan memenuhi kesulitan jaringan Bitcoin. Pada saat itu, *pool* memenangkan *block reward*, yang kemudian dibagikan kepada semua *miner* secara proporsional berdasarkan jumlah *share* yang mereka kirimkan.
+
+#### **Serangan Hashrate (*Hashrate Attacks*)**
+
+Jika satu entitas menguasai mayoritas (misalnya >50%) dari total *hashrate* jaringan, ia dapat melakukan serangan:
+
+* **Double-Spend Attack:** Penyerang mengirim pembayaran, menerima barang, lalu secara diam-diam menambang rantai alternatif di mana transaksi pembayaran tersebut dibatalkan. Jika rantai alternatifnya menjadi lebih panjang, rantai asli akan ditinggalkan, dan pedagang kehilangan uangnya. Inilah sebabnya menunggu **beberapa konfirmasi** (standarnya 6) sangat penting.
+* **Transaction Censorship:** Penyerang dapat menolak untuk memasukkan transaksi dari alamat tertentu ke dalam *block* yang ia tambang.
+
+#### **Mengubah Aturan Konsensus**
+
+* **Hard Fork:** Perubahan yang **tidak kompatibel ke belakang (*backward-incompatible*)**. *Node* lama akan menolak *block* baru. Ini berisiko memecah jaringan menjadi dua *blockchain* yang terpisah.
+* **Soft Fork:** Perubahan yang **kompatibel ke belakang (*backward-compatible*)**. Aturan baru dibuat lebih ketat. *Node* lama masih akan melihat *block* baru sebagai valid (meskipun mereka tidak memvalidasi aturan baru tersebut).
+
+![gambar](images/books-02-mastering_bitcoin/gambar_12-2.png)
+
+* **Deskripsi Gambar 12-2 (Blockchain dengan Forks):** Gambar ini menunjukkan dua jenis *fork*. Pada *block height* 4, terjadi *fork* alami satu *block* yang cepat terselesaikan. Namun, pada *block height* 6, terjadi *hard fork*. Rantai terpecah menjadi dua cabang (7a dan 7b) yang didasarkan pada aturan konsensus yang berbeda. Cabang-cabang ini akan terus tumbuh secara terpisah dan tidak akan pernah menyatu kembali.
+
+**Mekanisme Aktivasi Soft Fork:**
+
+* **BIP9 (Version Bits):** Mekanisme di mana *miner* memberi sinyal kesiapan dengan mengatur *bit* tertentu di *field* `version` *block*. Aktivasi terjadi jika 95% *miner* memberi sinyal dalam satu periode retargeting.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_12-3.png)
+
+* **Deskripsi Gambar 12-3 (Diagram Status BIP9):** Gambar ini adalah diagram alur yang menunjukkan siklus hidup proposal BIP9.
+
+  1. `DEFINED`: Proposal didefinisikan dalam kode.
+  2. `STARTED`: Periode sinyal dimulai.
+  3. `LOCKED_IN`: Ambang batas 95% tercapai. Aturan akan aktif setelah periode berikutnya.
+  4. `ACTIVE`: Aturan baru diberlakukan secara permanen.
+  5. `FAILED`: Waktu habis (*timeout*) sebelum ambang batas tercapai.
+
+Bab 12 ini menjelaskan bagaimana kompetisi komputasi yang intens dalam *mining* tidak hanya menciptakan bitcoin baru, tetapi yang lebih penting, menghasilkan properti **konsensus terdesentralisasi**—fenomena di mana ribuan *node* independen di seluruh dunia menyetujui satu sejarah transaksi yang sama dan tidak dapat diubah.
 
 ---
 
