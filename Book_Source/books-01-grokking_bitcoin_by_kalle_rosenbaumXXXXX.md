@@ -1,11 +1,18 @@
 # Bab 1
 ## Pengenalan Bitcoin
-
-Bab ini bertujuan untuk memberi Kita pemahaman dasar tentang apa itu Bitcoin, mengapa ia penting, dan bagaimana cara kerjanya secara garis besar. Bab ini adalah fondasi sebelum kita masuk ke aspek-aspek teknis yang lebih dalam di bab-bab berikutnya.
-
 #### **1. What is Bitcoin? (Apa itu Bitcoin?)**
 
-Bitcoin adalah sebuah **sistem kas digital**. Sistem ini memungkinkan orang untuk mengirim *bitcoin* (unit mata uangnya) satu sama lain tanpa memerlukan perantara seperti bank atau pihak ketiga terpercaya lainnya. Kita bisa membayangkannya seperti uang tunai (koin dan kertas), tetapi sepenuhnya digital dan digunakan melalui internet.
+Bitcoin adalah **jaringan terdesentralisasi** untuk **mengirim dan menerima mata uang digital** bernama **bitcoin**.
+
+* **Jaringan terdesentralisasi** → artinya tidak ada server pusat atau perusahaan yang mengatur. Semua komputer yang terhubung (**node**) saling berbagi data dan saling memverifikasi transaksi.
+* **Mata uang digital (bitcoin)** → data dalam bentuk unit nilai, yang bisa dikirim dari satu alamat ke alamat lain di jaringan Bitcoin.
+* **Alamat Bitcoin** → mirip seperti nomor rekening, tapi berbentuk string huruf dan angka hasil dari kriptografi.
+
+### **Ciri utama Bitcoin**
+
+1. **Tanpa pihak ketiga** → tidak ada bank atau perusahaan yang memproses transaksi.
+2. **Blockchain** → database publik tempat semua transaksi disimpan secara permanen.
+3. **Kriptografi** → teknologi matematika untuk memastikan data transaksi tidak bisa dipalsukan dan kepemilikan bitcoin hanya bisa digunakan oleh pemilik kunci pribadinya.
 
 **Istilah Penting:**
 
