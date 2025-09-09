@@ -844,8 +844,6 @@ Bitcoin tidak seperti uang tunai yang bisa diserahkan secara fisik. Sebaliknya, 
 
 Di Bitcoin, semua *full node* menyimpan database kepemilikan. Alice membayar Bob dengan meyakinkan ribuan *node* ini untuk memperbarui database mereka. Data yang digunakan Alice untuk meyakinkan mereka disebut **transaksi**. Bab ini akan menguraikan setiap bagian dari transaksi tersebut.
 
----
-
 #### **Transaksi yang Diserialisasi (*A Serialized Bitcoin Transaction*)**
 
 Saat kita meminta data transaksi mentah dari Bitcoin Core, kita akan mendapatkan serangkaian data heksadesimal. Ini adalah format **serialisasi**—cara data diatur untuk transmisi atau penyimpanan. Format ini sangat padat dan efisien.
@@ -868,8 +866,6 @@ $ bitcoin-cli getrawtransaction 466200308696215bbc949d5141a49a4138ecdfdfaa2a8029
 
 *Gambar 6-1 di buku adalah peta byte dari data heksadesimal ini, yang secara visual membaginya menjadi beberapa bagian utama. Kita akan membahas setiap bagian secara berurutan.*
 
----
-
 #### **Version (Versi)**
 
 * **Ukuran:** 4 byte
@@ -880,8 +876,6 @@ Bagian pertama dari setiap transaksi adalah nomor versinya.
 * **Versi 1:** Versi asli transaksi Bitcoin.
 * **Versi 2:** Diperkenalkan di **BIP68**. Versi ini menambahkan batasan baru pada *field* `sequence` untuk memungkinkan *relative timelocks*. Transaksi versi 1 tidak terpengaruh oleh aturan baru ini.
 * **Versi 3 (Diusulkan):** Diusulkan untuk mengubah kebijakan *relay* transaksi (bukan aturan konsensus) untuk mencegah serangan *denial-of-service* tertentu yang terkait dengan *transaction pinning*.
-
----
 
 #### **Extended Marker and Flag**
 
@@ -894,8 +888,6 @@ Dua *field* ini diperkenalkan oleh **Segregated Witness (SegWit)**.
 * **Flag (`01`):** Harus bernilai bukan nol (saat ini selalu `01`).
 
 Jika transaksi tidak menggunakan SegWit (format *legacy*), kedua *field* ini tidak ada.
-
----
 
 #### **Inputs**
 
@@ -938,8 +930,6 @@ Dalam format transaksi *legacy*, *field* ini berisi data (seperti tanda tangan d
 2. **Sinyal Replace-By-Fee (RBF) (BIP125):** Nilai `sequence` yang lebih rendah dari `0xfffffffe` menandakan bahwa transaksi ini "opt-in" untuk RBF, yang berarti pengirim dapat menggantinya dengan versi baru yang membayar *fee* lebih tinggi.
 3. **Relative Timelock (BIP68):** Untuk transaksi v2 atau lebih tinggi, `sequence` dapat digunakan untuk mengunci sebuah *input* agar tidak dapat dibelanjakan sampai UTXO-nya telah berumur sejumlah *block* atau detik tertentu.
 
----
-
 #### **Outputs**
 
 Bagian ini mendefinisikan tujuan dana.
@@ -965,8 +955,6 @@ Nilai yang ditransfer dalam satuan **satoshi**. Aturan konsensus mengizinkan nil
 
 Ini adalah *script* yang menetapkan kondisi yang harus dipenuhi untuk membelanjakan *output* ini di masa depan. Ini adalah bagian terpenting yang mengunci dana ke pemilik baru. Kita akan membahas *script* secara mendalam di Bab 7.
 
----
-
 #### **Witness Structure**
 
 * **Ukuran:** Bervariasi
@@ -981,8 +969,6 @@ Memisahkan data saksi (*witness*) dari data yang digunakan untuk menghitung `txi
 
 Struktur *witness* berisi satu *witness stack* untuk setiap *input*. Contoh kita memiliki satu *input*, jadi ada satu *stack* yang berisi satu item: tanda tangan Alice.
 
----
-
 #### **Lock Time**
 
 * **Ukuran:** 4 byte
@@ -994,8 +980,6 @@ Struktur *witness* berisi satu *witness stack* untuk setiap *input*. Contoh kita
 * Jika nilainya `< 500,000,000`, ia diartikan sebagai **nomor block**. Transaksi hanya valid di *block* dengan ketinggian tersebut atau lebih tinggi.
 * Jika nilainya `≥ 500,000,000`, ia diartikan sebagai **Unix timestamp**. Transaksi hanya valid jika MTP (*Median Time Past*) dari *block* lebih besar dari *timestamp* tersebut.
 
----
-
 #### **Coinbase Transactions**
 
 Transaksi pertama dalam setiap *block* adalah **coinbase transaction** yang spesial. Ini adalah transaksi yang dibuat oleh *miner* untuk mengklaim *block reward* (*block subsidy* + *transaction fees*). Ia memiliki aturan khusus:
@@ -1005,8 +989,6 @@ Transaksi pertama dalam setiap *block* adalah **coinbase transaction** yang spes
 * *Field* `input script`-nya digantikan oleh *field* `coinbase` yang bisa berisi data arbitrer (dan harus berisi tinggi *block* sesuai BIP34).
 * *Output*-nya tidak boleh melebihi total *reward* yang diizinkan.
 * *Output* dari *coinbase transaction* tidak dapat dibelanjakan sampai **100 konfirmasi** (aturan *maturity*).
-
----
 
 #### **Weight dan Vbytes**
 
