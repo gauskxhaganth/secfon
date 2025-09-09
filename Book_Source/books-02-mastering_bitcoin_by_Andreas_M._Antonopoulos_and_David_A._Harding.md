@@ -137,7 +137,10 @@ Kita akan melanjutkan kisah Alice dari Bab 1. Alice kini ingin membeli episode *
 
 Toko Bob menerima pembayaran Bitcoin. Saat *checkout*, sistem Bob secara otomatis membuat sebuah **faktur (*invoice*)** dalam bentuk **QR code**.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_2-1.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_2-1.png" alt="gambar" width="400"/>
+</p>
+
 
 Berbeda dengan QR code biasa yang hanya berisi alamat tujuan, faktur ini berisi lebih banyak informasi dalam format URI (*Uniform Resource Identifier*):
 
@@ -167,7 +170,9 @@ Transaksi di Bitcoin seperti entri dalam buku besar akuntansi berpasangan (*doub
 
 Total nilai dari *input* harus sedikit lebih besar dari total nilai *output*. Selisihnya adalah **biaya transaksi (*transaction fee*)**, yang menjadi insentif bagi *miner* untuk memasukkan transaksi tersebut ke dalam *blockchain*.
 
-![gambar](images/books-02-mastering_bitcoin/gambar_2-2.png)
+<p align="center">
+  <img src="images/books-02-mastering_bitcoin/gambar_2-2.png" alt="gambar" width="400"/>
+</p>
 
 *Gambar 2-2 di buku mengilustrasikan ini: Sebuah tabel dengan kolom Input dan Output. Total Input adalah 0.55 BTC, sementara Total Output adalah 0.50 BTC. Perbedaannya, yaitu 0.05 BTC, adalah biaya transaksi.*
 
