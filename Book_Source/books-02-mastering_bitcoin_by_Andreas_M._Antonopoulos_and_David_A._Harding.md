@@ -1167,10 +1167,6 @@ Ini adalah versi upgrade dari bahasa Script yang digunakan bersama Taproot. Ia m
 
 ---
 
-Berikut hasil versi yang sudah **dirapikan** tanpa mengubah isi teks sama sekali:
-
----
-
 # Bab 8
 ## Tanda Tangan Digital (*Digital Signatures*)**
 
