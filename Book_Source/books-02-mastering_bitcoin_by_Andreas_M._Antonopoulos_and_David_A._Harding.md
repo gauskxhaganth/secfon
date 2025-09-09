@@ -255,3 +255,231 @@ Setelah transaksi Alice terkonfirmasi, Bob kini adalah pemilik sah dari dana ter
 
 ---
 
+# Bab 3
+## Bitcoin Core: Implementasi Referensi**
+
+Uang hanya diterima jika orang percaya bisa membelanjakannya nanti. Untuk memastikan bitcoin yang diterima itu sah (bukan palsu atau nilainya dikurangi secara tiba-tiba), setiap pengguna perlu memverifikasinya. Sistem Bitcoin dirancang agar setiap orang bisa menjalankan perangkat lunak di komputernya sendiri untuk memverifikasi secara sempurna setiap transaksi dan aturan dalam sistem. Perangkat lunak yang melakukan ini disebut ***full verification node*** (atau disingkat ***full node***).
+
+Di bab ini, kita akan menginstal **Bitcoin Core**, implementasi *full node* yang paling banyak digunakan. Dengan ini, kita bisa memeriksa *blocks*, transaksi, dan data lain secara otoritatif—bukan karena ada pihak yang menyuruh kita percaya, tetapi karena *node* kita sendiri yang memverifikasinya secara independen.
+
+#### **Dari Bitcoin Menjadi Bitcoin Core**
+
+Bitcoin adalah proyek *open source* dengan lisensi MIT, artinya kodenya gratis untuk diunduh dan digunakan. Awalnya dikembangkan oleh Satoshi Nakamoto, kini perangkat lunak tersebut telah banyak dimodifikasi dan ditingkatkan oleh komunitas pengembang sukarelawan. Implementasi pertama yang dibuat Satoshi kini dikenal sebagai **Bitcoin Core** untuk membedakannya dari implementasi lain.
+
+Bitcoin Core adalah **implementasi referensi** (*reference implementation*), artinya ia menjadi acuan standar bagaimana setiap bagian dari teknologi Bitcoin harus diimplementasikan. Ia mencakup semua aspek: dompet, mesin validasi transaksi dan *block*, serta komunikasi P2P.
+
+![gambar_2-1](images/books-02-mastering_bitcoin/gambar_3-1.png)
+
+*Gambar 3-1 di buku menunjukkan arsitektur Bitcoin Core, yang terdiri dari berbagai komponen seperti Peer Discovery, Connection Manager, Wallet, RPC, Mempool, Validation Engine, dll. Ini adalah gambaran teknis dari "mesin" Bitcoin Core.*
+
+#### **Lingkungan Pengembangan Bitcoin (*Bitcoin Development Environment*)**
+
+Bab ini sangat teknis dan ditujukan untuk pengembang. Kita akan membahas proses penyiapan lingkungan pengembangan langkah demi langkah.
+
+##### **Mengompilasi (*Compiling*) Bitcoin Core dari Kode Sumber**
+
+Kita bisa mendapatkan kode sumber Bitcoin Core dengan mengunduh arsipnya atau dengan "meng-kloning" repositorinya dari GitHub. Menggunakan Git (alat penting bagi pengembang) adalah cara yang disarankan.
+
+**Istilah Penting:**
+
+* **Compile (Kompilasi):** Proses mengubah kode sumber yang dapat dibaca manusia (seperti C++) menjadi program yang dapat dieksekusi oleh komputer (file biner).
+* **Git:** Sistem kontrol versi terdistribusi yang digunakan untuk melacak perubahan dalam kode sumber selama pengembangan perangkat lunak.
+* **GitHub:** Platform hosting untuk pengembangan perangkat lunak yang menggunakan Git.
+
+Berikut adalah contoh perintah untuk mengkloning repositori Bitcoin Core menggunakan antarmuka baris perintah (*command-line*):
+
+```bash
+$ git clone https://github.com/bitcoin/bitcoin.git
+```
+
+Ini akan membuat salinan lokal dari seluruh riwayat kode sumber di direktori bernama `bitcoin`.
+
+##### **Memilih Rilis Bitcoin Core**
+
+Setelah mengkloning, Kita akan berada di versi kode terbaru yang mungkin belum stabil. Penting untuk beralih ke versi rilis spesifik yang stabil.
+
+1. Lihat daftar rilis yang tersedia dengan perintah `git tag`:
+
+   ```bash
+   $ git tag
+   v0.1.5
+   ...
+   v0.11.2
+   ...
+   v24.0.1
+   ```
+2. Pilih versi stabil terbaru (misalnya, `v24.0.1`) dan beralih ke sana dengan `git checkout`:
+
+   ```bash
+   $ git checkout v24.0.1
+   ```
+
+##### **Mengonfigurasi Build Bitcoin Core**
+
+Kode sumber menyertakan dokumentasi penting di direktori `doc/`. Kita harus membaca instruksi *build* yang sesuai dengan sistem operasi Kita (misalnya, `build-unix.md` untuk Linux/macOS).
+
+1. **Prasyarat (*Prerequisites*):** Pastikan semua pustaka (*libraries*) yang diperlukan sudah terinstal. Jika tidak, proses *build* akan gagal.
+2. **Hasilkan Skrip Build:** Jalankan skrip `autogen.sh` untuk membuat skrip konfigurasi.
+
+   ```bash
+   $ ./autogen.sh
+   ```
+3. **Konfigurasi:** Jalankan skrip `configure` yang baru saja dibuat. Skrip ini memeriksa sistem Kita dan menyesuaikan proses *build*. Kita bisa menambahkan opsi, misalnya untuk menonaktifkan GUI (*Graphical User Interface*) jika Kita hanya butuh server baris perintah.
+
+   ```bash
+   $ ./configure
+   ```
+
+   Jika ada pustaka yang hilang, skrip ini akan berhenti dengan pesan kesalahan. Instal pustaka yang kurang, lalu jalankan lagi.
+
+##### **Membangun Eksekutable (*Executables*) Bitcoin Core**
+
+Setelah konfigurasi berhasil, mulailah proses kompilasi. Ini bisa memakan waktu cukup lama.
+
+1. **Kompilasi:**
+
+   ```bash
+   $ make
+   ```
+2. **Verifikasi dan Instal:** Jalankan tes untuk memastikan semuanya berfungsi, lalu instal program ke sistem Kita. Perintah `sudo` mungkin diperlukan karena ini menginstal file ke direktori sistem.
+
+   ```bash
+   $ make check && sudo make install
+   ```
+
+   Setelah selesai, Kita akan memiliki beberapa program, yang terpenting adalah `bitcoind` (server/daemon Bitcoin) dan `bitcoin-cli` (alat baris perintah untuk berinteraksi dengan `bitcoind`).
+
+#### **Menjalankan Node Bitcoin Core**
+
+Menjalankan *full node* berarti Kita memiliki pandangan yang langsung dan otoritatif terhadap *blockchain*. Kita tidak perlu mempercayai pihak ketiga mana pun untuk memvalidasi transaksi.
+
+**Peringatan Sumber Daya:**
+Menjalankan *full node* membutuhkan sumber daya yang signifikan:
+
+* **Penyimpanan:** Lebih dari 500 GB data *blockchain* saat pertama kali sinkronisasi (disebut *Initial Block Download* atau IBD), dan terus bertambah setiap hari.
+* **Bandwidth:** Mengunduh *block* dan menyiarkan transaksi ke *node* lain akan menggunakan banyak bandwidth internet Kita.
+
+**Mengapa Menjalankan Node?**
+
+* **Keamanan & Privasi Maksimal:** Anda memvalidasi transaksi Anda sendiri dan tidak membocorkan alamat mana yang Anda minati ke pihak ketiga.
+* **Pengembangan:** Jika Anda seorang pengembang, Anda memerlukan akses API langsung ke *node*.
+* **Mendukung Jaringan:** Semakin banyak *full node* yang jujur, semakin kuat dan terdesentralisasi jaringan Bitcoin.
+
+##### **Mengonfigurasi Node Bitcoin Core**
+
+Bitcoin Core mencari file konfigurasi bernama `bitcoin.conf` di direktori datanya (misalnya, `~/.bitcoin/` di Linux). Kita bisa mengatur lebih dari 100 opsi di file ini. Beberapa yang penting:
+
+* `txindex=1`: Membangun indeks lengkap dari semua transaksi di *blockchain*. Ini **sangat penting** untuk seorang auditor atau analis *blockchain* karena memungkinkan Kita untuk mencari transaksi apa pun berdasarkan ID-nya. Tanpa ini, Kita hanya bisa mencari transaksi yang relevan dengan dompet *node* Kita.
+* `prune=<megabytes>`: Mengurangi kebutuhan ruang disk dengan menghapus *block-block* lama setelah diverifikasi. *Node* yang di-*prune* masih merupakan *full node* dalam hal validasi, tetapi tidak bisa melayani data *block* historis ke *node* lain.
+* `blocksonly=1`: Mengurangi penggunaan bandwidth dengan hanya menerima *block* yang sudah dikonfirmasi, bukan menyiarkan transaksi yang belum dikonfirmasi.
+
+**Contoh `bitcoin.conf` untuk seorang analis/auditor:**
+
+```
+# Maintain a full transaction index
+txindex=1
+
+# Optional: Set a larger cache for UTXO database
+dbcache=1000
+```
+
+Untuk menjalankan `bitcoind` di latar belakang sebagai *daemon* (layanan sistem):
+
+```bash
+$ bitcoind -daemon
+```
+
+Untuk memantau progres sinkronisasinya:
+
+```bash
+$ bitcoin-cli getblockchaininfo
+```
+
+#### **API Bitcoin Core**
+
+Bitcoin Core menyediakan antarmuka **JSON-RPC** (*JavaScript Object Notation - Remote Procedure Call*). Ini berarti Kita bisa mengirim perintah dalam format JSON ke *node* Kita dan menerima respons dalam format yang sama. Alat `bitcoin-cli` adalah cara mudah untuk menggunakan API ini dari baris perintah.
+
+##### **Contoh Perintah `bitcoin-cli`**
+
+1. **Mendapatkan Informasi:**
+
+   * `getblockchaininfo`: Menampilkan status *blockchain* di *node* Kita.
+   * `getnetworkinfo`: Menampilkan status koneksi jaringan *node* Kita.
+
+2. **Menjelajahi Transaksi (Membutuhkan `txindex=1`):**
+
+   * `getrawtransaction <txid>`: Mengambil data transaksi mentah dalam format heksadesimal.
+
+     ```bash
+     $ bitcoin-cli getrawtransaction 466200308696215bbc949d5141a49a4138ecdfdfaa2a8029c1f9bcecd1f96177
+     ```
+   * `decoderawtransaction <hex>`: Menerjemahkan data heksadesimal dari perintah di atas menjadi format yang dapat dibaca manusia (JSON).
+
+     ```bash
+     $ bitcoin-cli decoderawtransaction <hex_data_from_above>
+     ```
+
+     Hasilnya akan menunjukkan detail seperti `vin` (*inputs*), `vout` (*outputs*), `locktime`, dll.
+
+3. **Menjelajahi Block:**
+
+   * `getblockhash <height>`: Mendapatkan *hash* dari *block* pada ketinggian tertentu.
+
+     ```bash
+     $ bitcoin-cli getblockhash 123456
+     ```
+   * `getblock <hash>`: Mendapatkan detail lengkap dari *block* dengan *hash* tertentu.
+
+     ```bash
+     $ bitcoin-cli getblock 0000000000002917ed80650c6174aac8dfc46f5fe36480aaef682ff6cd83c3ca
+     ```
+
+     Hasilnya akan berisi *hash* *block* sebelumnya, *merkle root*, *nonce*, dan daftar ID dari semua transaksi di dalamnya.
+
+##### **Mengakses API Secara Terprogram**
+
+Kita bisa memanggil API JSON-RPC ini dari hampir semua bahasa pemrograman. Buku ini memberikan contoh menggunakan Python dengan pustaka `python-bitcoinlib`.
+
+**Contoh Kode Python (rpc\_example.py):**
+Kode ini menghubungkan ke *node* Bitcoin Core lokal Kita dan mencetak jumlah *block* saat ini.
+
+```python
+from bitcoin.rpc import RawProxy
+
+# Membuat koneksi ke node Bitcoin Core lokal
+p = RawProxy()
+
+# Menjalankan perintah getblockchaininfo
+info = p.getblockchaininfo()
+
+# Mengambil elemen 'blocks' dari info dan mencetaknya
+print(info['blocks'])
+```
+
+**Contoh Kode Python (rpc\_transaction.py):**
+Kode ini mengambil transaksi Alice, mendekodenya, dan mencetak alamat tujuan serta nilainya.
+
+```python
+from bitcoin.rpc import RawProxy
+
+p = RawProxy()
+
+# ID transaksi Alice
+txid = "466200308696215bbc949d5141a49a4138ecdfdfaa2a8029c1f9bcecd1f96177"
+
+# Ambil transaksi mentah (hex)
+raw_tx = p.getrawtransaction(txid)
+
+# Dekode transaksi hex menjadi objek JSON
+decoded_tx = p.decoderawtransaction(raw_tx)
+
+# Ulangi setiap output dalam transaksi dan cetak alamat serta nilainya
+for output in decoded_tx['vout']:
+    # Periksa apakah 'address' ada sebelum mencetaknya
+    if 'address' in output['scriptPubKey']:
+        print(output['scriptPubKey']['address'], output['value'])
+```
+
+Bab 3 ini memberikan Kita alat dan pemahaman dasar untuk mulai "membongkar" *blockchain*. Dengan menjalankan *full node* Kita sendiri dan menggunakan API-nya, Kita bisa memverifikasi, menganalisis, dan membangun aplikasi di atas Bitcoin dengan tingkat keamanan dan kepercayaan tertinggi. Keterampilan ini adalah fondasi mutlak untuk menjadi seorang auditor keamanan *blockchain*.
+
+---
