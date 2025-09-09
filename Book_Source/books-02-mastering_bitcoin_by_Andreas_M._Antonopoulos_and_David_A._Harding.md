@@ -143,7 +143,7 @@ Kita akan melanjutkan kisah Alice dari Bab 1. Alice kini ingin membeli episode *
 
 Toko Bob menerima pembayaran Bitcoin. Saat *checkout*, sistem Bob secara otomatis membuat sebuah **faktur (*invoice*)** dalam bentuk **QR code**.
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-1.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_2-1.png)
 
 Berbeda dengan QR code biasa yang hanya berisi alamat tujuan, faktur ini berisi lebih banyak informasi dalam format URI (*Uniform Resource Identifier*):
 
@@ -173,7 +173,7 @@ Transaksi di Bitcoin seperti entri dalam buku besar akuntansi berpasangan (*doub
 
 Total nilai dari *input* harus sedikit lebih besar dari total nilai *output*. Selisihnya adalah **biaya transaksi (*transaction fee*)**, yang menjadi insentif bagi *miner* untuk memasukkan transaksi tersebut ke dalam *blockchain*.
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-2.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_2-2.png)
 
 *Gambar 2-2 di buku mengilustrasikan ini: Sebuah tabel dengan kolom Input dan Output. Total Input adalah 0.55 BTC, sementara Total Output adalah 0.50 BTC. Perbedaannya, yaitu 0.05 BTC, adalah biaya transaksi.*
 
@@ -181,7 +181,7 @@ Total nilai dari *input* harus sedikit lebih besar dari total nilai *output*. Se
 
 Setiap transaksi terhubung dengan transaksi sebelumnya. *Input* dari sebuah transaksi sebenarnya adalah *output* dari transaksi sebelumnya. Inilah yang membentuk "rantai" kepemilikan.
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-3.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_2-3.png)
 
 *Gambar 2-3 di buku menunjukkan ini secara visual. Transaksi 1 (Tx1) mengirimkan 100,000 satoshi ke Alice. Transaksi Alice ke Bob (Tx2) menggunakan output dari Tx1 sebagai input-nya. Output dari Tx2 kemudian bisa menjadi input untuk transaksi Bob berikutnya (Tx3).*
 
@@ -202,15 +202,15 @@ Untuk privasi, alamat kembalian ini biasanya adalah alamat baru yang belum perna
 
 * **Transaksi Umum (*Common Transaction*):** Satu *input* dan dua *output* (satu untuk pembayaran, satu untuk kembalian). Ini adalah bentuk yang paling sering ditemui. *Digambarkan di Gambar 2-4*.
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-4.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_2-4.png)
 
 * **Transaksi Agregasi (*Aggregating Transaction*):** Beberapa *input* digabungkan menjadi satu *output* tunggal. Mirip seperti menukar banyak uang koin menjadi selembar uang kertas besar. *Digambarkan di Gambar 2-5*.
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-5.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_2-5.png)
 
 * **Transaksi Distribusi (*Distributing Transaction*):** Satu *input* yang membayar ke banyak *output* (banyak penerima). Sering digunakan oleh bisnis, misalnya untuk membayar gaji. *Digambarkan di Gambar 2-6*.
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-6.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_2-6.png)
 
 #### **Membangun Sebuah Transaksi (*Constructing a Transaction*)**
 
@@ -241,7 +241,7 @@ Sekitar lima menit setelah Alice mengirim transaksinya, seorang *miner* (misalny
 
 Saat *block* yang berisi transaksi Alice ditambahkan ke *blockchain*, transaksi tersebut mendapatkan **1 konfirmasi**. Setiap *block* baru yang ditambahkan di atasnya memberikan konfirmasi tambahan. Semakin banyak konfirmasi, semakin sulit (secara komputasi) untuk membatalkan transaksi tersebut.
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-7.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_2-7.png)
 
 *Gambar 2-7 di buku menggambarkan tumpukan block, dengan block yang berisi transaksi Alice berada di tengah. Tumpukan block di bawahnya menunjukkan sejarah (block height), sementara tumpukan block di atasnya menunjukkan tingkat keamanan atau kedalaman (block depth).*
 
@@ -249,7 +249,7 @@ Saat *block* yang berisi transaksi Alice ditambahkan ke *blockchain*, transaksi 
 
 Setelah transaksi Alice terkonfirmasi, Bob kini adalah pemilik sah dari dana tersebut. *Output* dari transaksi Alice menjadi UTXO baru yang dikontrol oleh kunci milik Bob. Bob sekarang bisa menggunakan UTXO ini sebagai *input* untuk transaksi berikutnya, misalnya untuk membayar desainer web-nya, Gopesh.
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-8.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_2-8.png)
 
 *Gambar 2-8 mengilustrasikan rantai transaksi lengkap: Joe membayar Alice (Transaksi #1), Alice membayar Bob (Transaksi #2), dan Bob membayar Gopesh (Transaksi #3). Ini menunjukkan bagaimana nilai berpindah dari satu pemilik ke pemilik berikutnya melalui rantai transaksi yang saling terhubung.*
 
@@ -268,7 +268,7 @@ Bitcoin adalah proyek *open source* dengan lisensi MIT, artinya kodenya gratis u
 
 Bitcoin Core adalah **implementasi referensi** (*reference implementation*), artinya ia menjadi acuan standar bagaimana setiap bagian dari teknologi Bitcoin harus diimplementasikan. Ia mencakup semua aspek: dompet, mesin validasi transaksi dan *block*, serta komunikasi P2P.
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_3-1.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_3-1.png)
 
 *Gambar 3-1 di buku menunjukkan arsitektur Bitcoin Core, yang terdiri dari berbagai komponen seperti Peer Discovery, Connection Manager, Wallet, RPC, Mempool, Validation Engine, dll. Ini adalah gambaran teknis dari "mesin" Bitcoin Core.*
 
@@ -529,11 +529,11 @@ $y^2 \mod p = (x^3 + 7) \mod p$
 
 dengan \$p = 2^{256} - 2^{32} - 2^9 - 2^8 - 2^7 - 2^6 - 2^4 - 1\$.
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_4-2.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_4-2.png)
 
 lalu
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_4-3.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_4-3.png)
 
 *Gambar 4-2 dan 4-3 di buku mengilustrasikan bentuk kurva eliptik di bilangan real (mulus) dan di *finite field* (titik-titik acak).*
 
@@ -561,7 +561,7 @@ $K = k \times G$
 * \$G\$: *generator point* (konstan di kurva).
 * \$K\$: *public key* (titik \$(x,y)\$ di kurva).
 
-![gambar_2-1](images/books-02-mastering_bitcoin/gambar_4-4.png)
+![gambar](images/books-02-mastering_bitcoin/gambar_4-4.png)
 
 *Gambar 4-4 memperlihatkan perkalian ini dengan “penjumlahan titik” berulang.*
 
@@ -648,6 +648,162 @@ Format umum: **WIF (Wallet Import Format)**.
 
 * **Vanity Addresses:** Alamat dengan pola khusus (contoh: `1KidsCharity...`). Dibuat dengan brute-force miliaran kunci. Sama amannya, tetapi jarang dipakai karena privasi dan ketidakcocokan dengan dompet modern.
 * **Paper Wallets:** Private key dicetak di kertas. **Berbahaya dan usang.** Rentan kesalahan dan kehilangan dana. **Jangan gunakan paper wallets.** Gunakan *recovery code* dompet modern.
+
+---
+
+# Bab 5 
+## Pemulihan Dompet (*Wallet Recovery*)**
+
+Bab ini membahas berbagai metode yang digunakan oleh dompet untuk memastikan pengguna dapat memulihkan akses ke bitcoin mereka jika terjadi masalah, tanpa mengorbankan keamanan.
+
+#### **Generasi Kunci Independen (*Independent Key Generation*)**
+
+Banyak orang keliru mengira dompet Bitcoin berisi bitcoin. Faktanya, dompet hanya berisi **kunci** (*keys*). Dompet-dompet awal menghasilkan setiap *private key* secara acak dan independen satu sama lain.
+
+**Masalahnya:** Setiap kali dompet menghasilkan kunci baru (misalnya, untuk alamat penerima baru), pengguna harus membuat cadangan (*backup*) baru dari file dompetnya. Jika mereka lupa membuat *backup* dan perangkat mereka rusak, dana yang diterima di alamat-alamat baru tersebut akan hilang selamanya. Metode ini tidak praktis dan berisiko tinggi.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_5-1.png)
+
+*Gambar 5-1 di buku mengilustrasikan ini sebagai sebuah dompet yang berisi kumpulan kunci yang tidak saling berhubungan.*
+
+#### **Generasi Kunci Deterministik (*Deterministic Key Generation*)**
+
+Dompet modern tidak lagi menghasilkan kunci secara acak dan independen. Sebaliknya, mereka menggunakan **generasi kunci deterministik**. Artinya, semua kunci di dalam dompet diturunkan (*derived*) dari satu sumber acak utama yang disebut **seed**.
+
+**Konsepnya:** Sebuah *hash function* akan selalu menghasilkan output yang sama jika diberi input yang sama. Kita bisa menggunakan *seed* sebagai input awal, lalu secara berulang-ulang meng-*hash*-nya (dengan sedikit modifikasi, seperti menambahkan angka urut) untuk menghasilkan serangkaian angka yang terlihat acak tetapi sebenarnya dapat diprediksi jika Anda mengetahui *seed*-nya.
+
+```bash
+# Contoh konseptual menggunakan command-line
+$ seed="f1cc3bc03ef51cb43ee7844460fa5049e779e7425a6349c8e89dfbb0fd97bb73"
+$ echo "$seed + 0" | sha256sum
+50b18e0bd9508310b8f699bad425efdf67d668cb2462b909fdb6b9bd2437beb3 -
+$ echo "$seed + 1" | sha256sum
+a965dbcd901a9e3d66af11759e64a58d0ed5c6863e901dfda43adcd5f8c744f3 -
+```
+
+Angka-angka hasil *hash* ini bisa digunakan sebagai *private keys*.
+
+**Keuntungannya:** Pengguna hanya perlu mencadangkan **satu kali**, yaitu *seed* itu sendiri. Dari *seed* tersebut, seluruh dompet (bahkan jutaan kunci) dapat dipulihkan kapan saja.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_5-2.png)
+
+*Gambar 5-2 di buku menunjukkan ini sebagai sebuah seed yang menghasilkan rantai kunci secara berurutan: k₀, k₁, k₂, ..., kₙ.*
+
+#### **Derivasi Kunci Publik Anak (*Public Child Key Derivation*)**
+
+Sebuah fitur canggih dari *Elliptic Curve Cryptography* (ECC) adalah kita bisa menurunkan kunci-kunci baru dari sisi *public key* tanpa memerlukan *private key*.
+
+Ingat rumus dari Bab 4: \$K = k \times G\$.
+Kita bisa menambahkan sebuah nilai (disebut **key tweak**) ke kedua sisi persamaan:
+
+$K_{child} = K_{parent} + \text{tweak} \times G$
+$k_{child} = k_{parent} + \text{tweak}$
+
+Artinya, seseorang (misalnya, server e-commerce) dapat mengambil *public key* induk dan menghasilkan serangkaian *public key* anak secara mandiri untuk setiap invoice. Server tersebut tidak perlu memegang *private key* sama sekali. Nanti, pemilik *private key* induk dapat menggunakan *tweak* yang sama untuk menghasilkan *private key* anak yang sesuai dan membelanjakan dananya. Ini adalah dasar keamanan yang sangat kuat untuk aplikasi yang perlu menghasilkan alamat penerima secara online.
+
+#### **Generasi Kunci Hierarkis Deterministik (HD) (BIP32)**
+
+Hampir semua dompet modern menggunakan standar yang disebut **Hierarchical Deterministic (HD) wallets**, yang didefinisikan dalam **BIP32**. Ini adalah evolusi dari dompet deterministik.
+
+**Fitur Utama:**
+
+* **Struktur Pohon (*Tree Structure*):** Kunci-kunci tidak hanya dihasilkan dalam satu barisan, tetapi dalam struktur seperti pohon yang bisa bercabang. Setiap kunci bisa menjadi "induk" dari cabang kunci "anak" baru.
+* **Organisasi:** Struktur pohon ini memungkinkan organisasi yang lebih baik. Misalnya, satu cabang (`m/0`) bisa digunakan untuk menerima pembayaran, dan cabang lain (`m/1`) untuk menerima kembalian (*change*). Perusahaan bisa menggunakan cabang yang berbeda untuk setiap departemen.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_5-3.png)
+
+*Gambar 5-3 di buku mengilustrasikan ini, menunjukkan sebuah pohon kunci yang bercabang dari satu `seed`.*
+
+#### **Seed dan Kode Pemulihan (*Recovery Codes*)**
+
+*Seed* hanyalah angka acak yang panjang. Agar lebih mudah bagi manusia untuk mencadangkannya, *seed* ini seringkali direpresentasikan sebagai serangkaian kata yang disebut **kode pemulihan (*recovery code*)** atau **mnemonic phrase**.
+
+> **Peringatan:** Meskipun dirancang agar lebih mudah diingat, **sangat disarankan untuk menuliskannya di atas kertas** daripada hanya mengandalkannya pada ingatan. Kehilangan kode ini berarti kehilangan dana.
+
+Ada beberapa standar kode pemulihan yang populer:
+
+* **BIP39:** Standar yang paling banyak digunakan. Menghasilkan 12-24 kata dari *entropy* acak ditambah *checksum*.
+* **Electrum v2:** Standar yang digunakan oleh dompet Electrum. Memiliki beberapa keunggulan seperti nomor versi internal.
+* **Aezeed:** Digunakan oleh dompet LND. Menyertakan nomor versi dan "tanggal lahir dompet" (*wallet birthday*) untuk mempercepat pemulihan.
+* **SLIP39:** Memungkinkan satu *seed* untuk dibagi menjadi beberapa kode pemulihan (*shares*). Anda bisa menentukan berapa banyak *shares* yang dibutuhkan untuk memulihkan dompet (misalnya, 3 dari 5 *shares*). Ini disebut **Shamir's Secret Sharing Scheme (SSSS)**.
+* **Codex32:** Proposal baru yang mirip SLIP39, memungkinkan pembuatan dan validasi *shares* bahkan tanpa komputer, hanya dengan kertas dan pulpen.
+
+**Passphrase Kode Pemulihan:**
+Standar seperti BIP39 dan SLIP39 mendukung **passphrase opsional**. Ini adalah kata sandi tambahan yang Anda buat.
+
+* **Keuntungan:** Jika seseorang menemukan kertas berisi 12 kata Anda, mereka tetap tidak bisa mengakses dana Anda tanpa *passphrase* ini (keamanan faktor kedua). Ini juga menciptakan **plausible deniability**, di mana dompet tanpa *passphrase* bisa berisi sedikit dana sebagai umpan, sementara dana utama ada di dompet dengan *passphrase*.
+* **Kerugian (khususnya BIP39):** Tidak ada *passphrase* yang "salah". Setiap *passphrase* akan menghasilkan dompet yang valid (tetapi kosong jika belum pernah digunakan). Jika Anda salah ketik *passphrase* saat pemulihan, dompet tidak akan memberitahu Anda—Anda hanya akan melihat saldo nol dan mungkin mengira dana Anda hilang.
+
+#### **Mencadangkan Data Non-Kunci**
+
+Kode pemulihan **hanya** mencadangkan kunci Anda. Ia tidak mencadangkan metadata lain seperti:
+
+* **Label Transaksi:** Catatan yang Anda buat untuk setiap transaksi (misalnya, "Pembayaran dari Bob untuk podcast").
+* **Status Channel Lightning Network:** Jika Anda menggunakan *Lightning Network*, status *channel* Anda tidak bisa dipulihkan hanya dari *seed*.
+
+Kehilangan data ini tidak sama dengan kehilangan dana, tetapi bisa sangat merepotkan. Dompet yang baik seharusnya menyediakan cara untuk mencadangkan seluruh data dompet (biasanya dalam file terenkripsi) selain hanya kode pemulihan.
+
+#### **Mencadangkan Jalur Derivasi Kunci (*Key Derivation Paths*)**
+
+Dalam dompet HD, setiap kunci memiliki "alamat" unik dalam struktur pohon, yang disebut **derivation path**. Contoh: `m/84'/0'/0'/0/5` adalah kunci kelima untuk menerima pembayaran di akun utama untuk alamat SegWit P2WPKH.
+
+Saat memulihkan dompet, aplikasi harus tahu *path* mana yang harus diperiksa untuk menemukan dana Anda. Ada dua pendekatan untuk ini:
+
+1. **Implicit Paths:** Menggunakan standar yang sudah disepakati, seperti **BIP44, BIP49, BIP84, BIP86**. Dompet akan secara otomatis memindai *path-path* standar ini saat pemulihan.
+2. **Explicit Paths:** Menyimpan deskripsi eksplisit tentang *script* dan *path* yang digunakan. Standar modern untuk ini adalah **Output Script Descriptors**. Ini jauh lebih fleksibel dan andal, terutama untuk pengaturan yang rumit seperti *multisignature*.
+
+#### **Tumpukan Teknologi Dompet Secara Rinci (*A Wallet Technology Stack in Detail*)**
+
+Bagian ini merinci tumpukan teknologi yang paling umum digunakan saat ini: **BIP39 → BIP32 → BIP44-style paths**.
+
+##### **Kode Pemulihan BIP39**
+
+Proses pembuatan kode pemulihan BIP39:
+
+1. Buat *entropy* acak (128-256 bit).
+2. Ambil beberapa bit pertama dari `SHA256(entropy)` sebagai *checksum*.
+3. Gabungkan *entropy* dan *checksum*.
+4. Bagi hasilnya menjadi segmen-segmen 11-bit.
+5. Setiap segmen 11-bit dipetakan ke satu kata dari daftar 2048 kata yang telah ditentukan.
+6. Urutan kata-kata inilah yang menjadi kode pemulihan Anda.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_5-4.png)
+
+*Gambar 5-4 di buku menggambarkan proses ini secara visual.*
+
+Proses mengubah kode pemulihan menjadi *seed*:
+7\. Kata-kata kode pemulihan diambil.
+8\. Sebuah *salt* dibuat dengan menggabungkan string `"mnemonic"` dengan *passphrase* opsional Anda.
+9\. Kode pemulihan dan *salt* dimasukkan ke dalam **fungsi peregangan kunci (key-stretching function)** bernama **PBKDF2**. Fungsi ini menjalankan proses *hashing* sebanyak 2048 kali untuk membuatnya lebih tahan terhadap serangan *brute-force*.
+10\. Output akhir adalah **seed 512-bit**. *Seed* inilah yang digunakan untuk membuat dompet HD BIP32.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_5-5.png)
+
+lalu
+
+![gambar](images/books-02-mastering_bitcoin/gambar_5-6.png)
+
+*Gambar 5-5 dan 5-6 mengilustrasikan alur ini.*
+
+##### **Membuat Dompet HD dari Seed**
+
+*Seed* 512-bit tersebut di-*hash* sekali lagi menggunakan `HMAC-SHA512` untuk menghasilkan:
+
+* **Master Private Key (m):** Kunci privat 256-bit di puncak pohon.
+* **Master Chain Code (c):** Data acak 256-bit yang digunakan untuk membuat derivasi kunci menjadi tidak dapat diprediksi.
+
+Gabungan dari kunci dan *chain code* disebut **extended key**.
+
+* **Extended Private Key (xprv):** `private key + chain code`. Dapat menurunkan semua kunci di bawahnya (*private* dan *public*).
+* **Extended Public Key (xpub):** `public key + chain code`. Hanya dapat menurunkan *public key* di bawahnya. Ini sangat berguna untuk skenario *watch-only wallet* atau server e-commerce.
+
+**Hardened Derivation:**
+Derivasi normal (`m/0`) memungkinkan penurunan *public key* anak dari *public key* induk. Namun, ini memiliki kelemahan: jika sebuah *private key* anak dan *chain code* induk bocor, semua *private key* anak lainnya bisa diungkap. Untuk mencegah ini, ada **hardened derivation** (`m/0'`).
+
+* **Hardened derivation** menggunakan *private key* induk (bukan *public key* induk) dalam prosesnya. Ini menciptakan "firewall" kriptografis di dalam pohon.
+* Praktik terbaik adalah selalu menggunakan *hardened derivation* untuk tingkat "akun" (`m/44'/0'/0'`), dan menggunakan derivasi normal setelahnya (`.../0/5`).
+
+Bab ini menunjukkan betapa canggihnya sistem di balik kode pemulihan 12 kata yang sederhana. Mekanisme ini dirancang untuk memberikan keseimbangan antara kemudahan penggunaan untuk *backup* dan keamanan yang kuat, sambil memungkinkan kasus penggunaan yang fleksibel seperti server e-commerce yang aman dan *multisignature wallets*.
 
 ---
 
