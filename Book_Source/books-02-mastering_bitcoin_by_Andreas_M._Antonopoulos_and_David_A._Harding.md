@@ -173,11 +173,15 @@ Transaksi di Bitcoin seperti entri dalam buku besar akuntansi berpasangan (*doub
 
 Total nilai dari *input* harus sedikit lebih besar dari total nilai *output*. Selisihnya adalah **biaya transaksi (*transaction fee*)**, yang menjadi insentif bagi *miner* untuk memasukkan transaksi tersebut ke dalam *blockchain*.
 
+![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-2.png)
+
 *Gambar 2-2 di buku mengilustrasikan ini: Sebuah tabel dengan kolom Input dan Output. Total Input adalah 0.55 BTC, sementara Total Output adalah 0.50 BTC. Perbedaannya, yaitu 0.05 BTC, adalah biaya transaksi.*
 
 ##### **Rantai Transaksi (*Transaction Chains*)**
 
 Setiap transaksi terhubung dengan transaksi sebelumnya. *Input* dari sebuah transaksi sebenarnya adalah *output* dari transaksi sebelumnya. Inilah yang membentuk "rantai" kepemilikan.
+
+![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-3.png)
 
 *Gambar 2-3 di buku menunjukkan ini secara visual. Transaksi 1 (Tx1) mengirimkan 100,000 satoshi ke Alice. Transaksi Alice ke Bob (Tx2) menggunakan output dari Tx1 sebagai input-nya. Output dari Tx2 kemudian bisa menjadi input untuk transaksi Bob berikutnya (Tx3).*
 
@@ -197,8 +201,11 @@ Untuk privasi, alamat kembalian ini biasanya adalah alamat baru yang belum perna
 ##### **Bentuk-Bentuk Transaksi Umum**
 
 * **Transaksi Umum (*Common Transaction*):** Satu *input* dan dua *output* (satu untuk pembayaran, satu untuk kembalian). Ini adalah bentuk yang paling sering ditemui. *Digambarkan di Gambar 2-4*.
+![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-4.png)
 * **Transaksi Agregasi (*Aggregating Transaction*):** Beberapa *input* digabungkan menjadi satu *output* tunggal. Mirip seperti menukar banyak uang koin menjadi selembar uang kertas besar. *Digambarkan di Gambar 2-5*.
+![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-5.png)
 * **Transaksi Distribusi (*Distributing Transaction*):** Satu *input* yang membayar ke banyak *output* (banyak penerima). Sering digunakan oleh bisnis, misalnya untuk membayar gaji. *Digambarkan di Gambar 2-6*.
+![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-6.png)
 
 #### **Membangun Sebuah Transaksi (*Constructing a Transaction*)**
 
@@ -229,11 +236,15 @@ Sekitar lima menit setelah Alice mengirim transaksinya, seorang *miner* (misalny
 
 Saat *block* yang berisi transaksi Alice ditambahkan ke *blockchain*, transaksi tersebut mendapatkan **1 konfirmasi**. Setiap *block* baru yang ditambahkan di atasnya memberikan konfirmasi tambahan. Semakin banyak konfirmasi, semakin sulit (secara komputasi) untuk membatalkan transaksi tersebut.
 
+![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-7.png)
+
 *Gambar 2-7 di buku menggambarkan tumpukan block, dengan block yang berisi transaksi Alice berada di tengah. Tumpukan block di bawahnya menunjukkan sejarah (block height), sementara tumpukan block di atasnya menunjukkan tingkat keamanan atau kedalaman (block depth).*
 
 #### **Membelanjakan Transaksi (*Spending the Transaction*)**
 
 Setelah transaksi Alice terkonfirmasi, Bob kini adalah pemilik sah dari dana tersebut. *Output* dari transaksi Alice menjadi UTXO baru yang dikontrol oleh kunci milik Bob. Bob sekarang bisa menggunakan UTXO ini sebagai *input* untuk transaksi berikutnya, misalnya untuk membayar desainer web-nya, Gopesh.
+
+![gambar_2-1](images/books-02-mastering_bitcoin/gambar_2-8.png)
 
 *Gambar 2-8 mengilustrasikan rantai transaksi lengkap: Joe membayar Alice (Transaksi #1), Alice membayar Bob (Transaksi #2), dan Bob membayar Gopesh (Transaksi #3). Ini menunjukkan bagaimana nilai berpindah dari satu pemilik ke pemilik berikutnya melalui rantai transaksi yang saling terhubung.*
 
