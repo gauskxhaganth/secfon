@@ -6,7 +6,6 @@ Bitcoin adalah **jaringan terdesentralisasi** untuk **mengirim dan menerima mata
 
 * **Jaringan terdesentralisasi** → artinya tidak ada server pusat atau perusahaan yang mengatur. Semua komputer yang terhubung (**node**) saling berbagi data dan saling memverifikasi transaksi.
 * **Mata uang digital (bitcoin)** → data dalam bentuk unit nilai, yang bisa dikirim dari satu alamat ke alamat lain di jaringan Bitcoin.
-* **Alamat Bitcoin** → mirip seperti nomor rekening, tapi berbentuk string huruf dan angka hasil dari kriptografi.
 
 ### **Ciri utama Bitcoin**
 
