@@ -138,7 +138,7 @@ Kita akan melanjutkan kisah Alice dari Bab 1. Alice kini ingin membeli episode *
 Toko Bob menerima pembayaran Bitcoin. Saat *checkout*, sistem Bob secara otomatis membuat sebuah **faktur (*invoice*)** dalam bentuk **QR code**.
 
 <p align="center">
-  <img src="images/books-02-mastering_bitcoin/gambar_2-1.png" alt="gambar" width="300"/>
+  <img src="images/books-02-mastering_bitcoin/gambar_2-1.png" alt="gambar" width="200"/>
 </p>
 
 
