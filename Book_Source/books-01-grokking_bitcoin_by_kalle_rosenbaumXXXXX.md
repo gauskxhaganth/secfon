@@ -1,6 +1,6 @@
 # Bab 1
 ## Pengenalan Bitcoin
-#### **1. Apa itu Bitcoin?
+#### **1. Apa itu Bitcoin?**
 
 Bitcoin adalah **jaringan terdesentralisasi** untuk **mengirim dan menerima mata uang digital** bernama **bitcoin**.
 
