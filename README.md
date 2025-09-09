@@ -5,7 +5,7 @@ karena setiap orang punya daya tangkap yang berbeda.
 ***(yg saya pelajari dari Buku-buku, Cyfrin Updraft, learnweb3, dan platform belajar lainnya)***
 Books:
 
-01. grokking Bitcoin by Kalle Rosenbaum
+01. Grokking Bitcoin by Kalle Rosenbaum
 02. Mastering Bitcoin Andreas M. Antonopoulos & David A. Harding
 
 Cyfrin Updraft:
