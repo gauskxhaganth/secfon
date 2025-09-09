@@ -1297,3 +1297,384 @@ Bab ini menunjukkan bagaimana tanda tangan digital berfungsi sebagai fondasi ote
 
 ---
 
+# Bab 9
+## Biaya Transaksi (*Transaction Fees*)**
+
+Setelah Alice menandatangani transaksi untuk membayar Bob, transaksi tersebut harus dimasukkan ke dalam *block* oleh seorang *miner* agar dapat dikonfirmasi. Ruang di dalam setiap *block* terbatas, dan para *miner* berhak memilih transaksi mana yang akan mereka masukkan.
+
+Secara umum, *miner* adalah aktor ekonomi rasional. Mereka akan memilih transaksi yang memberikan mereka pendapatan terbesar. Mekanisme yang memungkinkan sebuah transaksi "memberi uang" kepada *miner* yang memasukannya ke dalam *block* adalah **biaya transaksi (*transaction fees*)**.
+
+Anggap saja biaya transaksi ini bukan seperti biaya tetap, melainkan seperti **tawaran dalam sebuah lelang**. Barang yang dilelang adalah ruang terbatas di dalam *block* berikutnya. *Miner* bertindak sebagai juru lelang yang akan memilih penawar tertinggi.
+
+#### **Siapa yang Membayar Biaya Transaksi?**
+
+Di Bitcoin, biaya transaksi harus disetujui oleh si pengirim. Biaya ini tidak tersembunyi. Secara teknis, biaya dihitung sebagai selisih antara total nilai *input* dan total nilai *output* dalam sebuah transaksi.
+
+$Biaya = \sum(\text{Input}) - \sum(\text{Output})$
+
+Karena pengirim adalah pihak yang mengontrol *input* dan menandatangani transaksi, maka sudah menjadi kebiasaan bahwa **pengirim yang membayar biaya transaksi**. Penerima bisa saja membantu membayar biaya melalui transaksi lain (yang akan kita lihat nanti), tetapi cara paling efisien adalah jika biaya dibayar langsung dalam transaksi itu sendiri.
+
+#### **Biaya dan Tingkat Biaya (*Fees and Fee Rates*)**
+
+Bagi seorang *miner*, total biaya absolut dari sebuah transaksi tidak sepenting **tingkat biaya (*fee rate*)**. Karena ruang *block* terbatas, *miner* ingin memaksimalkan pendapatan per unit ruang yang digunakan.
+
+**Fee Rate** dihitung dengan membagi total biaya transaksi dengan ukurannya (dalam *weight* atau *vbytes*).
+
+$Fee\;Rate = \frac{\text{Total Fee}}{\text{Transaction Size}}$
+
+Unit yang paling umum digunakan saat ini adalah **satoshi per vbyte (sat/vbyte)**. Transaksi dengan *fee rate* tertinggi akan menjadi prioritas utama bagi *miner*.
+
+> **Peringatan:** Dompet harus berhati-hati agar pengguna tidak secara tidak sengaja membayar biaya yang sangat tinggi (*absurdly high fee*), misalnya karena salah memasukkan unit atau lupa membuat *output* kembalian.
+
+#### **Memperkirakan Tingkat Biaya yang Sesuai**
+
+Karena pasar biaya bersifat lelang, tidak ada yang bisa memprediksi secara sempurna berapa *fee rate* yang dibutuhkan. Namun, kita bisa membuat estimasi yang cukup baik dengan melihat *fee rate* dari transaksi-transaksi yang baru saja terkonfirmasi.
+
+*Full node* seperti Bitcoin Core memiliki **estimator biaya** bawaan. Ia melacak berapa lama (dalam *block*) waktu yang dibutuhkan untuk sebuah transaksi dengan *fee rate* tertentu untuk dikonfirmasi. Kita bisa memanggilnya melalui `bitcoin-cli`.
+
+**Contoh Kode (Estimasi Biaya):**
+Perintah ini meminta estimasi *fee rate* agar transaksi kemungkinan besar terkonfirmasi dalam 6 *block* (sekitar 1 jam).
+
+```bash
+$ bitcoin-cli -named estimatesmartfee conf_target=6
+{
+  "feerate": 0.00010248,  // Fee rate dalam BTC/kvb
+  "blocks": 6
+}
+```
+
+Hasil `feerate` tersebut perlu dikonversi ke `sat/vbyte` untuk perbandingan yang lebih mudah (dalam contoh ini sekitar 10.2 sat/vbyte).
+
+#### **Fee Bumping: Menaikkan Biaya Transaksi yang "Tersangkut"**
+
+Terkadang, estimasi biaya bisa salah, atau kondisi jaringan tiba-tiba menjadi padat. Transaksi yang Kita kirim mungkin "tersangkut" (*stuck*) di *mempool* dengan *fee rate* yang terlalu rendah. Untuk mengatasinya, ada teknik yang disebut **fee bumping**. Ada dua metode utama:
+
+##### **1. Replace-By-Fee (RBF)**
+
+RBF berarti Kita membuat **transaksi baru yang bertentangan (*conflicting*)** dengan transaksi asli (membelanjakan setidaknya satu UTXO yang sama), tetapi dengan *fee rate* yang lebih tinggi. *Miner* yang melihat kedua versi akan lebih memilih versi baru yang lebih menguntungkan, sehingga "menggantikan" versi lama.
+
+Ada dua varian RBF:
+
+* **Opt-in RBF (BIP125):** Transaksi asli harus "memberi sinyal" bahwa ia bersedia diganti. Ini dilakukan dengan mengatur *field* `sequence` pada salah satu *input*-nya ke nilai yang lebih rendah dari `0xfffffffe`. Ini adalah default di banyak dompet modern.
+* **Full RBF:** Setiap transaksi yang belum dikonfirmasi dapat diganti, tanpa perlu sinyal. Kebijakan ini masih kontroversial, tetapi beberapa *node* dan *miner* sudah mengaktifkannya.
+
+**Keuntungan RBF:** Sangat efisien dalam penggunaan ruang *block*.
+**Kerugian RBF:** Biasanya hanya bisa dilakukan oleh pengirim asli transaksi.
+
+##### **2. Child-Pays-for-Parent (CPFP)**
+
+Jika Kita adalah **penerima** sebuah transaksi yang tersangkut, Kita tidak bisa menggunakan RBF. Sebagai gantinya, Kita bisa menggunakan CPFP.
+Caranya adalah dengan mengambil *output* dari transaksi "induk" (*parent*) yang belum dikonfirmasi, dan membelanjakannya dalam **transaksi baru "anak" (*child*)**. Transaksi *child* ini dibuat dengan *fee rate* yang **sangat tinggi**.
+
+Seorang *miner* tidak bisa memasukkan transaksi *child* ke dalam *block* tanpa memasukkan transaksi *parent*-nya terlebih dahulu. Oleh karena itu, *miner* akan melihat keduanya sebagai satu "paket". Jika *fee rate* gabungan dari paket (total biaya / total ukuran) cukup tinggi, *miner* akan termotivasi untuk menambang keduanya.
+
+**Keuntungan CPFP:** Bisa dilakukan oleh siapa saja yang menerima *output* dari transaksi (termasuk pengirim jika ada *change output*).
+**Kerugian CPFP:** Kurang efisien karena membutuhkan pembuatan transaksi tambahan yang memakan ruang *block*.
+
+#### **Masalah Lanjutan: Package Relay dan Transaction Pinning**
+
+##### **Package Relay**
+
+CPFP memiliki masalah: jika *fee rate* transaksi *parent* sangat rendah sehingga bahkan tidak masuk ke *mempool* sebuah *node*, maka *node* tersebut akan menolak transaksi *child* karena "induknya tidak diketahui". **Package Relay** adalah proposal untuk memungkinkan *node* menerima dan me-*relay* *parent* dan *child* sebagai satu paket, sehingga memungkinkan CPFP berfungsi bahkan untuk transaksi dengan biaya sangat rendah.
+
+##### **Transaction Pinning**
+
+Ini adalah **vektor serangan** di mana seorang penyerang mempersulit atau membuat mustahil bagi pengguna jujur untuk melakukan *fee bumping*. Ini adalah masalah serius untuk protokol sensitif waktu seperti Lightning Network.
+
+**Contoh Pinning pada RBF:**
+Alice mengirim transaksi ke Bob. Bob (penyerang) membuat transaksi *child* dari *output* Alice dengan biaya sangat rendah tetapi ukuran sangat besar. Aturan RBF di Bitcoin Core saat ini mengharuskan biaya total dari transaksi pengganti lebih tinggi dari biaya total semua transaksi yang akan digantikan (termasuk *child*). Akibatnya, Alice harus membayar biaya yang sangat besar untuk menggantikan tidak hanya transaksinya sendiri, tetapi juga transaksi "sampah" milik Bob.
+
+**Contoh Pinning pada CPFP:**
+Seorang penyerang bisa membuat 25 transaksi *child* dari sebuah transaksi *parent*. Aturan di Bitcoin Core membatasi jumlah keturunan yang terhubung dalam *mempool* menjadi 25. Setelah batas ini tercapai, tidak ada seorang pun (termasuk pengguna jujur) yang bisa menambahkan transaksi *child* lain untuk melakukan CPFP.
+
+##### **CPFP Carve Out dan Anchor Outputs**
+
+Ini adalah solusi spesifik untuk masalah *transaction pinning* di protokol dua pihak seperti Lightning Network. **CPFP Carve Out** adalah pengecualian pada aturan batas 25 keturunan, yang memungkinkan **satu** transaksi *child* tambahan dibuat. **Anchor Outputs** adalah jenis *output* khusus yang dirancang untuk digunakan dengan *carve out*, yang secara efektif menjamin bahwa salah satu pihak dalam kontrak selalu memiliki kemampuan untuk melakukan CPFP pada transaksi.
+
+#### **Fee Sniping: Serangan Teoritis Jangka Panjang**
+
+**Fee sniping** adalah skenario serangan teoritis di mana seorang *miner* mencoba menambang ulang *block* dari masa lalu (`block N`) untuk "mencuri" transaksi dengan biaya sangat tinggi dari *block* masa depan (`block N+1`). Saat imbalan *block* (*subsidy*) menurun, biaya transaksi akan menjadi sumber pendapatan utama *miner*, sehingga insentif untuk melakukan serangan semacam ini bisa meningkat.
+
+**Pertahanan:** Banyak dompet modern secara default mengatur `locktime` transaksi ke tinggi *block* saat ini. Ini berarti transaksi tersebut hanya bisa dimasukkan ke dalam *block* berikutnya atau setelahnya, tidak bisa ditarik kembali ke *block* yang lebih lama. Ini membuat *fee sniping* menjadi kurang menguntungkan.
+
+---
+
+# Bab 10
+## The Bitcoin Network
+
+Bitcoin adalah jaringan **peer-to-peer (P2P)**. Ini berarti tidak ada server pusat; semua peserta, yang disebut **node**, memiliki kedudukan yang setara dan saling terhubung dalam topologi jala (*mesh network*). Sifat P2P yang terdesentralisasi ini adalah fondasi dari seluruh sistem keamanan Bitcoin.
+
+#### **Jenis-jenis dan Peran Node (*Node Types and Roles*)**
+
+Meskipun semua *full node* setara, mereka bisa mengambil peran yang berbeda tergantung pada fungsionalitas yang mereka jalankan:
+
+* **Archival Full Node:** Ini adalah *node* yang menyimpan salinan lengkap dari seluruh *blockchain* dari awal hingga akhir. Mereka bertindak sebagai tulang punggung jaringan, menyediakan data historis untuk *node* lain.
+* **Lightweight Client (SPV Client):** Klien yang dirancang untuk perangkat dengan sumber daya terbatas (seperti ponsel). Mereka tidak mengunduh seluruh *blockchain*, melainkan hanya *block headers* dan memverifikasi transaksi dengan metode *Simplified Payment Verification* (SPV).
+* **Miner:** *Node* yang menjalankan perangkat keras khusus untuk memecahkan algoritma *Proof-of-Work* dan membuat *block* baru. Beberapa *miner* menjalankan *full node*, sementara yang lain (terutama di *mining pool*) adalah klien yang bergantung pada server *pool*.
+* **User Wallets:** Bisa berupa *full node* (seperti dompet bawaan Bitcoin Core di desktop) atau *lightweight client* (sebagian besar dompet seluler).
+
+#### **Relai Block yang Efisien dan Pencegahan *Fork***
+
+Ketika seorang *miner* menemukan *block* baru, sangat penting agar *block* tersebut disebarkan ke seluruh *miner* lain secepat mungkin. Jika ada penundaan, *miner* lain mungkin akan menemukan *block* lain pada ketinggian yang sama, menyebabkan **blockchain fork**, di mana hanya satu dari dua *block* yang bersaing akan menjadi bagian dari rantai utama. Ini disebut **block-finding race** dan merugikan desentralisasi karena memberi keuntungan pada *miner* besar.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_10-1.png)
+
+* **Deskripsi Gambar 10-1:** Gambar ini menunjukkan sebuah rantai *block* yang bercabang menjadi dua rantai yang bersaing. Kedua cabang tersebut kemudian memiliki tanda tanya di ujungnya, mengilustrasikan ketidakpastian tentang cabang mana yang akan diperpanjang dan menjadi rantai yang "benar".
+
+##### **Compact Block Relay (BIP152)**
+
+Untuk meminimalkan latensi penyebaran *block*, Bitcoin Core mengimplementasikan **compact block relay**. Idenya adalah karena sebagian besar *node* sudah memiliki transaksi di dalam **mempool** mereka, mereka tidak perlu menerima salinan kedua dari transaksi tersebut saat *block* baru datang.
+
+Sebagai gantinya, *node* pengirim hanya mengirim **header block** dan **daftar pengenal singkat** (6-*byte*) untuk setiap transaksi. *Node* penerima kemudian merekonstruksi *block* tersebut menggunakan transaksi dari *mempool*-nya sendiri.
+
+*Compact block relay* memiliki dua mode:
+
+1. **Low-bandwidth mode (Default):** *Peer* hanya akan mengumumkan *hash* dari *block* baru. *Node* Kita hanya akan meminta *compact block* jika diperlukan, sehingga menghemat *bandwidth*.
+2. **High-bandwidth mode:** *Peer* akan langsung mengirimkan *compact block* bahkan sebelum memvalidasi isinya sepenuhnya (hanya memeriksa PoW). Ini meminimalkan latensi di setiap lompatan (*hop*) jaringan, sangat penting bagi para *miner*.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_10-2.png)
+
+* **Deskripsi Gambar 10-2:** Gambar ini membandingkan tiga mode relai:
+
+  * **A. Legacy:** Node B harus meminta *block* penuh setelah menerima pengumuman, yang memakan waktu.
+  * **B. High bandwidth:** Node A langsung mengirim *compact block*, dan Node B segera merekonstruksinya (validasi terjadi setelahnya), ini sangat cepat.
+  * **C. Low bandwidth:** Node B menerima pengumuman, lalu meminta *compact block*, yang sedikit lebih lambat dari mode B tetapi lebih hemat *bandwidth*.
+
+##### **Jaringan Relai Block Privat (*Private Block Relay Networks*)**
+
+Untuk latensi yang lebih rendah lagi, para *miner* besar sering menggunakan jaringan privat yang dioptimalkan seperti **FIBRE (Fast Internet Bitcoin Relay Engine)**. Jaringan ini menggunakan teknik seperti **Forward Error Correction (FEC)**, yang memungkinkan rekonstruksi data yang hilang tanpa perlu meminta ulang, sehingga mengurangi latensi secara signifikan.
+
+#### **Penemuan Jaringan (*Network Discovery*)**
+
+Bagaimana *node* baru menemukan *node* lain untuk terhubung? Prosesnya disebut *bootstrapping*.
+
+1. **DNS Seeds:** Bitcoin Core memiliki daftar beberapa *server* DNS khusus yang disebut **DNS seeds**. Saat *node* baru dimulai, ia akan meminta daftar alamat IP dari *node-node* Bitcoin yang aktif dari *seed* ini.
+
+2. **Handshake:** Setelah mendapatkan satu alamat IP, *node* baru akan terhubung dan memulai "jabat tangan" (*handshake*). Ia mengirim pesan `version` yang berisi info seperti versi protokol, layanan yang didukung, dan tinggi *block* saat ini. *Peer* akan merespons dengan pesan `verack` (*version acknowledgement*).
+
+![gambar](images/books-02-mastering_bitcoin/gambar_10-3.png)
+
+   * **Deskripsi Gambar 10-3:** Gambar ini mengilustrasikan alur jabat tangan awal. Node A mengirimkan pesan `version` ke Node B. Node B merespons dengan `verack` dan kemudian mengirimkan pesan `version`-nya sendiri ke Node A, yang juga direspons dengan `verack` oleh Node A.
+
+3. **Menemukan Peer Lain:** Setelah terhubung, *node* akan mengirim pesan `getaddr` untuk meminta daftar alamat IP *peer* lain. *Peer* akan merespons dengan pesan `addr` yang berisi daftar alamat. Dengan cara ini, *node* secara bertahap membangun daftar *peer*-nya dan menjadi bagian dari jaringan.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_10-4.png)
+
+   * **Deskripsi Gambar 10-4:** Gambar ini menunjukkan Node A mengirim `getaddr` ke Node B. Node B merespons dengan beberapa pesan `addr`, memberikan Node A daftar *peer* baru untuk dihubungi.
+
+**Contoh Kode (Melihat Peer yang Terhubung):**
+
+```bash
+$ bitcoin-cli getpeerinfo
+```
+
+Perintah ini akan menampilkan daftar *peer* yang sedang terhubung, beserta detail seperti alamat IP (`addr`), versi klien (`subver`), dan statistik koneksi (`bytessent`, `bytesrecv`).
+
+#### **Klien Full Node vs. Klien Ringan (*Lightweight*)**
+
+##### **Full Nodes**
+
+*Full node* adalah standar emas keamanan. Ia mengunduh dan memvalidasi **setiap** transaksi dalam **setiap** *block* secara independen, dimulai dari *genesis block*. Ini memberikan jaminan keamanan tertinggi tanpa perlu mempercayai pihak lain. Saat pertama kali dijalankan, *node* baru akan melakukan sinkronisasi dengan meminta *block headers* terlebih dahulu, lalu mengunduh *block-block* penuh dari beberapa *peer* secara paralel.
+
+##### **Lightweight Clients (SPV)**
+
+Klien SPV tidak mengunduh *block* penuh, melainkan hanya **block headers**. Ini membuat mereka jauh lebih "ringan".
+
+![gambar](images/books-02-mastering_bitcoin/gambar_10-5.png)
+
+* **Deskripsi Gambar 10-5:** Gambar ini menunjukkan klien ringan (Node A) berulang kali mengirim pesan `getheaders` ke *full node* (Node B) dan menerima pesan `headers` sebagai balasan, memungkinkannya untuk menyinkronkan seluruh rantai *header* dengan cepat.
+
+Kelemahan klien SPV adalah mereka tidak bisa memvalidasi transaksi secara penuh. Mereka bergantung pada kejujuran mayoritas *node* yang terhubung dengannya. Mereka bisa **memastikan sebuah transaksi ada**, tetapi **tidak bisa memastikan sebuah transaksi (misalnya, *double-spend*) tidak ada**.
+
+Untuk menemukan transaksi mereka di antara jutaan transaksi lain, klien SPV memerlukan metode pemfilteran.
+
+##### **Bloom Filters (BIP37) - Metode Lama dan Tidak Aman**
+
+*Bloom filter* adalah filter pencarian probabilistik. Klien SPV membuat "pola" dari alamat-alamatnya dan mengirimkannya ke *full node*. *Full node* kemudian hanya mengirim transaksi yang cocok dengan pola tersebut.
+
+* **Cara Kerja:**
+
+  * Sebuah pola (misalnya, alamat) di-*hash* beberapa kali.
+  * Setiap hasil *hash* digunakan untuk menyalakan satu bit (dari 0 menjadi 1) dalam sebuah array bit.
+  * Untuk memeriksa kecocokan, data baru di-*hash* dengan cara yang sama. Jika semua bit yang sesuai sudah menyala, maka "mungkin" cocok (*probabilistic match*).
+  * Jika ada satu bit saja yang mati, maka "pasti tidak" cocok.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_10-6.png)
+lalu
+![gambar](images/books-02-mastering_bitcoin/gambar_10-7.png)
+lalu
+![gambar](images/books-02-mastering_bitcoin/gambar_10-8.png)
+lalu
+![gambar](images/books-02-mastering_bitcoin/gambar_10-9.png)
+lalu
+![gambar](images/books-02-mastering_bitcoin/gambar_10-10.png)
+
+* **Deskripsi Gambar 10-6 hingga 10-10:** Gambar-gambar ini secara visual mengilustrasikan proses kerja *bloom filter* dengan array 16-bit sederhana: bagaimana menambahkan pola "A" dan "B" akan menyalakan bit-bit tertentu, dan bagaimana menguji pola "X" menghasilkan "mungkin cocok" sementara menguji pola "Y" menghasilkan "pasti tidak cocok".
+
+**Masalah Kritis Bloom Filters:** *Bloom filter* memberikan **privasi yang sangat buruk**. *Full node* yang jahat dapat menganalisis filter untuk merekayasa balik dan menebak alamat-alamat milik klien. Selain itu, ia juga rentan terhadap serangan DoS. Karena alasan ini, metode ini tidak lagi direkomendasikan.
+
+##### **Compact Block Filters (BIP157/158) - Metode Modern dan Privat**
+
+Ini adalah solusi yang lebih baru dan jauh lebih baik. Idenya dibalik:
+
+1. **Full node** yang membuat filter untuk **setiap block**. Filter ini berisi representasi singkat dari semua *output script* yang relevan di dalam *block*.
+2. **Lightweight client** mengunduh filter-filter ini.
+3. Klien **secara lokal** memeriksa apakah salah satu alamatnya cocok dengan data di dalam filter. Ia tidak pernah mengirimkan informasi tentang alamatnya ke *node*.
+4. Jika ada kecocokan, klien kemudian mengunduh *block* penuh yang relevan.
+
+Struktur data yang digunakan adalah **Golomb-Rice Coded Sets (GCS)**, sebuah cara yang sangat efisien untuk meng-encode daftar angka (dalam hal ini, *hash* dari *script*) dengan memanfaatkan fakta bahwa selisih antara angka-angka yang terurut cenderung lebih kecil daripada angka itu sendiri, sehingga lebih hemat ruang.
+
+#### **Mempools dan Orphan Pools**
+
+* **Mempool:** Hampir setiap *node* menyimpan daftar transaksi yang belum dikonfirmasi di dalam memori, yang disebut **mempool**. *Node* menggunakan ini untuk melacak transaksi yang valid tetapi belum masuk ke dalam *block*.
+* **Orphan Pool:** Jika sebuah *node* menerima transaksi "anak" tetapi belum menerima transaksi "induk"-nya, ia akan menyimpannya sementara di **orphan pool**. Ketika transaksi induknya tiba, *node* akan memvalidasi anak yatim tersebut dan menambahkannya ke *mempool*.
+
+Bab ini menunjukkan arsitektur jaringan yang kompleks namun tangguh yang memungkinkan Bitcoin beroperasi secara terdesentralisasi. Dari cara *node* menemukan satu sama lain hingga mekanisme canggih untuk menyebarkan *block* dan melayani klien ringan secara privat, semuanya dirancang untuk mendukung sistem yang terbuka dan aman.
+
+---
+
+# Bab 11
+## Blockchain
+
+*Blockchain* adalah inti dari sistem pencatatan Bitcoin. Ia adalah struktur data yang berisi daftar semua transaksi yang pernah dikonfirmasi, yang diatur dalam *block-block* yang terurut dan saling terhubung ke belakang (*back-linked*). Kita bisa membayangkannya sebagai buku besar digital yang didistribusikan ke seluruh dunia.
+
+Kekuatan utamanya terletak pada sifat **immutability** (tidak dapat diubah). Setelah sebuah transaksi terkubur cukup dalam di dalam *blockchain*, mengubahnya menjadi sangat tidak praktis karena memerlukan daya komputasi yang luar biasa besar.
+
+---
+
+#### **Struktur Sebuah Block (*Structure of a Block*)**
+
+Sebuah *block* adalah wadah yang mengagregasi transaksi. Strukturnya terdiri dari dua bagian utama:
+
+1. **Block Header (80 bytes):** Bagian metadata yang ringkas dan berukuran tetap.
+2. **Daftar Transaksi:** Bagian utama yang berisi semua transaksi yang dimasukkan ke dalam *block* tersebut. Ukurannya bisa bervariasi hingga batas maksimum *block*.
+
+**Struktur Detail sebuah Block di dalam file data Bitcoin Core:**
+
+| Ukuran                    | Field                   | Deskripsi                                                                                  |
+| :------------------------ | :---------------------- | :----------------------------------------------------------------------------------------- |
+| 4 bytes                   | **Block Size**          | Ukuran total *block* dalam *byte*.                              |
+| 80 bytes                  | **Block Header**        | Metadata penting yang akan kita bahas di bawah.                 |
+| 1–9 bytes (*compactSize*) | **Transaction Counter** | Jumlah transaksi yang ada di dalam *block* ini.                 |
+| Bervariasi                | **Transactions**        | Daftar lengkap dari semua transaksi yang dicatat dalam *block*. |
+
+---
+
+#### **Block Header**
+
+*Block Header* adalah bagian yang paling penting karena inilah yang di-*hash* untuk *Proof-of-Work* dan yang menghubungkan *block-block* menjadi sebuah rantai.
+
+**Struktur Detail Block Header (Total 80 bytes):**
+
+| Ukuran   | Field                   | Deskripsi                                                                                                                                                      |
+| :------- | :---------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 4 bytes  | **Version**             | Menunjukkan versi aturan konsensus yang diikuti oleh *block* ini. Digunakan untuk proses *upgrade* jaringan (soft forks).           |
+| 32 bytes | **Previous Block Hash** | *Hash* dari *header block* sebelumnya. Inilah "rantai" yang menghubungkan *block* ini ke induknya (*parent block*).                 |
+| 32 bytes | **Merkle Root**         | Sebuah *hash* tunggal yang merupakan ringkasan kriptografis dari **semua** transaksi di dalam *block* ini.                          |
+| 4 bytes  | **Timestamp**           | Waktu perkiraan pembuatan *block*, dalam format detik sejak Epoch Unix.                                                             |
+| 4 bytes  | **Target**              | Batas kesulitan yang harus dipenuhi oleh *Proof-of-Work*. \*Hash block* harus lebih kecil dari nilai ini.                            |
+| 4 bytes  | **Nonce**               | Sebuah angka yang diubah-ubah oleh *miner* (bisa mencapai 4 miliar kali per detik) untuk mencoba menemukan *hash block* yang valid. |
+
+---
+
+#### **Pengenal Block: Block Hash vs. Block Height**
+
+Sebuah *block* dapat diidentifikasi dengan dua cara:
+
+1. **Block Hash:** Pengenal utama dan **unik**. Dihasilkan dari *double-hashing* (`SHA256(SHA256())`) dari 80 *byte* *Block Header*. *Hash* ini tidak disimpan di dalam *block* itu sendiri, melainkan dihitung oleh setiap *node*.
+   Contoh:
+   `000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f`.
+
+2. **Block Height:** Posisi *block* di dalam *blockchain*, dihitung dari *genesis block* (height = 0). **Penting:** *Block height* **bukan pengenal yang unik**. Saat terjadi *fork*, bisa ada dua *block* berbeda yang bersaing untuk *height* yang sama. Rantai yang lebih panjang dengan total *Proof-of-Work* terbanyak akan menang, sedangkan *block* yang kalah menjadi *orphan block*.
+
+---
+
+#### **Genesis Block**
+
+*Block* pertama dalam *blockchain* disebut **genesis block**. Ia dibuat pada tahun 2009 dan menjadi leluhur bersama dari semua *block* lainnya. *Block* ini di-*hardcode* ke dalam perangkat lunak Bitcoin, berfungsi sebagai **akar kepercayaan (*root of trust*)** yang tidak bisa diubah.
+
+**Contoh Kode (Melihat Genesis Block via `bitcoin-cli`):**
+
+```bash
+$ bitcoin-cli getblock 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f
+{
+  "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+  "confirmations": ...,
+  "height": 0,
+  "version": 1,
+  "merkleroot": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+  "time": 1231006505,
+  ...
+}
+```
+
+*Coinbase transaction* dari *genesis block* berisi pesan terkenal:
+**"The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"**,
+yang mengacu pada krisis keuangan saat itu dan menegaskan tujuan Bitcoin.
+
+---
+
+#### **Menghubungkan Block di dalam Blockchain**
+
+Setiap *block* baru terhubung ke *block* sebelumnya melalui *field* `Previous Block Hash` di dalam *header*-nya. *Field* ini berisi *hash* dari *header block* induknya.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_11-1.png)
+
+* **Deskripsi Gambar 11-1 (halaman 251):**
+  Menunjukkan tiga *block* berurutan (misalnya, 277314, 277315, 277316). Panah dari *header Block* 277316 menunjuk ke *header Block* 277315, menandakan bahwa *field* "Previous Block Hash" di 277316 berisi *hash* dari 277315. Hal yang sama berlaku untuk 277315 → 277314. Inilah yang membentuk "rantai" yang tidak bisa diputuskan. Mengubah satu *block* akan mengubah *hash*-nya, memutus tautan, dan mengharuskan penambangan ulang seluruh rantai berikutnya.
+
+---
+
+#### **Pohon Merkle (*Merkle Trees*)**
+
+Setiap *block* bisa berisi ribuan transaksi. Untuk meringkas semuanya menjadi satu *hash* 32-byte (`Merkle Root`), Bitcoin menggunakan **Merkle Tree**.
+
+**Konstruksi Merkle Tree:**
+Proses dibangun dari bawah ke atas (*bottom-up*):
+
+1. **Daun (*Leaves*):** Setiap transaksi di-hash (double-SHA256) → `txid`. Inilah daun pohon di level terbawah.
+2. **Jumlah Ganjil:** Jika jumlah transaksi ganjil, transaksi terakhir diduplikasi agar genap.
+3. **Level Atas:** Pasangan *hash* digabung (64-byte) lalu di-hash lagi (double-SHA256) → node induk.
+4. **Rekursif:** Ulangi hingga hanya tersisa satu node di puncak, yaitu **Merkle Root**.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_11-2.png)
+
+lalu
+
+![gambar](images/books-02-mastering_bitcoin/gambar_11-3.png)
+
+* **Deskripsi Gambar 11-2 & 11-3 (halaman 253):**
+
+  * Gambar 11-2: 4 transaksi (A, B, C, D). `txid`-nya (Hₐ, Hᵦ, H꜀, HᏧ) jadi daun → Hₐᵦ, H꜀Ꮷ → Merkle Root Hₐᵦ꜀Ꮷ.
+  * Gambar 11-3: 3 transaksi. C diduplikasi agar genap.
+
+**Celah Desain dan Mitigasi:**
+Duplikasi daun terakhir membuka kelemahan (CVE-2012-2459), memungkinkan daftar transaksi berbeda menghasilkan Merkle Root sama. Bisa dipakai untuk serangan DoS terhadap *node* lama. Bitcoin Core modern telah menambahkan mitigasi untuk mendeteksi anomali ini.
+
+**Merkle Path dan Klien Ringan (SPV):**
+Dengan *Merkle Path*, Kita bisa membuktikan transaksi K ada di *block* hanya dengan:
+
+* Transaksi K itu sendiri.
+* *Hash* "saudara" di setiap level pohon.
+
+Klien dapat menghitung ulang jalur dan memverifikasi *Merkle Root* di *header block*. Dengan hanya 80-byte header + *Merkle Path* kecil, **SPV client** bisa memverifikasi transaksi tanpa mengunduh seluruh *block*.
+
+![gambar](images/books-02-mastering_bitcoin/gambar_11-6.png)
+
+* **Deskripsi Gambar 11-6 (halaman 256):**
+  Untuk membuktikan transaksi K, cukup sertakan *hash* L, gabungan IJ, gabungan MNOP, dan gabungan ABCDEFGH. Dengan 4 *hash* ini, klien bisa merekonstruksi root dan memvalidasi transaksi K.
+
+---
+
+#### **Blockchain Uji Coba Bitcoin**
+
+Untuk pengembangan yang aman, ada beberapa jaringan Bitcoin selain jaringan utama (**mainnet**):
+
+* **Testnet:** Publik, mirip *mainnet*, koin tidak bernilai. Kurang stabil karena minim insentif bagi *miner*.
+* **Signet (BIP325):** Stabil, berbasis **Proof-of-Authority** dengan blok ditandatangani pihak tepercaya. Mencegah spam dan lebih andal untuk uji coba.
+* **Regtest (*Regression Testing*):** Lokal & privat, bisa buat blok instan dan mengatur waktu. Ideal untuk pengembangan awal & uji otomatis.
+
+Alur kerja terbaik: **Regtest → Signet/Testnet → Mainnet** untuk membangun aplikasi Bitcoin yang aman.
+
+---
+
