@@ -244,4 +244,3 @@ Sistem token kue kita sekarang telah berevolusi ke **versi 2.0**: pembayaran ama
 * Ada berbagai strategi untuk menyimpan *private key*, masing-masing dengan trade-off antara keamanan dan kenyamanan.
 
 ---
-
