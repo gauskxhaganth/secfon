@@ -26,7 +26,7 @@ Jaringan Bitcoin dikelilingi oleh berbagai partisipan dan layanan:
 * **Bitcoin nodes (Node Bitcoin):** Komputer-komputer yang menjalankan perangkat lunak Bitcoin. Mereka bertanggung jawab untuk memproses pembayaran, menjaga keamanan, dan mencetak bitcoin baru. Siapa pun bisa menjalankan node mereka sendiri.
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_1.1.png" alt="gambar" width="500"/>
+  <img src="images/books-01-grokking_bitcoin/figure_1.1.png" alt="gambar" width="575"/>
 </p>
 
 Ekosistem Bitcoin diilustrasikan dengan Jaringan Bitcoin (kumpulan komputer/node yang terhubung) di tengah. Di sekelilingnya ada berbagai partisipan: Pengguna akhir, Pengguna korporat, Pedagang, Layanan Bitcoin, Bursa, Pengembang, dan Protokol di atas Bitcoin. Jaringan ini bertanggung jawab atas keamanan, pencetakan bitcoin baru, dan pemrosesan pembayaran.
@@ -36,7 +36,7 @@ Ekosistem Bitcoin diilustrasikan dengan Jaringan Bitcoin (kumpulan komputer/node
 Bagian ini menjelaskan alur pembayaran Bitcoin dalam empat langkah sederhana, menggunakan contoh Alice yang ingin membayar 1 BTC kepada Bob.
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_1.2.png" alt="gambar" width="500"/>
+  <img src="images/books-01-grokking_bitcoin/figure_1.2.png" alt="gambar" width="575"/>
 </p>
 
 Diagram alur pembayaran Bitcoin dari Alice ke Bob.
@@ -98,7 +98,7 @@ Selain Bitcoin, ada ribuan mata uang kripto lain yang disebut *alt-coin* (koin a
 Bitcoin memiliki **network effect (efek jaringan)** yang sangat kuat: nilainya meningkat karena banyak orang dan layanan yang sudah menggunakannya. Sebuah *alt-coin* baru akan sulit bersaing jika tidak menawarkan inovasi yang signifikan, sama seperti sulitnya membuat jejaring sosial baru untuk menyaingi yang sudah ada.
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_1.14.png" alt="gambar" width="500"/>
+  <img src="images/books-01-grokking_bitcoin/figure_1.14.png" alt="gambar" width="575"/>
 </p>
 
 Perbandingan Efek Jaringan. Sisi kiri menunjukkan Internet (dengan logo Facebook, Google, Skype, Twitter) dan Jaringan Bitcoin yang ramai, dengan label "Banyak orang dan layanan". Sisi kanan menunjukkan "Wownet" dan "Wowcoin" yang sepi dan terisolasi, dengan label "Tidak ada orang atau layanan".
