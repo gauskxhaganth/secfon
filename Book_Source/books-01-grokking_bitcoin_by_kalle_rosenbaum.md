@@ -1632,15 +1632,27 @@ Sebelum kita menyelami cara kerja `segwit`, penting untuk memahami masalah-masal
 
 Ingat kembali contoh warisan dari Bab 9: Kita memberikan `transaction` `time-locked` (Tx3) kepada putri Kita yang membelanjakan *output* dari `transaction` lain (Tx2) yang belum dikonfirmasi.
 
-[ALT TEXT: Diagram alur transaksi warisan dari Bab 9, menunjukkan ketergantungan Tx3 pada Tx2. - Figure 10.1]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.1.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram alur transaksi warisan dari Bab 9, menunjukkan ketergantungan Tx3 pada Tx2. - Figure 10.1]
 
 Ketika Kita menyiarkan Tx2 ke jaringan, sebuah `node` jahat (misalnya, `node` milik Qi) dapat mencegatnya. Qi dapat memodifikasi data `signature` di dalam Tx2 untuk membuat `transaction` baru yang termodifikasi, Tx2M. Tx2M ini valid, membelanjakan input yang sama, dan mengirim dana ke tujuan yang sama, tetapi memiliki `txid` yang berbeda dari Tx2.
 
-[ALT TEXT: Ilustrasi bagaimana transaksi Tx2 diubah menjadi Tx2M oleh node jahat saat disiarkan di jaringan. - Figure 10.2]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.2.png" alt="gambar" width="580"/>
+</p>
+
+[Ilustrasi bagaimana transaksi Tx2 diubah menjadi Tx2M oleh node jahat saat disiarkan di jaringan. - Figure 10.2]
 
 Jika `miner` akhirnya menambang Tx2M, maka `transaction` asli Kita, Tx2, menjadi tidak valid. Akibatnya, `transaction` warisan putri Kita, Tx3, yang merujuk pada `txid` dari Tx2, juga menjadi **tidak valid selamanya**. Dana warisan tersebut akan hilang.
 
-[ALT TEXT: Diagram yang menunjukkan Tx3 menjadi tidak valid karena txid dari Tx2 telah berubah menjadi txid dari Tx2M yang dikonfirmasi. - Figure 10.3]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.3.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram yang menunjukkan Tx3 menjadi tidak valid karena txid dari Tx2 telah berubah menjadi txid dari Tx2M yang dikonfirmasi. - Figure 10.3]
 
 **Bagaimana Malleability Dilakukan?**
 
@@ -1649,7 +1661,11 @@ Ada beberapa cara untuk mengubah data `signature` (`scriptSig`) tanpa membatalka
 2.  **Trik Kriptografis**: `Signature` ECDSA memiliki properti di mana nilai `s`-nya dapat dinegasikan (`s` menjadi `-s mod n`) dan `signature` tetap valid. Ini adalah bentuk `malleability` yang paling umum.
 3.  **Menambahkan Opcode Redundan**: Menambahkan `opcode` yang tidak mengubah hasil eksekusi `script` ke dalam `scriptSig`, seperti `OP_DUP` diikuti oleh `OP_DROP`.
 
-[ALT TEXT: Tiga cara untuk melakukan transaction malleability: mengubah format signature, trik kriptografi, dan menambahkan opcode redundan. - Figure 10.4]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.4.png" alt="gambar" width="580"/>
+</p>
+
+[Tiga cara untuk melakukan transaction malleability: mengubah format signature, trik kriptografi, dan menambahkan opcode redundan. - Figure 10.4]
 
 Meskipun `node` modern memiliki kebijakan *relay* untuk mencegah `transaction` yang termodifikasi, seorang `miner` tetap dapat memasukkan `transaction` tersebut ke dalam `block` secara langsung.
 
@@ -1657,13 +1673,25 @@ Meskipun `node` modern memiliki kebijakan *relay* untuk mencegah `transaction` y
 
 Proses verifikasi `signature` pada `transaction` lawas (non-`segwit`) memiliki inefisiensi performa yang signifikan. Masalahnya terletak pada cara data di-hash sebelum ditandatangani. Untuk setiap *input* yang ditandatangani, hampir seluruh data `transaction` di-hash ulang.
 
-[ALT TEXT: Proses penandatanganan input pertama dalam transaksi, di mana pubkey script dari output yang dibelanjakan disalin ke dalam signature script. - Figure 10.5]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.5.png" alt="gambar" width="580"/>
+</p>
 
-[ALT TEXT: Proses penandatanganan input kedua dalam transaksi, di mana proses hashing yang serupa diulang. - Figure 10.6]
+[Proses penandatanganan input pertama dalam transaksi, di mana pubkey script dari output yang dibelanjakan disalin ke dalam signature script. - Figure 10.5]
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.6.png" alt="gambar" width="580"/>
+</p>
+
+[Proses penandatanganan input kedua dalam transaksi, di mana proses hashing yang serupa diulang. - Figure 10.6]
 
 Akibatnya, waktu verifikasi meningkat secara **kuadratik (O(n²))** seiring dengan jumlah input. Jika `transaction` dengan 2 input membutuhkan waktu 1 ms untuk diverifikasi, `transaction` dengan 4 input akan membutuhkan sekitar 4 ms. `Transaction` dengan 1.024 input bisa memakan waktu lebih dari 4 menit.
 
-[ALT TEXT: Grafik yang menunjukkan pertumbuhan waktu verifikasi kuadratik seiring bertambahnya jumlah input dalam transaksi. - Figure 10.7]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.7.png" alt="gambar" width="580"/>
+</p>
+
+[Grafik yang menunjukkan pertumbuhan waktu verifikasi kuadratik seiring bertambahnya jumlah input dalam transaksi. - Figure 10.7]
 
 Ini membuka celah untuk serangan *Denial-of-Service* (DoS), di mana penyerang dapat membuat `block` yang penuh dengan `transaction` multi-input yang kompleks, menyebabkan `node` di seluruh jaringan menjadi lambat atau bahkan macet.
 
@@ -1673,7 +1701,11 @@ Ini membuka celah untuk serangan *Denial-of-Service* (DoS), di mana penyerang da
 
 Data `signature` (`scriptSig`) bisa memakan lebih dari 60-70% dari total ukuran `transaction`, terutama pada `transaction` dengan banyak input. Ini adalah pemborosan `bandwidth` yang signifikan bagi pengguna `lightweight wallet`.
 
-[ALT TEXT: Ilustrasi mengapa lightweight wallet membutuhkan seluruh data transaksi, termasuk signature, untuk memverifikasi merkle proof. - Figure 10.8]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.8.png" alt="gambar" width="580"/>
+</p>
+
+[Ilustrasi mengapa lightweight wallet membutuhkan seluruh data transaksi, termasuk signature, untuk memverifikasi merkle proof. - Figure 10.8]
 
 #### Kesulitan Pembaruan Script
 
@@ -1685,16 +1717,24 @@ Keterbatasannya adalah:
 
 Dibutuhkan mekanisme pembaruan yang lebih fleksibel dan dapat diperluas di masa depan.
 
----
-
 ### Solusi: Cara Kerja Segwit
 
 `Segwit` menyelesaikan semua masalah di atas dengan satu perubahan fundamental: **memisahkan data `witness` dari data inti `transaction`**.
 
 * Pada `transaction` lawas (legacy), `txid` dihitung dari semua data, termasuk `signature`.
-    [ALT TEXT: Anatomi transaksi legacy di mana txid mencakup signature script. - Figure 10.10]
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.10.png" alt="gambar" width="580"/>
+</p>
+
+    [Anatomi transaksi legacy di mana txid mencakup signature script. - Figure 10.10]
 * Pada `transaction` `segwit`, `scriptSig` pada dasarnya kosong. Data `signature` dan `public key` dipindahkan ke struktur data terpisah yang disebut `witness`, yang dilampirkan pada `transaction`.
-    [ALT TEXT: Anatomi transaksi segwit di mana txid tidak lagi mencakup data signature yang telah dipisahkan ke dalam field witness. - Figure 10.11]
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.11.png" alt="gambar" width="580"/>
+</p>
+
+    [Anatomi transaksi segwit di mana txid tidak lagi mencakup data signature yang telah dipisahkan ke dalam field witness. - Figure 10.11]
 
 Dengan memisahkan `witness`, `txid` tidak lagi bergantung pada data `signature`. Ini secara efektif **menghilangkan semua vektor `transaction malleability` pihak ketiga**.
 
@@ -1715,11 +1755,19 @@ Struktur alamat Bech32 terdiri dari:
     * **Witness Version**: Angka 0-16 yang memungkinkan pembaruan `script` di masa depan.
     * **Witness Program**: Data inti (misalnya, `PKH` atau `script hash`).
 
-[ALT TEXT: Proses decoding alamat segwit Bech32 untuk mengekstrak witness version dan witness program. - Figure 10.12]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.12.png" alt="gambar" width="580"/>
+</p>
+
+[Proses decoding alamat segwit Bech32 untuk mengekstrak witness version dan witness program. - Figure 10.12]
 
 Ketika seseorang mengirim dana ke alamat `segwit` ini, mereka membuat `output` `transaction` dengan `pubkey script` yang sangat sederhana, hanya berisi `witness version` dan `witness program`.
 
-[ALT TEXT: Contoh output transaksi yang dikirim ke alamat segwit, hanya berisi version byte dan witness program. - Figure 10.13]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.13.png" alt="gambar" width="580"/>
+</p>
+
+[Contoh output transaksi yang dikirim ke alamat segwit, hanya berisi version byte dan witness program. - Figure 10.13]
 
 #### Menghabiskan Output Segwit
 
@@ -1727,7 +1775,11 @@ Saat Kita ingin membelanjakan dana dari `output` `segwit`, Kita membuat `transac
 * `scriptSig`-nya kosong.
 * `Signature` dan `public key` ditempatkan di dalam *field* `witness` yang terpisah.
 
-[ALT TEXT: Transaksi yang membelanjakan output segwit, dengan scriptSig kosong dan data signature di dalam field witness. - Figure 10.14]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.14.png" alt="gambar" width="580"/>
+</p>
+
+[Transaksi yang membelanjakan output segwit, dengan scriptSig kosong dan data signature di dalam field witness. - Figure 10.14]
 
 #### Verifikasi Transaksi Segwit
 
@@ -1739,7 +1791,11 @@ Saat Kita ingin membelanjakan dana dari `output` `segwit`, Kita membuat `transac
     * **32 byte**: **P2WSH** (Pay-to-Witness-Script-Hash).
 4.  Untuk P2WPKH, `node` menggunakan *template* `script` P2PKH standar, tetapi mengambil `PKH` dari `witness program` dan `signature`/`public key` dari *field* `witness`.
 
-[ALT TEXT: Proses verifikasi transaksi P2WPKH oleh node segwit-aware. - Figure 10.15]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.15.png" alt="gambar" width="580"/>
+</p>
+
+[Proses verifikasi transaksi P2WPKH oleh node segwit-aware. - Figure 10.15]
 
 **Pada `Node` Lama (Non-segwit):**
 Ini adalah bagian jenius dari desain `soft fork` `segwit`.
@@ -1748,7 +1804,11 @@ Ini adalah bagian jenius dari desain `soft fork` `segwit`.
 3.  Saat `script` ini dieksekusi, dua nilai non-nol didorong ke `stack`. Item teratas `stack` adalah non-nol, yang diinterpretasikan sebagai `TRUE`.
 4.  `Transaction` dianggap valid oleh `node` lama.
 
-[ALT TEXT: Bagaimana node lama memvalidasi transaksi segwit sebagai script yang selalu TRUE (anyone-can-spend). - Figure 10.16]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.16.png" alt="gambar" width="580"/>
+</p>
+
+[Bagaimana node lama memvalidasi transaksi segwit sebagai script yang selalu TRUE (anyone-can-spend). - Figure 10.16]
 
 Ini secara efektif adalah `script` **"anyone-can-spend"** dari sudut pandang `node` lama. Keamanannya dijamin oleh fakta bahwa mayoritas besar `hashrate` jaringan adalah `segwit-aware` dan akan menolak `block` apa pun dari `miner` lama yang mencoba mencuri dana dengan cara ini.
 
@@ -1761,7 +1821,11 @@ Agar `witness` yang terpisah tetap terikat pada `block`, `segwit` memperkenalkan
 
 `Commitment` ini ditempatkan di dalam sebuah `output` `OP_RETURN` di dalam `coinbase transaction`. `Node` lama mengabaikan `output` `OP_RETURN` ini, sehingga kompatibilitas tetap terjaga.
 
-[ALT TEXT: Diagram bagaimana merkle root dari wtxid (witness root hash) dimasukkan ke dalam coinbase transaction sebagai witness commitment. - Figure 10.17]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.17.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram bagaimana merkle root dari wtxid (witness root hash) dimasukkan ke dalam coinbase transaction sebagai witness commitment. - Figure 10.17]
 
 #### Pay-to-Witness-Script-Hash (P2WSH)
 
@@ -1777,7 +1841,11 @@ P2WSH adalah versi `segwit` dari P2SH. Ini berfungsi dengan cara yang sangat mir
 * Data `transaction` yang umum untuk semua input (seperti daftar output) di-hash sekali saja untuk membuat sebuah *intermediate hash*.
 * Untuk setiap input, *intermediate hash* ini kemudian di-hash bersama dengan data spesifik untuk input tersebut (seperti `outpoint` yang dibelanjakan, `script`, dan **jumlah (`amount`) yang dibelanjakan**).
 
-[ALT TEXT: Proses hashing dua langkah segwit yang efisien, di mana intermediate hash digunakan kembali untuk setiap input. - Figure 10.26]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.26.png" alt="gambar" width="580"/>
+</p>
+
+[Proses hashing dua langkah segwit yang efisien, di mana intermediate hash digunakan kembali untuk setiap input. - Figure 10.26]
 
 Dengan melakukan ini, waktu verifikasi menjadi **linear (O(n))**, peningkatan performa yang sangat besar.
 
@@ -1798,9 +1866,16 @@ Dengan melakukan ini, waktu verifikasi menjadi **linear (O(n))**, peningkatan pe
     * 1 byte data non-`witness` (data `transaction` inti) dihitung sebagai **4 WU**.
     * 1 byte data `witness` dihitung sebagai **1 WU**.
 
-[ALT TEXT: Perhitungan block weight, di mana byte non-witness dikalikan 4 dan byte witness dikalikan 1. - Figure 10.36]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_10.36.png" alt="gambar" width="580"/>
+</p>
+
+[Perhitungan block weight, di mana byte non-witness dikalikan 4 dan byte witness dikalikan 1. - Figure 10.36]
 
 Implikasinya adalah:
 * Batas ukuran `block` dasar (tanpa `witness`) tetap 1MB (1.000.000 byte * 4 WU/byte = 4.000.000 WU), sehingga kompatibel dengan `node` lama.
 * Namun, karena data `witness` memiliki "diskon" bobot, ukuran total `block` (data inti + `witness`) secara efektif bisa mencapai ~2MB, tergantung pada seberapa banyak `transaction` `segwit` yang ada di dalamnya. Ini meningkatkan kapasitas jaringan.
 * Batas *signature operations* (sigops) juga disesuaikan dengan skema bobot yang sama.
+
+---
+
