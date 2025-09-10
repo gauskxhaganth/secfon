@@ -1879,3 +1879,174 @@ Implikasinya adalah:
 
 ---
 
+# Bab 11
+## Peningkatan Bitcoin
+
+Bab ini adalah salah satu bab paling krusial untuk memahami bagaimana *Bitcoin* berevolusi dan menjaga konsensus di tengah perubahan. Sebagai calon auditor keamanan, memahami mekanisme peningkatan dan potensi risikonya, seperti *chain split*, adalah fundamental. Bab ini akan membahas dua cara utama perubahan aturan konsensus: ***hard fork*** dan ***soft fork***. Kita juga akan menelusuri bagaimana mekanisme untuk menerapkan perubahan ini telah berkembang seiring waktu, yang berpuncak pada konsep penting di mana pengguna—bukan hanya *miners*—yang pada akhirnya menentukan aturan jaringan.
+
+### *Bitcoin Forks*
+
+Dalam konteks *Bitcoin*, istilah ***fork*** tidak merujuk pada penyalinan kode sumber (*open source project fork*), melainkan **perubahan pada aturan konsensus**. Aturan konsensus adalah seperangkat aturan yang divalidasi oleh setiap *full node* untuk menentukan apakah sebuah *blockchain* valid atau tidak. Aturan ini memastikan bahwa semua partisipan dalam jaringan memiliki pandangan yang sama mengenai "siapa memiliki apa" (*UTXO set*).
+
+Perubahan aturan konsensus ini terbagi menjadi dua kategori utama:
+
+* ***Hard Forks***: Ini adalah perubahan yang **melonggarkan** aturan konsensus. Artinya, *block* yang sebelumnya dianggap tidak valid oleh aturan lama, kini dianggap valid oleh aturan baru. Contohnya adalah meningkatkan batas maksimal *block weight*.
+* ***Soft Forks***: Ini adalah perubahan yang **memperketat** aturan konsensus. Artinya, semua *block* yang dianggap valid oleh aturan baru juga pasti valid menurut aturan lama. Namun, beberapa *block* yang valid menurut aturan lama bisa jadi tidak valid menurut aturan baru. Contohnya adalah mengurangi batas maksimal *block weight*.
+
+Buku ini menggunakan analogi sebuah restoran vegetarian yang populer untuk menjelaskan konsep ini. Anggap restoran adalah seorang *miner*, para tamu adalah *full nodes*, dan makanan yang disajikan adalah *blocks*.
+
+* **Tanpa Perubahan**: Restoran menyajikan makanan vegetarian, dan para tamu (vegetarian) menerimanya. Ini adalah keadaan normal.
+* **Hard Fork**: Restoran mulai menyajikan daging (melonggarkan aturan "hanya vegetarian"). Para tamu vegetarian akan menolak makanan ini. *Node* lama akan menolak *block* baru yang hanya valid menurut aturan baru yang lebih longgar.
+* **Soft Fork**: Restoran mulai hanya menyajikan makanan vegan (memperketat aturan). Para tamu vegetarian tetap bisa menerima makanan ini karena makanan vegan adalah bagian dari makanan vegetarian. *Node* lama akan tetap menerima *block* baru karena *block* tersebut masih mematuhi aturan lama yang lebih longgar.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_11.1.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram Venn yang membandingkan set block yang valid. Lingkaran "Aturan Lama" (misal, block weight <= 4M) berada di tengah. Lingkaran "Hard Fork" (misal, <= 8M) melingkupi aturan lama. Lingkaran "Soft Fork" (misal, <= 2M) berada di dalam aturan lama. - Figure 11.1]
+
+Setiap kali sebuah *fork* diimplementasikan dan ada sekelompok *node* yang menjalankannya, ada risiko terjadinya ***chain split***, di mana *blockchain* terbelah menjadi dua versi yang berbeda.
+
+#### Perubahan Aturan Non-Konsensus
+
+Penting untuk membedakan *fork* dari pembaruan perangkat lunak biasa yang tidak mengubah aturan konsensus. Buku ini memberikan dua contoh:
+1.  **Fitur `kill`**: Jika Kita menambahkan pesan jaringan baru bernama `kill` yang bisa mematikan *node* lain, ini bukan *fork*. *Node* lama tidak akan mengerti pesan ini dan akan mengabaikannya, sementara *node* baru yang menjalankan perangkat lunak Kita akan terpengaruh. Ini adalah perubahan protokol jaringan, bukan aturan konsensus.
+2.  ***Compact Blocks*** **(BIP152)**: Ini adalah fitur optimasi di mana sebuah *node* mengirimkan *block header* dan ID *transaction* yang dipersingkat kepada *peer*-nya, bukan seluruh *block*. *Peer* tersebut kemudian merekonstruksi *block* menggunakan *transaction* yang sudah ada di *mempool*-nya. Ini adalah perubahan yang sangat berguna untuk mengurangi penggunaan *bandwidth* dan mempercepat propagasi *block*. Ini adalah perubahan *opt-in* yang kompatibel; *node* baru bisa berkomunikasi dengan lebih efisien, sementara *node* lama tetap berfungsi seperti biasa. Ini bukan *fork* karena tidak mengubah validasi *block*.
+
+#### *Hard Forks*
+
+Ketika sebuah *hard fork* terjadi (misalnya, batas *block weight* dinaikkan dari 4M menjadi 8M WU), *node* baru akan menerima *block* dari *node* lama (karena *block* <= 4M WU pasti <= 8M WU). Namun, *node* lama akan menolak *block* dari *node* baru jika ukurannya, misalnya, 6M WU.
+
+Jika hanya minoritas *hashrate* yang menjalankan aturan baru, *block* mereka yang lebih besar akan sering ditolak oleh mayoritas jaringan, menyebabkan mereka membuang-buang sumber daya dan akhirnya harus kembali ke rantai utama.
+
+Namun, jika mayoritas *hashrate* menjalankan aturan baru, mereka akan mulai membangun rantai mereka sendiri yang lebih panjang (memiliki lebih banyak *proof-of-work*). *Node* lama akan mengabaikan rantai ini dan terus menambang di rantai mereka yang lebih pendek. Ini menciptakan *chain split* yang berpotensi permanen.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_11.6.png" alt="gambar" width="580"/>
+</p>
+
+[Rantai blockchain terpisah, di mana node-node baru yang memiliki hashrate mayoritas berhasil membuat rantai yang lebih panjang daripada node-node lama. - Figure 11.6]
+
+Risiko terbesar bagi rantai baru adalah **wipeout**. Jika karena suatu alasan mayoritas *hashrate* kembali ke rantai lama, rantai lama bisa menjadi lebih kuat (memiliki lebih banyak *proof-of-work* kumulatif) daripada rantai baru. Karena *block* lama valid bagi *node* baru, *node* baru akan melakukan *reorg* besar-besaran, meninggalkan rantai baru dan kembali ke rantai lama. Semua *transaction* di rantai baru akan hilang.
+
+Untuk mencegah ini, *hard fork* dapat mengimplementasikan **wipeout protection**. Contohnya, *Bitcoin Cash* mengharuskan *block* pertama setelah *split* berukuran lebih dari 1 MB. Aturan ini membuat *block* tersebut tidak valid bagi *node* *Bitcoin* asli, dan sebaliknya, *block* *Bitcoin* asli di ketinggian yang sama menjadi tidak valid bagi *node* *Bitcoin Cash*. Ini menciptakan perpisahan yang tidak dapat didamaikan, mencegah *reorg*.
+
+#### *Soft Forks*
+
+Dengan *soft fork*, aturan diperketat. *Node* lama akan selalu menerima *block* dari *node* baru. Namun, jika seorang *miner* lama membuat sebuah *block* yang valid menurut aturan lama tetapi tidak valid menurut aturan baru (misalnya, menghabiskan *output* Segwit seolah-olah itu adalah *anyone-can-spend*), maka *node* baru akan menolak *block* tersebut.
+
+Jika hanya minoritas *hashrate* yang menjalankan aturan baru, mereka akan menolak *block* dari mayoritas dan pada dasarnya "memisahkan diri" dari jaringan utama ke rantai mereka sendiri, yang kemungkinan besar tidak akan bertahan lama.
+
+Namun, jika mayoritas *hashrate* menjalankan aturan baru, mereka akan mengabaikan *block* yang tidak patuh dari *miner* lama. Rantai baru akan terus tumbuh lebih kuat. *Miner* lama yang terus membuat *block* yang tidak patuh akan mendapati *block* mereka ditolak oleh mayoritas dan kehilangan *block reward*. Akhirnya, mereka akan terpaksa untuk meningkatkan perangkat lunak mereka atau berhenti menambang. Rantai lama akan mengalami *reorg* dan bergabung dengan rantai baru yang lebih kuat.
+
+> **Perbedaan Kunci**:
+> * Pada **hard fork**, *node* baru berisiko mengalami *wipeout*. *Node* lama aman dari *reorg*.
+> * Pada **soft fork**, *node* lama berisiko mengalami *wipeout*. *Node* baru aman dari *reorg*.
+
+#### *Transaction Replay*
+
+Setelah *chain split* permanen, pengguna secara efektif memiliki koin di kedua rantai. Sebuah *transaction* yang dibuat untuk satu rantai bisa jadi valid di rantai lainnya juga. Jika Kita mengirim 2 BTC Old, ada kemungkinan *transaction* yang sama "diputar ulang" (*replayed*) di rantai New, menyebabkan Kita tanpa sengaja juga mengirim 2 BTC New.
+
+Untuk mencegah ini, *fork* dapat mengimplementasikan **replay protection**. *Bitcoin Cash*, misalnya, memperkenalkan tipe `SIGHASH` baru bernama `FORKID`. *Transaction* yang menggunakan `FORKID` hanya valid di rantai *Bitcoin Cash* dan tidak valid di rantai *Bitcoin*. Sebaliknya, *transaction* tanpa `FORKID` hanya valid di rantai *Bitcoin* dan tidak valid di *Bitcoin Cash*.
+
+### Mekanisme Peningkatan
+
+Karena risiko *chain split*, peningkatan *Bitcoin* harus dilakukan dengan sangat hati-hati. Sejauh ini, sebagian besar peningkatan non-kritis dilakukan melalui *soft fork*. Mekanisme untuk mengkoordinasikan *soft fork* ini telah berevolusi.
+
+#### Sinyal Coinbase (BIP16)
+
+Peningkatan pertama yang terkoordinasi adalah untuk *pay-to-script-hash* (P2SH) pada tahun 2012. *Miner* yang mendukung perubahan ini menyisipkan string `/P2SH/` di dalam *coinbase transaction* mereka. Pada tanggal yang ditentukan (*flag day*), para pengembang menghitung jumlah *block* yang memberi sinyal. Karena lebih dari 55% *block* mendukung, aturan P2SH diaktifkan pada tanggal 1 April 2012, dan semua *node* yang telah diperbarui mulai memberlakukan aturan baru tersebut.
+
+#### Sinyal dengan Peningkatan Nomor Versi *Block* (BIP34, 66, 65)
+
+Mekanisme ini menggunakan *field* versi pada *block header* untuk sinyal. Ini digunakan untuk tiga *soft fork*:
+* **BIP34**: Mengharuskan tinggi *block* dicantumkan dalam *coinbase transaction*. Menggunakan versi *block* 2.
+* **BIP66**: Mengharuskan penggunaan format DER yang ketat untuk *signatures*. Menggunakan versi *block* 3.
+* **BIP65**: Mengaktifkan `OP_CHECKLOCKTIMEVERIFY`. Menggunakan versi *block* 4.
+
+Proses aktivasinya bertahap:
+1.  *Miner* mulai membuat *block* dengan versi yang lebih tinggi (misalnya, versi 2 untuk BIP34).
+2.  Ketika 75% dari 1.000 *block* terakhir memiliki versi ≥2, *node* baru mulai menolak *block* versi 2 yang tidak mematuhi aturan baru (misalnya, tidak ada tinggi *block* di *coinbase*).
+3.  Ketika 95% dari 1.000 *block* terakhir memiliki versi ≥2, *node* baru mulai menolak semua *block* versi 1. Ini memaksa *miner* yang tersisa untuk meningkatkan perangkat lunak mereka agar *block* mereka tidak ditolak.
+
+Mekanisme ini disebut ***miner-activated soft fork*** (MASF), karena *miners* yang memberi sinyal dan pada akhirnya memberlakukan aturan baru.
+
+#### Sinyal dengan Bit Versi *Block* (BIP9)
+
+Mekanisme sebelumnya memiliki keterbatasan: hanya satu *soft fork* yang bisa diimplementasikan pada satu waktu, dan nomor versi *block* tidak dapat digunakan kembali. **BIP9** mengatasi ini dengan menafsirkan *field* versi *block* secara berbeda.
+
+*Block* yang 3 bit pertamanya adalah `001` akan menggunakan 29 bit sisanya sebagai bit-flags individual. Setiap bit dapat digunakan untuk memberi sinyal dukungan terhadap satu proposal peningkatan yang berbeda secara bersamaan.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_11.21.png" alt="gambar" width="580"/>
+</p>
+
+[Representasi 32-bit dari field versi blok, di mana 3 bit pertama disetel ke 001 dan 29 bit sisanya dapat digunakan sebagai flag individual. - Figure 11.21]
+
+Setiap proposal BIP9 memiliki parameter:
+* **Name**: Nama fitur (misalnya, `csv`, `segwit`).
+* **Bit**: Bit mana dari 29 bit yang digunakan (0-28).
+* **Start time**: Waktu kapan penghitungan sinyal dimulai.
+* **Timeout**: Waktu kapan proposal dianggap gagal jika tidak mencapai ambang batas.
+
+Proposal akan melalui beberapa status, yang dievaluasi setiap periode *retarget* (2.016 *blocks*):
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_11.22.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram alir status untuk aktivasi BIP9. Dimulai dari DEFINED, beralih ke STARTED setelah start time. Dari STARTED, bisa beralih ke LOCKED_IN jika ambang batas 95% tercapai, atau ke FAILED jika timeout tercapai. Dari LOCKED_IN, beralih ke ACTIVE setelah satu periode retarget. - Figure 11.22]
+
+* **DEFINED**: Status awal sebelum *start time*.
+* **STARTED**: Setelah *start time*, jaringan menunggu sinyal.
+* **LOCKED_IN**: Jika 95% (1.916 dari 2.016 *blocks*) memberi sinyal dukungan dalam satu periode *retarget*, status berubah menjadi `LOCKED_IN`. Ini adalah titik di mana aktivasi tidak bisa dibatalkan lagi.
+* **ACTIVE**: Setelah satu periode *retarget* penuh dalam status `LOCKED_IN`, aturan baru mulai diberlakukan.
+* **FAILED**: Jika *timeout* tercapai sebelum status `LOCKED_IN`, proposal gagal.
+
+**Contoh Penerapan BIP9:**
+* **Relative Lock Time (csv)**: Menggunakan bit 0. Proses ini berjalan lancar dan mencapai status `ACTIVE` setelah hanya tiga periode *retarget*.
+* **Segregated Witness (Segwit)**: Ini adalah contoh yang jauh lebih kompleks dan kontroversial. Menggunakan bit 1, proposal Segwit macet di sekitar 30% dukungan dari *miner* dan berisiko gagal. Ini memicu perdebatan sengit di komunitas.
+
+Konflik seputar Segwit melahirkan beberapa proposal tandingan:
+* **Segwit2x**: Proposal untuk mengaktifkan Segwit, diikuti dengan *hard fork* untuk meningkatkan *block size*. Didukung oleh banyak *miner*.
+* **BIP148**: Proposal untuk melakukan ***user-activated soft fork*** (UASF). *Node* yang menjalankan BIP148 akan mulai menolak *block* yang tidak memberi sinyal dukungan untuk Segwit (bit 1) mulai 1 Agustus 2017. Ini adalah upaya untuk "memaksa" aktivasi Segwit tanpa bergantung pada *miner*.
+* **BIP91**: Proposal kompromi untuk menjembatani semua pihak. BIP91 menggunakan bit 4 dan ambang batas 80% yang lebih rendah. Setelah aktif, ia akan menolak *block* yang tidak memberi sinyal untuk Segwit (bit 1). Karena mayoritas *miner* mengadopsi BIP91, ini menyebabkan tingkat sinyal untuk proposal Segwit asli (bit 1) meroket hingga lebih dari 95%, yang akhirnya mengaktifkan Segwit melalui mekanisme BIP9 asli.
+
+Pelajaran dari aktivasi Segwit adalah bahwa memberikan hak veto kepada minoritas kecil *hashrate* (5% dalam BIP9) dapat menghambat peningkatan yang diinginkan oleh mayoritas ekonomi.
+
+### *User-Activated Soft Forks* (UASF)
+
+Konsep ini menekankan bahwa kekuatan tertinggi dalam jaringan *Bitcoin* tidak terletak pada *miner*, tetapi pada **mayoritas ekonomi**—pengguna, bursa, pedagang, dan bisnis yang menggunakan *Bitcoin*. *Miner* dibayar untuk mengikuti aturan, bukan untuk menentukannya.
+
+UASF adalah mekanisme di mana mayoritas ekonomi ini secara kolektif memutuskan untuk memberlakukan aturan baru (yang lebih ketat) pada tanggal atau tinggi *block* yang telah ditentukan.
+
+Mari kita bayangkan sebuah skenario:
+1.  99% pengguna (*node* ekonomi) ingin menerapkan *soft fork* untuk memperkecil ukuran *block*, tetapi 100% *miner* menolaknya.
+2.  Pengguna memperbarui perangkat lunak mereka untuk menolak *block* yang terlalu besar setelah tanggal yang ditentukan.
+3.  Setelah tanggal tersebut, *miner* terus membuat *block* besar. Namun, bagi 99% pengguna, *block-block* ini tidak valid. *Block reward* yang diterima *miner* menjadi tidak berharga karena tidak ada bursa atau pedagang yang mau menerimanya.
+4.  Jika ada satu *miner* saja yang memutuskan untuk mengikuti aturan pengguna dan membuat *block* kecil, *block* tersebut akan menjadi satu-satunya *block* yang diterima oleh mayoritas ekonomi. *Miner* ini akan bisa menjual koinnya dan membayar tagihan listrik.
+5.  Melihat ini, *miner* lain yang rasional akan beralih ke rantai yang diterima pengguna agar tidak merugi.
+6.  Akhirnya, rantai yang didukung pengguna akan memiliki mayoritas *hashrate*, menyebabkan *reorg* pada rantai *miner* yang tidak patuh. Rantai yang tidak patuh akan terhapus. Pengguna menang.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_11.28.png" alt="gambar" width="580"/>
+</p>
+
+lalu
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_11.29.png" alt="gambar" width="580"/>
+</p>
+
+lalu
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_11.30.png" alt="gambar" width="580"/>
+</p>
+
+[Serangkaian diagram yang menggambarkan bagaimana satu miner yang mematuhi aturan pengguna berhasil membuat rantai yang valid, yang kemudian diikuti oleh miner lain, dan akhirnya menyebabkan rantai yang tidak patuh dihapus. - Figure 11.28, 11.29, 11.30]
+
+UASF adalah penegasan kembali bahwa *Bitcoin* adalah sistem yang diatur oleh konsensus pengguna. Mekanisme deployment di masa depan kemungkinan akan menggabungkan sinyal dari *miner* dengan mekanisme aktivasi oleh pengguna untuk memastikan bahwa peningkatan yang diinginkan oleh mayoritas ekonomi dapat diimplementasikan tanpa bisa diveto oleh sekelompok kecil *miner*.
+
+---
+
+
