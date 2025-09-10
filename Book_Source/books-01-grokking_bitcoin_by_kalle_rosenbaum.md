@@ -250,3 +250,253 @@ Sistem token kue kita sekarang telah berevolusi ke **versi 2.0**: pembayaran ama
 * Ada berbagai strategi untuk menyimpan *private key*, masing-masing dengan trade-off antara keamanan dan kenyamanan.
 
 ---
+
+# Bab 3
+## Alamat (Addresses)
+
+**Tujuan Bab Ini:**
+Bab ini akan menjelaskan evolusi dari penggunaan nama asli ke penggunaan alamat Bitcoin yang lebih anonim dan aman. Kita akan belajar:
+
+* Bagaimana mengganti nama dengan *public key hash* untuk meningkatkan privasi dasar.
+* Bagaimana melindungi diri dari kesalahan ketik yang bisa menyebabkan kehilangan dana secara permanen.
+
+Pada akhir bab ini, sistem *spreadsheet cookie token* kita tidak akan lagi menggunakan nama orang, melainkan *hash* dari *public key*. Ini adalah langkah besar untuk membuatnya lebih mirip dengan cara kerja Bitcoin yang sebenarnya.
+
+#### **1. Kebiasaan Makan Cookie Terungkap (Cookie-eating habits disclosed)**
+
+**Masalah Awal: Kurangnya Privasi**
+
+Sistem *spreadsheet* yang kita gunakan sejauh ini memiliki kelemahan besar: semua transaksi dicatat menggunakan nama asli.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.2.png" alt="gambar" width="400"/>
+</p>
+
+* **Gambar 3.2: Acme Insurances mengawasi kebiasaan makan cookie Chloe.**
+
+  * Gambar ini menunjukkan bagaimana sebuah pihak ketiga (misalnya, perusahaan asuransi bernama Acme) bisa mendapatkan salinan *spreadsheet* tersebut.
+  * Dengan hanya melakukan pencarian sederhana untuk nama "Chloe", perusahaan tersebut dapat melihat seluruh riwayat transaksinya. Mereka bisa tahu seberapa sering Chloe membeli cookie, berapa banyak yang dia beli, dan dari siapa dia menerima token.
+  * Informasi ini bisa disalahgunakan, misalnya untuk menaikkan premi asuransi Chloe dengan asumsi dia memiliki gaya hidup yang tidak sehat.
+
+Masalah ini tidak hanya berlaku untuk pihak ketiga. Setiap rekan kerja yang memiliki akses baca ke *spreadsheet* juga bisa dengan mudah melihat saldo dan riwayat transaksi semua orang. Ini menciptakan masalah privasi yang serius. Menanggapi hal ini, para rekan kerja meminta Lisa (administrator sistem dalam contoh kita) untuk mencari solusi.
+
+#### **2. Mengganti Nama dengan Kunci Publik (Replacing names with public keys)**
+
+**Solusi Pertama: Menggunakan Kunci Publik**
+
+Lisa, yang sudah lelah mengelola daftar nama dan *public key* yang terhubung, mengusulkan ide untuk meningkatkan privasi dan menyederhanakan pekerjaannya.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.3.png" alt="gambar" width="400"/>
+</p>
+
+* **Gambar 3.3: Mengganti nama dengan kunci publik.**
+
+  * Gambar ini mengilustrasikan perubahan pada *spreadsheet*. Kolom "From" (Dari) dan "To" (Ke) tidak lagi berisi nama seperti "Alice" atau "Cafe", melainkan *public key* lengkap mereka yang terdiri dari 66 karakter heksadesimal (33 byte).
+  * Sekarang, *spreadsheet* menjadi jauh lebih sulit dibaca. Tanpa mengetahui *public key* milik Chloe, Acme Insurances tidak bisa lagi melacak transaksinya dengan mudah.
+
+**Proses Pembayaran yang Baru**
+
+Dengan perubahan ini, proses pembayaran juga berubah. Pengguna tidak lagi menggunakan nama.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.4.png" alt="gambar" width="400"/>
+</p>
+
+* **Gambar 3.4: Gaya pembayaran baru menggunakan kunci publik, bukan nama.**
+
+  * Ketika John ingin membayar, pesan yang dia kirim ke Lisa tidak lagi berbunyi, "Lisa, tolong pindahkan 10 CT ke Cafe. /John".
+  * Pesan barunya sekarang berisi:
+
+    1. *Public key* pengirim.
+    2. *Public key* penerima.
+    3. Jumlah yang ditransfer.
+  * Pesan ini kemudian ditandatangani secara digital menggunakan *private key* yang sesuai dengan *public key* pengirim.
+  
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.5.png" alt="gambar" width="400"/>
+</p>
+
+* **Gambar 3.5: Faiza (rekan kerja baru) menerima hadiah dari perusahaan.**
+
+  * **Persiapan:** Faiza membuat *key pair* (*private key* dan *public key*). Dia menyimpan *private key* miliknya dengan aman.
+  * **Berbagi Informasi:** Faiza memberikan **hanya *public key*-nya** kepada pihak yang akan membayarnya (perusahaan), **bukan kepada Lisa**. Ini penting karena Lisa tidak lagi perlu memelihara tabel nama dan *public key*.
+  * **Proses Transaksi:** Perusahaan membuat pesan untuk memindahkan 100 CT dari *public key* mereka ke *public key* Faiza. Pesan ini ditandatangani dengan *private key* perusahaan dan dikirim ke Lisa.
+  * **Verifikasi oleh Lisa:** Lisa melakukan verifikasi:
+
+    1. Dia menggunakan *public key* pengirim (yang ada di dalam pesan) untuk memverifikasi tanda tangan digital.
+    2. Dia memeriksa *spreadsheet* untuk memastikan *public key* pengirim memiliki saldo yang cukup.
+    3. Lisa tidak perlu tahu siapa pemilik *public key* penerima. Selama pengirim sah dan memiliki cukup dana, dia akan mencatat transaksi tersebut.
+
+Perubahan ini membuat sistem menjadi **pseudonim**. Identitas tidak lagi terikat pada nama, tetapi pada *public key*.
+
+#### **3. Memperpendek Kunci Publik (Shortening the public key)**
+
+**Masalah Baru: Ukuran Data**
+
+Meskipun privasi meningkat, muncul masalah baru. *Public key* berukuran 33 byte, jauh lebih besar daripada nama seperti "John" yang hanya 4 byte. Hal ini membuat ukuran *spreadsheet* membengkak, memperlambat proses unduh bagi pengguna dan memakan lebih banyak ruang penyimpanan di komputer Lisa.
+
+**Solusi Kedua: Hashing Kunci Publik menjadi 20 byte**
+
+Para developer mengusulkan untuk mengganti *public key* dengan *hash* kriptografis dari *public key* tersebut. Proses ini tidak hanya memperpendek data tetapi juga menambahkan lapisan keamanan ekstra.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.6.png" alt="gambar" width="400"/>
+</p>
+
+* **Gambar 3.6: Mengganti kunci publik dengan hash RIPEMD160 dari hash SHA256 kunci publik.**
+
+  * Prosesnya adalah sebagai berikut:
+
+    1. Ambil *public key* (33 byte).
+    2. Lakukan *hashing* menggunakan fungsi **SHA256**. Hasilnya adalah *hash* sepanjang 32 byte.
+    3. Ambil hasil dari SHA256 tersebut, lalu lakukan *hashing* sekali lagi menggunakan fungsi **RIPEMD160**. Hasilnya adalah *hash* sepanjang 20 byte (160 bit).
+  * Hasil akhir ini disebut **Public Key Hash (PKH)**.
+
+> **Istilah Teknis:**
+>
+> * **Public Key Hash (PKH):** Ini adalah "sidik jari" dari sebuah *public key*. Ini adalah representasi yang lebih pendek dari *public key* yang dihasilkan melalui serangkaian fungsi *hash* (di Bitcoin, `RIPEMD160(SHA256(public_key))`). Tujuannya adalah untuk memperpendek alamat dan menambahkan lapisan keamanan.
+
+Sekarang, *spreadsheet* menggunakan PKH yang hanya 20 byte, yang jauh lebih efisien daripada *public key* 33 byte.
+
+**Proses Pembayaran Menggunakan PKH**
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.7.png" alt="gambar" width="400"/>
+</p>
+
+* **Gambar 3.7: John membeli cookie menggunakan PKH.**
+
+  * Pesan yang dikirim John ke Lisa sekarang sedikit berbeda:
+
+    * **Penerima (To):** adalah **PKH** milik Cafe.
+    * **Pengirim (From):** tetap menggunakan **Public Key** milik John, bukan PKH-nya.
+  * Mengapa pengirim masih menggunakan *public key*? Karena Lisa (atau siapapun yang memverifikasi) masih membutuhkan *public key* asli untuk memverifikasi tanda tangan digital.
+  * Setelah menerima pesan, Lisa akan:
+
+    1. Mengambil *public key* pengirim dari pesan.
+    2. Menghitung PKH dari *public key* tersebut (`RIPEMD160(SHA256(public_key))`).
+    3. Menggunakan PKH yang baru dihitung ini untuk memeriksa saldo pengirim di *spreadsheet*.
+    4. Jika semua valid, dia mencatat transaksi baru, dengan PKH pengirim di kolom "From" dan PKH penerima di kolom "To".
+
+#### **4. Mengapa Menggunakan SHA256 dan RIPEMD160?**
+
+Menggunakan dua fungsi *hash* yang berbeda dan berurutan adalah pilihan desain yang disengaja untuk keamanan berlapis:
+
+1. **Keamanan Ekstra:** Jika suatu saat salah satu dari fungsi *hash* ini (misalnya SHA256) ditemukan memiliki kelemahan (*vulnerability*) sehingga bisa direkayasa balik (*pre-image attack*), *public key* masih dilindungi oleh fungsi *hash* kedua (RIPEMD160). Seorang penyerang harus memecahkan keduanya untuk bisa mendapatkan *public key* dari PKH, yang secara eksponensial lebih sulit.
+2. **Perbedaan Pengembang:** SHA256 dikembangkan oleh NSA (National Security Agency) AS, sementara RIPEMD160 dikembangkan oleh komunitas akademik di Eropa. Menggunakan keduanya mengurangi risiko adanya *backdoor* tersembunyi dari satu pihak pengembang.
+
+#### **5. Menghindari Kesalahan Ketik yang Mahal (Avoiding expensive typing errors)**
+
+**Masalah Kritis: Kesalahan Manusia**
+
+Sistem yang sekarang menggunakan PKH (string heksadesimal 20 byte) sangat rentan terhadap kesalahan ketik.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.8.png" alt="gambar" width="400"/>
+</p>
+
+* **Gambar 3.8: John salah ketik saat memasukkan PKH penerima.**
+
+  * John ingin membayar Cafe, tetapi dia salah mengetik satu karakter terakhir dari PKH Cafe (misalnya, mengetik `d` padahal seharusnya `c`).
+  * Dia menandatangani pesan tersebut dan mengirimkannya ke Lisa.
+  * Lisa memverifikasi tanda tangan dan saldo pengirim. Semuanya valid. Dia tidak peduli dan tidak bisa memeriksa apakah PKH penerima itu benar atau tidak. Dia hanya mencatat transaksi sesuai permintaan.
+  * Akibatnya, 10 CT milik John dikirim ke sebuah PKH yang tidak memiliki *private key* yang sesuai. Tidak ada seorang pun di dunia yang bisa menggunakan dana tersebut. Uang itu **terbakar secara digital** (*digitally burned*) dan hilang selamanya.
+
+Ini adalah masalah kegunaan dan keamanan yang sangat serius. Perlu ada cara untuk mendeteksi kesalahan ketik sebelum transaksi dikirim.
+
+**Solusi Ketiga: Base58check**
+
+Untuk mengatasi masalah ini, diperkenalkan konsep **Alamat Cookie Token** (di dunia nyata, ini adalah **Alamat Bitcoin**). Alamat ini adalah representasi dari PKH yang dirancang agar lebih ramah manusia dan memiliki mekanisme pendeteksi kesalahan. Proses konversi dari PKH ke alamat ini disebut **Base58check**.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.10.png" alt="gambar" width="400"/>
+</p>
+
+lalu
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.12.png" alt="gambar" width="400"/>
+</p>
+
+* **Gambar 3.10 & 3.12: Gambaran umum encoding Base58check.**
+
+  * Proses ini mengubah PKH (byte mentah) menjadi sebuah string alamat yang bisa dibaca (contoh: `19g6oo8f...gCenRBPD`).
+  * Yang terpenting, proses ini bisa dibalik (*decoding*) untuk mendapatkan kembali PKH asli, dan selama proses *decoding*, ia akan memeriksa integritas alamat untuk memastikan tidak ada salah ketik.
+
+**Proses Encoding Base58check**
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.13.png" alt="gambar" width="400"/>
+</p>
+
+* **Gambar 3.13: Proses encoding Base58check pada PKH John.**
+  Proses ini terdiri dari beberapa langkah:
+
+  1. **Tambahkan Versi (Version Byte):** Sebuah byte versi ditambahkan di awal PKH. Untuk alamat P2PKH (Pay-to-Public-Key-Hash) di Bitcoin, byte versinya adalah `0x00`. Ini berguna untuk membedakan jenis-jenis alamat di masa depan.
+  2. **Buat Checksum:** Sebuah *checksum* ditambahkan untuk mendeteksi kesalahan.
+
+     * Ambil PKH yang sudah diberi versi.
+     * Lakukan *hashing* dua kali dengan SHA256: `checksum_data = SHA256(SHA256(versioned_PKH))`.
+     * Ambil **4 byte pertama** dari `checksum_data`. Inilah *checksum*-nya.
+  3. **Gabungkan:** Tempelkan *checksum* 4 byte tersebut di akhir PKH yang sudah diberi versi. Sekarang kita punya data sepanjang 25 byte (1 byte versi + 20 byte PKH + 4 byte checksum).
+  4. **Encode dengan Base58:** Ubah data 25 byte tersebut menjadi string menggunakan skema *encoding* Base58.
+
+> **Istilah Teknis:**
+>
+> * **Checksum:** Sejumlah kecil data yang dihitung dari blok data yang lebih besar. Tujuannya adalah untuk mendeteksi kesalahan yang mungkin terjadi saat transmisi atau penyimpanan. Jika data utama sedikit saja berubah, *checksum* yang dihitung ulang tidak akan cocok dengan *checksum* asli.
+> * **Base58:** Skema *encoding* yang menggunakan 58 karakter alfanumerik. Karakter yang ambigu secara visual dihilangkan untuk mengurangi kesalahan ketik (misalnya, `0` (nol), `O` (huruf O besar), `I` (huruf I besar), dan `l` (huruf l kecil)).
+
+**Proses Decoding Base58check (dan Verifikasi)**
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.11.png" alt="gambar" width="400"/>
+</p>
+
+lalu
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_3.15.png" alt="gambar" width="400"/>
+</p>
+
+* **Gambar 3.11 & 3.15: Faiza membayar ke alamat John.**
+  Ketika Faiza ingin membayar John, *wallet*-nya akan melakukan proses sebaliknya:
+
+  1. Ambil alamat Base58check (misalnya, dari QR code).
+  2. Lakukan *decode* dari Base58 kembali menjadi data 25 byte.
+  3. Pisahkan data 25 byte tersebut menjadi tiga bagian:
+
+     * Byte pertama: Versi.
+     * 20 byte berikutnya: PKH.
+     * 4 byte terakhir: *Checksum* yang diterima.
+  4. **Verifikasi:** Ambil bagian versi dan PKH, lalu hitung ulang *checksum*-nya dengan `SHA256(SHA256(versioned_PKH))`.
+  5. Bandingkan 4 byte pertama dari *checksum* yang baru dihitung dengan *checksum* yang diterima.
+
+     * **Jika cocok:** Alamat tersebut valid. *Wallet* bisa melanjutkan untuk membuat transaksi menggunakan PKH yang diekstrak.
+     * **Jika tidak cocok:** Alamat tersebut salah ketik. *Wallet* akan menampilkan pesan kesalahan dan mencegah pengiriman dana, sehingga uang tidak hilang.
+
+Peluang sebuah kesalahan ketik menghasilkan alamat yang valid secara kebetulan sangat kecil, sekitar 1 banding 4.3 miliar. Ini membuat sistem menjadi sangat aman dari kesalahan manusia.
+
+#### **6. Kembali ke Privasi (Back to privacy)**
+
+Meskipun PKH dan alamat meningkatkan privasi dengan menghilangkan nama, masalah dasarnya tetap ada jika pengguna terus-menerus menggunakan alamat yang sama. Acme Insurances masih bisa mengidentifikasi bahwa semua pembayaran ke `19g6oo8f...` berasal dari satu entitas (misalnya Cafe). Jika mereka tahu satu saja transaksi milik John, mereka bisa menghubungkan semua transaksi lain yang menggunakan alamat yang sama.
+
+**Solusi Terbaik:** Gunakan alamat baru untuk setiap transaksi yang diterima. *Wallet* modern (seperti yang nanti dibahas di Bab 4) akan mengelola pembuatan dan penyimpanan banyak alamat ini secara otomatis, sehingga sangat meningkatkan privasi pengguna.
+
+### **Ringkasan Bab 3**
+
+Bab ini membawa kita melalui evolusi penting dalam sistem pembayaran kita untuk membuatnya lebih mirip Bitcoin:
+
+1. **Masalah:** Menggunakan nama asli di *spreadsheet* sangat buruk untuk privasi.
+
+   * **Solusi:** Ganti nama dengan **kunci publik**.
+2. **Masalah:** *Public key* terlalu panjang dan tidak efisien.
+
+   * **Solusi:** Ganti *public key* dengan **Public Key Hash (PKH)** yang lebih pendek (20 byte) yang dibuat dengan `RIPEMD160(SHA256(public_key))`.
+3. **Masalah:** PKH rentan terhadap kesalahan ketik yang menyebabkan dana hilang selamanya.
+
+   * **Solusi:** Gunakan **Alamat (Address)** yang di-*encode* dengan **Base58check**. Alamat ini memiliki *checksum* internal untuk mendeteksi dan mencegah kesalahan ketik.
+
+Sekarang, sistem kita jauh lebih privat, efisien, dan aman dari kesalahan pengguna. Kita siap untuk melanjutkan ke bab berikutnya yang akan membahas bagaimana *wallet* mengelola semua ini untuk kita.
+
+---
