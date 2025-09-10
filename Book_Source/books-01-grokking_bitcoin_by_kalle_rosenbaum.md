@@ -793,7 +793,11 @@ Sistem yang kita miliki sejauh ini memiliki tiga masalah utama:
 2.  **Tidak Fleksibel**: Jika seorang pengguna memiliki dana yang tersebar di beberapa alamat (misalnya 5 CT di alamat A dan 8 CT di alamat B), mereka tidak bisa melakukan satu pembayaran tunggal sebesar 10 CT. Mereka harus melakukan dua transaksi terpisah, yang merepotkan dan membuat *spreadsheet* menjadi "bengkak".
 3.  **Kebutuhan untuk Percaya pada Lisa (Masalah Inti)**: Ini adalah masalah paling kritis. Karena hanya Lisa yang melihat email berisi tanda tangan digital, tidak ada yang bisa membuktikan jika Lisa berbuat curang. Ia bisa saja secara diam-diam mengubah jumlah pembayaran ke dirinya sendiri atau bahkan menambahkan baris transaksi palsu dari orang lain ke dirinya di dalam *spreadsheet*. Meskipun kita mengasumsikan Lisa adalah orang yang paling jujur, sistem yang baik seharusnya tidak bergantung pada kejujuran satu individu.
 
-[ALT TEXT: Ilustrasi dua cara Lisa dapat berbuat curang: mengubah jumlah transaksi yang ada dan menambahkan transaksi palsu baru ke spreadsheet. - Figure 5.2]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_5.2.png" alt="gambar" width="580"/>
+</p>
+
+[Ilustrasi dua cara Lisa dapat berbuat curang: mengubah jumlah transaksi yang ada dan menambahkan transaksi palsu baru ke spreadsheet. - Figure 5.2]
 
 Untuk mengatasi masalah ini, Lisa memperkenalkan sebuah konsep baru yang akan merevolusi sistem: **`transaction`**.
 
@@ -801,7 +805,11 @@ Untuk mengatasi masalah ini, Lisa memperkenalkan sebuah konsep baru yang akan me
 
 **`Transaction`** adalah sebuah paket data terstruktur yang menggantikan dua hal sekaligus: (1) email informal yang dikirim pengguna ke Lisa, dan (2) baris sederhana dalam *spreadsheet*.
 
-[ALT TEXT: Diagram alur pembayaran baru. Wallet John membuat sebuah 'transaction', mengirimkannya ke Lisa, yang kemudian memverifikasi dan menambahkan 'transaction' utuh tersebut ke dalam spreadsheet. - Figure 5.3]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_5.3.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram alur pembayaran baru. Wallet John membuat sebuah 'transaction', mengirimkannya ke Lisa, yang kemudian memverifikasi dan menambahkan 'transaction' utuh tersebut ke dalam spreadsheet. - Figure 5.3]
 
 Alur kerjanya kini berubah secara fundamental di belakang layar:
 1.  **Pembuatan (`Create`)**: `Wallet` pengguna (misalnya John) membuat sebuah `transaction` formal.
@@ -813,7 +821,11 @@ Kunci dari sistem baru ini adalah `transaction` tidak hanya menyatakan "siapa me
 #### 1. Membuat `Transaction`
 Mari kita bedah anatomi dari `transaction` yang dibuat oleh `wallet` John untuk membeli kue seharga 10 CT.
 
-[ALT TEXT: Anatomi sebuah transaction yang belum ditandatangani, menunjukkan dua input yang merujuk pada UTXO dari transaksi sebelumnya dan dua output untuk pembayaran dan kembalian. - Figure 5.4]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_5.4.png" alt="gambar" width="580"/>
+</p>
+
+[Anatomi sebuah transaction yang belum ditandatangani, menunjukkan dua input yang merujuk pada UTXO dari transaksi sebelumnya dan dua output untuk pembayaran dan kembalian. - Figure 5.4]
 
 Sebuah `transaction` terdiri dari **`inputs`** dan **`outputs`**.
 
@@ -829,7 +841,11 @@ Sebuah `transaction` terdiri dari **`inputs`** dan **`outputs`**.
 **Menandatangani `Transaction`**
 Setelah struktur `transaction` selesai dibuat, `wallet` harus menandatanganinya.
 
-[ALT TEXT: Proses penandatanganan transaction, di mana setiap input ditandatangani secara terpisah dan public key yang sesuai disisipkan ke dalam input. - Figure 5.5]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_5.5.png" alt="gambar" width="580"/>
+</p>
+
+[Proses penandatanganan transaction, di mana setiap input ditandatangani secara terpisah dan public key yang sesuai disisipkan ke dalam input. - Figure 5.5]
 
 * **Setiap `input` harus ditandatangani secara terpisah** menggunakan *private key* yang sesuai dengan `PKH` dari `UTXO` yang dibelanjakannya.
 * Tanda tangan tersebut mencakup (atau *commits to*) seluruh `transaction` (semua `input` dan `output`). Ini memastikan tidak ada bagian dari `transaction` yang dapat diubah setelah ditandatangani.
@@ -843,7 +859,11 @@ Lisa kini tidak perlu lagi menghitung saldo. Proses verifikasinya berubah:
 
 Untuk mempercepat langkah pertama, Lisa tidak lagi memindai seluruh *spreadsheet*. Ia kini memelihara sebuah database terpisah yang disebut **`UTXO set`**.
 
-[ALT TEXT: Ilustrasi Lisa menggunakan UTXO set-nya untuk memeriksa apakah input dari transaksi John valid (ada dan belum dibelanjakan). - Figure 5.6]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_5.6.png" alt="gambar" width="580"/>
+</p>
+
+[Ilustrasi Lisa menggunakan UTXO set-nya untuk memeriksa apakah input dari transaksi John valid (ada dan belum dibelanjakan). - Figure 5.6]
 
 `UTXO set` adalah daftar semua "koin" yang belum dibelanjakan yang ada di seluruh sistem. Saat `transaction` baru masuk:
 * Lisa memeriksa apakah `input`-nya ada di dalam `UTXO set`. Jika ya, `transaction` valid.
@@ -860,7 +880,11 @@ Di Bitcoin, para verifier independen ini disebut **`full nodes`**. Mereka adalah
 ### Script
 Kenyataannya, `input` dan `output` pada `transaction` Bitcoin lebih canggih dari sekadar berisi data. Mereka sebenarnya berisi bagian-bagian dari sebuah program komputer kecil yang ditulis dalam bahasa pemrograman sederhana bernama **`Script`**.
 
-[ALT TEXT: Diagram yang menunjukkan bahwa signature script dari input dan pubkey script dari output yang dibelanjakan digabungkan untuk membentuk satu program Script. - Figure 5.11]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_5.11.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram yang menunjukkan bahwa signature script dari input dan pubkey script dari output yang dibelanjakan digabungkan untuk membentuk satu program Script. - Figure 5.11]
 
 * **`Pubkey Script` (di dalam `output`)**: Ini adalah semacam "kunci" atau tantangan. Ia mendefinisikan kondisi yang harus dipenuhi untuk membelanjakan `output` tersebut.
 * **`Signature Script` (di dalam `input`)**: Ini adalah "jawaban" untuk tantangan tersebut. Ia menyediakan data yang memenuhi kondisi yang ditetapkan oleh `pubkey script`.
@@ -886,7 +910,11 @@ Fleksibilitas `Script` memungkinkan jenis-jenis transaksi yang lebih kompleks da
 #### Multiple Signatures (`Multisig`)
 Bayangkan sebuah dana amal yang dikelola oleh tiga orang (Faiza, Ellen, dan John). Mereka tidak ingin satu orang pun memiliki kendali penuh. Mereka dapat membuat sebuah `output` yang memerlukan, misalnya, **2 dari 3 tanda tangan** untuk dapat dibelanjakan.
 
-[ALT TEXT: Diagram yang menggambarkan setup multisignature 2-dari-3, di mana kombinasi dua dari tiga orang dapat menandatangani transaksi. - Figure 5.18]
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_5.18.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram yang menggambarkan setup multisignature 2-dari-3, di mana kombinasi dua dari tiga orang dapat menandatangani transaksi. - Figure 5.18]
 
 Ini memberikan keuntungan:
 * Jika satu kunci dicuri, dana tetap aman.
