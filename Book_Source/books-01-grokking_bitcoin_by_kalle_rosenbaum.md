@@ -269,7 +269,7 @@ Pada akhir bab ini, sistem *spreadsheet cookie token* kita tidak akan lagi mengg
 Sistem *spreadsheet* yang kita gunakan sejauh ini memiliki kelemahan besar: semua transaksi dicatat menggunakan nama asli.
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.2.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.2.png" alt="gambar" width="580"/>
 </p>
 
 * **Gambar 3.2: Acme Insurances mengawasi kebiasaan makan cookie Chloe.**
@@ -287,7 +287,7 @@ Masalah ini tidak hanya berlaku untuk pihak ketiga. Setiap rekan kerja yang memi
 Lisa, yang sudah lelah mengelola daftar nama dan *public key* yang terhubung, mengusulkan ide untuk meningkatkan privasi dan menyederhanakan pekerjaannya.
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.3.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.3.png" alt="gambar" width="580"/>
 </p>
 
 * **Gambar 3.3: Mengganti nama dengan kunci publik.**
@@ -300,7 +300,7 @@ Lisa, yang sudah lelah mengelola daftar nama dan *public key* yang terhubung, me
 Dengan perubahan ini, proses pembayaran juga berubah. Pengguna tidak lagi menggunakan nama.
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.4.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.4.png" alt="gambar" width="580"/>
 </p>
 
 * **Gambar 3.4: Gaya pembayaran baru menggunakan kunci publik, bukan nama.**
@@ -314,7 +314,7 @@ Dengan perubahan ini, proses pembayaran juga berubah. Pengguna tidak lagi menggu
   * Pesan ini kemudian ditandatangani secara digital menggunakan *private key* yang sesuai dengan *public key* pengirim.
   
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.5.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.5.png" alt="gambar" width="580"/>
 </p>
 
 * **Gambar 3.5: Faiza (rekan kerja baru) menerima hadiah dari perusahaan.**
@@ -341,7 +341,7 @@ Meskipun privasi meningkat, muncul masalah baru. *Public key* berukuran 33 byte,
 Para developer mengusulkan untuk mengganti *public key* dengan *hash* kriptografis dari *public key* tersebut. Proses ini tidak hanya memperpendek data tetapi juga menambahkan lapisan keamanan ekstra.
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.6.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.6.png" alt="gambar" width="580"/>
 </p>
 
 * **Gambar 3.6: Mengganti kunci publik dengan hash RIPEMD160 dari hash SHA256 kunci publik.**
@@ -362,7 +362,7 @@ Sekarang, *spreadsheet* menggunakan PKH yang hanya 20 byte, yang jauh lebih efis
 **Proses Pembayaran Menggunakan PKH**
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.7.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.7.png" alt="gambar" width="580"/>
 </p>
 
 * **Gambar 3.7: John membeli cookie menggunakan PKH.**
@@ -393,7 +393,7 @@ Menggunakan dua fungsi *hash* yang berbeda dan berurutan adalah pilihan desain y
 Sistem yang sekarang menggunakan PKH (string heksadesimal 20 byte) sangat rentan terhadap kesalahan ketik.
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.8.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.8.png" alt="gambar" width="580"/>
 </p>
 
 * **Gambar 3.8: John salah ketik saat memasukkan PKH penerima.**
@@ -410,13 +410,13 @@ Ini adalah masalah kegunaan dan keamanan yang sangat serius. Perlu ada cara untu
 Untuk mengatasi masalah ini, diperkenalkan konsep **Alamat Cookie Token** (di dunia nyata, ini adalah **Alamat Bitcoin**). Alamat ini adalah representasi dari PKH yang dirancang agar lebih ramah manusia dan memiliki mekanisme pendeteksi kesalahan. Proses konversi dari PKH ke alamat ini disebut **Base58check**.
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.10.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.10.png" alt="gambar" width="580"/>
 </p>
 
 lalu
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.12.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.12.png" alt="gambar" width="580"/>
 </p>
 
 * **Gambar 3.10 & 3.12: Gambaran umum encoding Base58check.**
@@ -427,7 +427,7 @@ lalu
 **Proses Encoding Base58check**
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.13.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.13.png" alt="gambar" width="580"/>
 </p>
 
 * **Gambar 3.13: Proses encoding Base58check pada PKH John.**
@@ -450,13 +450,13 @@ lalu
 **Proses Decoding Base58check (dan Verifikasi)**
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.11.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.11.png" alt="gambar" width="580"/>
 </p>
 
 lalu
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_3.15.png" alt="gambar" width="400"/>
+  <img src="images/books-01-grokking_bitcoin/figure_3.15.png" alt="gambar" width="580"/>
 </p>
 
 * **Gambar 3.11 & 3.15: Faiza membayar ke alamat John.**
