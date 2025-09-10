@@ -1090,3 +1090,123 @@ Untuk mengurangi risiko ini, pengguna `lightweight wallet` dapat melakukan dua h
 
 ---
 
+## Bab 7: Proof of Work
+
+Pada Bab 6, kita berhasil membuat histori transaksi menjadi sulit diubah dengan memperkenalkan `blockchain` yang `block`-nya ditandatangani oleh Lisa. Namun, Lisa masih memegang kekuasaan absolut untuk menentukan `transaction` mana yang akan ia masukkan ke dalam `block`. Ia bisa saja memutuskan untuk tidak memproses pembayaran kue karena alasan pribadi, secara efektif melakukan sensor. Sistem yang benar-benar terdesentralisasi tidak boleh memiliki satu titik kegagalan atau kontrol seperti ini.
+
+### Mengkloning Lisa dan Masalah Kolisi `Block`
+
+Solusi pertama yang terpikirkan untuk masalah sensor adalah dengan menambahkan lebih banyak "Lisa". Kita bisa menambahkan Tom dan Qi sebagai produsen `block` juga. Pengguna akan mengirim `transaction` mereka ke ketiga orang ini, dan kemungkinan `transaction` tersebut untuk dikonfirmasi akan meningkat secara dramatis.
+
+Namun, ini menciptakan masalah baru yang fatal: **kolisi `block` (`block collisions`)**. Jika Lisa, Tom, dan Qi semuanya membuat `block` baru setiap 10 menit, maka pada `height` yang sama (misalnya, `height` 101), akan ada tiga versi `block` yang valid tetapi saling bertentangan. `Blockchain` akan langsung menjadi kacau.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_7.3.png" alt="gambar" width="580"/>
+</p>
+
+[Tiga cabang blockchain yang berbeda pada height 101, masing-masing dibuat oleh Lisa, Tom, dan Qi, menunjukkan masalah kolisi blok. - Figure 7.3]
+
+### Solusi Naif: Mengundi Angka Keberuntungan
+
+Untuk mengatasi kolisi, para produsen `block` (yang kini kita sebut **`miner`**) memerlukan sebuah mekanisme untuk memutuskan siapa yang berhak membuat `block` berikutnya. Alih-alih bergiliran (yang bisa macet jika satu `miner` berhenti), kita bisa menggunakan sistem lotre.
+
+Bayangkan setiap `miner` mengundi sebuah angka acak setiap detik. Jika angka yang mereka dapatkan berada di bawah ambang batas tertentu (misalnya, di bawah 556 dari 1.000.000), mereka dianggap "beruntung" dan berhak membuat `block` berikutnya. Karena probabilitasnya rendah, biasanya hanya akan ada satu pemenang dalam satu waktu.
+
+Namun, sesekali, dua `miner` bisa saja beruntung pada saat yang bersamaan. Ini akan menyebabkan **`blockchain split`** (pemisahan rantai), di mana ada dua cabang `block` yang valid pada `height` yang sama.
+
+**Menyelesaikan `Split`**:
+Aturan mainnya sederhana: **rantai terpanjang (`longest chain`) adalah rantai yang benar**. Para `miner` akan memilih salah satu cabang untuk melanjutkan pekerjaan mereka.
+* **Resolusi Cepat**: `Miner` berikutnya yang beruntung akan menambahkan `block` ke salah satu cabang, membuatnya lebih panjang. Semua `miner` lain akan melihat ini, meninggalkan cabang yang lebih pendek, dan beralih ke cabang yang kini menjadi yang terpanjang. `Transaction` dari `block` yang ditinggalkan akan kembali ke `mempool` untuk dimasukkan ke `block` di masa depan.
+* **Resolusi Tertunda**: `Split` bisa berlanjut jika `miner` di kedua cabang terus menemukan `block` baru secara bersamaan, tetapi probabilitasnya menurun secara eksponensial seiring bertambahnya panjang `split`. Pada akhirnya, satu cabang pasti akan menang.
+
+**Kelemahan Kritis Sistem Angka Keberuntungan**:
+Sistem ini, meskipun lebih baik, masih memiliki kelemahan fatal: **tidak ada cara untuk membuktikan bahwa seorang `miner` benar-benar mengundi angka secara jujur**. Seorang `miner` bisa saja berbohong dan mengklaim mereka mendapatkan angka keberuntungan kapan pun mereka mau untuk mencuri hadiah `block`. Kita membutuhkan lotre yang tidak bisa dicurangi.
+
+### Memaksa Kejujuran: `Proof of Work`
+
+Di sinilah konsep jenius **`proof of work`** masuk. Idenya adalah mengganti lotre yang mudah dipalsukan dengan lotre yang sangat sulit secara komputasi tetapi hasilnya sangat mudah untuk diverifikasi oleh siapa pun.
+
+Tanda tangan digital Lisa di `block header` kini digantikan oleh `proof of work`.
+Aturan barunya adalah: **sebuah `block` dianggap valid hanya jika hash dari `block header`-nya (yaitu `Block ID`-nya) secara numerik lebih kecil dari nilai `target` yang telah disepakati**.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_7.11.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram yang menunjukkan bahwa Block ID, yang merupakan hash dari block header, harus lebih kecil dari nilai Target agar proof of work valid. - Figure 7.11]
+
+`Block header` kini memiliki sebuah kolom baru: **`nonce`** (*number used once*). `Nonce` adalah angka yang bisa diubah-ubah oleh `miner` untuk mendapatkan hash `block header` yang berbeda.
+
+Proses untuk menemukan `proof of work` yang valid (yang disebut **`mining`**) adalah sebagai berikut:
+1.  Seorang `miner` merakit sebuah kandidat `block` (memilih `transaction`, membuat `coinbase transaction`, dll.).
+2.  Ia mengatur `nonce` di `block header` menjadi 0.
+3.  Ia menghash `block header` tersebut.
+4.  Ia memeriksa apakah hash yang dihasilkan lebih kecil dari `target`.
+5.  Jika tidak, ia menaikkan `nonce` (`nonce` = 1), dan kembali ke langkah 3.
+
+`Miner` melakukan proses coba-coba (`brute-force`) ini jutaan hingga miliaran kali per detik. Karena *output* dari fungsi hash kriptografis tidak dapat diprediksi, ini setara dengan mengundi angka acak berulang kali dengan kecepatan sangat tinggi. Siapa pun yang pertama kali menemukan `nonce` yang menghasilkan hash di bawah `target` adalah "pemenang" lotre dan berhak mempublikasikan `block`-nya.
+
+**Mengapa `Proof of Work` Lebih Baik?**
+* **Sulit Dibuat, Mudah Diverifikasi**: Butuh kerja keras (listrik dan daya komputasi) untuk menemukan `proof of work`, tetapi siapa pun dapat memverifikasinya dengan melakukan **hanya satu kali operasi hash** pada `block header` pemenang dan membandingkannya dengan `target`.
+* **Tidak Bisa Dicurangi**: Satu-satunya cara untuk menemukan `proof of work` adalah dengan benar-benar melakukan pekerjaan komputasi. Tidak ada jalan pintas.
+* **Terdesentralisasi Penuh**: Verifikasi tidak lagi memerlukan kunci publik Lisa dari "papan buletin". Semua informasi yang dibutuhkan untuk memverifikasi sebuah `block` (termasuk `proof of work`-nya) kini terkandung di dalam `block` itu sendiri.
+
+> **Rantai Terkuat (`Strongest Chain`) vs. Rantai Terpanjang**: Dengan `proof of work`, aturan konsensus sedikit berubah. `Node` tidak lagi sekadar mengikuti rantai terpanjang, melainkan rantai dengan **akumulasi `proof of work` terbanyak**. Ini disebut **`strongest chain`**. Untuk saat ini, keduanya hampir sama, tetapi perbedaannya menjadi penting saat kita membahas penyesuaian kesulitan.
+
+### Penyesuaian Kesulitan (`Difficulty Adjustments`)
+
+Sistem `proof of work` memiliki masalah: apa yang terjadi jika lebih banyak `miner` bergabung? Dengan total **`hashrate`** (jumlah hash yang dicoba per detik oleh seluruh jaringan) yang lebih tinggi, `block` akan ditemukan lebih cepat dari target rata-rata 10 menit. Ini akan menyebabkan inflasi pasokan koin yang lebih cepat dari yang direncanakan dan meningkatkan frekuensi `blockchain split`.
+
+Solusinya adalah **`difficulty adjustment`**.
+* Jaringan Bitcoin secara otomatis menyesuaikan nilai **`target`** setiap **2.016 `block`** (sekitar dua minggu).
+* Ia mengukur berapa lama waktu yang dibutuhkan untuk menemukan 2.016 `block` terakhir.
+* Jika waktunya **kurang dari dua minggu** (artinya `hashrate` meningkat dan `block` ditemukan terlalu cepat), jaringan akan **menurunkan `target`** (membuatnya lebih sulit untuk ditemukan).
+* Jika waktunya **lebih dari dua minggu** (artinya `hashrate` menurun dan `block` ditemukan terlalu lambat), jaringan akan **menaikkan `target`** (membuatnya lebih mudah).
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_7.22.png" alt="gambar" width="580"/>
+</p>
+
+[Grafik yang menunjukkan hubungan antara waktu penyelesaian 2.016 blok dengan faktor perubahan target. Jika kurang dari 2 minggu, target turun (lebih sulit). Jika lebih dari 2 minggu, target naik (lebih mudah). - Figure 7.22]
+
+Mekanisme ini secara elegan memastikan bahwa, tidak peduli berapa banyak `hashrate` yang ada di jaringan, rata-rata waktu antar `block` akan selalu kembali ke sekitar 10 menit.
+
+### Apa Kerugian yang Bisa Dilakukan Miner?
+
+Karena `block` tidak lagi ditandatangani oleh identitas tertentu, apakah ini berarti `miner` bisa melakukan serangan **`double-spend`**? Jawabannya adalah **ya, jika mereka memiliki `hashrate` yang sangat besar dan keberuntungan yang luar biasa**.
+
+**Serangan `Double-Spend`**:
+1.  Lisa (seorang `miner` jahat) ingin membeli kafe. Ia membuat dua `transaction` yang membelanjakan `UTXO` yang sama: `Tx-KAFE` (dikirim ke pemilik kafe) dan `Tx-LISA` (dikirim kembali ke dirinya sendiri).
+2.  Ia menyiarkan `Tx-KAFE` ke jaringan `miner` yang jujur.
+3.  Secara bersamaan, ia mulai menambang `block` secara **rahasia** yang berisi `Tx-LISA`.
+4.  Jaringan jujur menemukan `block` yang berisi `Tx-KAFE`. Pemilik kafe melihatnya.
+5.  Pemilik kafe menunggu beberapa `block` tambahan ditambang di atas `block` tersebut. Ini disebut **konfirmasi (`confirmations`)**. Setelah 6 konfirmasi, ia merasa aman dan menyerahkan akta kafe kepada Lisa.
+6.  Sementara itu, Lisa terus menambang rantai rahasianya. Agar serangannya berhasil, ia harus bisa menambang lebih cepat dari gabungan seluruh `miner` jujur lainnya, sehingga rantai rahasianya pada akhirnya menjadi **lebih kuat** (memiliki lebih banyak akumulasi `proof of work`) daripada rantai publik yang jujur.
+7.  Jika ia berhasil, ia akan menyiarkan rantai rahasianya. `Node` lain akan melihat bahwa rantai Lisa lebih kuat, melakukan reorganisasi (`reorg`), dan meninggalkan rantai yang berisi `Tx-KAFE`. `Tx-KAFE` secara efektif terhapus dari sejarah, dan `Tx-LISA` menjadi `transaction` yang sah. Lisa berhasil mendapatkan kafe dan uangnya kembali.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_7.27.png" alt="gambar" width="580"/>
+</p>
+
+[Ilustrasi kegagalan serangan double-spend Lisa. Rantai jujur terus tumbuh lebih cepat daripada rantai rahasia Lisa, membuatnya tertinggal jauh. - Figure 7.27]
+
+**Perlindungan terhadap `Double-Spend`**:
+* **Konfirmasi**: Semakin banyak konfirmasi yang ditunggu oleh pedagang, semakin sulit bagi penyerang untuk mengejar dan melampaui rantai jujur. Probabilitas keberhasilan serangan menurun secara eksponensial dengan setiap konfirmasi tambahan.
+* **Serangan 51%**: Secara teoretis, jika seorang penyerang menguasai lebih dari 50% `hashrate` jaringan, mereka secara statistik dijamin akan bisa melakukan serangan `double-spend` dengan sukses.
+* **Insentif Ekonomi**: Namun, bahkan seorang `miner` dengan 51% `hashrate` memiliki insentif kuat untuk **tidak menyerang jaringan**. Melakukan serangan akan menghancurkan kepercayaan pada sistem, yang akan menyebabkan harga koin anjlok. Ini akan membuat investasi besar mereka dalam perangkat keras `mining` dan koin yang mereka tambang menjadi tidak berharga. Jauh lebih menguntungkan bagi mereka untuk bermain jujur dan mengumpulkan hadiah `block`.
+
+### `Transaction Fees`
+
+Ada satu insentif lagi yang perlu diselaraskan. `Block` yang lebih besar membutuhkan waktu lebih lama untuk disebarkan ke seluruh jaringan. Ini meningkatkan risiko `block` tersebut menjadi "yatim" (`orphaned`) jika `miner` lain menemukan `block` yang lebih kecil pada saat yang bersamaan. Hal ini menciptakan insentif bagi `miner` untuk membuat `block` yang kecil atau bahkan kosong.
+
+Solusinya adalah **`transaction fees`**.
+* Pengguna dapat secara sukarela menyertakan `fee` dalam `transaction` mereka dengan membuat nilai total `output` sedikit lebih kecil dari nilai total `input`.
+* Selisih ini dapat diklaim oleh `miner` yang berhasil menambang `block` yang berisi `transaction` tersebut.
+* `Miner` menambahkan total `fee` dari semua `transaction` di `block`-nya ke dalam `output` dari `coinbase transaction` miliknya. **`Block Reward`** kini didefinisikan sebagai **`Block Subsidy` (koin baru) + Total `Transaction Fees`**.
+
+Ini menciptakan **pasar `fee` (`fee market`)**. Pengguna bersaing satu sama lain untuk mendapatkan ruang di dalam `block` yang terbatas dengan menawarkan `fee` yang lebih tinggi. `Miner`, untuk memaksimalkan keuntungan, akan memprioritaskan `transaction` dengan `fee` per byte tertinggi.
+
+Ketika **`block subsidy`** akhirnya menjadi nol setelah bertahun-tahun (karena proses *halving*), `transaction fees` akan menjadi **satu-satunya** sumber pendapatan bagi `miner` dan satu-satunya insentif bagi mereka untuk terus mengamankan jaringan.
+
+---
+
