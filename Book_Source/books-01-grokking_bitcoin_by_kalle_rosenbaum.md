@@ -501,7 +501,8 @@ Sekarang, sistem kita jauh lebih privat, efisien, dan aman dari kesalahan penggu
 
 ---
 
-## Bab 4: Wallets
+# Bab 4
+## Wallets
 
 Sejauh ini, interaksi dengan sistem *cookie token* masih sangat manual dan rumit bagi pengguna. Mereka harus membuat *private key*, mengelola *public key*, dan menyusun email secara manual kepada Lisa untuk setiap transaksi. Selain itu, untuk menjaga privasi, pengguna disarankan menggunakan alamat yang berbeda untuk setiap pembayaran, yang semakin menambah kerumitan. Bab ini memperkenalkan solusi untuk masalah-masalah ini dalam bentuk aplikasi seluler yang disebut **`wallet`** (dompet).
 
@@ -770,8 +771,6 @@ Ini memungkinkan kompartementalisasi keamanan. Kafe dapat menggunakan *hardened 
 * **Keamanan**: Operasi `k * G` mudah dilakukan, tetapi kebalikannya—menemukan `k` jika Kita hanya tahu `P` dan `G`—secara komputasi tidak mungkin dilakukan. Ini dikenal sebagai **Masalah Logaritma Diskrit Kurva Eliptik**. Inilah yang membuat derivasi kunci publik menjadi fungsi satu arah.
 * **Encoding Kunci Publik**: Karena kurva ini simetris terhadap sumbu x, untuk setiap nilai `x` ada dua kemungkinan nilai `y` (positif dan negatif). Untuk menghemat ruang, kita hanya perlu menyimpan koordinat `x` (32 byte) dan satu byte tambahan sebagai awalan (`02` jika `y` genap, `03` jika `y` ganjil) untuk menandakan paritas `y`. Inilah mengapa *public key* terkompresi memiliki panjang 33 byte.
 
----
-
 ### Rangkuman dan Dampak pada Sistem
 Bab ini memperkenalkan `wallet` sebagai alat penting di sisi pengguna, yang secara signifikan meningkatkan kegunaan dan keamanan.
 * **Pembayaran Mudah**: Otomatisasi pembuatan dan pengiriman transaksi melalui QR code.
@@ -782,7 +781,8 @@ Sistem *cookie token* kini telah mencapai versi 4.0, yang jauh lebih matang dari
 
 ---
 
-## Bab 5: Transactions
+# Bab 5
+## Transactions
 
 Bab ini bertujuan untuk mengatasi beberapa masalah serius yang masih ada dalam sistem *cookie token*. Meskipun penggunaan tanda tangan digital di Bab 2 telah mencegah adanya penipu, sistem ini masih memiliki kelemahan fundamental yang berpusat pada Lisa.
 
@@ -1088,7 +1088,8 @@ Untuk mengurangi risiko ini, pengguna `lightweight wallet` dapat melakukan dua h
 
 ---
 
-## Bab 7: Proof of Work
+# Bab 7
+## Proof of Work
 
 Pada Bab 6, kita berhasil membuat histori transaksi menjadi sulit diubah dengan memperkenalkan `blockchain` yang `block`-nya ditandatangani oleh Lisa. Namun, Lisa masih memegang kekuasaan absolut untuk menentukan `transaction` mana yang akan ia masukkan ke dalam `block`. Ia bisa saja memutuskan untuk tidak memproses pembayaran kue karena alasan pribadi, secara efektif melakukan sensor. Sistem yang benar-benar terdesentralisasi tidak boleh memiliki satu titik kegagalan atau kontrol seperti ini.
 
@@ -1208,3 +1209,598 @@ Ketika **`block subsidy`** akhirnya menjadi nol setelah bertahun-tahun (karena p
 
 ---
 
+# Bab 8
+## Peer-to-peer network
+
+### Masalah Terakhir: *Shared Folder*
+
+Meskipun `proof-of-work` telah mendesentralisasi proses pembuatan `block`, `block-block` tersebut masih harus melewati satu titik pusat: *shared folder*. Administrator *folder* ini (sebut saja Luke) menjadi otoritas pusat yang baru. Ia memiliki kekuasaan untuk:
+* **Melakukan Sensor**: Luke bisa saja menolak untuk menyimpan `block` dari `miner` tertentu (misalnya, karena `block` tersebut berisi `transaction` yang kontroversial), sehingga `block` tersebut tidak akan pernah sampai ke `node` lain.
+* **Menjadi Titik Kegagalan**: Jika server *shared folder* mati, seluruh jaringan akan berhenti.
+* **Menjadi Hambatan Kinerja (`Bottleneck`)**: Jika ada 100 `node` yang ingin mengunduh `block` 1 MB, *shared folder* harus melayani total lalu lintas data sebesar 100 MB, yang membuat penyebaran `block` menjadi sangat lambat.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_8.2.png" alt="gambar" width="580"/>
+</p>
+
+[Ilustrasi administrator shared folder memblokir sebuah block dari miner Rashid, mencegahnya mencapai node lain. - Figure 8.2]
+
+Sistem ini belum benar-benar tahan sensor (`censorship-resistant`) selama masih ada satu entitas yang dapat mengontrol aliran informasi.
+
+### Membangun Jaringan `Peer-to-peer`
+
+Solusinya adalah dengan memungkinkan para `full node` dan `miner` untuk berkomunikasi secara langsung satu sama lain dalam sebuah **`peer-to-peer` (P2P) `network`**.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_8.3.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram jaringan P2P di mana node-node terhubung satu sama lain. Sebuah block baru dari Rashid disebarkan dari node ke node. - Figure 8.3]
+
+Jaringan ini berfungsi seperti **jaringan gosip (`gossip network`)**.
+* Setiap `node` terhubung ke beberapa `node` lain yang disebut **`peers`**.
+* Ketika sebuah `node` menerima informasi baru (seperti `block` atau `transaction`), ia memverifikasinya dan kemudian meneruskannya (`relay`) ke semua `peer`-nya.
+* `Peer-peer` tersebut kemudian melakukan hal yang sama, menyebarkan informasi ke seluruh jaringan dalam hitungan detik.
+
+Dalam model ini, sensor menjadi sangat sulit. Jika satu `node` (misalnya Kafe) menolak untuk meneruskan `block` ke Lisa, Lisa akan tetap menerimanya dari `peer` lain yang terhubung dengannya (misalnya Tom atau Qi). Sebuah `node` aman selama ia **terhubung dengan baik (`well-connected`)** ke beberapa `peer` yang beragam.
+
+Jaringan P2P ini tidak hanya digunakan untuk menyebarkan `block`, tetapi juga `transaction`. `Wallet` tidak perlu lagi mengirim email ke `miner`; ia cukup menyiarkan `transaction`-nya ke satu atau beberapa `node`, dan jaringan P2P akan menyebarkannya ke semua `miner`.
+
+#### Bagaimana `Peer` Berkomunikasi?
+Komunikasi antar `node` terjadi melalui koneksi internet standar.
+* Setiap `node` yang ingin menerima koneksi akan "mendengarkan" pada sebuah **IP address** dan **nomor port TCP** tertentu (port default Bitcoin adalah `8333`).
+* `Node` lain kemudian dapat membuat **koneksi TCP** ke alamat tersebut untuk membangun saluran komunikasi dua arah.
+
+Setelah terhubung, mereka harus berbicara dalam "bahasa" yang sama, yang didefinisikan oleh sebuah **protokol jaringan**. Protokol ini menentukan format pesan yang dapat mereka kirimkan satu sama lain, seperti pesan `inv` (`inventory`), yang memberitahu `peer` tentang `transaction` atau `block` baru yang Anda miliki.
+
+### Alur Hidup Sebuah `Transaction` di Jaringan P2P
+
+Mari kita ikuti perjalanan `transaction` John dari awal hingga akhir di jaringan P2P yang sudah berjalan.
+
+**1. John Mengirim `Transaction`**
+`Wallet` John, yang merupakan `lightweight client`, terhubung ke `full node` milik Tom. Setelah John membuat dan menandatangani `transaction` pembelian kue, proses pengirimannya adalah sebagai berikut untuk menghemat *bandwidth*:
+1.  **`inv`**: `Wallet` John mengirim pesan `inv` ke Tom, yang hanya berisi `txid` dari `transaction` baru tersebut.
+2.  **`getdata`**: Tom memeriksa apakah ia sudah memiliki `transaction` dengan `txid` tersebut. Karena belum, ia meminta data lengkapnya dengan mengirimkan pesan `getdata`.
+3.  **`tx`**: `Wallet` John merespons dengan pesan `tx` yang berisi data `transaction` lengkap.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_8.12.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram tiga langkah komunikasi antara wallet John dan node Tom: inv, getdata, dan tx. - Figure 8.12]
+
+**2. Tom Meneruskan `Transaction`**
+Setelah menerima dan memverifikasi `transaction` John, Tom akan memberitahu semua `peer`-nya (Lisa, Qi, Rashid) tentang `transaction` baru ini menggunakan pesan `inv`.
+* Para `peer`-nya yang belum memiliki `transaction` tersebut akan merespons dengan `getdata`.
+* Jika seorang `peer` (misalnya Lisa) menerima `inv` dari Tom untuk `transaction` yang sudah ia terima dari `peer` lain, Lisa cukup mengabaikan `inv` dari Tom. `Node` melacak `inventory` yang telah mereka lihat untuk menghindari pemrosesan dan pengunduhan yang berulang.
+
+Proses gosip ini terus berlanjut hingga `transaction` John menyebar ke seluruh jaringan.
+
+**3. `Wallet` Kafe Mendapat Notifikasi**
+`Wallet` `lightweight` milik kafe terhubung ke `full node` milik kafe sendiri (sebagai *trusted node*).
+* Ketika `full node` kafe menerima `transaction` John, ia mengujinya terhadap `bloom filter` yang telah diberikan oleh `wallet` `lightweight`-nya.
+* Karena `transaction` ini ditujukan untuk kafe, ia cocok dengan `filter`.
+* `Full node` kemudian memberitahu `wallet` `lightweight` (melalui proses `inv` -> `getdata` -> `tx`), yang kemudian menampilkan notifikasi kepada pemilik kafe bahwa ada pembayaran masuk yang **masih menunggu konfirmasi (0-conf)**.
+
+**4. `Transaction` Dimasukkan ke dalam `Block`**
+Para `miner` di jaringan (Rashid, Lisa, dll.) telah menerima `transaction` John. Rashid menjadi `miner` yang beruntung dan berhasil menemukan `proof-of-work` untuk `block` baru yang berisi `transaction` John.
+
+**5. `Block` Disebarkan ke Seluruh Jaringan (`Block Propagation`)**
+Rashid sekarang harus menyebarkan `block`-nya secepat mungkin. Untuk efisiensi, penyebaran `block` menggunakan protokol yang sedikit berbeda (**BIP130**):
+1.  **`headers`**: Rashid mengirim pesan `headers` ke semua `peer`-nya. Pesan ini hanya berisi `block header` (80 byte), bukan seluruh `block`.
+2.  **`getdata`**: `Peer` lain dapat dengan sangat cepat memverifikasi `proof-of-work` pada `header`. Jika valid, mereka akan meminta `block` penuh dengan pesan `getdata`.
+3.  **`block`**: Rashid merespons dengan data `block` lengkap.
+
+Proses ini jauh lebih cepat daripada mengirim seluruh `block` ke semua orang, karena verifikasi awal yang mahal (`proof-of-work`) dilakukan pada data yang sangat kecil.
+
+**6. `Wallet` `Lightweight` Mendapat Notifikasi Konfirmasi**
+* `Full node` (milik Tom dan kafe) menerima `header` dari `block` baru Rashid dan meneruskannya ke `wallet` `lightweight` yang terhubung.
+* `Wallet` John dan kafe melihat ada `block` baru. Untuk memverifikasi bahwa `transaction` mereka ada di dalamnya tanpa mengunduh seluruh `block`, mereka meminta **`merkleblock`** dari `full node`.
+* `Full node` merespons dengan `merkleblock`, yang berisi `block header` dan `merkle proof` yang diperlukan. `Wallet` memverifikasi bukti ini.
+* Setelah verifikasi berhasil, `wallet` kini dapat dengan yakin menampilkan bahwa `transaction` tersebut telah memiliki **1 konfirmasi**.
+
+Seiring berjalannya waktu dan lebih banyak `block` ditambang di atasnya, jumlah konfirmasi akan terus bertambah, membuat `transaction` semakin aman dari serangan `double-spend`.
+
+### Meninggalkan Sistem *Cookie Token*
+
+Pada titik ini, sistem yang telah kita bangun—dengan `HD wallets`, `transactions`, `blockchain`, `proof of work`, dan jaringan `peer-to-peer`—secara fungsional identik dengan Bitcoin. Analogi *cookie token* telah mencapai tujuannya. Mulai sekarang, kita akan membahas Bitcoin secara langsung.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_8.25.png" alt="gambar" width="580"/>
+</p>
+
+[Rangkuman visual evolusi sistem cookie token dari spreadsheet sederhana di Bab 3 hingga jaringan P2P yang terdesentralisasi penuh di Bab 8. - Figure 8.25]
+
+### Bootstrapping Jaringan: Bagaimana `Node` Baru Bergabung?
+
+Bagaimana sebuah `node` yang benar-benar baru (milik Selma) bisa bergabung dengan jaringan? Ia tidak tahu alamat IP `node` lain. Proses ini disebut **`bootstrapping`**.
+
+**Langkah 1: Menjalankan Perangkat Lunak**
+Selma mengunduh perangkat lunak `full node`, seperti **Bitcoin Core**.
+* **Verifikasi Perangkat Lunak (Sangat Penting!)**: Sebelum menjalankan perangkat lunak, ia harus memverifikasi tanda tangan digital dari pengembang. Ini untuk memastikan perangkat lunak tersebut asli dan belum dimodifikasi oleh peretas. Proses ini melibatkan:
+    1.  Mengunduh file program dan file tanda tangan (`.asc`).
+    2.  Mendapatkan `public key` pengembang dari beberapa sumber terpercaya (situs web resmi, buku ini, teman) dan memverifikasi **`fingerprint`**-nya.
+    3.  Menggunakan `public key` tersebut untuk memeriksa validitas tanda tangan pada file program.
+
+**Langkah 2: Terhubung ke `Node` Lain**
+`Node` Selma yang baru dimulai perlu menemukan beberapa `peer` pertama. Ia menggunakan beberapa metode:
+1.  **`DNS Seeds`**: Bitcoin Core memiliki daftar nama domain (`DNS seed`) yang *hardcoded*. Ketika dijalankan, ia akan menanyakan ke server DNS untuk mendapatkan daftar alamat IP dari `node-node` aktif.
+2.  **Daftar *Hardcoded***: Sebagai cadangan, perangkat lunak juga memiliki daftar alamat IP `node` yang stabil yang juga *hardcoded*.
+3.  **Manual**: Pengguna dapat secara manual menambahkan alamat IP `peer`.
+
+Setelah mendapatkan beberapa alamat, `node`-nya akan membuat koneksi TCP dan melakukan **`handshake`**: bertukar pesan `version` untuk menyetujui versi protokol dan menginformasikan `block height` masing-masing.
+
+**Langkah 3: Sinkronisasi (`Initial Blockchain Download` - IBD)**
+Selma perlu mengunduh seluruh histori `blockchain` untuk membangun `UTXO set`-nya sendiri.
+* **Headers-First Sync**: Untuk efisiensi dan keamanan, `node`-nya pertama-tama akan mengunduh **seluruh rantai `block header`** dari satu `peer`. Ini cepat karena `header` berukuran kecil, dan memungkinkan `node`-nya untuk memverifikasi rantai `proof-of-work` terkuat sebelum mengunduh data `transaction` yang besar.
+* **Download `Block`**: Setelah memiliki rantai `header` yang tervalidasi, ia mulai mengunduh `block` penuh secara paralel dari beberapa `peer`.
+* **Optimalisasi `Assumevalid`**: Untuk mempercepat proses IBD yang bisa memakan waktu berhari-hari, Bitcoin Core memiliki `hash` `block` yang *hardcoded* dari beberapa minggu sebelum rilis. `Node` akan "mengasumsikan" semua tanda tangan sebelum `block` ini valid dan melewatkan pemeriksaan skripnya (meskipun tetap memproses `transaction` untuk membangun `UTXO set`). Ini secara dramatis mengurangi waktu sinkronisasi.
+
+**Langkah 4: Operasi Normal**
+Setelah `blockchain` sepenuhnya diunduh dan diverifikasi, `node` Selma kini menjadi peserta penuh dalam jaringan P2P, menerima dan menyebarkan `transaction` dan `block` baru seperti `node` lainnya.
+
+Bab ini telah melengkapi fondasi teknis Bitcoin. Kita telah beralih dari sistem terpusat yang sederhana menjadi jaringan moneter global yang terdesentralisasi dan tahan sensor.
+
+---
+
+# Bab 9
+## Transactions Revisited
+
+Bab ini merupakan kelanjutan dari konsep `transaction` yang telah diperkenalkan sebelumnya. Jika bab-bab awal menjelaskan anatomi dasar sebuah `transaction`, bab ini mengeksplorasi fitur-fitur canggih yang membuatnya lebih dari sekadar alat transfer nilai. Fitur-fitur ini, seperti *time locks* dan *programmable scripts*, adalah fondasi dari banyak aplikasi tingkat lanjut di atas `blockchain` Bitcoin, termasuk kontrak digital.
+
+### Time-locked Transactions
+
+Konsep inti dari *time-locked transaction* adalah sebuah `transaction` yang sudah ditandatangani dan valid secara kriptografis, namun tidak dapat dimasukkan ke dalam `block` (dan oleh karena itu tidak dapat dikonfirmasi) hingga kondisi waktu tertentu terpenuhi.
+
+Untuk mengaktifkan fitur ini, ada dua komponen utama dalam sebuah `transaction` yang digunakan: `locktime` dan `sequence number`.
+
+* **`locktime`**: Field di level `transaction` yang menentukan waktu paling awal (bisa dalam format timestamp atau block height) `transaction` tersebut valid untuk ditambang.
+* **`sequence number`**: Field 32-bit di setiap *input* `transaction`. Agar `locktime` pada sebuah `transaction` dapat berfungsi, setidaknya salah satu `sequence number` dari input-inputnya harus diatur ke nilai yang lebih kecil dari `ffffffff`. Jika semua `sequence number` adalah `ffffffff`, `locktime` akan diabaikan oleh jaringan.
+
+**Skenario Penggunaan: Warisan Digital**
+
+Buku ini memberikan contoh yang sangat baik: Anda ingin memberikan 100 bitcoin kepada putri Anda, tetapi hanya setelah Anda meninggal dunia. Anda bisa membuat sebuah `transaction` yang terkunci waktu (*time-locked*) satu tahun ke depan.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.1.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram transaksi time-locked yang mengirim 100 BTC kepada anak perempuan, valid pada 30 April 2019. - Figure 9.1]
+
+Anda membuat `transaction` (Tx1) yang ditandatangani, lalu memberikannya kepada putri Anda untuk disimpan. `Transaction` ini belum disiarkan ke jaringan. Jika Anda meninggal sebelum tanggal `locktime` tercapai, putri Anda dapat menyiarkan `transaction` tersebut setelah tanggal yang ditentukan untuk mengklaim dananya.
+
+Namun, bagaimana jika Anda masih hidup setelah tanggal itu? Anda tentu tidak ingin putri Anda bisa mengambil uang tersebut. Di sinilah letak kerumitannya. Untuk membatalkan Tx1, Anda harus membuat `transaction` baru (Tx2) yang membelanjakan salah satu *output* yang sama yang digunakan oleh Tx1 (*double-spend*). Karena Tx2 tidak memiliki `locktime`, Anda bisa menyiarkannya sebelum `locktime` Tx1 tercapai. Setelah Tx2 terkonfirmasi, Tx1 menjadi tidak valid selamanya.
+
+Untuk tetap adil kepada putri Anda, sebelum menyiarkan Tx2, Anda membuat `transaction` *time-locked* baru (Tx3) yang berlaku satu tahun lagi, yang membelanjakan *output* dari Tx2, lalu memberikannya kepada putri Anda.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.2.png" alt="gambar" width="580"/>
+</p>
+
+[Proses membatalkan transaksi time-locked lama (Tx1) dengan transaksi baru (Tx2), dan membuat transaksi time-locked berikutnya (Tx3). - Figure 9.2]
+
+> **Poin Kritis untuk Auditor**: Urutan operasi di sini sangat penting. Tx3 harus diberikan kepada putri Anda *sebelum* Tx2 disiarkan. Jika tidak, ada risiko Anda meninggal setelah menyiarkan Tx2 tetapi sebelum memberikan Tx3, yang akan menyebabkan dana warisan hilang. Selain itu, skenario ini rentan terhadap **`transaction malleability`**, sebuah konsep yang akan dibahas lebih dalam di Bab 10, di mana `txid` dari Tx2 bisa berubah sebelum dikonfirmasi, sehingga membuat Tx3 tidak valid.
+
+#### Time Measurements
+
+`Locktime` dapat diekspresikan dalam dua cara:
+
+1.  **Block Time (Timestamp)**: Menggunakan Unix timestamp. Sebuah `transaction` valid jika **Median Time Past (MTP)** dari 11 `block` terakhir lebih besar dari nilai `locktime` `transaction` tersebut. MTP digunakan alih-alih timestamp `block` saat ini untuk mencegah manipulasi oleh `miners`.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.3.png" alt="gambar" width="580"/>
+</p>
+
+    [Ilustrasi validasi locktime berdasarkan Median Time Past dari 11 block terakhir. - Figure 9.3]
+
+2.  **Block Height**: Menggunakan nomor `block`. `Transaction` tidak valid sampai `block` dengan nomor yang ditentukan telah ditambang. Contohnya, jika `locktime` adalah 571019, `transaction` baru bisa dimasukkan ke dalam `block` 571020 atau setelahnya.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.4.png" alt="gambar" width="580"/>
+</p>
+
+    [Contoh transaksi time-locked berdasarkan block height. - Figure 9.4]
+
+#### Relative Time Locks
+
+Berbeda dengan *absolute time locks* yang merujuk pada waktu atau `block height` absolut, *relative time locks* mengunci sebuah *input* berdasarkan waktu konfirmasi dari *output* yang dibelanjakannya. Fitur ini diaktifkan melalui `sequence number` di setiap input dan memerlukan `transaction` version 2 atau lebih tinggi (**BIP68**).
+
+`Sequence number` diinterpretasikan sebagai bitfield:
+* **Bit 31 (paling kiri)**: Jika `0`, *relative lock* aktif. Jika `1`, tidak aktif.
+* **Bit 22**: Jika `1`, nilai 16 bit terakhir diartikan sebagai kelipatan 512 detik. Jika `0`, diartikan sebagai jumlah `block`.
+* **Bit 0-15**: Nilai *time lock* itu sendiri (baik dalam jumlah `block` atau kelipatan 512 detik).
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.5.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram transaksi dengan dua input yang memiliki relative time lock berbeda: satu berbasis waktu (30 hari), satu lagi berbasis jumlah block (1000 block). - Figure 9.5]
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.6.png" alt="gambar" width="580"/>
+</p>
+
+[Penjelasan bitfield dari sequence number untuk relative lock berbasis waktu. - Figure 9.6]
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.7.png" alt="gambar" width="580"/>
+</p>
+
+[Penjelasan bitfield dari sequence number untuk relative lock berbasis jumlah block. - Figure 9.7]
+
+### Time-locked Outputs
+
+Selain mengunci seluruh `transaction`, kita juga bisa mengunci sebuah *output* spesifik, sehingga siapa pun yang ingin membelanjakannya harus memenuhi kondisi waktu yang ditentukan dalam `script` output tersebut.
+
+#### Absolute Time-locked Outputs
+
+Fitur ini diimplementasikan menggunakan `script` operator **`OP_CHECKLOCKTIMEVERIFY`** atau **`OP_CLTV`** (**BIP65**).
+
+Contohnya, Anda ingin memberi uang saku kepada putri Anda yang baru bisa dibelanjakan pada tanggal 1 Mei. Anda membuat `transaction` dengan `script` output yang mengandung `OP_CLTV`.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.8.png" alt="gambar" width="580"/>
+</p>
+
+[Transaksi dengan satu output yang dikunci hingga 1 Mei menggunakan OP_CLTV. - Figure 9.8]
+
+`Script`-nya akan terlihat seperti ini:
+`<timestamp 1 Mei> OP_CLTV OP_DROP OP_DUP OP_HASH160 <PKHD> OP_EQUALVERIFY OP_CHECKSIG`
+
+Cara kerjanya:
+* `Transaction` yang membelanjakan output ini *harus* memiliki `locktime` yang lebih besar atau sama dengan `<timestamp 1 Mei>`.
+* `OP_CLTV` akan memeriksa `locktime` dari `transaction` pembelanja. Jika tidak memenuhi syarat, `script` akan gagal.
+* Jika berhasil, eksekusi dilanjutkan ke verifikasi `signature` seperti biasa.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.9.png" alt="gambar" width="580"/>
+</p>
+
+[Ilustrasi beberapa transaksi yang mencoba membelanjakan output OP_CLTV, menunjukkan mana yang valid dan tidak valid berdasarkan locktime-nya. - Figure 9.9]
+
+#### Relative Time-locked Outputs
+
+Fitur ini diimplementasikan menggunakan **`OP_CHECKSEQUENCEVERIFY`** atau **`OP_CSV`** (**BIP112**). `Script` ini memastikan bahwa sejumlah `block` atau waktu tertentu telah berlalu sejak *output* yang dikunci ini dikonfirmasi.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.10.png" alt="gambar" width="580"/>
+</p>
+
+[Konsep relative time-locked output, di mana output hanya bisa dibelanjakan setelah 3 block terkonfirmasi di atasnya. - Figure 9.10]
+
+`OP_CSV` sangat krusial untuk kontrak digital canggih, seperti *atomic swaps*.
+
+### Atomic Swaps
+
+*Atomic swap* adalah protokol untuk menukar aset kripto dari dua `blockchain` yang berbeda (misalnya, Bitcoin dan Namecoin) antara dua pihak yang tidak saling percaya, tanpa memerlukan pihak ketiga (seperti bursa). Disebut "atomic" karena pertukaran ini dijamin berhasil sepenuhnya atau gagal sepenuhnya, tidak ada kondisi di mana salah satu pihak bisa kabur dengan dana pihak lain.
+
+**Skenario:** John ingin menukar 2 BTC miliknya dengan 100 NMC milik Fadime.
+
+**Mekanisme Kunci:**
+1.  **Secret (S) dan Hash (H)**: John membuat sebuah angka rahasia acak (`S`) dan menghitung hash-nya (`H = SHA256(S)`). John merahasiakan `S` tetapi membagikan `H` kepada Fadime.
+2.  **Contract Transactions**: Kedua belah pihak membuat `transaction` di `blockchain` masing-masing yang dikunci dengan `script` khusus. `Transaction` ini menggunakan `p2sh` (Pay-to-Script-Hash).
+    * **`Redeem script` John (di Bitcoin)**:
+        * **Kondisi 1 (Swap)**: Fadime dapat mengklaim 2 BTC jika ia bisa memberikan `S` (pre-image dari `H`) dan `signature`-nya.
+        * **Kondisi 2 (Refund)**: John dapat mengambil kembali 2 BTC-nya jika Fadime tidak mengklaimnya setelah 48 jam (*relative time lock*).
+    * **`Redeem script` Fadime (di Namecoin)**:
+        * **Kondisi 1 (Swap)**: John dapat mengklaim 100 NMC jika ia bisa memberikan `S` dan `signature`-nya.
+        * **Kondisi 2 (Refund)**: Fadime dapat mengambil kembali 100 NMC-nya jika John tidak mengklaimnya setelah 24 jam.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.11.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram dua contract transaction untuk atomic swap, satu di blockchain Bitcoin dan satu di Namecoin, keduanya menggunakan redeem script dengan dua kondisi. - Figure 9.11]
+
+> **Poin Kritis untuk Auditor**: Perhatikan perbedaan *timeout*. *Timeout* Fadime (24 jam) lebih pendek daripada John (48 jam). Ini penting karena John harus bertindak lebih dulu untuk mengklaim NMC, yang akan membuka rahasia `S`. Fadime diberikan waktu yang lebih pendek untuk membatalkan jika John tidak bertindak, sementara John diberikan waktu lebih lama untuk mengklaim kembali dananya jika terjadi masalah setelah ia mengungkapkan `S`.
+
+**Alur Eksekusi:**
+1.  John menyiarkan *contract transaction*-nya di `blockchain` Bitcoin. Fadime menunggu konfirmasi.
+2.  Setelah terkonfirmasi, Fadime menyiarkan *contract transaction*-nya di `blockchain` Namecoin. John menunggu konfirmasi.
+3.  John mengklaim 100 NMC dengan menyiarkan *swap transaction* di Namecoin. `Transaction` ini **mengungkapkan rahasia `S`** di dalam `script`-nya agar valid.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.12.png" alt="gambar" width="580"/>
+</p>
+
+    [Langkah pertama swap, di mana John mengklaim Namecoin dengan mengungkapkan rahasia S. - Figure 9.12]
+4.  Fadime memantau `blockchain` Namecoin, melihat `S` yang diungkapkan oleh John.
+5.  Fadime menggunakan `S` tersebut untuk membuat *swap transaction*-nya di `blockchain` Bitcoin untuk mengklaim 2 BTC.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.13.png" alt="gambar" width="580"/>
+</p>
+
+    [Langkah kedua swap, di mana Fadime menggunakan rahasia S untuk mengklaim Bitcoin. - Figure 9.13]
+
+Jika ada pihak yang tidak kooperatif (misalnya, Fadime tidak menyiarkan `transaction`-nya), pihak lain dapat mengklaim kembali dananya setelah periode *timeout* berakhir.
+
+### Storing stuff in the Bitcoin blockchain
+
+`Blockchain` Bitcoin adalah basis data publik yang abadi, yang membuatnya menarik untuk menyimpan data arbitrer. Praktik awalnya adalah dengan menyisipkan data ke dalam `transaction` dengan cara yang tidak efisien.
+
+Contoh historis yang diberikan adalah sebuah *tribute* untuk Len Sassaman yang disematkan dalam sebuah `transaction`. Ini dilakukan dengan membuat banyak *output* `p2pkh` di mana `PKH` (Public Key Hash) bukanlah hash dari `public key` sungguhan, melainkan data ASCII yang di-encode.
+
+> **Poin Kritis untuk Auditor**: Praktik ini menyebabkan masalah serius yang disebut **Bloated UTXO set**. Karena `PKH` tersebut palsu, tidak ada `private key` yang dapat digunakan untuk membelanjakan *output* tersebut. Akibatnya, *output* ini menjadi *unspendable* (tidak dapat dibelanjakan) dan akan tersimpan selamanya di dalam `UTXO set` semua `full node`, membebani memori dan sumber daya jaringan.
+
+**Solusi: `OP_RETURN`**
+
+Untuk memfasilitasi penyimpanan data tanpa membebani `UTXO set`, `OP_RETURN` diperkenalkan.
+* `OP_RETURN` adalah sebuah `script` operator yang secara otomatis membuat sebuah *output* menjadi **provably unspendable** (terbukti tidak dapat dibelanjakan).
+* Ketika `full node` melihat `output` dengan `OP_RETURN`, ia tahu bahwa `output` tersebut tidak perlu dimasukkan ke dalam `UTXO set`.
+* Ada kebijakan jaringan (bukan aturan konsensus) yang membatasi ukuran data `OP_RETURN` (saat ini sekitar 80 byte) dan hanya mengizinkan satu `output` `OP_RETURN` per `transaction`.
+
+**Contoh Penggunaan: Token Kepemilikan Mobil**
+
+Buku ini mengilustrasikan pembuatan token sederhana di atas Bitcoin. Produsen mobil "Ampere" membuat `transaction` untuk setiap mobil baru.
+* **Pembuatan Token**: Ampere membuat `transaction` yang membelanjakan koin dari alamatnya sendiri (`PKHA`), dengan `output` pertama ditujukan kembali ke alamatnya, dan sebuah `output` `OP_RETURN` yang berisi data seperti `"ampere <nomor sasis>"`.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.14.png" alt="gambar" width="580"/>
+</p>
+
+    [Ampere membuat token mobil baru dengan transaksi OP_RETURN. - Figure 9.14]
+* **Transfer Token**: Untuk mentransfer kepemilikan (misalnya, ke dealer dengan `PKHD`), Ampere membelanjakan *output* token sebelumnya, dengan `output` pertama dari `transaction` baru ini ditujukan ke `PKHD`. Rantai kepemilikan ini dapat dilacak di `blockchain`.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.15.png" alt="gambar" width="580"/>
+</p>
+
+lalu
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.16.png" alt="gambar" width="580"/>
+</p>
+
+    [Ampere mentransfer token mobil ke dealer. - Figure 9.15 & 9.16]
+* **Bukti Kepemilikan**: Pemilik mobil yang sah dapat membuktikan kepemilikannya dengan menandatangani sebuah *challenge* (pesan acak) dari mobil menggunakan `private key` yang sesuai dengan `PKH` pemilik saat ini di `blockchain`.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.17.png" alt="gambar" width="580"/>
+</p>
+
+    [Fadime menyalakan mobilnya dengan menandatangani challenge-response. - Figure 9.17]
+
+### Replacing pending transactions
+
+Terkadang sebuah `transaction` bisa "macet" (tertunda konfirmasinya) karena `fee` yang dibayarkan terlalu rendah. Ada dua mekanisme utama untuk mengatasi ini:
+
+#### Opt-in Replace-by-Fee (RBF)
+
+**BIP125** memperkenalkan RBF, sebuah kebijakan di mana pengirim dapat menandai `transaction`-nya agar bisa diganti.
+* **Mekanisme**: Jika setidaknya satu `sequence number` dari input `transaction` diatur ke nilai yang lebih rendah dari `ffffffe`, `transaction` tersebut dianggap dapat diganti.
+* **Proses**: Jika `transaction` asli macet, pengirim dapat membuat `transaction` baru yang membelanjakan input yang sama tetapi dengan `fee` yang lebih tinggi. `Node` yang mendukung kebijakan RBF akan menerima `transaction` baru ini dan membuang yang lama.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.20.png" alt="gambar" width="580"/>
+</p>
+
+[Perbandingan transaksi asli yang macet dan transaksi pengganti RBF dengan fee lebih tinggi. - Figure 9.20]
+
+Jika RBF tidak diaktifkan, sebagian besar `node` akan mengikuti kebijakan *first-seen*, yaitu menolak `transaction` kedua sebagai upaya *double-spend*.
+
+#### Child Pays for Parent (CPFP)
+
+CPFP adalah metode di mana *penerima* atau *pengirim* (melalui *change output*) dapat "mempercepat" konfirmasi `transaction` yang macet.
+* **Mekanisme**: Buat `transaction` baru (*child*) yang membelanjakan salah satu *output* dari `transaction` yang macet (*parent*).
+* **Proses**: `Transaction` *child* ini dibuat dengan `fee` yang sangat tinggi. `Miner` yang ingin mengklaim `fee` tinggi dari *child* harus menambang `transaction` *parent*-nya terlebih dahulu agar *child* menjadi valid. Dengan demikian, `fee` gabungan dari kedua `transaction` menjadi cukup menarik bagi `miner`.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.22.png" alt="gambar" width="580"/>
+</p>
+
+[Diagram Child Pays for Parent, di mana transaksi anak dengan fee tinggi mendorong miner untuk menambang transaksi induk yang macet. - Figure 9.22]
+
+### Different signature types
+
+Sebuah `signature` dalam Bitcoin tidak selalu harus mengunci seluruh `transaction`. Perilaku `signature` dapat diubah menggunakan **`SIGHASH flag`**, sebuah byte yang ditambahkan ke akhir `signature`.
+
+Ini memungkinkan kontrol granural atas bagian mana dari `transaction` yang dikunci oleh `signature`. Ada dua kategori `flag`:
+
+**1. Mode untuk Output:**
+* **`SIGHASH_ALL` (default)**: Mengunci semua input dan semua output. `Signature` menjadi tidak valid jika ada bagian dari `transaction` (selain `scriptSig`) yang diubah.
+* **`SIGHASH_SINGLE`**: Mengunci semua input, tetapi hanya mengunci *output* yang memiliki indeks yang sama dengan *input* yang sedang ditandatangani. `Output` lain bisa diubah.
+* **`SIGHASH_NONE`**: Mengunci semua input, tetapi tidak ada *output* yang dikunci. Siapa pun dapat mengubah tujuan dana.
+
+**2. Mode untuk Input:**
+* **`SIGHASH_ANYONECANPAY`**: `Flag` ini dapat dikombinasikan dengan salah satu dari tiga mode di atas. `Flag` ini hanya mengunci *input* yang sedang ditandatangani. Input lain dapat ditambahkan, dihapus, atau diubah. Ini berguna untuk skenario *crowdfunding*, di mana banyak orang dapat "ikut membayar" dengan menambahkan input mereka sendiri ke `transaction` yang sudah ada.
+
+<p align="center">
+  <img src="images/books-01-grokking_bitcoin/figure_9.24.png" alt="gambar" width="580"/>
+</p>
+
+[Ilustrasi visual dari enam kombinasi SIGHASH flag yang berbeda dan bagian mana dari transaksi yang dikunci oleh masing-masing. - Figure 9.24]
+
+Kombinasi `flag` ini memungkinkan pembuatan kontrak digital yang sangat fleksibel.
+
+---
+
+# Bab 10
+## Segregated Witness
+
+Bab ini membahas salah satu pembaruan teknis paling signifikan pada protokol Bitcoin, yang dikenal sebagai **`Segregated Witness`** (disingkat **`segwit`**). `Segregated Witness` secara harfiah berarti "saksi yang dipisahkan". Dalam konteks Bitcoin, "saksi" atau **`witness`** adalah data tanda tangan (`signature`) yang membuktikan otorisasi sebuah `transaction`. `Segwit` adalah mekanisme yang memisahkan data `witness` ini dari bagian utama `transaction`.
+
+Pembaruan ini dirancang dengan sangat hati-hati untuk mengatasi beberapa masalah fundamental dalam desain asli Bitcoin, sekaligus diimplementasikan sebagai sebuah `soft fork`, yang berarti `node` lama yang belum diperbarui tetap dapat beroperasi di jaringan tanpa menyebabkan perpecahan. Bab ini akan menguraikan masalah-masalah tersebut dan bagaimana `segwit` menyelesaikannya secara elegan.
+
+### Masalah yang Diselesaikan oleh Segwit
+
+Sebelum kita menyelami cara kerja `segwit`, penting untuk memahami masalah-masalah yang mendorong pembuatannya.
+
+#### Transaction Malleability
+
+`Transaction malleability` adalah kerentanan di mana `signature` dari sebuah `transaction` dapat diubah oleh pihak ketiga (misalnya, sebuah `node` di jaringan) tanpa membuat `transaction` tersebut menjadi tidak valid. Meskipun perubahan ini tidak dapat mengubah pengirim, penerima, atau jumlah dana, perubahan sekecil apa pun pada data `transaction` akan menghasilkan **`txid`** (ID `transaction`) yang sama sekali berbeda.
+
+Ingat kembali contoh warisan dari Bab 9: Kita memberikan `transaction` `time-locked` (Tx3) kepada putri Kita yang membelanjakan *output* dari `transaction` lain (Tx2) yang belum dikonfirmasi.
+
+[ALT TEXT: Diagram alur transaksi warisan dari Bab 9, menunjukkan ketergantungan Tx3 pada Tx2. - Figure 10.1]
+
+Ketika Kita menyiarkan Tx2 ke jaringan, sebuah `node` jahat (misalnya, `node` milik Qi) dapat mencegatnya. Qi dapat memodifikasi data `signature` di dalam Tx2 untuk membuat `transaction` baru yang termodifikasi, Tx2M. Tx2M ini valid, membelanjakan input yang sama, dan mengirim dana ke tujuan yang sama, tetapi memiliki `txid` yang berbeda dari Tx2.
+
+[ALT TEXT: Ilustrasi bagaimana transaksi Tx2 diubah menjadi Tx2M oleh node jahat saat disiarkan di jaringan. - Figure 10.2]
+
+Jika `miner` akhirnya menambang Tx2M, maka `transaction` asli Kita, Tx2, menjadi tidak valid. Akibatnya, `transaction` warisan putri Kita, Tx3, yang merujuk pada `txid` dari Tx2, juga menjadi **tidak valid selamanya**. Dana warisan tersebut akan hilang.
+
+[ALT TEXT: Diagram yang menunjukkan Tx3 menjadi tidak valid karena txid dari Tx2 telah berubah menjadi txid dari Tx2M yang dikonfirmasi. - Figure 10.3]
+
+**Bagaimana Malleability Dilakukan?**
+
+Ada beberapa cara untuk mengubah data `signature` (`scriptSig`) tanpa membatalkan validitasnya:
+1.  **Mengubah Format Encoding `Signature`**: `Signature` dalam Bitcoin menggunakan format encoding standar (DER). Ada beberapa cara untuk merepresentasikan `signature` yang sama dalam format ini yang sedikit berbeda secara bita namun tetap valid secara matematis. (Masalah ini sebagian besar telah diatasi oleh **BIP66**).
+2.  **Trik Kriptografis**: `Signature` ECDSA memiliki properti di mana nilai `s`-nya dapat dinegasikan (`s` menjadi `-s mod n`) dan `signature` tetap valid. Ini adalah bentuk `malleability` yang paling umum.
+3.  **Menambahkan Opcode Redundan**: Menambahkan `opcode` yang tidak mengubah hasil eksekusi `script` ke dalam `scriptSig`, seperti `OP_DUP` diikuti oleh `OP_DROP`.
+
+[ALT TEXT: Tiga cara untuk melakukan transaction malleability: mengubah format signature, trik kriptografi, dan menambahkan opcode redundan. - Figure 10.4]
+
+Meskipun `node` modern memiliki kebijakan *relay* untuk mencegah `transaction` yang termodifikasi, seorang `miner` tetap dapat memasukkan `transaction` tersebut ke dalam `block` secara langsung.
+
+#### Inefisiensi Verifikasi Signature
+
+Proses verifikasi `signature` pada `transaction` lawas (non-`segwit`) memiliki inefisiensi performa yang signifikan. Masalahnya terletak pada cara data di-hash sebelum ditandatangani. Untuk setiap *input* yang ditandatangani, hampir seluruh data `transaction` di-hash ulang.
+
+[ALT TEXT: Proses penandatanganan input pertama dalam transaksi, di mana pubkey script dari output yang dibelanjakan disalin ke dalam signature script. - Figure 10.5]
+
+[ALT TEXT: Proses penandatanganan input kedua dalam transaksi, di mana proses hashing yang serupa diulang. - Figure 10.6]
+
+Akibatnya, waktu verifikasi meningkat secara **kuadratik (O(n²))** seiring dengan jumlah input. Jika `transaction` dengan 2 input membutuhkan waktu 1 ms untuk diverifikasi, `transaction` dengan 4 input akan membutuhkan sekitar 4 ms. `Transaction` dengan 1.024 input bisa memakan waktu lebih dari 4 menit.
+
+[ALT TEXT: Grafik yang menunjukkan pertumbuhan waktu verifikasi kuadratik seiring bertambahnya jumlah input dalam transaksi. - Figure 10.7]
+
+Ini membuka celah untuk serangan *Denial-of-Service* (DoS), di mana penyerang dapat membuat `block` yang penuh dengan `transaction` multi-input yang kompleks, menyebabkan `node` di seluruh jaringan menjadi lambat atau bahkan macet.
+
+#### Pemborosan Bandwidth
+
+`Lightweight wallet` (atau `SPV wallet`) tidak memverifikasi `signature` karena mereka tidak memiliki `UTXO set` lengkap. Namun, untuk memverifikasi bahwa `transaction` mereka termasuk dalam sebuah `block` (melalui `merkle proof`), mereka harus mengunduh `transaction` secara lengkap, termasuk semua data `signature`-nya. Ini karena `txid` dihitung dari seluruh data `transaction`, termasuk `signature`.
+
+Data `signature` (`scriptSig`) bisa memakan lebih dari 60-70% dari total ukuran `transaction`, terutama pada `transaction` dengan banyak input. Ini adalah pemborosan `bandwidth` yang signifikan bagi pengguna `lightweight wallet`.
+
+[ALT TEXT: Ilustrasi mengapa lightweight wallet membutuhkan seluruh data transaksi, termasuk signature, untuk memverifikasi merkle proof. - Figure 10.8]
+
+#### Kesulitan Pembaruan Script
+
+Bahasa `Script` Bitcoin memiliki ruang terbatas untuk pembaruan. Sebelumnya, pembaruan seperti `OP_CLTV` dan `OP_CSV` dilakukan dengan mendefinisikan ulang fungsi dari `opcode` `OP_NOP` yang tidak terpakai.
+
+Keterbatasannya adalah:
+* Hanya ada 10 `OP_NOP` yang tersedia.
+* `Opcode` baru harus berperilaku persis seperti `NOP` (tidak melakukan apa-apa pada `stack`) jika berhasil dieksekusi, untuk menjaga kompatibilitas dengan `node` lama. Ini membatasi desain `opcode` baru (misalnya, mengapa `OP_CLTV` harus diikuti oleh `OP_DROP`).
+
+Dibutuhkan mekanisme pembaruan yang lebih fleksibel dan dapat diperluas di masa depan.
+
+---
+
+### Solusi: Cara Kerja Segwit
+
+`Segwit` menyelesaikan semua masalah di atas dengan satu perubahan fundamental: **memisahkan data `witness` dari data inti `transaction`**.
+
+* Pada `transaction` lawas (legacy), `txid` dihitung dari semua data, termasuk `signature`.
+    [ALT TEXT: Anatomi transaksi legacy di mana txid mencakup signature script. - Figure 10.10]
+* Pada `transaction` `segwit`, `scriptSig` pada dasarnya kosong. Data `signature` dan `public key` dipindahkan ke struktur data terpisah yang disebut `witness`, yang dilampirkan pada `transaction`.
+    [ALT TEXT: Anatomi transaksi segwit di mana txid tidak lagi mencakup data signature yang telah dipisahkan ke dalam field witness. - Figure 10.11]
+
+Dengan memisahkan `witness`, `txid` tidak lagi bergantung pada data `signature`. Ini secara efektif **menghilangkan semua vektor `transaction malleability` pihak ketiga**.
+
+#### Segwit Addresses
+
+Untuk menerima dana ke `wallet` `segwit`, jenis alamat baru diperkenalkan. Alamat ini menggunakan skema encoding **Bech32** (**BIP173**) dan memiliki format yang berbeda.
+
+Contoh alamat `segwit` (P2WPKH): `bc1qeqzjk7vume5wmrdgz5xyehh54cchdjag6jdmkj`
+
+Keunggulan Bech32 dibandingkan Base58check (alamat lawas):
+* **Tidak case-sensitive**: Semua karakter dalam huruf kecil, memudahkan penulisan dan pembacaan.
+* **Deteksi error lebih baik**: Mampu mendeteksi hingga 4 kesalahan karakter dengan jaminan 100%.
+
+Struktur alamat Bech32 terdiri dari:
+1.  **Human-Readable Part (HRP)**: `bc` untuk `mainnet` Bitcoin.
+2.  **Separator**: Angka `1`.
+3.  **Data Part**: Meng-encode dua informasi:
+    * **Witness Version**: Angka 0-16 yang memungkinkan pembaruan `script` di masa depan.
+    * **Witness Program**: Data inti (misalnya, `PKH` atau `script hash`).
+
+[ALT TEXT: Proses decoding alamat segwit Bech32 untuk mengekstrak witness version dan witness program. - Figure 10.12]
+
+Ketika seseorang mengirim dana ke alamat `segwit` ini, mereka membuat `output` `transaction` dengan `pubkey script` yang sangat sederhana, hanya berisi `witness version` dan `witness program`.
+
+[ALT TEXT: Contoh output transaksi yang dikirim ke alamat segwit, hanya berisi version byte dan witness program. - Figure 10.13]
+
+#### Menghabiskan Output Segwit
+
+Saat Kita ingin membelanjakan dana dari `output` `segwit`, Kita membuat `transaction` di mana:
+* `scriptSig`-nya kosong.
+* `Signature` dan `public key` ditempatkan di dalam *field* `witness` yang terpisah.
+
+[ALT TEXT: Transaksi yang membelanjakan output segwit, dengan scriptSig kosong dan data signature di dalam field witness. - Figure 10.14]
+
+#### Verifikasi Transaksi Segwit
+
+**Pada `Node` Baru (Segwit-aware):**
+1.  `Node` mengenali pola `pubkey script` segwit: `<version_byte> <witness_program>`.
+2.  `Node` memeriksa `witness version`. Saat ini, hanya versi 0 yang didefinisikan.
+3.  Berdasarkan panjang `witness program` (untuk versi 0), `node` menentukan jenisnya:
+    * **20 byte**: **P2WPKH** (Pay-to-Witness-Public-Key-Hash).
+    * **32 byte**: **P2WSH** (Pay-to-Witness-Script-Hash).
+4.  Untuk P2WPKH, `node` menggunakan *template* `script` P2PKH standar, tetapi mengambil `PKH` dari `witness program` dan `signature`/`public key` dari *field* `witness`.
+
+[ALT TEXT: Proses verifikasi transaksi P2WPKH oleh node segwit-aware. - Figure 10.15]
+
+**Pada `Node` Lama (Non-segwit):**
+Ini adalah bagian jenius dari desain `soft fork` `segwit`.
+1.  `Node` lama tidak mengenali *field* `witness` dan mengabaikannya.
+2.  Ia melihat `transaction` dengan `scriptSig` kosong dan `pubkey script` yang hanya berisi dua data push (`version byte` dan `witness program`).
+3.  Saat `script` ini dieksekusi, dua nilai non-nol didorong ke `stack`. Item teratas `stack` adalah non-nol, yang diinterpretasikan sebagai `TRUE`.
+4.  `Transaction` dianggap valid oleh `node` lama.
+
+[ALT TEXT: Bagaimana node lama memvalidasi transaksi segwit sebagai script yang selalu TRUE (anyone-can-spend). - Figure 10.16]
+
+Ini secara efektif adalah `script` **"anyone-can-spend"** dari sudut pandang `node` lama. Keamanannya dijamin oleh fakta bahwa mayoritas besar `hashrate` jaringan adalah `segwit-aware` dan akan menolak `block` apa pun dari `miner` lama yang mencoba mencuri dana dengan cara ini.
+
+#### Inklusi dalam Block
+
+Agar `witness` yang terpisah tetap terikat pada `block`, `segwit` memperkenalkan aturan baru:
+* Jika sebuah `block` mengandung `transaction` `segwit`, `coinbase transaction`-nya *harus* berisi sebuah **`witness commitment`**.
+* `Witness commitment` ini adalah `hash` dari **`witness root hash`** dan sebuah `witness reserved value`.
+* `Witness root hash` adalah `merkle root` yang dibangun dari **`wtxid`** semua `transaction` di dalam `block`. `Wtxid` adalah `hash` dari `transaction` *termasuk* data `witness`-nya.
+
+`Commitment` ini ditempatkan di dalam sebuah `output` `OP_RETURN` di dalam `coinbase transaction`. `Node` lama mengabaikan `output` `OP_RETURN` ini, sehingga kompatibilitas tetap terjaga.
+
+[ALT TEXT: Diagram bagaimana merkle root dari wtxid (witness root hash) dimasukkan ke dalam coinbase transaction sebagai witness commitment. - Figure 10.17]
+
+#### Pay-to-Witness-Script-Hash (P2WSH)
+
+P2WSH adalah versi `segwit` dari P2SH. Ini berfungsi dengan cara yang sangat mirip:
+* `Redeem script` yang kompleks (disebut **`witness script`**) di-hash menggunakan `SHA256` (menghasilkan hash 32-byte).
+* Hash ini menjadi `witness program` dalam `output` P2WSH.
+* Untuk membelanjakannya, `witness` harus berisi argumen `script` (misalnya, `signatures`) diikuti oleh `witness script` lengkap.
+* `Node` `segwit-aware` akan memverifikasi bahwa `hash` dari `witness script` yang diberikan cocok dengan `witness program` di `output` yang dibelanjakan, lalu mengeksekusi `witness script` tersebut.
+
+#### Metode Hashing Baru untuk Signature
+
+`Segwit` memperkenalkan metode hashing `signature` baru (**BIP143**) yang memperbaiki masalah inefisiensi kuadratik.
+* Data `transaction` yang umum untuk semua input (seperti daftar output) di-hash sekali saja untuk membuat sebuah *intermediate hash*.
+* Untuk setiap input, *intermediate hash* ini kemudian di-hash bersama dengan data spesifik untuk input tersebut (seperti `outpoint` yang dibelanjakan, `script`, dan **jumlah (`amount`) yang dibelanjakan**).
+
+[ALT TEXT: Proses hashing dua langkah segwit yang efisien, di mana intermediate hash digunakan kembali untuk setiap input. - Figure 10.26]
+
+Dengan melakukan ini, waktu verifikasi menjadi **linear (O(n))**, peningkatan performa yang sangat besar.
+
+> **Poin Kritis untuk Auditor**: `Signature` `segwit` juga meng-commit **jumlah (`amount`)** dari *output* yang dibelanjakan. Ini adalah peningkatan keamanan yang signifikan untuk `hardware wallet`, karena `wallet` dapat memverifikasi `fee` yang dibayarkan tanpa perlu mempercayai komputer host untuk memberikan informasi `amount` yang benar.
+
+#### Peningkatan Lainnya
+
+* **Penghematan Bandwidth**: Karena `txid` tidak lagi bergantung pada `witness`, `lightweight wallet` dapat meminta `transaction` tanpa data `witness`, menghemat lebih dari 50% `bandwidth`.
+* **Script yang Dapat Diperbarui**: `Witness version byte` menyediakan mekanisme yang bersih dan dapat diperluas untuk memperkenalkan versi baru `Script` di masa depan tanpa harus menggunakan `OP_NOP` lagi.
+* **Kompatibilitas Wallet**: Untuk memungkinkan `wallet` lama mengirim dana ke `wallet` `segwit`, dikembangkan skema **`nested segwit`**, di mana `output` `segwit` (P2WPKH atau P2WSH) "dibungkus" di dalam `output` P2SH. Alamat yang dihasilkan dimulai dengan angka '3', sehingga dikenali oleh `wallet` lama.
+
+### Batas Block
+
+`Segwit` juga memperkenalkan cara baru untuk menghitung batas ukuran `block`, yang memungkinkan peningkatan kapasitas `transaction` melalui `soft fork`.
+
+* **Batas Lama**: Ukuran `block` maksimal 1.000.000 byte.
+* **Konsep Baru**: **`Block Weight`**. Batas baru adalah 4.000.000 *Weight Units* (WU).
+    * 1 byte data non-`witness` (data `transaction` inti) dihitung sebagai **4 WU**.
+    * 1 byte data `witness` dihitung sebagai **1 WU**.
+
+[ALT TEXT: Perhitungan block weight, di mana byte non-witness dikalikan 4 dan byte witness dikalikan 1. - Figure 10.36]
+
+Implikasinya adalah:
+* Batas ukuran `block` dasar (tanpa `witness`) tetap 1MB (1.000.000 byte * 4 WU/byte = 4.000.000 WU), sehingga kompatibel dengan `node` lama.
+* Namun, karena data `witness` memiliki "diskon" bobot, ukuran total `block` (data inti + `witness`) secara efektif bisa mencapai ~2MB, tergantung pada seberapa banyak `transaction` `segwit` yang ada di dalamnya. Ini meningkatkan kapasitas jaringan.
+* Batas *signature operations* (sigops) juga disesuaikan dengan skema bobot yang sama.
