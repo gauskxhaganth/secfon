@@ -219,7 +219,7 @@ Misalkan John ingin membeli kue:
    d. Dia membandingkan Hash A dan Hash B. Jika **sama persis**, berarti tanda tangan itu valid dan hanya bisa dibuat oleh pemilik *private key* yang sesuai, yaitu John.
 
 <p align="center">
-  <img src="images/books-01-grokking_bitcoin/figure_1.14.png" alt="gambar" width="575"/>
+  <img src="images/books-01-grokking_bitcoin/figure_2.14.png" alt="gambar" width="575"/>
 </p>
 
 Diagram alur proses tanda tangan digital:
