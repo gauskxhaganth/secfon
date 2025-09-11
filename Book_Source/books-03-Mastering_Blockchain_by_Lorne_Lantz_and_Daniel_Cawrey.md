@@ -1114,7 +1114,7 @@ Secara keseluruhan, pasar *cryptocurrency* **kekurangan kedalaman pasar** (*mark
 
 ### Risiko Rekan-Sanding (*Counterparty Risk*)
 
-Ini adalah salah satu risiko terbesar dalam perdagangan *crypto*: **risiko bahwa bursa yang Anda gunakan akan diretas, bangkrut, atau melarikan diri dengan dana Anda**. Ini menggarisbawahi pepatah terkenal: *"Not your keys, not your money."*
+Ini adalah salah satu risiko terbesar dalam perdagangan *crypto*: **risiko bahwa bursa yang Kita gunakan akan diretas, bangkrut, atau melarikan diri dengan dana Kita**. Ini menggarisbawahi pepatah terkenal: *"Not your keys, not your money."*
 
 Bursa yang baik memiliki infrastruktur kustodi yang kuat, biasanya melibatkan:
 * ***Cold Storage***: Menyimpan sebagian besar (idealnya >95%) dana pelanggan secara *offline*, tidak terhubung ke internet, untuk melindunginya dari peretas.
@@ -1168,3 +1168,581 @@ Bab ini memberikan gambaran yang realistis tentang dunia perdagangan *cryptocurr
 
 ---
 
+# Bab 7
+## Mendesentralisasi Keuangan dan Web
+
+Bab ini mengeksplorasi bagaimana `blockchain` dan `smart contracts` mulai digunakan untuk membangun ulang layanan keuangan dan aplikasi web tanpa memerlukan perantara terpusat seperti bank atau perusahaan teknologi besar.
+
+## Redistribusi Kepercayaan (*Redistribution of Trust*)
+
+Fondasi dari gerakan ini adalah pergeseran kepercayaan dari institusi ke teknologi. Perbankan tradisional seringkali lambat dan mahal, terutama untuk transaksi lintas batas . `Blockchain` menawarkan alternatif dengan lapisan pembayaran yang menghilangkan perantara
+
+### Identitas dan Bahaya Peretasan
+
+Salah satu pendorong utama desentralisasi adalah kegagalan perusahaan-perusahaan besar dalam menjaga data pengguna. Buku ini menyoroti serangkaian peretasan besar yang membuktikan bahwa model terpusat memiliki risiko sistemik:
+* **Yahoo! (2013)**: 3 miliar akun terpengaruh.
+* **Facebook (2018)**: 50 juta akun terpengaruh.
+* **Equifax (2017)**: Data pribadi 143 juta pelanggan terekspos.
+* **eBay (2014)**: Data 145 juta pengguna terekspos.
+* **Uber (2016)**: Data 57 juta penumpang dan 600.000 pengemudi diakses.
+
+Kejadian-kejadian ini mendorong pengembangan konsep ***self-sovereign identity***, di mana individu mengontrol data pribadi mereka sendiri menggunakan pasangan *public/private key*, alih-alih menyerahkannya kepada perusahaan.
+
+Untuk berpartisipasi dalam ekosistem baru ini, beberapa komponen menjadi penting:
+* ***Wallets***: *Wallet* non-kustodial seperti `MetaMask` (ekstensi peramban) dan *hardware wallet* seperti `Ledger` menjadi gerbang utama untuk berinteraksi dengan layanan `DeFi`.
+* ***Private Keys***: Pengguna bertanggung jawab penuh atas keamanan *private key* dan *seed phrase* mereka.
+* ***Naming Services***: Layanan seperti **Ethereum Naming Service (ENS)** memungkinkan pengguna untuk mengasosiasikan nama yang mudah dibaca (misalnya, `namasaya.eth`) dengan alamat `blockchain` mereka yang panjang dan rumit, meningkatkan kegunaan.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_7-1.png" alt="gambar" width="550"/>
+</p>
+
+[Gambar yang menunjukkan contoh kunci publik dan kunci privat dalam format QR code dan string alfanumerik yang panjang. - Figure 7-1]
+
+## Mendesentralisasi Keuangan (*Decentralizing Finance* - DeFi)
+
+**`DeFi`** adalah ekosistem layanan keuangan terbuka yang dibangun di atas `blockchain` publik (terutama `Ethereum`), tanpa memerlukan perantara tradisional.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_7-2.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram perbandingan antara sistem keuangan tradisional (melibatkan pengirim, bank, perusahaan pembayaran, dan penerima) dengan sistem keuangan terdesentralisasi (pengirim dan penerima berinteraksi langsung melalui jaringan peer-to-peer). - Figure 7-2]
+
+### Definisi-Definisi Penting
+
+Untuk memahami `DeFi`, kita harus memahami beberapa terminologi baru:
+* ***Minting***: Proses **menciptakan** `token` baru untuk meningkatkan suplai.
+* ***Burning***: Proses **menghancurkan** `token` secara permanen untuk mengurangi suplai.
+* ***Wrapped Tokens***: `Token` ERC-20 yang merepresentasikan aset dari `blockchain` lain (misalnya, **wBTC** adalah `token` ERC-20 yang nilainya dipatok 1:1 dengan BTC). Ini memungkinkan aset seperti `Bitcoin` untuk digunakan dalam ekosistem `DeFi` di `Ethereum`.
+* **DAOs (*Decentralized Autonomous Organizations*)**: Organisasi yang diatur oleh kode dan pemegang `token`, seringkali digunakan untuk mengelola protokol `DeFi`.
+* **Oracles**: Layanan pihak ketiga yang menyediakan data dari dunia nyata (misalnya, harga ETH/USD) ke `smart contracts`. `Blockchain` tidak dapat mengakses data di luar dirinya sendiri, sehingga `oracles` sangat penting.
+    > **Peringatan Keamanan**: `Oracle` adalah komponen yang sangat kritis. `Smart contract` yang aman sekalipun bisa dieksploitasi jika `oracle` yang digunakannya dimanipulasi.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_7-3.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram yang menunjukkan bagaimana oracles bertindak sebagai jembatan, mengambil data dari web dan menyediakannya untuk blockchain seperti Bitcoin, Ethereum, dan Tezos. - Figure 7-3]
+
+### *Stablecoins*: Tulang Punggung `DeFi`
+
+Karena volatilitas *cryptocurrency* biasa, `DeFi` membutuhkan aset stabil sebagai medium pertukaran dan unit akun. Inilah peran ***stablecoins***.
+* **`DAI` (dari MakerDAO)**: `Stablecoin` terdesentralisasi yang nilainya dipatok ke USD, tetapi dijamin oleh **jaminan *crypto*** (seperti ETH dan BAT) yang nilainya berlebih (*over-collateralized*). Pengguna mengunci jaminan mereka di dalam sebuah "vault" dan dapat "mencetak" (`mint`) `DAI`.
+* **`USDC` dan `TrueUSD`**: `Stablecoin` terpusat yang dijamin oleh **dolar AS sungguhan** yang disimpan di rekening bank dan diaudit secara berkala. Pengguna yang ingin menukar USD dengan `USDC` (atau sebaliknya) harus melalui proses **KYC** (*Know Your Customer*).
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_7-4.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram alur yang menunjukkan bagaimana stablecoins seperti USDC, meskipun memerlukan KYC di titik penerbitan, dapat ditransfer secara pseudonim antar pengguna di dalam blockchain tanpa hubungan KYC langsung dengan penerbit. - Figure 7-4]
+
+### Layanan-Layanan `DeFi`
+
+Dengan adanya `stablecoins`, berbagai layanan keuangan dapat dibangun:
+* **Peminjaman (*Lending*)**: Platform seperti **`Compound`** memungkinkan pengguna untuk meminjamkan aset *crypto* mereka untuk mendapatkan bunga, atau meminjam aset lain dengan menjadikan *crypto* mereka sebagai jaminan.
+* **Tabungan (*Savings*)**: Pengguna dapat mengunci `DAI` mereka ke dalam **DAI Savings Rate (DSR)** *contract* milik MakerDAO untuk mendapatkan bunga, yang didanai dari biaya stabilitas yang dibayar oleh peminjam `DAI`.
+* **Derivatif (*Derivatives*)**: Platform seperti **`Synthetix`** memungkinkan pengguna untuk menciptakan **aset sintetis** (disebut `Synths`) yang melacak harga aset dunia nyata seperti USD, emas, atau saham.
+
+### *Flash Loans*: Inovasi Berisiko Tinggi
+
+***Flash loan*** adalah fitur unik di `DeFi` yang memungkinkan peminjaman aset **tanpa jaminan sama sekali**, dengan syarat pinjaman tersebut harus dikembalikan **dalam satu `transaction` `Ethereum` yang sama**.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_7-12.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram alur flash loan, menunjukkan bagaimana sebuah smart contract meminjam dana dari platform DeFi, menggunakan dana tersebut untuk operasi (seperti arbitrase), dan mengembalikannya beserta biaya, semua dalam satu transaksi atomik. - Figure 7-12]
+
+Bagi pemberi pinjaman, ini **bebas risiko**. Jika peminjam tidak dapat mengembalikan dana di akhir `transaction`, seluruh `transaction` (termasuk pinjaman awal) akan batal seolah-olah tidak pernah terjadi.
+
+**Studi Kasus: Eksploitasi Fulcrum**
+*Flash loans* membuka peluang arbitrase yang kuat, tetapi juga vektor serangan baru. Pada Februari 2020, seorang penyerang menggunakan *flash loan* untuk melakukan **serangan manipulasi `oracle`** pada platform `Fulcrum`.
+
+Langkah-langkah serangan tersebut adalah sebagai berikut:
+1.  **Pinjam**: Penyerang meminjam 10.000 ETH melalui *flash loan* dari `dYdX`.
+2.  **Simpan & Manipulasi**: Sebagian ETH digunakan untuk meminjam 112 wBTC dari `Compound`. Sebagian lainnya digunakan untuk membuka posisi *short* besar pada `Fulcrum`.
+3.  **Jatuhkan Harga**: Posisi *short* ini memaksa `Fulcrum` untuk menjual sejumlah besar wBTC di DEX lain (`Uniswap`), yang menyebabkan harga wBTC di `Uniswap` anjlok drastis (ini adalah manipulasi `oracle`).
+4.  **Untung**: Penyerang kemudian menukar 112 wBTC yang dipinjamnya tadi di `Uniswap` dengan harga yang sudah dimanipulasi, menghasilkan keuntungan besar dalam bentuk ETH.
+5.  **Bayar Kembali**: Penyerang mengembalikan pinjaman 10.000 ETH ke `dYdX`.
+
+Seluruh proses ini terjadi dalam satu `transaction` dan menghasilkan keuntungan sekitar $385.000 dengan modal hanya biaya `gas`. Ini adalah contoh sempurna bagaimana komposabilitas `DeFi` bisa menjadi pedang bermata dua.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_7-16.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram alur serangan Fulcrum yang kompleks, menunjukkan bagaimana penyerang menggunakan dana dari flash loan (dYdX) untuk berinteraksi dengan beberapa protokol DeFi (Compound, Fulcrum, Kyber, Uniswap) untuk memanipulasi harga oracle dan mendapatkan keuntungan. - Figure 7-16]
+
+## Privasi
+
+`Blockchain` publik seperti `Ethereum` pada dasarnya transparan, yang menjadi masalah untuk banyak aplikasi keuangan. Beberapa teknologi privasi yang sedang dikembangkan antara lain:
+
+### Zero-Knowledge Proof
+
+**Zero-knowledge proof** adalah metode atau protokol kriptografi di mana pihak A (prover) membuktikan kepada pihak B (verifier) bahwa sebuah pernyataan itu benar **tanpa mengungkapkan informasi apa pun selain bahwa pernyataan itu benar.**
+
+Misalkan seorang prover perlu membuktikan kepada verifier bahwa mereka menemukan Waldo dalam gambar *Where’s Waldo?*. Cara termudah adalah prover menunjuk Waldo, tetapi cara ini mengungkapkan rahasia lokasi Waldo, padahal tujuannya hanya membuktikan bahwa prover tahu di mana Waldo berada.
+
+Pendekatan zero-knowledge bisa dilakukan dengan cara prover mengambil selembar kertas besar, jauh lebih besar dari gambar Waldo, dan melubangi bagian tengahnya sesuai bentuk Waldo. Di luar penglihatan verifier, prover menutup gambar sehingga hanya Waldo yang terlihat melalui lubang tersebut.
+
+Dengan begitu, prover telah membuktikan bahwa mereka menemukan Waldo **tanpa mengungkapkan informasi apa pun yang bisa membantu verifier menemukan Waldo.**
+
+Mari kita lihat contoh lain. Misalkan prover ingin membuktikan kepada verifier bahwa mereka tahu kata sandi (password) yang benar untuk login ke sebuah situs web. Metode saat ini yang digunakan banyak situs adalah menyimpan **hash** dari password pengguna di database mereka. Saat pengguna ingin login, urutannya seperti ini:
+
+1. Pengguna mengirimkan password dalam bentuk teks biasa ke server.
+2. Server mengenkripsi password menggunakan algoritma enkripsi standar, seperti MD5.
+3. Jika hash MD5 yang dihasilkan cocok dengan hash yang tersimpan di database, maka password yang dimasukkan dianggap valid.
+
+Namun, metode ini membuat password pengguna rentan terhadap hal-hal berikut:
+
+#### Man in the middle attacks
+
+Jika peretas menyusupi komunikasi antara pengguna dan server, mereka bisa mencegat password dalam bentuk teks biasa.
+
+#### Brute force dan dictionary attacks
+
+Jika database situs diretas, peretas bisa mencoba mendekripsi password pengguna melalui berbagai cara, termasuk brute force (coba-coba) atau dictionary attack (menggunakan daftar kata umum).
+
+Dengan pendekatan **zero-knowledge**, pengguna bisa membuktikan bahwa mereka memiliki password yang valid **tanpa perlu mengungkapkan password itu** — server bahkan **tidak menyimpan versi apa pun dari password, termasuk hash-nya.**
+
+Hal ini bisa dilakukan dengan mengimplementasikan **Thinbus Secure Remote Password (SRP) protocol**:
+
+1. Server menyimpan **salt** yang dibuat secara acak (data acak yang digunakan sebagai input tambahan), dan **verifier** yang tidak bisa didekripsi kembali menjadi password.
+2. Saat pengguna login ke situs web, mereka mengirim **nilai sekali pakai** (one-time value) yang hanya digunakan untuk login itu saja. Pesan login berikutnya akan terlihat sangat berbeda. Server menerima nilai sekali pakai ini, dan melalui SRP dapat memverifikasi apakah pesan yang diterima benar dikirim oleh pengguna dengan password yang valid. **Figure 7-17 menunjukkan hal ini.**
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_7-17.png" alt="gambar" width="550"/>
+</p>
+
+Implementasi zero-knowledge proof secara signifikan meningkatkan privasi dan keamanan banyak sistem. Namun, hal ini juga menimbulkan biaya tambahan dalam daya pemrosesan dan ruang penyimpanan. Kekurangan lainnya adalah memerlukan dua pihak (prover dan verifier) untuk berinteraksi langsung satu sama lain.
+
+Kekurangan ini tidak menjadi masalah dalam kasus situs web, tetapi penerapan zero-knowledge proof di blockchain akan berdampak besar karena beberapa alasan:
+
+* Penambang blockchain menyimpan salinan seluruh riwayat blockchain, yang ukurannya bertambah sangat cepat seiring pertumbuhan jaringan. Menambahkan lebih banyak data akan memperburuk masalah ini.
+* Dalam jaringan blockchain, pengirim transaksi ingin membuktikan bahwa transaksi valid, dan penambang memverifikasinya. Masalahnya, pengirim tidak berkomunikasi langsung dengan setiap penambang. Sebaliknya, pengirim menyiarkan (broadcast) detail transaksi, dan penambang memverifikasinya — proses yang tidak melibatkan interaksi langsung satu lawan satu.
+
+Jadi, agar blockchain bisa mengadopsi metode zero-knowledge proof, metode tersebut harus:
+
+* **Ringkas (succinct)** agar bisa diskalakan.
+* **Non-interaktif**, sehingga node dalam jaringan bisa memverifikasi pernyataan zero-knowledge dari node lain tanpa berkomunikasi langsung.
+
+Dengan metode ini, pengirim (prover) transaksi dapat menyiarkan satu potong data, dan penambang (verifier) dapat memverifikasi validitas transaksi tanpa interaksi tambahan dengan pengirim.
+
+Data yang disiarkan oleh pengirim transaksi ke jaringan harus berukuran sangat kecil, karena data tersebut akan disimpan di blockchain.
+
+### zk-SNARKs
+
+Salah satu bentuk zero-knowledge proof adalah **Zero-Knowledge Succinct Non-Interactive Arguments of Knowledge (zk-SNARKs)**, sebuah teknologi privasi yang sudah digunakan di cryptocurrency seperti **Zcash**.
+
+Di Ethereum, zk-SNARKs dapat digunakan untuk meningkatkan privasi dalam smart contract. Walaupun diharapkan akan diintegrasikan di masa depan, saat ini zk-SNARKs memerlukan proses **precompiling** (memproses input data untuk menghasilkan output) di jaringan seperti Ethereum karena biaya gas yang sangat tinggi.
+
+Untuk sementara, menjalankan kode di luar EVM adalah cara terbaik untuk melakukan precompiling, misalnya menggunakan **Rust** atau **JavaScript**. **Aztec** adalah teknologi awal di mainnet Ethereum yang berhasil mengintegrasikan zk-SNARKs untuk meningkatkan privasi.
+
+### Zcash
+
+**Zcash** adalah blockchain yang berfokus pada privasi yang memberi pengirim transaksi pilihan untuk membuat informasi transaksi bersifat publik atau privat.
+
+Transaksi privat Zcash menggunakan **zk-SNARKs**. Implementasi zk-SNARKs pada Zcash telah memberikan bukti kepada komunitas tentang betapa bergunanya teknologi ini pada blockchain publik. Secara khusus, teknologi ini:
+
+* Memungkinkan transaksi privat dilakukan di blockchain publik seperti Bitcoin atau Ethereum.
+* Memungkinkan eksekusi privat dari kode smart contract di blockchain publik.
+
+### Ring Signatures
+
+Dengan **ring signatures**, siapa pun dari sekelompok orang yang telah ditentukan dapat menandatangani transaksi, sehingga sulit menentukan identitas pengirim yang sebenarnya.
+
+Siapa pun dari anggota kelompok tersebut bisa menjadi pengirim transaksi, sehingga menyembunyikan identitas pengirim dan meningkatkan privasi. Semakin besar ukuran ring, semakin tinggi tingkat penyamaran.
+
+Cryptocurrency **Monero** saat ini menggunakan teknologi ini, ditambah **decoy outputs** untuk menyembunyikan UXTO.
+
+## Web 3.0
+
+Blockchain dan cryptocurrency dengan tingkat privasi yang memadai dapat menciptakan platform baru untuk web, memberikan insentif bagi jenis pengembangan baru, dan menggeser pengguna dari model oligarki yang mendominasi selama dekade terakhir.
+
+Sudah menjadi hal umum untuk membicarakan tahapan berbeda dalam evolusi World Wide Web:
+
+* **Web 1.0** terdiri dari halaman statis, form input, dan konten pasif.
+* **Web 2.0** memperkenalkan halaman dinamis, form interaktif, dan konten buatan pengguna.
+* **Web 3.0** adalah iterasi berikutnya, di mana data yang dihasilkan dari dua generasi sebelumnya **dikembalikan, dimonetisasi, dan dikendalikan oleh pengguna.**
+
+Seperti apa bentuk Web 3.0 secara keseluruhan masih belum jelas, tetapi beberapa karakteristik mulai muncul, dan kerangka dasar untuk teknologi Web 3.0 sedang dibangun saat ini.
+
+Pengguna menyerahkan banyak data, sering kali tanpa menyadarinya, dan sebagian besar hal ini terjadi di dalam browser web.
+
+**Brave** adalah browser berbasis Chromium yang berfokus pada privasi.
+Meskipun browser web lain juga mengklaim memiliki fitur privasi, Brave adalah **yang pertama mengimplementasikan teknologi blockchain.**
+
+Brave memiliki pemblokir iklan bawaan, menggantikan iklan dengan cryptocurrency.
+**Basic Attention Token (BAT)**, mata uang kripto berbasis **ERC-20**, digunakan untuk membayar pemilik situs web dan pembuat konten sebagai pengganti platform iklan.
+
+Membayar pengembang independen untuk mengerjakan kode sumber terbuka bisa menjadi proses yang kompleks.
+Cryptocurrency dan blockchain memunculkan perubahan menarik dalam pengembangan perangkat lunak.
+
+Situs seperti **Gitcoin** mendukung gerakan ini: Gitcoin mempertemukan pengembang yang mencari proyek dengan penyandang dana yang ingin seseorang memperbaiki bug, membuat fitur baru, atau mengerjakan tugas lain pada sebuah proyek — dan **semua pembayarannya dilakukan menggunakan crypto.**
+
+Penyimpanan file adalah bagian penting dari aplikasi berbasis web, dan mendesentralisasi aspek ini adalah hal yang penting.
+
+Menyimpan dan berbagi data adalah hal yang memungkinkan banyak penyedia teknologi memanfaatkan data pengguna melalui ketentuan layanan mereka.
+
+**Interplanetary File System (IPFS)** adalah jaringan persisten yang memungkinkan penyimpanan terdistribusi untuk file selama masih ada satu node yang berjalan.
+
+Tujuan IPFS adalah memungkinkan penyimpanan file yang aman dan tahan lama.
+Desainnya bersifat modular, sehingga dapat digunakan untuk berbagai kasus penggunaan.
+
+Membangun **framework web terdesentralisasi** adalah tugas besar.
+Hal ini memerlukan penggabungan **identitas, sistem terdistribusi, dan blockchain** menjadi sebuah kerangka yang dapat digunakan pengembang untuk membuat aplikasi yang semakin terdesentralisasi.
+
+**Blockstack**, yang dimulai dari sistem identitas lalu berkembang ke sistem terdistribusi, adalah salah satu framework awal tersebut.
+Blockstack menggunakan **REST call** untuk membuat **dapps** dalam kerangka kerja yang mirip dengan apa yang sebelumnya digunakan pengembang.
+
+Lalu ada juga **perjudian.**
+Karena nilai ditransfer melalui smart contract di Web 3.0, maka **lebih mudah untuk mengaudit apakah aturan permainannya adil.**
+
+Dalam perjudian tradisional, rumah (penyelenggara) biasanya memiliki keunggulan dalam hal peluang menang.
+
+Dalam kerangka baru ini, jenis permainan baru sedang diciptakan — misalnya, **perjudian tanpa kerugian (no-loss gambling).**
+
+Salah satu contohnya adalah **DAO pool**, di mana semua peserta menyetor **stablecoin** yang kemudian menghasilkan bunga.
+Pool ini menjalani proses pemilihan secara acak untuk memilih pemenang:
+
+* Pemenang mendapatkan semua bunga yang dihasilkan dari pool.
+* Para peserta yang kalah mendapatkan kembali jumlah stablecoin awal mereka.
+
+## Rangkuman Bab 7
+
+Bab ini menunjukkan bagaimana `blockchain` berevolusi dari sekadar *cryptocurrency* menjadi fondasi untuk sistem keuangan dan aplikasi web yang sepenuhnya baru. `DeFi` menunjukkan potensi luar biasa untuk menciptakan layanan keuangan yang terbuka, transparan, dan dapat diakses oleh siapa saja. Namun, seperti yang ditunjukkan oleh eksploitasi *flash loan*, kompleksitas dan komposabilitasnya juga menciptakan risiko keamanan yang belum pernah ada sebelumnya. Bagi seorang auditor, memahami interaksi antar protokol, ketergantungan pada `oracles`, dan mekanisme tata kelola DAO adalah kunci untuk mengidentifikasi potensi kerentanan dalam ekosistem yang bergerak cepat ini.
+
+---
+
+# Bab 8 
+## Catch Me If You Can
+
+Bab ini menyoroti bahwa di balik janji-janji besar teknologi `blockchain`, perjalanannya dipenuhi dengan skandal, peretasan, dan pencurian. Memahami peristiwa-peristiwa ini sangat penting karena sejarah seringkali berulang, dan kelemahan yang dieksploitasi di masa lalu bisa muncul kembali dalam bentuk baru.
+
+Kasus paling terkenal yang mengawali reputasi `Bitcoin` di dunia kriminal adalah **Silk Road**, sebuah pasar gelap anonim di *dark web*. Silk Road menggunakan `Bitcoin` sebagai mekanisme pembayaran dan jaringan **Tor** untuk menyembunyikan identitas penggunanya. Namun, pada tahun 2013, FBI berhasil menangkap operatornya, Ross Ulbricht, yang membuktikan bahwa aktivitas di `blockchain` tidak sepenuhnya anonim seperti yang diyakini banyak orang pada awalnya.
+
+## Evolusi Pencucian Uang Kripto (*Crypto Laundering*)
+
+Awalnya, para pelaku kejahatan mengira `Bitcoin` memberikan anonimitas sempurna. Namun, setelah runtuhnya bursa Mt. Gox pada tahun 2014 dan upaya penegak hukum yang berhasil melacak dana yang dicuri, pandangan ini berubah. `Bitcoin` sebenarnya bersifat **pseudo-anonim**: identitas memang tidak melekat langsung pada alamat, tetapi semua `transaction` bersifat publik dan permanen, memungkinkan analisis untuk menghubungkan alamat-alamat tersebut.
+
+Buku ini menjelaskan beberapa cara untuk mengaitkan identitas dengan alamat `Bitcoin`:
+* Pengguna secara sukarela mengungkap kepemilikan alamat mereka.
+* Pihak-pihak dalam `transaction` biasanya saling mengetahui identitas masing-masing.
+* Bursa dan layanan *wallet* yang menerapkan KYC memiliki data identitas pengguna yang terkait dengan alamat setoran.
+* Bukti dari investigasi kriminal dapat menghubungkan alamat dengan individu.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_8-2.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar dari alat analisis blockchain Breadcrumbs yang menunjukkan hubungan transaksi antara alamat Bitcoin milik Satoshi dan alamat lain, termasuk milik Hal Finney. - Figure 8-2]
+
+Karena `Bitcoin` dapat dilacak, para pelaku kejahatan beralih ke metode yang lebih canggih untuk mencuci uang, yang umumnya mengikuti tiga tahap:
+1.  **Penempatan (*Placement*)**: Memasukkan dana haram ke dalam ekosistem *crypto*.
+2.  **Pelapisan (*Layering*)**: Menyamarkan jejak dana dengan memindahkannya melalui layanan pencampur (*tumbler/mixing service*) atau menukarnya dengan *privacy coin* (koin privasi) seperti **`Monero`**.
+3.  **Integrasi (*Integration*)**: Mengubah kembali *crypto* yang sudah "bersih" menjadi uang fiat agar bisa dibelanjakan.
+
+Tahap 1 dan 3 adalah titik terlemah karena memerlukan *on-ramp* (membeli *crypto* dengan fiat) dan *off-ramp* (menjual *crypto* untuk fiat), yang semakin diawasi oleh regulator.
+
+### Regulasi dan Penegakan Hukum
+
+* **Panduan FinCEN (2013)**: Badan kejahatan finansial AS, **FinCEN**, mengeluarkan panduan yang mengklasifikasikan bursa *crypto* sebagai **Money Services Businesses (MSBs)**, yang mewajibkan mereka untuk mendapatkan lisensi dan mematuhi aturan anti pencucian uang.
+* **FATF dan *Travel Rule***: **FATF** (*Financial Action Task Force*), sebuah badan antar-pemerintah, memperkenalkan ***Travel Rule*** yang mengharuskan penyedia layanan aset virtual (VASP), seperti bursa, untuk saling berbagi informasi identitas pengirim dan penerima untuk `transaction` di atas ambang batas tertentu.
+
+Buku ini juga mencantumkan daftar panjang individu dan perusahaan yang telah berurusan dengan penegak hukum AS karena berbagai pelanggaran, mulai dari skema Ponzi, penjualan sekuritas tidak terdaftar, hingga pencucian uang. Ini menjadi preseden hukum penting yang harus dipahami oleh setiap pelaku industri.
+
+## Menghindari Pengawasan: Arbitrase Regulasi
+
+**Arbitrase regulasi** adalah praktik di mana perusahaan memindahkan operasinya ke yurisdiksi dengan peraturan yang lebih longgar atau lebih ramah terhadap *crypto* untuk menghindari pengawasan ketat. Buku ini menyoroti beberapa "surga" regulasi populer:
+* **Malta**: Menerapkan serangkaian undang-undang yang dirancang untuk menarik perusahaan `blockchain`.
+* **Singapura**: Memperlakukan *cryptocurrency* sebagai barang, yang menguntungkan dari segi pajak, dan memiliki kerangka hukum yang jelas.
+* **Hong Kong**: Tidak memiliki pajak keuntungan modal dan mengambil pendekatan yang relatif longgar terhadap regulasi bursa *spot*.
+* **Bahama**: Dikenal sebagai yurisdiksi ramah finansial dan sedang menyusun RUU untuk menarik proyek *crypto*.
+
+## Risiko Tersembunyi: *Stablecoins* dan ICOs
+
+### Masalah pada *Stablecoins*
+
+Meskipun bertujuan stabil, tidak semua *stablecoin* berhasil. Buku ini memberikan contoh kegagalan dan kontroversi:
+* **NuBits**: Gagal mempertahankan patokannya terhadap USD karena model cadangan fraksionalnya yang cacat.
+* **Basis**: Proyek ambisius yang mengumpulkan $133 juta tetapi harus ditutup dan mengembalikan dana karena tokennya dianggap sebagai sekuritas oleh regulator AS, yang membuat model desentralisasinya mustahil diimplementasikan.
+* **Tether (USDT)**: *Stablecoin* terbesar namun paling kontroversial. Dikelola secara terpusat oleh Bitfinex, belum pernah diaudit secara penuh, dan menghadapi masalah hukum serius terkait cadangannya.
+
+### Sisi Gelap *Initial Coin Offerings* (ICOs)
+
+Laporan SEC tentang **The DAO** pada tahun 2017 adalah titik balik yang menyatakan bahwa banyak `token` ICO memenuhi definisi **sekuritas** dan harus tunduk pada hukum sekuritas. Sejak saat itu, banyak ICO terbukti sebagai proyek yang tidak layak atau penipuan langsung.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_8-3.png" alt="gambar" width="550"/>
+</p>
+
+[Grafik spektrum yang menunjukkan berbagai tingkat viabilitas ICO, dari proyek yang sah dan berniat baik di satu sisi, hingga penipuan terang-terangan (scam) di sisi lain. - Figure 8-3]
+
+Buku ini menyarankan untuk mengevaluasi tiga faktor utama sebuah ICO:
+1.  **Niat Pendiri (*Founder Intentions*)**: Apakah mereka benar-benar bersemangat untuk memecahkan masalah, atau hanya ingin menggalang dana dengan cepat?
+2.  **Ekonomi `Token` (*Token Economics*)**: Apakah `token` tersebut memiliki **utilitas** nyata dalam ekosistem, atau hanya berfungsi sebagai **sekuritas** untuk spekulasi?
+3.  ***Whitepaper***: Apakah rencana bisnisnya masuk akal dan menjawab pertanyaan: "Mengapa ini harus ada di `blockchain`?"
+
+## Peretasan Bursa (*Exchange Hacks*)
+
+Ini adalah bagian paling kritis bagi seorang auditor. Bursa terpusat adalah target utama peretas karena mereka menyimpan *private key* milik ribuan pengguna.
+
+* **Mt. Gox**: Kasus peretasan bursa paling terkenal dalam sejarah. Antara 2011 dan 2014, bursa ini kehilangan total **850.000 `bitcoin`** (bernilai $425 juta saat itu) melalui serangkaian peretasan yang tidak terdeteksi dan manajemen keamanan yang buruk. Dana yang dicuri dilacak mengalir melalui bursa lain seperti BTC-e, menunjukkan adanya ekosistem pencucian uang yang terorganisir.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_8-4.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram alur yang menunjukkan jejak dana curian dari Mt. Gox, Bitcoinica, dan Bitfloor yang semuanya mengalir ke bursa BTC-e untuk dicuci. - Figure 8-4]
+
+* **Coincheck (2018)**: Kehilangan lebih dari $500 juta dalam bentuk *crypto* NEM karena praktik keamanan yang sangat buruk, seperti tidak menggunakan *cold wallet* atau *multisignature*.
+* **NiceHash (2017)**: Sebuah pasar *hash power* yang diretas dan kehilangan 4.700 BTC.
+
+## Peretasan Lainnya
+
+Selain menyerang bursa, peretas menggunakan berbagai metode kreatif:
+
+* **Mengekspos *Private Key***: Seperti dalam kasus reporter Bloomberg TV yang secara tidak sengaja menunjukkan QR code *private key* di siaran langsung, yang dananya langsung dicuri oleh pemirsa.
+* ***CryptoLocker* dan *Ransomware***: Malware yang mengenkripsi file korban dan menuntut pembayaran dalam *crypto* (biasanya `Bitcoin` atau `Monero`) untuk kunci dekripsi.
+* ***SIM Swapping***: Serangan yang sangat berbahaya dan umum. Pelaku menipu operator seluler untuk mentransfer nomor telepon korban ke SIM card milik mereka. Setelah menguasai nomor telepon, mereka dapat mencegat kode verifikasi 2FA berbasis SMS untuk mereset kata sandi email dan akun bursa korban, lalu menguras dananya.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_8-5.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar dari opsi pemulihan kata sandi akun Google, menunjukkan bagaimana nomor telepon dapat digunakan sebagai metode pemulihan, yang menjadi target dalam serangan SIM swapping. - Figure 8-5]
+
+## Rangkuman Bab 8
+
+Bab ini berfungsi sebagai pengingat keras bahwa inovasi teknologi selalu diiringi oleh penyalahgunaan. Dari pasar gelap hingga skema Ponzi, dari peretasan bursa besar-besaran hingga serangan rekayasa sosial seperti *SIM swapping*, sejarah awal *cryptocurrency* dipenuhi dengan pelajaran mahal tentang keamanan. Bagi seorang auditor, memahami vektor serangan ini—baik teknis maupun non-teknis—dan bagaimana regulator meresponsnya adalah fundamental untuk dapat mengevaluasi risiko secara akurat dalam proyek `blockchain` apa pun.
+
+---
+
+# Bab 9 
+## Blockchain Lainnya
+
+Bab ini mengeksplorasi bagaimana konsep inti `blockchain` diadaptasi untuk kebutuhan bisnis dan organisasi. `Blockchain` publik, dengan sifatnya yang transparan dan seringkali spekulatif, tidak selalu cocok untuk lingkungan korporat yang menuntut privasi, kontrol akses, dan kepatuhan terhadap peraturan.
+
+## Untuk Apa `Blockchain` Berguna (Dalam Konteks Bisnis)?
+
+Meskipun kasus penggunaan utama `blockchain` publik adalah *cryptocurrency*, teknologi di baliknya—konsensus, *hashing*, enkripsi, dan distribusi—menawarkan properti yang menarik bagi bisnis:
+* **Merekam secara Permanen**: Sangat sulit untuk mengubah catatan yang sudah ada.
+* **Berbagi Data**: Memungkinkan banyak pihak yang tidak saling percaya untuk berkolaborasi dalam satu set data yang sama dan terverifikasi.
+
+Masalah utama yang coba dipecahkan `blockchain` di dunia bisnis adalah **koordinasi dan sinkronisasi *database***. Saat ini, setiap perusahaan memiliki *database* silo mereka sendiri, dan mereka harus terus-menerus melakukan rekonsiliasi satu sama lain, yang memakan waktu dan biaya. `Blockchain` menawarkan prospek sebuah *database* bersama yang dapat dipercaya oleh semua pihak.
+
+## *Databases* dan *Ledgers*
+
+* ***Database***: Kumpulan informasi terstruktur yang biasanya dikelola secara terpusat oleh seorang administrator.
+* ***Ledger***: Istilah untuk sistem pencatatan. Dalam konteks `blockchain`, kita membedakan antara:
+    * ***Permissionless Ledger***: `Blockchain` terbuka seperti `Bitcoin`, di mana **siapa saja** bisa bergabung dan berpartisipasi.
+    * ***Permissioned Ledger***: `Blockchain` privat atau konsorsium, di mana partisipan **harus mendapatkan izin** untuk bergabung. Ini adalah model yang dominan di dunia enterprise. Istilah yang sering digunakan di sini adalah **Distributed Ledger Technology (DLT)**.
+
+## Desentralisasi vs. Sentralisasi (Dalam Konteks Bisnis)
+
+Dalam `blockchain` privat, tingkat desentralisasi menjadi sebuah pilihan desain, bukan sebuah keharusan ideologis. Seringkali, **komposisi jaringan** (siapa saja yang diizinkan berpartisipasi) dianggap lebih penting daripada mekanisme konsensus itu sendiri. Tujuannya bukan untuk menjadi "tanpa kepercayaan" (*trustless*) sepenuhnya, melainkan untuk menciptakan sistem kepercayaan yang efisien di antara sekelompok pihak yang sudah dikenal.
+
+Buku ini menguraikan empat properti kunci yang harus dimiliki oleh DLT yang andal:
+1.  **Kontrol Penerimaan (*Admission Control*)**: Aturan yang jelas tentang siapa yang boleh bergabung dan data apa yang boleh dimasukkan.
+2.  **Konsensus (*Consensus*)**: Mekanisme untuk menyetujui validitas data.
+3.  **Verifikasi (*Verification*)**: Proses untuk memastikan perilaku jaringan sudah benar dan sesuai aturan.
+4.  **Penegakan (*Enforcement*)**: Mekanisme untuk menjaga keteraturan dan mencegah penyimpangan.
+
+## Implementasi Enterprise
+
+Beberapa platform DLT telah muncul sebagai pemain utama di ruang enterprise.
+
+### Implementasi Berbasis `Ethereum`
+
+Banyak perusahaan memulai dengan melakukan *fork* pada `Ethereum` untuk menambahkan fitur privasi yang mereka butuhkan:
+* **Nightfall (oleh EY)**: Menggunakan kriptografi **zk-SNARKs** untuk memungkinkan `transaction` `token` ERC-20 dan ERC-721 yang privat di atas `blockchain` `Ethereum`.
+* **Quorum (oleh JPMorgan)**: Sebuah *fork* `Ethereum` yang mendukung `transaction` dan `smart contract` privat.
+
+### Platform DLT Utama
+
+* **Hyperledger (dihosting oleh Linux Foundation)**: Ini adalah proyek payung *open-source* untuk berbagai kerangka kerja `blockchain`. Yang paling terkenal adalah **Hyperledger Fabric**, sebuah DLT modular yang banyak digunakan oleh perusahaan seperti IBM dan Oracle.
+* **Corda (oleh R3)**: Didesain khusus untuk industri keuangan, Corda memiliki arsitektur yang unik:
+    * **Tidak ada `blockchain` global**: `Transaction` hanya dibagikan dan dicatat oleh pihak-pihak yang terlibat langsung (*peer-to-peer*), bukan disiarkan ke seluruh jaringan. Ini memberikan privasi bawaan.
+    * **Model UTXO**: Mirip dengan `Bitcoin`.
+    * **Konsensus Validitas & Keunikan**: Konsensus hanya diperlukan untuk memastikan `transaction` valid dan inputnya belum dibelanjakan, bukan untuk menyetujui urutan global.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_9-1.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram perbandingan antara dua perusahaan yang berinteraksi tanpa Corda (database terpisah) dan dengan Corda (ledger bersama yang tersinkronisasi). - Figure 9-1]
+ 
+ <p align="center">
+   <img src="images/books-03-mastering_blockchain/figure_9-2.png" alt="gambar" width="550"/>
+ </p>
+ 
+[Diagram jaringan Corda, menunjukkan beberapa node (perusahaan) yang terhubung secara peer-to-peer, dengan Notary Node yang memvalidasi keunikan transaksi. - Figure 9-2]
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_9-3.png" alt="gambar" width="550"/>
+</p>
+
+[Ilustrasi privasi di Corda, menunjukkan bahwa Bob dapat melihat transaksinya dengan Alice dan Carl, tetapi Alice tidak dapat melihat transaksi Bob dengan Carl. - Figure 9-3]
+
+* **DAML (oleh Digital Asset)**: Ini adalah **bahasa `smart contract`** yang agnostik terhadap `blockchain`. Pengembang dapat menulis logika bisnis dalam DAML, dan kemudian menjalankannya di berbagai platform DLT yang berbeda seperti Hyperledger Fabric atau Corda.
+
+## *Blockchain as a Service* (BaaS)
+
+Penyedia layanan *cloud* besar telah memudahkan perusahaan untuk bereksperimen dengan `blockchain` melalui penawaran BaaS mereka:
+* **Amazon QLDB**: Sebuah *database ledger* terpusat yang dapat diverifikasi secara kriptografis.
+* **Microsoft Azure**: Menawarkan *template* untuk menerapkan berbagai jaringan DLT seperti Quorum dan Corda.
+* **IBM Blockchain Platform**: Dibangun di atas Hyperledger Fabric.
+
+## Kasus Penggunaan di Berbagai Industri
+
+Bab ini menyajikan banyak contoh nyata tentang bagaimana DLT sedang diuji coba:
+
+* **Perbankan dan Keuangan**:
+    * Bank sentral seperti **Banque de France** dan **US Federal Reserve** sedang bereksperimen dengan DLT untuk pembayaran antar bank dan identitas digital.
+    * **JPMorgan** telah menciptakan **JPM Coin**, sebuah *stablecoin*, untuk mempercepat pembayaran lintas batas di jaringannya yang berbasis **Quorum**.
+    * Bank seperti **Santander** telah menerbitkan **obligasi digital** sepenuhnya di `blockchain`.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_9-4.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram desain uji coba blockchain oleh Boston Fed, menggunakan Hyperledger untuk merekonsiliasi pembayaran antar bank. - Figure 9-4]
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_9-5.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram alur proses penerbitan obligasi digital oleh Santander di blockchain, melibatkan issuer, custodian, dan investor. - Figure 9-5]
+
+* **Industri Lain**:
+    * **Legal**: Menggunakan `smart contract` untuk perjanjian pengiriman barang.
+    * **Gaming**: Menciptakan permainan catur *on-chain* yang terbukti adil dan tidak bisa dicurangi.
+    * **Kesehatan**: Membuat catatan kesehatan yang dapat diaudit dan dikontrol oleh pasien.
+    * **Pembayaran**: **Visa** meluncurkan **B2B Connect** (berbasis Hyperledger) untuk pembayaran korporat lintas batas.
+    
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_9-6.png" alt="gambar" width="550"/>
+</p>
+
+[Skema permainan catur on-chain yang dikembangkan oleh Technical University of Berlin, menggunakan smart contract Ethereum. - Figure 9-6]
+
+## Studi Kasus: Libra
+
+**Libra** (sekarang Diem) adalah proyek yang diprakarsai oleh Facebook, yang bertujuan untuk menciptakan sistem pembayaran global. Ini adalah contoh model hibrida: `permissioned` pada awalnya, dengan rencana untuk menjadi lebih `permissionless` di masa depan.
+
+* **Libra Association**: Sebuah konsorsium perusahaan besar (seperti Uber, Spotify, Coinbase) yang bertindak sebagai **Validator Nodes** awal, yang bertanggung jawab untuk menjalankan jaringan dan memvalidasi `transaction`.
+* **Teknologi**:
+    * **Konsensus**: Menggunakan protokol **Byzantine Fault Tolerant (BFT)** yang cepat dan efisien bernama **HotStuff**.
+    * **`Smart Contract`**: Menggunakan bahasa pemrograman baru yang aman bernama **Move**.
+    * **Aset**: Didukung oleh cadangan aset nyata (seperti mata uang fiat dan obligasi pemerintah).
+* **Cara Kerja**:
+    * `Transaction` diusulkan oleh seorang "pemimpin" yang bergiliran di antara para validator.
+    * Sebuah blok dianggap final setelah disetujui oleh mayoritas validator (melalui **Quorum Certificate**) dan memiliki tiga blok turunan yang juga telah disetujui. Ini memberikan finalitas yang cepat.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_9-7.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram mekanisme konsensus Libra, menunjukkan bagaimana seorang pemimpin validator mengusulkan blok dan validator lainnya memberikan suara. - Figure 9-7]
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_9-8.png" alt="gambar" width="550"/>
+</p>
+
+[Ilustrasi proses komitmen blok di Libra, di mana Blok #100 menjadi final hanya setelah Blok #103 yang berisi Quorum Certificate untuk Blok #102 diusulkan. - Figure 9-8]
+
+Struktur `transaction` Libra mirip dengan `Ethereum` (model akun) dan mencakup *fields* seperti alamat pengirim, program (kode Move), harga `gas`, dan nomor urut untuk mencegah *replay attacks*.
+
+## Rangkuman Bab 9
+
+Bab ini menunjukkan bahwa masa depan `blockchain` tidak hanya terbatas pada jaringan publik yang `permissionless`. Untuk adopsi oleh perusahaan, model `permissioned` DLT seperti Hyperledger Fabric dan Corda menawarkan solusi yang lebih sesuai dengan kebutuhan akan privasi, kontrol, dan kepatuhan. Proyek ambisius seperti Libra mencoba menjembatani kesenjangan antara dunia terpusat dan terdesentralisasi. Bagi seorang auditor, sangat penting untuk memahami model kepercayaan dari setiap sistem ini: apakah keamanan bergantung pada insentif kriptoekonomi (seperti `Bitcoin`) atau pada identitas dan reputasi para pihak yang berpartisipasi (seperti Corda dan Libra)?
+
+---
+
+# Bab 10 
+## Masa Depan `Blockchain`
+
+Bab ini dimulai dengan sebuah analogi yang kuat: kondisi `blockchain` saat ini sering disamakan dengan internet di masa-masa awalnya—lambat, rumit, dan adopsi konsumennya masih rendah. Namun, seperti yang ditunjukkan oleh sejarah, teknologi baru diadopsi dengan kecepatan yang semakin meningkat.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_10-1.png" alt="gambar" width="550"/>
+</p>
+
+[Grafik yang menunjukkan tingkat adopsi berbagai teknologi dari waktu ke waktu, di mana teknologi yang lebih baru seperti smartphone dan tablet diadopsi jauh lebih cepat daripada teknologi yang lebih tua seperti telepon dan listrik. - Figure 10-1]
+
+Buku ini juga memberikan pelajaran dari sejarah internet itu sendiri: pertarungan antara protokol **OSI** (yang didukung oleh komite dan pemerintah) dan **TCP/IP** (yang lebih fleksibel dan *open-source*). Pada akhirnya, TCP/IP yang lebih gesit menang dan menjadi standar internet. Pelajarannya adalah bahwa proyek `blockchain` yang paling menjanjikan saat ini belum tentu menjadi pemenang di masa depan. Ekosistem ini sangat dinamis.
+
+## *Blockchains* yang Patut Diperhatikan
+
+Selain `Bitcoin` dan `Ethereum`, buku ini menyoroti beberapa platform lain yang menawarkan pendekatan berbeda:
+
+* **EOS**: Platform yang dirancang untuk *throughput* `transaction` yang sangat tinggi dan tanpa biaya `transaction` langsung. Ini dicapai dengan menggunakan model konsensus yang lebih terpusat, di mana sejumlah kecil "block propagators" yang kuat memvalidasi `transaction`.
+* **Cardano**: Platform `smart contract` yang menggunakan mekanisme *Proof-of-Stake* dan dikenal karena pendekatannya yang sangat akademis dan berbasis riset, menggunakan bahasa pemrograman fungsional Haskell.
+* **Monero**: `Blockchain` yang berfokus pada privasi dan mendapatkan daya tarik sebagai "uang tunai digital" yang sesungguhnya.
+
+### Penjelasan Mendalam: Cara Kerja `Monero`
+
+Untuk memahami betapa berbedanya `blockchain` privasi, buku ini memberikan contoh `transaction` `Monero`. Tidak seperti `Bitcoin`, detail `transaction` `Monero` sebagian besar disembunyikan dari publik. Ini dicapai melalui tiga teknologi kriptografi utama:
+
+1.  ***Ring Signatures***: Untuk menyembunyikan **identitas pengirim**. Ketika Kita mengirim `transaction`, input Kita dicampur dengan 10 input "umpan" (*decoy*) lainnya yang diambil secara acak dari `blockchain`. Secara publik, ada 11 kemungkinan pengirim, tetapi hanya pengirim asli yang tahu mana yang benar. Untuk mencegah *double-spending*, setiap input asli menghasilkan ***key image*** yang unik, yang dicatat di `blockchain` tanpa mengungkapkan input mana yang digunakannya.
+
+2.  ***Ring Confidential Transactions (RingCT)***: Untuk menyembunyikan **jumlah `transaction`**. Jumlah yang dikirim dienkripsi. Namun, *miner* masih dapat memverifikasi bahwa `transaction` itu valid (yaitu, tidak ada koin yang diciptakan dari udara tipis) dengan menggunakan bukti kriptografis yang disebut ***range proof***, yang membuktikan bahwa `sum(input) = sum(output)` tanpa perlu mengetahui jumlah sebenarnya.
+
+3.  ***Stealth Addresses***: Untuk menyembunyikan **identitas penerima**. Untuk setiap `transaction`, pengirim membuat alamat publik unik sekali pakai atas nama penerima. Hanya pengirim dan penerima yang tahu bahwa alamat ini ditujukan untuk penerima tersebut, sehingga tidak ada yang bisa melacak semua `transaction` yang masuk ke satu alamat publik yang sama.
+
+## Masalah Skalabilitas (*The Scaling Problem*)
+
+Ini adalah tantangan terbesar yang dihadapi `blockchain` publik saat ini. `Bitcoin` (3-7 TPS) dan `Ethereum` (~20 TPS) terlalu lambat untuk adopsi massal. Bab ini membahas beberapa solusi canggih yang sedang dikembangkan:
+
+* ***Sidechains***: `Blockchain` sekunder yang berjalan paralel dengan `blockchain` utama. Aset dapat dipindahkan dari rantai utama ke *sidechain*, di mana `transaction` dapat diproses lebih cepat dan murah, dan kemudian dipindahkan kembali ke rantai utama saat diperlukan. **Liquid Network** dari Blockstream adalah contoh *federated sidechain* untuk `Bitcoin`.
+* ***Sharding***: Teknik partisi *database* di mana `blockchain` dan beban kerjanya dipecah menjadi beberapa segmen yang lebih kecil yang disebut **`shards`**. Setiap *shard* dapat memproses `transaction` secara paralel, sehingga secara dramatis meningkatkan *throughput* total jaringan.
+* **DAGs (*Directed Acyclic Graphs*)**: Struktur data alternatif untuk `blockchain`. Alih-alih rantai linier, `transaction` membentuk struktur seperti jaring di mana setiap `transaction` baru memvalidasi beberapa `transaction` sebelumnya. Ini memungkinkan pemrosesan paralel dan berpotensi mencapai skalabilitas yang sangat tinggi.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_10-2.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram struktur jaringan DAG, menunjukkan node-node transaksi yang saling terhubung dalam format jaring, bukan rantai lurus. - Figure 10-2]
+
+### Penjelasan Mendalam: *Lightning Network*
+
+Buku ini memberikan penjelasan rinci tentang *Lightning Network* sebagai solusi skalabilitas Lapisan-2 (*Layer-2*) untuk `Bitcoin`.
+
+1.  **Konsep Inti**: Alih-alih mencatat setiap `transaction` kecil di `blockchain` utama, pengguna membuka **saluran pembayaran (*payment channel*)** satu sama lain.
+2.  **Transaksi Pendanaan (*Funding Transaction*)**: Untuk membuka saluran, Alice (misalnya) mengirim `transaction` `on-chain` yang mengunci sejumlah BTC ke dalam alamat *multisignature* 2-dari-2 yang dikendalikan bersama oleh Alice dan Bob.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_10-4.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram yang menunjukkan Alice membuka payment channel dengan Bob dengan mengirimkan funding transaction ke blockchain. - Figure 10-4]
+
+3.  **Transaksi *Off-Chain***: Setelah saluran didanai, Alice dan Bob dapat saling mengirim BTC dalam jumlah tak terbatas secara instan dan hampir tanpa biaya. `Transaction` ini hanyalah pertukaran pesan yang ditandatangani secara kriptografis di antara mereka, yang memperbarui saldo di dalam saluran. `Transaction`-`transaction` ini **tidak disiarkan** ke `blockchain` utama.
+4.  **Menutup Saluran**: Ketika mereka selesai bertransaksi, mereka menyiarkan satu `transaction` terakhir ke `blockchain` utama yang mendistribusikan saldo akhir dari alamat *multisignature* kembali ke alamat masing-masing.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_10-5.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram yang menunjukkan Alice dan Bob menarik dana dari payment channel mereka melalui sebuah transaksi multisig. - Figure 10-5]
+
+Dengan demikian, ribuan `transaction` *off-chain* dapat diselesaikan hanya dengan dua `transaction` *on-chain* (membuka dan menutup).
+
+### Penskalaan `Ethereum` (`Ethereum 2.0`)
+
+`Ethereum` sedang dalam proses *upgrade* besar-besaran yang disebut **`Ethereum 2.0`**, yang bertujuan untuk meningkatkan skalabilitas secara masif. Komponen utamanya meliputi:
+* **Perpindahan ke *Proof-of-Stake***: Menggunakan algoritma bernama **Casper** yang jauh lebih hemat energi daripada *mining* PoW.
+* ***Sharding***: Memecah jaringan `Ethereum` menjadi 64 `shard chains` yang berjalan secara paralel.
+* ***Beacon Chain***: `Blockchain` PoS baru yang berfungsi sebagai "jantung" yang mengoordinasikan semua *shard* dan menjaga konsensus.
+
+## Masa Depan Privasi dan Interoperabilitas
+
+* **Privasi**: Inovasi terus berlanjut di luar `Monero`.
+    * **Schnorr Signatures**: Peningkatan pada `Bitcoin` yang memungkinkan beberapa tanda tangan dalam satu `transaction` digabungkan menjadi satu, meningkatkan efisiensi dan privasi (misalnya, membuat `transaction` *multisig* terlihat seperti `transaction` biasa).
+    * **Taproot**: Peningkatan lain pada `Bitcoin` yang menggunakan **MAST** (*Merkelized Abstract Syntax Trees*) untuk menyembunyikan logika `smart contract` yang kompleks, membuatnya terlihat seperti `transaction` sederhana di `blockchain`.
+* **Interoperabilitas**: Kemampuan `blockchain` yang berbeda untuk berkomunikasi satu sama lain. Ini dianggap sebagai langkah penting berikutnya untuk adopsi massal. Proyek seperti **`Polkadot`** dan **`Cosmos`** sedang membangun "internet `blockchain`" untuk tujuan ini.
+
+## Rangkuman Bab 10
+
+Bab terakhir ini melukiskan gambaran masa depan `blockchain` yang dinamis dan penuh tantangan. Masalah-masalah fundamental seperti **skalabilitas** dan **privasi** sedang ditangani secara aktif melalui berbagai pendekatan inovatif, mulai dari solusi Lapisan-2 seperti *Lightning Network*, arsitektur baru seperti *sharding* dan DAGs, hingga kriptografi canggih seperti *zero-knowledge proofs*. Seperti halnya TCP/IP yang muncul sebagai standar pemenang untuk internet, pertempuran untuk menjadi protokol `blockchain` fundamental di masa depan masih berlangsung. Bagi Kita sebagai auditor, ini berarti lanskap risiko akan terus berubah, dan kemampuan untuk memahami serta mengevaluasi teknologi-teknologi baru ini akan menjadi sangat berharga.
