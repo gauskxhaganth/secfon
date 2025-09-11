@@ -8,6 +8,7 @@ Books:
 01. Grokking Bitcoin by Kalle Rosenbaum
 02. Mastering Bitcoin by Andreas M. Antonopoulos & David A. Harding
 03. Mastering Blockchain by Lorne Lantz & Daniel Cawrey
+03z. 03a. Programming Bitcoin by Jimmy Song
 
 Cyfrin Updraft:
 
