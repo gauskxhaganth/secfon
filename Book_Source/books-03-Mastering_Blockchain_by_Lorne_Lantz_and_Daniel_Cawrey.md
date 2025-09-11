@@ -891,3 +891,280 @@ Bab ini menunjukkan lompatan besar dari `blockchain` sebagai buku kas digital me
 
 ---
 
+# Bab 5
+## Tokenize Everything
+
+Bab ini mengeksplorasi bagaimana `Ethereum` memungkinkan siapa saja untuk menciptakan *cryptocurrency* mereka sendiri dengan relatif mudah. Aset-aset digital ini, yang dikenal sebagai **`tokens`**, telah memicu gelombang inovasi, spekulasi, dan penggalangan dana melalui mekanisme yang disebut *Initial Coin Offerings* (ICOs).
+
+### Latar Belakang: Ledakan ICO
+
+Buku ini memulai dengan memberikan konteks historis tentang beberapa ICO yang paling berpengaruh, yang menunjukkan evolusi dari ide ke platform yang matang:
+* **Mastercoin (2013)**: Dianggap sebagai "token sale" pertama, menggalang dana untuk membangun protokol baru di atas `Bitcoin`.
+* **Ethereum (2014)**: Mengadakan *crowdsale* selama 42 hari, menjual sekitar 60 juta `ether` dan mengumpulkan dana setara $18 juta, yang menjadi cetak biru bagi banyak ICO di masa depan.
+* **Gnosis (2017)**: Menggunakan model lelang Belanda yang inovatif, berhasil mengumpulkan dana besar dalam waktu singkat.
+* **EOS (2017-2018)**: Mengadakan ICO selama setahun penuh di platform `Ethereum`, mengumpulkan dana lebih dari $4 miliar, salah satu yang terbesar sepanjang masa.
+
+Namun, era ICO yang tidak diregulasi ini mulai berakhir ketika regulator, seperti SEC di AS, mulai turun tangan. Kasus terhadap proyek Munchee pada tahun 2017 menjadi titik balik, di mana SEC menyatakan bahwa `token` mereka adalah sebuah **sekuritas** (*security*), yang secara efektif mengakhiri praktik ICO spekulatif di AS.
+
+## *Tokens* di Platform `Ethereum`
+
+Membuat `token` di `Ethereum` memungkinkan pengembang untuk menerbitkan aset digital yang secara otomatis kompatibel dengan ekosistem `Ethereum` yang luas (seperti *wallets* dan bursa). Standar teknis seperti **ERC-20** memastikan interoperabilitas ini.
+
+Di luar *cryptocurrency*, `token` memiliki potensi untuk merepresentasikan aset dunia nyata, seperti real estat, karya seni, atau saham, yang memungkinkan pencatatan kepemilikan dan transfer yang lebih efisien dan transparan.
+
+### *Fungible* dan *Nonfungible Tokens*
+
+Ini adalah dua kategori `token` yang paling fundamental:
+1.  ***Fungible Tokens***: Setiap `token` identik dan dapat dipertukarkan satu sama lain. Nilainya sama. Contohnya adalah mata uang seperti dolar AS atau `bitcoin`. Satu `bitcoin` sama nilainya dengan `bitcoin` lainnya. Standar yang paling umum untuk ini adalah **ERC-20**.
+2.  ***Nonfungible Tokens* (NFTs)**: Setiap `token` unik, memiliki atribut tersendiri, dan tidak dapat dipertukarkan secara setara. Contohnya adalah sebuah rumah, lukisan, atau `token` CryptoKitties. Setiap CryptoKitty adalah unik. Standar yang paling umum untuk ini adalah **ERC-721**.
+
+### Apakah `Token` Diperlukan?
+
+Buku ini mengajukan pertanyaan penting bagi setiap pengembang `blockchain`: Apakah proyek ini benar-benar membutuhkan `token`? Banyak proyek ICO menciptakan `token` hanya untuk tujuan penggalangan dana tanpa kegunaan nyata di dalam ekosistem mereka. Di bawah pengawasan regulator, `token` harus memiliki **utilitas** (*utility*) yang jelas agar tidak dianggap sebagai sekuritas semata.
+
+### *Airdrops*
+
+Selain ICO, metode distribusi `token` lainnya adalah ***airdrop***, di mana `token` dibagikan secara gratis kepada pemegang *cryptocurrency* lain (misalnya, semua pemilik alamat `Ethereum`). Tujuannya adalah untuk menciptakan basis pengguna awal secara instan. Namun, ini memiliki kekurangan seperti potensi implikasi pajak dan dilusi nilai.
+
+## Memahami *Ethereum Requests for Comment* (ERCs)
+
+ERCs adalah standar teknis yang diusulkan dan disetujui oleh komunitas `Ethereum` untuk memastikan bahwa `smart contracts` dan aplikasi dapat berinteraksi satu sama lain dengan andal.
+
+### ERC-20: Standar untuk *Fungible Tokens*
+
+ERC-20 adalah standar yang paling banyak digunakan. Sebuah `smart contract` yang sesuai dengan ERC-20 harus mengimplementasikan serangkaian fungsi dan *event* wajib.
+
+**Fungsi Wajib ERC-20**:
+* `totalSupply()`: Mengembalikan jumlah total `token` yang ada.
+* `balanceOf(address _owner)`: Mengembalikan saldo `token` dari sebuah alamat.
+* `transfer(address _to, uint256 _value)`: Mengirim `token` dari alamat pengirim `transaction` ke alamat lain.
+* `approve(address _spender, uint256 _value)`: Memberi izin kepada alamat lain (*spender*) untuk menarik sejumlah `token` dari akun Anda.
+* `allowance(address _owner, address _spender)`: Mengembalikan sisa jumlah `token` yang diizinkan untuk ditarik oleh *spender*.
+* `transferFrom(address _from, address _to, uint256 _value)`: Digunakan oleh *spender* untuk mengirim `token` atas nama pemilik akun.
+
+**Event Wajib ERC-20**:
+* `Transfer(...)`: Demicu ketika `token` ditransfer.
+* `Approval(...)`: Demicu ketika fungsi `approve` dipanggil.
+
+Buku ini menyediakan contoh kode `smart contract` ERC-20 (`EIP20.sol`), yang menunjukkan bagaimana fungsi-fungsi ini diimplementasikan.
+
+### ERC-721: Standar untuk *Nonfungible Tokens* (NFTs)
+
+ERC-721 memungkinkan penciptaan `token` yang unik dan langka secara digital. Setiap `token` memiliki `tokenId` yang unik dan dapat memiliki metadata yang berbeda.
+
+Contoh paling terkenal adalah **CryptoKitties**, sebuah permainan di mana setiap "kucing" digital adalah sebuah `token` ERC-721 yang unik. Atribut unik dari setiap kucing (seperti warna, pola, generasi) disimpan di `blockchain` dan dapat dilihat dengan memanggil fungsi di *smart contract* CryptoKitties.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_5-1.png" alt="gambar" width="550"/>
+</p>
+
+[Gambar seekor CryptoKitty bernama Draco #1154, yang merupakan seekor kucing digital bergaya naga hijau, menampilkan atribut-atribut uniknya. - Figure 5-1]
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_5-2.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan dari Etherscan yang menunjukkan hasil pemanggilan fungsi 'getKitty' pada smart contract CryptoKitties dengan ID 1270015, mengembalikan data atribut unik dari kucing tersebut yang tersimpan di blockchain. - Figure 5-2]
+
+### ERC-777: Standar *Fungible Token* yang Ditingkatkan
+
+ERC-777 diusulkan untuk memperbaiki beberapa kekurangan dari ERC-20. Masalah utama dengan ERC-20 adalah ketika `token` dikirim ke sebuah `smart contract`, kontrak tersebut tidak diberi tahu tentang penerimaan `token` tersebut. Hal ini menyebabkan banyak `token` "terbakar" atau hilang selamanya.
+
+ERC-777 memperkenalkan ***hooks***, yaitu fungsi yang secara otomatis dipanggil pada kontrak pengirim dan penerima saat `transaction` terjadi (`tokensToSend` dan `tokensReceived`). Ini memungkinkan kontrak untuk bereaksi terhadap `transaction` `token` yang masuk dan menolak `transaction` yang tidak diinginkan, sehingga mencegah kehilangan dana.
+
+### ERC-1155: Standar Multi-Token
+
+Diciptakan oleh Enjin dan dirancang untuk industri *gaming*, ERC-1155 adalah standar yang lebih efisien yang dapat mengelola **beberapa jenis `token` (baik *fungible* maupun *nonfungible*) dalam satu `smart contract` tunggal**. Misalnya, dalam sebuah game, pedang legendaris bisa menjadi NFT, sementara koin emas bisa menjadi `token` *fungible*.
+
+Salah satu peningkatannya yang signifikan adalah kemampuan untuk melakukan **transfer batch**, yaitu mengirim beberapa jenis `token` yang berbeda ke beberapa alamat dalam satu `transaction`, yang secara drastis mengurangi biaya `gas`.
+
+## Pola *Smart Contract* Umum
+
+Selain standar `token`, bab ini membahas dua jenis `smart contract` penting lainnya.
+
+### *Multisignature Contracts*
+
+Sebuah *wallet* `Ethereum` standar (disebut *Externally Owned Account* atau EOA) dikendalikan oleh satu *private key*. Jika kunci ini dicuri, semua dana hilang. Ini adalah **titik kegagalan tunggal** (*single point of failure*).
+
+***Multisignature (multisig) contract*** adalah `smart contract` yang bertindak sebagai *wallet* bersama yang memerlukan **M dari N** tanda tangan untuk mengotorisasi sebuah `transaction`. Contohnya, sebuah kontrak 3-dari-5 memerlukan tanda tangan dari 3 alamat pemilik yang berbeda (dari total 5 pemilik) sebelum dana dapat dikirim.
+
+Ini secara signifikan meningkatkan keamanan dan sering digunakan oleh proyek-proyek ICO untuk mengelola dana yang mereka kumpulkan secara transparan.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_5-3.png" alt="gambar" width="550"/>
+</p>
+
+[Contoh log event dari sebuah transaksi multisig di Etherscan, menunjukkan urutan event: submitTransaction oleh satu pemilik, diikuti oleh confirmTransaction oleh dua pemilik lainnya sebelum transaksi dieksekusi. - Figure 5-3]
+
+### *Decentralized Exchange (DEX) Contracts*
+
+Berbeda dengan bursa terpusat (*centralized exchanges*) seperti Coinbase yang dikendalikan oleh satu perusahaan, ***decentralized exchange* (DEX)** beroperasi melalui serangkaian `smart contract` di `blockchain`. `Smart contract` ini menangani fungsi-fungsi inti bursa:
+* Menyimpan dana pengguna dalam *escrow*.
+* Mencatat pesanan beli/jual (*order book*).
+* Mengeksekusi pertukaran aset ketika pesanan cocok.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_5-4.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram perbandingan antara arsitektur bursa terpusat (frontend, backend, database dikelola oleh satu perusahaan) dan bursa terdesentralisasi (frontend terpisah, sementara backend dan database adalah smart contract di blockchain Ethereum). - Figure 5-4]
+
+**Keuntungan DEX**:
+* **Transparansi Lebih Besar**: Kode *backend* bersifat publik dan dapat diaudit.
+* **Mengurangi Risiko Rekan-Sanding (*Counterparty Risk*)**: Pengguna tetap memegang kendali atas dana mereka (atau dana dikunci dalam kontrak yang dapat diaudit), bukan mempercayakannya kepada perusahaan.
+
+**Kekurangan DEX**:
+* **Sangat Lambat**: Setiap tindakan (membuat pesanan, membatalkan) adalah sebuah `transaction` yang harus menunggu untuk ditambang.
+* **Mahal**: Setiap `transaction` memerlukan biaya `gas`.
+* **Sulit Digunakan**: Pengalaman pengguna lebih rumit dibandingkan bursa terpusat.
+
+## Rangkuman Bab 5
+
+Bab ini menunjukkan bagaimana `Ethereum` berevolusi menjadi platform dominan untuk **tokenisasi**. Standar-standar seperti ERC-20 dan ERC-721 telah memungkinkan penciptaan ribuan aset digital yang beragam, dari *cryptocurrency* baru hingga barang koleksi digital yang unik. Bagi seorang auditor keamanan, pemahaman mendalam tentang detail teknis setiap standar ERC dan pola `smart contract` seperti *multisig* dan DEX sangatlah penting, karena setiap implementasi memiliki potensi kerentanan dan vektor serangan yang unik.
+
+---
+
+# Bab 6
+## Infrastruktur Pasar
+
+Bab ini mengakui sebuah fakta penting: sebagian besar aktivitas `blockchain` saat ini didorong oleh **spekulasi**. Oleh karena itu, memahami pasar, platform perdagangannya, dan risikonya adalah kunci untuk memahami ekosistem secara keseluruhan. Meskipun infrastruktur pasar telah berkembang pesat, ia masih jauh dari sempurna, tidak teregulasi sepenuhnya, dan penuh dengan manipulasi.
+
+> **Peringatan Buku**: Bab ini bukanlah anjuran untuk berspekulasi. Sangat mungkin untuk kehilangan banyak uang saat memperdagangkan *cryptocurrency*.
+
+## Evolusi Harga `Bitcoin`
+
+`Bitcoin` dianggap sebagai **penentu arah** (*bellwether*) bagi seluruh ekonomi *cryptocurrency*; harga `altcoin` lain umumnya mengikuti tren harga BTC. Sejarah harga `Bitcoin` ditandai oleh siklus *bubble* dan *crash* yang ekstrem, di mana setiap puncaknya lebih tinggi dari yang sebelumnya.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_6-1.png" alt="gambar" width="550"/>
+</p>
+
+[Grafik harga pasar Bitcoin dari tahun 2010 hingga 2020, menunjukkan volatilitas ekstrem dengan beberapa puncak dan lembah yang tajam, termasuk lonjakan besar pada akhir tahun 2017. - Figure 6-1]
+
+## Peran Bursa (*The Role of Exchanges*)
+
+Bursa (*exchanges*) telah menjadi kekuatan dominan di pasar *cryptocurrency*. Memahami mereka adalah kunci untuk memahami pasar.
+
+### Jenis Bursa dan Istilah Perdagangan
+
+Buku ini mengkategorikan bursa menjadi beberapa jenis:
+* ***Centralized exchanges***: Dijalankan oleh sebuah perusahaan yang mengambil biaya dari perdagangan.
+* ***Decentralized exchanges (DEXes)***: Beroperasi menggunakan `smart contracts` (dibahas di Bab 5).
+* ***Spot exchanges***: Memperdagangkan aset *crypto* itu sendiri.
+* ***Derivatives exchanges***: Memperdagangkan produk keuangan yang lebih kompleks seperti *futures* dan *options*.
+
+Beberapa istilah dasar perdagangan yang perlu diketahui:
+* ***Market Order***: Pesanan untuk membeli atau menjual segera pada harga pasar saat ini.
+* ***Limit Order***: Pesanan untuk membeli atau menjual pada harga spesifik yang telah ditentukan.
+* ***Maker/Taker Model***: Model biaya di mana "maker" (penyedia likuiditas yang menempatkan *limit order*) membayar biaya lebih rendah (atau tidak sama sekali) daripada "taker" (yang mengambil likuiditas dengan *market order*).
+* ***Bid***: Harga tertinggi yang bersedia dibayar oleh pembeli.
+* ***Ask***: Harga terendah yang bersedia diterima oleh penjual.
+
+### Konsep Kunci dalam Perdagangan
+
+* ***Order Books***: Tampilan visual dari semua pesanan beli (*bids*) dan jual (*asks*) yang terbuka untuk suatu aset di bursa. Pesanan jual biasanya berwarna merah, dan pesanan beli berwarna hijau.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_6-2.png" alt="gambar" width="550"/>
+</p>
+
+[Contoh tampilan order book sebuah bursa, menunjukkan daftar harga dan jumlah pesanan beli (hijau) di bawah dan pesanan jual (merah) di atas. - Figure 6-2]
+
+* ***Slippage***: Perbedaan antara harga yang diharapkan dari sebuah perdagangan dan harga eksekusi aktualnya. Ini adalah masalah besar di pasar *crypto* yang "tipis" (*thin*), di mana tidak ada cukup pesanan untuk menyerap pesanan besar tanpa menggerakkan harga secara signifikan.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_6-3.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan order book Coinbase Pro yang menunjukkan slippage, di mana jumlah pesanan jual jauh lebih besar daripada pesanan beli pada beberapa tingkat harga. - Figure 6-3]
+
+* ***Depth Charts***: Alat visualisasi untuk *order book* yang menunjukkan seberapa "dalam" likuiditas di sisi beli dan jual. Ini membantu *trader* melihat hubungan antara penawaran dan permintaan secara *real-time*.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_6-4.png" alt="gambar" width="550"/>
+</p>
+
+[Contoh depth chart, dengan kurva hijau di kiri menunjukkan akumulasi pesanan beli dan kurva abu-abu/merah di kanan menunjukkan akumulasi pesanan jual. - Figure 6-4]
+
+* **Yurisdiksi (*Jurisdiction*)**: Tidak seperti pasar saham, `cryptocurrency` diperdagangkan di ribuan pasar di seluruh dunia, masing-masing dengan tingkat pengawasan peraturan yang berbeda. Ini menciptakan lanskap yang kompleks.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_6-5.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram yang mengkategorikan bursa kripto menjadi empat tipe berdasarkan tingkat regulasi dan akses perbankan di berbagai yurisdiksi seperti AS, Malta, Jepang, dan wilayah internasional lainnya. - Figure 6-5]
+
+* ***Wash Trading***: Bentuk manipulasi pasar di mana pelaku secara bersamaan membeli dan menjual aset yang sama untuk menciptakan volume perdagangan palsu. Tujuannya adalah untuk membuat aset terlihat lebih diminati daripada yang sebenarnya, menyembunyikan aktivitas penjualan besar, atau meningkatkan pendapatan biaya untuk bursa.
+
+* **Whales**: Sebutan untuk pemegang *crypto* dalam jumlah sangat besar yang dapat memengaruhi pasar secara signifikan. Mereka dapat memanipulasi harga, terutama pada `altcoin` dengan likuiditas rendah, dengan menciptakan "dinding" beli atau jual (*buy/sell walls*) yang besar di *order book*.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_6-6.png" alt="gambar" width="550"/>
+</p>
+
+[Sebuah depth chart yang menunjukkan "sell wall" yang sangat besar, digambarkan sebagai dinding vertikal berwarna merah yang tinggi, menandakan sejumlah besar pesanan jual pada tingkat harga tertentu. - Figure 6-6]
+
+## Struktur Pasar *Cryptocurrency*
+
+Secara keseluruhan, pasar *cryptocurrency* **kekurangan kedalaman pasar** (*market depth*), yang berarti tidak mampu menyerap pesanan besar dengan mudah seperti pasar tradisional.
+
+### Arbitrase (*Arbitrage*)
+
+**Arbitrase** adalah praktik membeli aset di satu pasar dan secara bersamaan menjualnya di pasar lain dengan harga lebih tinggi untuk mendapatkan keuntungan dari selisih harga. Para *arbitrageur* memainkan peran penting dalam ekosistem dengan membantu menjaga harga tetap konsisten di berbagai bursa dan meningkatkan likuiditas.
+
+### Risiko Rekan-Sanding (*Counterparty Risk*)
+
+Ini adalah salah satu risiko terbesar dalam perdagangan *crypto*: **risiko bahwa bursa yang Anda gunakan akan diretas, bangkrut, atau melarikan diri dengan dana Anda**. Ini menggarisbawahi pepatah terkenal: *"Not your keys, not your money."*
+
+Bursa yang baik memiliki infrastruktur kustodi yang kuat, biasanya melibatkan:
+* ***Cold Storage***: Menyimpan sebagian besar (idealnya >95%) dana pelanggan secara *offline*, tidak terhubung ke internet, untuk melindunginya dari peretas.
+* ***Hot Storage***: Menyimpan sebagian kecil dana (<5%) secara *online* dalam *withdrawal wallet* untuk memproses penarikan pelanggan dengan cepat.
+* ***Warm Wallet***: Dompet perantara yang secara otomatis menyapu dana dari alamat setoran dan mendistribusikannya ke *hot* atau *cold storage*.
+* **Whitelisting**: Mengkonfigurasi *wallet* sehingga hanya dapat mengirim dana ke alamat-alamat tertentu yang telah ditentukan sebelumnya, untuk membatasi kerusakan jika diretas.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_6-8.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram alur sistem kustodi sebuah bursa, menunjukkan bagaimana dana dari beberapa deposit wallet pengguna disatukan di sebuah warm wallet, yang kemudian didistribusikan ke cold storage untuk keamanan jangka panjang dan ke hot storage untuk penarikan. - Figure 6-8]
+
+**Tanda bahaya**: Penundaan penarikan dana yang konsisten sering kali merupakan gejala bahwa bursa sedang mengalami masalah likuiditas dan mungkin akan gagal.
+
+## Analisis Pasar
+
+*Trader* menggunakan dua metode utama untuk menganalisis pasar:
+
+1.  **Analisis Fundamental**: Mengevaluasi nilai intrinsik sebuah aset dengan memeriksa faktor ekonomi, berita, adopsi pengguna, dan perkembangan teknologi. Di dunia *crypto*, analisis fundamental yang andal sangat sulit karena banyaknya **disinformasi**, **"pay-to-play" jurnalisme** (di mana outlet berita dibayar untuk liputan positif), dan **manipulasi media sosial**.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_6-11.png" alt="gambar" width="550"/>
+</p>
+
+[Grafik batang berjudul "Pay-to-play" yang menunjukkan harga dalam dolar AS yang diminta oleh berbagai outlet berita kripto untuk sebuah artikel, dengan harga berkisar dari beberapa ratus hingga hampir $4000. - Figure 6-11]
+
+2.  **Analisis Teknis**: Menganalisis data pasar historis, terutama harga dan volume, untuk mengidentifikasi pola dan memprediksi pergerakan harga di masa depan. Salah satu pola unik di *crypto* adalah **pola "Bart"**, yang menunjukkan lonjakan atau penurunan harga yang tajam diikuti oleh pergerakan sideways dan kemudian pembalikan yang tajam, menyerupai bentuk kepala Bart Simpson. Pola ini adalah gejala dari pasar yang diperdagangkan secara tipis dengan likuiditas rendah.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_6-12.png" alt="gambar" width="550"/>
+</p>
+
+[Grafik harga cryptocurrency yang menunjukkan pola "Bart", di mana harga naik tajam, bergerak datar, lalu turun tajam, membentuk siluet yang mirip dengan kepala kartun Bart Simpson. - Figure 6-12]
+
+## Perdagangan Arbitrase dan API Bursa
+
+### Mengelola *Float*
+
+Untuk melakukan arbitrase, seorang *trader* memerlukan **`float`**, yaitu dana likuid yang ditempatkan di berbagai bursa, siap untuk diperdagangkan. Buku ini menguraikan tiga konfigurasi `float`, masing-masing dengan trade-off antara modal yang dibutuhkan, kecepatan eksekusi, dan risiko. Konfigurasi 3 (arbitrase segitiga di satu bursa) adalah yang paling efisien karena menghilangkan waktu tunggu transfer antar bursa.
+
+### *Exchange APIs* dan *Trading Bots*
+
+Sebagian besar perdagangan *crypto* bervolume tinggi dilakukan oleh **`trading bots`** yang berinteraksi dengan bursa melalui **API** (*Application Programming Interfaces*). Kualitas API sangat bervariasi antar bursa. API yang baik memiliki dokumentasi yang jelas, server yang cepat, dan mendukung **REST** (di mana bot harus terus "menarik" data) dan **WebSocket** (di mana bursa "mendorong" pembaruan secara *real-time* ke bot, yang jauh lebih cepat).
+
+Penting bagi pengembang untuk menggunakan **lingkungan *sandbox*** (jika tersedia) untuk menguji bot mereka tanpa mempertaruhkan uang sungguhan.
+
+## Rangkuman Bab 6
+
+Bab ini memberikan gambaran yang realistis tentang dunia perdagangan *cryptocurrency* yang liar. Infrastrukturnya, meskipun berkembang, masih terfragmentasi oleh yurisdiksi, rentan terhadap manipulasi, dan membawa risiko kustodi yang signifikan. Bagi seorang auditor keamanan, pemahaman tentang bagaimana bursa beroperasi, kelemahan dalam sistem kustodi mereka, risiko API, dan prevalensi manipulasi pasar adalah sangat penting. Ini adalah area di mana kerugian terbesar sering terjadi, dan memahami mekanisme ini adalah langkah pertama untuk mitigasi risiko.
+
+---
+
