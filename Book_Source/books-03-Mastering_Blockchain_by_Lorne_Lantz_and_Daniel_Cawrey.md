@@ -30,7 +30,7 @@ Istilah-istilah ini sangat fundamental dalam dunia `blockchain` dan sering kali 
   <img src="images/books-03-mastering_blockchain/figure_1-1.png" alt="gambar" width="550"/>
 </p>
 
-    [Roda sepeda dengan desain terdistribusi, menunjukkan banyak jeruji yang terhubung ke satu hub pusat sebagai analogi ketahanan sistem. - Figure 1-1]
+[Roda sepeda dengan desain terdistribusi, menunjukkan banyak jeruji yang terhubung ke satu hub pusat sebagai analogi ketahanan sistem. - Figure 1-1]
 
   * **Sistem Terpusat (*Centralized System*)**: Meskipun internet dirancang terdistribusi, banyak aplikasi dominan saat ini (seperti Google, Facebook) bersifat terpusat. Dalam model ini, semua titik (stasiun) terhubung ke satu titik pusat (hub). Jika hub ini gagal, seluruh sistem akan lumpuh.
 
@@ -50,7 +50,7 @@ Buku ini memberikan ilustrasi visual yang sangat baik untuk membedakan ketiganya
   <img src="images/books-03-mastering_blockchain/figure_1-3.png" alt="gambar" width="550"/>
 </p>
 
-    [Diagram database terpusat seperti PayPal, di mana satu server pusat mengelola semua data transaksi. - Figure 1-3]
+[Diagram database terpusat seperti PayPal, di mana satu server pusat mengelola semua data transaksi. - Figure 1-3]
 
   * **Gambar 1-4 (Terdistribusi)**: Seperti beberapa *database* yang di-*hosting* di Amazon Web Services (AWS), setiap *node* memiliki salinan data yang sama dan saling mengenal, tetapi semuanya masih dikendalikan oleh satu entitas (Amazon).
 
@@ -58,7 +58,7 @@ Buku ini memberikan ilustrasi visual yang sangat baik untuk membedakan ketiganya
   <img src="images/books-03-mastering_blockchain/figure_1-4.png" alt="gambar" width="550"/>
 </p>
 
-    [Diagram database terdistribusi yang dihosting di AWS, menunjukkan beberapa server yang saling terhubung dan mereplikasi data, namun masih di bawah kendali satu entitas. - Figure 1-4]
+[Diagram database terdistribusi yang dihosting di AWS, menunjukkan beberapa server yang saling terhubung dan mereplikasi data, namun masih di bawah kendali satu entitas. - Figure 1-4]
 
   * **Gambar 1-5 (Terdesentralisasi)**: Seperti `Blockchain` `Bitcoin`, setiap *node* memiliki salinan data yang sama, *node*-*node* tersebut mungkin tidak saling mengenal (anonim), dan kontrol dipegang oleh banyak entitas.
 
@@ -66,7 +66,7 @@ Buku ini memberikan ilustrasi visual yang sangat baik untuk membedakan ketiganya
   <img src="images/books-03-mastering_blockchain/figure_1-5.png" alt="gambar" width="550"/>
 </p>
 
-    [Diagram database terdesentralisasi seperti Blockchain Bitcoin, di mana banyak node anonim saling terhubung, masing-masing memegang salinan data yang sama tanpa ada kontrol pusat. - Figure 1-5]
+[Diagram database terdesentralisasi seperti Blockchain Bitcoin, di mana banyak node anonim saling terhubung, masing-masing memegang salinan data yang sama tanpa ada kontrol pusat. - Figure 1-5]
 
 ## Para Pendahulu `Bitcoin` (*Bitcoin Predecessors*)
 
