@@ -6,7 +6,8 @@ karena setiap orang punya daya tangkap yang berbeda.
 Books:
 
 01. Grokking Bitcoin by Kalle Rosenbaum
-02. Mastering Bitcoin Andreas M. Antonopoulos & David A. Harding
+02. Mastering Bitcoin by Andreas M. Antonopoulos & David A. Harding
+03. Mastering Blockchain by Lorne Lantz & Daniel Cawrey
 
 Cyfrin Updraft:
 
