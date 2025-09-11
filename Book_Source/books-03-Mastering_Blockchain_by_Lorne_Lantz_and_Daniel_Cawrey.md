@@ -692,3 +692,202 @@ Bab ini menunjukkan bahwa ekosistem `blockchain` sangat dinamis dan terus berevo
 
 ---
 
+# Bab 4 - Evolusi Menuju `Ethereum`
+
+Bab ini menandai pergeseran penting dari `blockchain` sebagai sistem pencatatan transaksi sederhana (seperti `Bitcoin`) menjadi platform komputasi terdesentralisasi serbaguna. Bagi seorang auditor, memahami `Ethereum` dan `smart contracts` adalah mutlak, karena sebagian besar kerentanan dan eksploitasi di dunia `blockchain` modern terjadi pada lapisan aplikasi ini.
+
+## Memperbaiki Fungsionalitas `Bitcoin` yang Terbatas
+
+`Bitcoin` dirancang dengan bahasa skrip yang sengaja dibuat terbatas (*Turing incomplete*) untuk mengurangi kompleksitas dan potensi serangan. Ini membuatnya sangat aman untuk tujuan utamanya—transfer nilai—tetapi tidak fleksibel untuk aplikasi yang lebih kompleks. Komunitas pengembang inti `Bitcoin` cenderung sangat berhati-hati dalam melakukan perubahan protokol demi menjaga keamanan dan desentralisasi.
+
+Sikap konservatif ini mendorong sebagian pengembang untuk mencari cara lain guna menambahkan fungsionalitas yang lebih canggih.
+
+### *Colored Coins* dan *Tokens*
+
+Ide awal untuk memperluas kegunaan `Bitcoin` adalah melalui ***colored coins***. Konsepnya adalah "mewarnai" atau menandai sejumlah kecil `bitcoin` untuk merepresentasikan aset dunia nyata, seperti saham, obligasi, atau properti. Hal ini dilakukan dengan menyimpan metadata tambahan di `blockchain` `Bitcoin`.
+
+Ini adalah cikal bakal konsep ***token***: unit nilai yang diciptakan dengan memprogram sebuah *ledger* unik di atas `blockchain` yang sudah ada. `Token` bertindak seperti *cryptocurrency*, tetapi keamanannya didukung oleh jaringan `blockchain` induknya.
+
+### *Mastercoin* dan *Smart Contracts*
+
+Pada tahun 2013, sebuah proyek bernama **`Mastercoin`** (yang kemudian menjadi **Omni Layer**) mengambil ide ini lebih jauh. `Mastercoin` adalah sebuah protokol yang dibangun di atas `Bitcoin` untuk menambahkan fitur-fitur yang tidak ada di protokol inti `Bitcoin`, seperti:
+
+* Kemampuan untuk menciptakan *cryptocurrency* baru (*tokens*) dengan mudah.
+* Implementasi awal dari ***smart contracts***, yaitu program komputer kompleks yang berjalan di atas `blockchain`.
+
+`Mastercoin` juga tercatat sebagai pelopor ***Initial Coin Offering* (ICO)**, sebuah mekanisme penggalangan dana berbasis `blockchain`, untuk mendanai pengembangan protokolnya.
+
+### Memahami Omni Layer
+
+**Omni Layer** adalah penerus `Mastercoin` dan merupakan infrastruktur aset terdesentralisasi yang berjalan di atas `Bitcoin`. Dengan membangun di atas `Bitcoin`, Omni Layer memanfaatkan efek jaringan dan keamanan `Bitcoin` yang sudah mapan tanpa harus membangun komunitas *miner* dari nol.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_4-1.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram arsitektur teknis Omni Layer, menunjukkan bagaimana protokol Mastercoin/Omni berjalan di atas protokol Bitcoin yang tidak diubah, dan di atasnya lagi terdapat berbagai mata uang pengguna (user currency). - Figure 4-1]
+
+Secara teknis, Omni Layer menyisipkan data transaksinya ke dalam `blockchain` `Bitcoin` menggunakan *field* **`OP_RETURN`**, yang memungkinkan penyimpanan sejumlah kecil data arbitrer dalam sebuah `transaction` `Bitcoin`.
+
+#### Studi Kasus: Tether (USDT) di Omni Layer
+
+Proyek paling terkenal yang dibangun di atas Omni Layer adalah **Tether (USDT)**, sebuah `stablecoin` yang dipatok ke dolar AS. `Transaction` USDT sebenarnya adalah `transaction` `Bitcoin` yang membawa metadata Omni di dalamnya.
+
+Buku ini menunjukkan contoh `transaction` 5 USDT:
+* Di *block explorer* `Bitcoin`, ia terlihat seperti `transaction` `Bitcoin` biasa, tetapi memiliki output `OP_RETURN` dengan data *hexadecimal*.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_4-2.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan transaksi Tether di block explorer Bitcoin, menyoroti field OP_RETURN yang berisi metadata Omni Layer. - Figure 4-2]
+
+* Di *Omniexplorer*, metadata `OP_RETURN` tersebut diterjemahkan menjadi informasi yang dapat dibaca manusia: `transaction` "Simple Send" sebesar 5.00 USDT.
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_4-3.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan transaksi yang sama di Omniexplorer, yang menerjemahkan data mentah dari OP_RETURN menjadi detail transaksi yang jelas seperti jumlah, properti (Tether US), pengirim, dan penerima. - Figure 4-3]
+
+Buku ini bahkan memecah data *hex* `6f6d6e69000000000000001f000000001dcd6500` menjadi:
+* `6f6d6e69` -> `omni` (penanda transaksi Omni)
+* `00000000` -> Tipe `transaction`: Simple send
+* `0000001f` -> Tipe Properti: 31 (kode untuk USDT)
+* `000000001dcd6500` -> Jumlah: 5.00000000
+
+Ini adalah contoh brilian tentang bagaimana fungsionalitas baru dapat "diselipkan" ke dalam `blockchain` yang ada.
+
+## `Ethereum`: Membawa *Mastercoin* ke Tingkat Selanjutnya
+
+Pada tahun 2013, Vitalik Buterin, yang frustrasi dengan keengganan `Mastercoin` untuk menambahkan lebih banyak fungsionalitas, mengusulkan sebuah protokol baru: **`Ethereum`* Tujuannya adalah menciptakan platform komputasi terdesentralisasi yang lebih umum dan fleksibel—sebuah "komputer dunia" yang diamankan oleh konsensus.
+
+### Ether dan Gas
+
+`Ethereum` memiliki dua unit akun:
+
+1.  **Ether (ETH)**: Ini adalah *cryptocurrency* utama dari jaringan `Ethereum`, digunakan untuk membayar biaya dan sebagai jaminan `Ethereum` menggunakan **model saldo akun (*account state*)**, yang berbeda dari model UTXO `Bitcoin`.
+    > **Analogi Buku**: Model UTXO `Bitcoin` seperti memiliki uang tunai fisik; untuk membayar kopi seharga $1.50, Anda harus memberikan dua lembar $1 dan menerima kembalian $0.50. Model akun `Ethereum` seperti memiliki saldo di rekening bank; Anda cukup mengirim tepat $1.50. Ini membuat `smart contract` jauh lebih sederhana untuk diprogram.
+
+2.  **Gas**: Ini adalah unit untuk mengukur dan membayar biaya komputasi yang dilakukan di jaringan. Setiap operasi dalam *smart contract* (seperti penjumlahan, penyimpanan data) memiliki biaya `gas` yang telah ditentukan.
+    > **Tujuan Krusial `Gas`**: `Gas` mencegah **masalah penghentian (*halting problem*)**, di mana sebuah program bisa berjalan dalam *loop* tak terbatas dan melumpuhkan jaringan. Di `Ethereum`, setiap `transaction` harus menetapkan **batas `gas` (*gas limit*)**. Jika eksekusi kode melebihi batas ini, `transaction` akan berhenti, tetapi *miner* tetap dibayar untuk pekerjaan yang telah mereka lakukan.
+
+### Kasus Penggunaan: ICOs
+
+Kemampuan `Ethereum` untuk membuat `token` dan menjalankan `smart contract` secara otomatis menjadikannya platform yang ideal untuk ***Initial Coin Offerings* (ICOs)**. Proyek baru dapat membuat `token` (misalnya, token ERC-20), menulis *smart contract* yang akan secara otomatis mengirimkan `token` tersebut kepada siapa saja yang mengirimkan ETH ke alamat kontrak, dan dengan demikian menggalang dana dengan cara yang terdesentralisasi.
+
+### *Decentralized Autonomous Organizations* (DAOs)
+
+DAO adalah sebuah konsep di mana sebuah organisasi dijalankan sepenuhnya oleh kode (*smart contracts*) dan diatur oleh para pemegang `token`, tanpa memerlukan struktur manajemen terpusat.
+
+#### Tragedi "The DAO" dan `Fork` `Ethereum Classic`
+
+Pada tahun 2016, sebuah proyek ambisius bernama **"The DAO"** diluncurkan untuk berfungsi sebagai dana ventura terdesentralisasi. Proyek ini berhasil mengumpulkan dana senilai lebih dari $154 juta dalam bentuk ETH.
+
+Namun, *smart contract*-nya memiliki **kerentanan panggilan rekursif (*recursive call vulnerability*)**. Seorang penyerang mengeksploitasi celah ini dan berhasil menyedot dana senilai lebih dari $50 juta dalam bentuk ether.
+
+Karena `smart contract` bersifat *immutable* (tidak dapat diubah setelah diterapkan), satu-satunya cara untuk mengembalikan dana adalah dengan melakukan *hard fork* pada seluruh `blockchain` `Ethereum` untuk "memutar kembali" sejarah sebelum peretasan terjadi. Keputusan ini sangat kontroversial:
+
+* **Pro-`Fork`**: Berargumen bahwa ini perlu untuk melindungi investor dan masa depan platform.
+* **Anti-`Fork`**: Berargumen bahwa `blockchain` harusnya *immutable* dan "kode adalah hukum" (*code is law*). Mengubah sejarah merusak prinsip inti desentralisasi.
+
+Mayoritas komunitas memilih untuk melakukan `fork`. Rantai yang di-*fork* ini tetap menjadi **`Ethereum` (ETH)**, sementara rantai asli yang tidak diubah dilanjutkan oleh minoritas komunitas dan sekarang dikenal sebagai **`Ethereum Classic` (ETC)**.
+
+### Organisasi Kunci dalam Ekosistem `Ethereum`
+
+* **Ethereum Foundation**: Organisasi nirlaba yang memandu pengembangan dan mendanai riset.
+* **Enterprise Ethereum Alliance (EEA)**: Konsorsium perusahaan besar (seperti IBM, Microsoft) yang tertarik pada solusi `blockchain` `Ethereum` untuk bisnis.
+* **Parity**: Perusahaan yang membangun perangkat lunak klien dan alat pengembang untuk `Ethereum`.
+* **ConsenSys**: "Studio ventura" yang membangun `dapps`, alat (seperti **Truffle Suite**, **MetaMask**), dan berinvestasi dalam startup `Ethereum`.
+
+## *Decentralized Applications* (Dapps)
+
+**Dapp** adalah aplikasi yang *backend*-nya berjalan di atas `smart contract` di `blockchain`, sementara *frontend*-nya bisa berupa antarmuka web atau seluler biasa. Fitur utamanya adalah **imutabilitas** dan **ketahanan terhadap sensor**.
+
+Namun, pengembangan `dapp` memiliki tantangan:
+* **Deployment**: Memperbarui *smart contract* sangat sulit dan berisiko.
+* **User Experience (UX)**: Interaksi dengan `blockchain` seringkali lambat dan membingungkan bagi pengguna biasa.
+* **Kecepatan dan Skalabilitas**: Jaringan bisa menjadi sangat padat, seperti yang terjadi saat popularitas `dapp` **CryptoKitties** meledak pada akhir 2017 dan hampir melumpuhkan jaringan `Ethereum`.
+
+## Menerapkan dan Mengeksekusi *Smart Contracts* di `Ethereum`
+
+Bagian ini adalah inti teknis dari bab ini, sangat penting untuk seorang auditor.
+
+### *The Ethereum Virtual Machine* (EVM)
+
+**EVM** adalah "mesin" komputasi virtual yang berjalan di setiap *node* `Ethereum`. Tujuannya adalah untuk:
+1.  Memungkinkan pengembang untuk menerapkan (*deploy*) *smart contracts* ke `blockchain`.
+2.  Memberi instruksi kepada *miner* tentang cara mengeksekusi kode *smart contract*.
+
+#### Proses Pengembangan dan Deployment
+
+1.  **Menulis (*Authoring*)**: Pengembang menulis *smart contract* dalam bahasa tingkat tinggi seperti **Solidity**. Mereka menggunakan alat seperti **Remix IDE** (lingkungan pengembangan terintegrasi berbasis web) atau **Truffle Suite**.
+2.  **Menguji (*Testing*)**: Sebelum *deployment* ke jaringan utama (*mainnet*), kontrak diuji secara ekstensif di **jaringan uji (*testnet*)** seperti Ropsten atau Rinkeby, di mana mereka bisa mendapatkan tETH (ETH uji) gratis dari *faucet*.
+3.  **Kompilasi**: Kode Solidity dikompilasi menjadi **bytecode**, yaitu serangkaian instruksi level rendah (*opcodes*) yang dapat dipahami oleh EVM.
+4.  **Deployment**: Untuk menerapkan kontrak, pengembang mengirimkan `transaction` khusus ke jaringan `Ethereum`. `Transaction` ini tidak memiliki alamat tujuan (`To` *address* kosong) dan berisi *bytecode* kontrak di *field* datanya.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_4-4.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar dari antarmuka Remix IDE yang menunjukkan proses deployment smart contract 'Mastering_Blockchain_Guestbook.sol', dengan jendela konfirmasi dari MetaMask yang muncul untuk otorisasi transaksi. - Figure 4-4]
+
+    Setelah `transaction` ini ditambang, `Ethereum` akan membuat alamat baru untuk *smart contract* tersebut.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_4-5.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar dari Etherscan yang menunjukkan detail transaksi pembuatan smart contract, dengan field 'To' yang menandakan '[Contract 0xab... Created]'. - Figure 4-5]
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_4-6.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram alir yang menunjukkan transformasi kode dari Solidity Code (mudah dibaca pengembang), menjadi Opcodes (dijalankan oleh EVM), dan akhirnya menjadi Bytecode (disimpan di blockchain). - Figure 4-6]
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_4-7.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan kode sumber smart contract yang telah diverifikasi di Etherscan setelah deployment. - Figure 4-7]
+
+### Berinteraksi dengan *Smart Contract*
+
+Untuk berinteraksi dengan *smart contract* yang sudah ada, aplikasi *frontend* memerlukan **Application Binary Interface (ABI)**. ABI adalah deskripsi *machine-readable* dari semua fungsi dan variabel dalam sebuah kontrak, mirip seperti dokumentasi API.
+
+* **Membaca Data (*Reading*)**: Memanggil fungsi *read-only* (yang tidak mengubah *state*) adalah gratis dan tidak memerlukan `transaction`. Ini seperti melakukan panggilan API publik.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_4-8.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan fungsi read-only dari sebuah smart contract di Etherscan, memperlihatkan fungsi seperti 'getmessagefromreader' dan 'getnumberofmessagesfromreaders'. - Figure 4-8]
+
+* **Menulis Data (*Writing*)**: Setiap tindakan yang mengubah *state* dari *smart contract* (misalnya, mentransfer `token`, mengubah nilai variabel) **harus** dilakukan melalui `transaction`. Pengguna harus membayar `gas`, dan `transaction` tersebut harus ditambang.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_4-9.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar yang menunjukkan interaksi tulis ke smart contract melalui Etherscan, dengan jendela MetaMask yang meminta konfirmasi pengguna untuk mengirim transaksi yang akan mengubah state kontrak. - Figure 4-9]
+
+### *Gas* dan Harga
+
+Saat Anda mengirim `transaction` yang berinteraksi dengan kontrak, Kita harus menentukan dua hal terkait `gas`:
+* ***Gas Price***: Harga yang bersedia Kita bayar per unit `gas`, biasanya dalam denominasi **Gwei** ($10^{-9}$ ETH). Semakin tinggi harga `gas` yang Kita tawarkan, semakin besar insentif bagi *miner* untuk memproses `transaction` Kita terlebih dahulu.
+* ***Gas Limit***: Jumlah `gas` maksimum yang bersedia Kita gunakan untuk `transaction` ini. Ini untuk melindungi Kita dari kode yang salah yang mungkin menghabiskan semua ETH Kita.
+
+Total biaya `transaction` = `Gas` yang digunakan * `Gas Price`.
+
+<p align="center">
+  <img src="images/books-03-mastering_blockchain/figure_4-10.png" alt="gambar" width="550"/>
+</p>
+
+[Tabel yang menunjukkan daftar beberapa opcodes EVM seperti STOP, ADD, MUL, SUB beserta biaya gas yang digunakan untuk setiap operasi. - Figure 4-10]
+
+## Rangkuman Bab 4
+
+Bab ini menunjukkan lompatan besar dari `blockchain` sebagai buku kas digital menjadi platform komputasi global. Konsep `smart contract` yang dipopulerkan oleh `Ethereum` membuka dunia baru aplikasi terdesentralisasi (*dapps*), penggalangan dana (ICOs), dan organisasi otonom (DAOs). Bagi seorang auditor keamanan, pemahaman mendalam tentang EVM, Solidity, `gas`, dan interaksi kontrak adalah fundamental, karena di sinilah sebagian besar risiko dan kompleksitas berada. Sejarah The DAO juga menjadi pelajaran penting tentang trade-off antara imutabilitas dan pragmatisme dalam ekosistem yang sedang berkembang.
+
+---
+
