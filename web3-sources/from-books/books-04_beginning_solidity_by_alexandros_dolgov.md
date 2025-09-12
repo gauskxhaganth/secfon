@@ -279,9 +279,9 @@ Ada dua jenis utama:
 * Jika ada yang mencurigai kecurangan, mereka bisa **mengajukan *fraud proof*** ke L1.
 * Jika terbukti, transaksi penipu dibatalkan dan penipunya kehilangan deposit.
 
-🧠 Contoh: Arbitrum, Optimism
+Contoh: Arbitrum, Optimism
 
-📌 Karakteristik:
+Karakteristik:
 
 * Murah dan throughput tinggi
 * Tapi finalitas (kepastian transaksi valid) lambat → harus tunggu challenge period selesai
@@ -292,9 +292,9 @@ Ada dua jenis utama:
 * Setiap batch transaksi dikirim ke L1 bersama **bukti kriptografis (zero-knowledge proof)**.
 * Bukti ini **diverifikasi oleh smart contract di L1**.
 
-🧠 Contoh: zkSync, Starknet, Scroll
+Contoh: zkSync, Starknet, Scroll
 
-📌 Karakteristik:
+Karakteristik:
 
 * Finalitas cepat (karena langsung ada bukti)
 * Lebih kompleks secara teknis (membuat bukti mahal & lambat saat ini)
@@ -306,12 +306,12 @@ Ada dua jenis utama:
 * L1 hanya menyimpan **bukti validitas**, **bukan data transaksi mentah**.
 * Ini **menghemat ruang dan biaya sangat besar**, karena L1 tidak menyimpan data.
 
-📌 Karakteristik:
+Karakteristik:
 
 * Skalabilitas tinggi (karena data tidak dibebankan ke L1)
 * Tapi **keamanan datanya tergantung pada penyedia data off-chain**, bukan Ethereum → ada risiko jika penyedia data hilang atau jahat
 
-🧠 Contoh: StarkEx (dalam mode validium)
+Contoh: StarkEx (dalam mode validium)
 
 ## Sidechains
 
@@ -319,24 +319,24 @@ Ada dua jenis utama:
 * Memiliki **konsensus sendiri** dan **validator sendiri**, **bukan dijamin oleh Ethereum**.
 * Terhubung ke Ethereum lewat **jembatan (*bridge*)** untuk transfer aset.
 
-📌 Karakteristik:
+Karakteristik:
 
 * Biaya sangat murah dan throughput tinggi
 * Tapi keamanan bergantung pada jaringan sidechain itu sendiri (jika validator mereka diserang, dana bisa hilang)
 
-🧠 Contoh: Polygon PoS chain, Gnosis Chain
+Contoh: Polygon PoS chain, Gnosis Chain
 
 ## Sharding
 
 * Teknik untuk **memecah satu blockchain besar jadi banyak *shard* kecil**, masing-masing memproses subset transaksi secara paralel.
 * Setiap shard seperti *mini blockchain* yang menyumbangkan hasilnya ke beacon chain (rangka utama Ethereum).
 
-📌 Tujuan:
+Tujuan:
 
 * Menambah kapasitas transaksi Ethereum
 * Mengurangi beban setiap node → setiap node hanya perlu memvalidasi shard tertentu
 
-🧠 Catatan:
+Catatan:
 
 * Sharding ini rencananya bagian dari roadmap Ethereum, tapi model awal sharding transaksi **diubah menjadi fokus data (lihat Danksharding)**
 
@@ -346,12 +346,12 @@ Ada dua jenis utama:
 * Fokus bukan lagi memproses transaksi, tapi **menyediakan ruang data murah dalam bentuk *data blobs*** untuk rollups.
 * Dengan **proto-danksharding (EIP-4844)**, Ethereum mulai mendukung **blob-carrying transactions** yang jauh lebih murah untuk rollups.
 
-📌 Tujuan:
+Tujuan:
 
 * Memberikan **ruang data besar dan murah** supaya rollups bisa menyimpan datanya tanpa membebani gas fee L1.
 * Membuat Ethereum menjadi **settlement layer**: tempat rollups memposting bukti dan data ringkasan mereka.
 
-🧠 Dampaknya:
+Dampaknya:
 
 * Rollups menjadi jauh lebih murah
 * Ethereum tetap aman dan ringan karena hanya menyimpan bukti dan data blob, bukan semua transaksi mentah
@@ -579,7 +579,7 @@ Proses instalasi dijelaskan langkah demi langkah:
 
 [Contoh 12 kata seed phrase yang dihasilkan oleh MetaMask, seperti mammal, transfer, hint, dll. - Figure 3.1]
 
-    > **PERINGATAN**: `Seed phrase` ini adalah `master key` Kita. Tulis di atas kertas atau logam, simpan di tempat yang sangat aman, dan **JANGAN PERNAH** membagikannya kepada siapa pun atau menyimpannya secara digital (misalnya di komputer atau cloud). Jika Kita kehilangan `seed phrase` ini, dana Kita akan hilang selamanya. Jika orang lain mendapatkannya, mereka dapat mencuri semua dana Kita.
+> **PERINGATAN**: `Seed phrase` ini adalah `master key` Kita. Tulis di atas kertas atau logam, simpan di tempat yang sangat aman, dan **JANGAN PERNAH** membagikannya kepada siapa pun atau menyimpannya secara digital (misalnya di komputer atau cloud). Jika Kita kehilangan `seed phrase` ini, dana Kita akan hilang selamanya. Jika orang lain mendapatkannya, mereka dapat mencuri semua dana Kita.
 
 6.  Konfirmasi `seed phrase` Kita, dan instalasi selesai. Kita akan melihat antarmuka utama MetaMask.
 

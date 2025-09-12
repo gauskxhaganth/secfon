@@ -1,49 +1,17 @@
-# Web3 Lernen
-Repo ini berisi materi belajar seputar dunia Web3, isinya berdasarkan pemahaman pribadi saya (mustahil identik dengan sumber-sumber belajarnya), <br>
+# Sicherheitsforschernotizen
+Repo ini berisi materi belajar seputar dunia keamanan siber, isinya berdasarkan pemahaman pribadi saya (mustahil identik dengan sumber-sumber belajarnya), <br>
 karena setiap orang punya daya tangkap yang berbeda.
 
-***(yg saya pelajari dari Buku-buku, Cyfrin Updraft, learnweb3, dan platform belajar lainnya)***
-Books:
+## Web3
+***(yg saya pelajari dari Buku-buku dan platform belajar lainnya)***
+Rangkuman pribadi Buku-buku:
 
-01. Grokking Bitcoin by Kalle Rosenbaum
-02. Mastering Bitcoin by Andreas M. Antonopoulos & David A. Harding
-03. Mastering Blockchain by Lorne Lantz & Daniel Cawrey <br>
+01. Grokking Bitcoin
+02. Mastering Bitcoin
+03. Mastering Blockchain
+04. Beginning solidity
 
-Cyfrin Updraft:
 
-1. Blockchain Foundations
-	* Blockchain Basics
-	* Chainlink Fundamentals
-	
-2. Vyper Smart Contract Develoment
-	* Introduction to Python and Vyper
-	* Intermediate Python and Vyper
-	* Advanced Python and Vyper Smart Contract Development
-	
-3. Solidity Smart Contract Development
-	* Solidity Smart Contract Development
-	* Foundry Fundamentals
-	* Advanced Foundry
-
-4. Web3 Wallet Security
-	* Web3 Wallet Security Basics
-	* Advanced Web3 Wallet Security
-
-5. Smart Contract Security Audit
-	* Smart Contract Security
-	* Assembly and Formal Verification
-
-6. Zero Knowledge (ZK) Development
-	* Fundamentals of Zero-Knowledge Proofs (ZKPs)
-	* Noir Programming And ZK Circuits
-	* Full-Stack Web3 Development Crash Course
-
-7. 	DeFi Development
-	* Curve Cryptoswap
-	* Curve Stableswap
-	* Uniswap V2
-	* Uniswap V3
-	* Rocket Pool rETH Integration
-	* GMX Perpetuals Trading
-	* Aave V3 Protocol Development
-	* Rust Programming Basics
+## Web2
+***(yg saya pelajari dari Buku-buku dan platform belajar lainnya)***
+Rangkuman pribadi Buku-buku:
