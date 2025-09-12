@@ -1,5 +1,5 @@
 # Sicherheitsforschernotizen
-Repo ini berisi materi belajar seputar dunia keamanan siber, isinya berdasarkan pemahaman pribadi saya (mustahil identik dengan sumber-sumber belajarnya), karena setiap orang punya daya tangkap yang berbeda.
+Repo ini berisi materi belajar seputar dunia keamanan siber, isinya berdasarkan pemahaman pribadi saya saja.
 
 ## Web3
 #### From-Books:
