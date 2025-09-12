@@ -731,3 +731,639 @@ Lebih penting lagi bagi auditor, Kita dapat menggunakan *block explorer* untuk m
 [Tampilan tab 'Contract' di Etherscan untuk sebuah smart contract yang terverifikasi, menunjukkan kode sumber, serta opsi Read, Write, dan Proxy. - Figure 3.52 & 3.53]
 
 Kita sekarang memiliki kemampuan praktis untuk berinteraksi, mengelola aset, dan yang terpenting, memverifikasi aktivitas di *blockchain* Ethereum. Keterampilan ini akan menjadi dasar saat kita mulai menulis dan mendeploy *smart contract* kita sendiri di bab-bab berikutnya.
+
+---
+
+# Bab 4
+## Remix, Data Types, Visibility, and HelloWorld
+
+Bab ini adalah titik awal Anda dalam menulis kode Solidity secara praktis. Kita akan beralih dari konsep teoretis ke implementasi nyata dengan menggunakan **Remix IDE**, sebuah lingkungan pengembangan yang sangat ramah bagi pemula. Tujuan utama bab ini adalah membangun *smart contract* pertama Kita—sebuah program klasik "HelloWorld"—sambil membedah elemen-elemen paling fundamental dalam pemrograman Solidity.
+
+Bagi seorang calon auditor, bab ini sangat krusial karena memperkenalkan "anatomi" dasar dari sebuah *smart contract*: bagaimana lisensi dan versi dideklarasikan, bagaimana data disimpan melalui **`data types`**, dan bagaimana akses ke fungsi dikontrol melalui **`visibility levels`**. Memahami fondasi ini akan memungkinkan Kita untuk mulai "membaca" dan menganalisis kode dengan benar.
+
+### Apa Itu Pemrograman?
+
+Sebelum masuk ke kode, bab ini memberikan analogi yang sangat membantu: **pemrograman adalah proses belajar bahasa baru untuk berkomunikasi dengan komputer** Sama seperti bahasa manusia (misalnya, Bahasa Spanyol atau Rusia), bahasa pemrograman memiliki struktur, aturan (sintaks), dan ekspresi yang unik.
+
+  * **Evolusi dan Budaya**: Bahasa pemrograman berevolusi, dengan versi baru yang memperkenalkan fitur-fitur baru, sama seperti kata "selfie" masuk ke dalam leksikon global. Setiap bahasa juga memiliki "budaya" atau etosnya sendiri; misalnya, Python menekankan kesederhanaan, sementara Solidity mencerminkan prinsip-prinsip *blockchain* seperti transparansi, keamanan, dan desentralisasi.
+  * **Compiler sebagai Penerjemah**: Perbedaan utama adalah tujuan komunikasinya. Bahasa manusia untuk antar-manusia, sementara bahasa pemrograman untuk manusia ke komputer. Komputer pada dasarnya hanya memahami kode biner (angka 0 dan 1). Oleh karena itu, kita memerlukan **`compiler`**, yang bertindak sebagai "penerjemah" yang mengubah kode Solidity yang dapat dibaca manusia menjadi *bytecode* yang dapat dipahami dan dieksekusi oleh komputer (khususnya, oleh *Ethereum Virtual Machine* atau EVM).
+
+### Memulai dengan Solidity, Remix, dan HelloWorld
+
+**Solidity** adalah bahasa pemrograman *high-level*, yang berarti sintaksnya lebih dekat dengan bahasa manusia sehingga lebih mudah dibaca dan dipahami dibandingkan bahasa *low-level*. Hal penting yang harus selalu diingat adalah Solidity bersifat **`case-sensitive`**. Ini berarti huruf besar dan huruf kecil dianggap berbeda. Misalnya, `pragma` adalah sintaks yang valid, tetapi `Pragma` akan menghasilkan *error* karena *compiler* tidak mengenalinya. Bagi Solidity, `p` dan `P` adalah karakter yang sama sekali berbeda.
+
+Untuk mulai menulis kode, kita akan menggunakan **Remix IDE**.
+
+#### Membuat File HelloWorld.sol di Remix
+
+Remix adalah *Integrated Development Environment* (IDE) berbasis web yang bisa diakses langsung melalui peramban di `https://remix.ethereum.org`. Langkah-langkah berikut akan memandu Kita dalam menyiapkan *workspace* dan membuat *file* pertama Kita.
+
+1.  **Buka Remix**: Saat Kita membuka situs Remix, Kita akan disambut dengan antarmuka default yang berisi beberapa *file* dan folder contoh.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_4-1.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan antarmuka awal Remix IDE saat pertama kali dibuka. - Figure 4.1]
+
+2.  **Bersihkan Workspace**: Untuk memulai dari awal, bab ini menginstruksikan untuk menghapus semua *file* dan folder default (`contracts`, `scripts`, `tests`, dll.). Kita dapat melakukannya dengan mengklik kanan pada setiap item dan memilih "Delete".
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_4-2.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan panel File Explorer di Remix, menunjukkan proses menghapus file default. - Figure 4.2]
+
+3.  **Buat File Baru**: Klik kanan di area kosong pada panel *File Explorer* dan pilih "New File".
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_4-3.png" alt="gambar" width="550"/>
+</p>
+
+[Menu konteks yang muncul setelah klik kanan di File Explorer Remix, dengan opsi 'New File' disorot. - Figure 4.3]
+
+4.  **Beri Nama File**: Sebuah *file* kosong akan muncul. Beri nama **`HelloWorld.sol`**. Bagian `.sol` adalah ekstensi yang memberitahu *compiler* bahwa *file* ini berisi kode Solidity.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_4-5.png" alt="gambar" width="550"/>
+</p>
+
+[File baru yang telah dibuat dan diberi nama HelloWorld.sol di workspace Remix. - Figure 4.5]
+
+Setelah langkah-langkah ini, Kita akan memiliki kanvas kosong yang siap untuk diisi dengan kode *smart contract* pertama Kita.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_4-6.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan editor kode Remix yang kosong dengan tab file HelloWorld.sol yang aktif. - Figure 4.6]
+
+### //SPDX-License-Identifier
+
+Setiap *file* Solidity harus dimulai dengan baris komentar khusus ini. Di Solidity, dua garis miring (`//`) menandakan sebuah **`comment`** (komentar). Teks apa pun setelah `//` pada baris yang sama akan diabaikan oleh *compiler* dan tidak dianggap sebagai kode. Komentar sangat berguna untuk:
+
+  * Menjelaskan logika kode yang kompleks kepada rekan tim atau diri Kita di masa depan.
+  * Mendokumentasikan fungsi dan keputusan desain.
+  * Membantu orang lain (termasuk auditor) memahami maksud dari kode Kita di *blockchain* yang bersifat *open-source*.
+
+Namun, baris `//SPDX-License-Identifier: MIT` adalah sebuah pengecualian. Meskipun diawali dengan `//`, *compiler* tidak mengabaikannya. Ini adalah deklarasi standar yang mengidentifikasi lisensi *software* dari kode Kita, misalnya, `MIT`, `GPL-3.0`, atau `Unlicensed`. Jika baris ini tidak ada, *compiler* akan memberikan peringatan. Pikirkan ini sebagai "salam pembuka" wajib untuk setiap *file* Solidity.
+
+### Versi Solidity dan Baris `pragma`
+
+Baris kedua yang krusial adalah deklarasi versi *compiler*.
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.25;
+```
+
+  * **`pragma`**: Ini adalah arahan (*directive*) khusus untuk *compiler*. Dalam hal ini, `pragma solidity` memberitahu *compiler* versi mana yang harus digunakan untuk mengompilasi kode ini.
+  * **`0.8.25`**: Ini adalah nomor versinya. Bab ini memecahnya dengan sangat baik:
+      * **`0` (Major Version)**: Menandakan perubahan besar yang dapat merusak kompatibilitas (*breaking changes*). Analogi yang diberikan adalah perubahan dari Bahasa Yunani Kuno ke Bahasa Yunani Modern.
+      * **`8` (Minor Version)**: Menandakan penambahan fitur baru yang tidak merusak kompatibilitas. Analogi yang diberikan adalah penambahan kata baru seperti "selfie" ke dalam kamus.
+      * **`25` (Patch Version)**: Menandakan perbaikan *bug* atau pembaruan kecil. Analogi yang diberikan adalah koreksi ejaan dalam sebuah kata.
+  * **`;` (Semicolon)**: Di Solidity, setiap pernyataan (*statement*) harus diakhiri dengan titik koma. Ini mirip dengan penggunaan titik di akhir kalimat dalam bahasa manusia.
+
+### `contract HelloWorld {}`
+
+Setelah lisensi dan versi, baris berikutnya adalah deklarasi *contract* itu sendiri.
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.25;
+
+contract HelloWorld {}
+```
+
+  * **`contract`**: Ini adalah *keyword* yang mendefinisikan sebuah *smart contract*.
+  * **`HelloWorld`**: Ini adalah nama yang Kita berikan untuk *contract* Kita.
+  * **`{}` (Curly Braces)**: Tanda kurung kurawal ini mendefinisikan "tubuh" atau cakupan (*scope*) dari *contract*. Semua kode, variabel, dan fungsi yang menjadi bagian dari *contract* ini akan ditulis di antara `{` dan `}`.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_4-8.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan kode dasar contract HelloWorld di Remix dengan kurung kurawal pembuka dan penutup. - Figure 4.8]
+
+### Data Types dan Variables di Solidity
+
+Dalam bahasa manusia, kita menyampaikan informasi (data) melalui kata atau angka. Demikian pula, Solidity berkomunikasi dengan komputer melalui **`data types`**. *Data type* mendefinisikan jenis data yang dapat disimpan oleh sebuah **`variable`**. Bab ini memperkenalkan enam tipe data dasar.
+
+1.  **`int` (Integer)**: Mewakili bilangan bulat, bisa positif atau negatif (misalnya, 3, -3).
+
+    ```solidity
+    int number = -5;
+    ```
+
+2.  **`uint` (Unsigned Integer)**: Mewakili bilangan bulat positif saja (termasuk 0). Ini adalah tipe data yang paling umum digunakan untuk nilai moneter atau hitungan, karena jumlah token tidak mungkin negatif.
+
+    ```solidity
+    uint number2 = 35;
+    ```
+
+3.  **`string`**: Mewakili serangkaian karakter atau teks. Teks harus diapit oleh tanda kutip ganda (`"`) atau tunggal (`'`).
+
+    ```solidity
+    string name = "Alexandros";
+    ```
+
+4.  **`address`**: Tipe data khusus untuk menyimpan alamat Ethereum (20-byte). Ini digunakan untuk mereferensikan akun pengguna atau *smart contract* lain.
+
+    ```solidity
+    address MyETHaddress = 0xd0A7f0e336af86aCC72d85af1EDf25790bAd76a4;
+    ```
+
+5.  **`bool` (Boolean)**: Hanya dapat menyimpan dua nilai: `true` atau `false`.
+
+    ```solidity
+    bool isTrue = true;
+    ```
+
+6.  **`bytes`**: Mewakili serangkaian data *byte*. Tipe ini sering kali lebih efisien dari segi *gas* dibandingkan `string` untuk menangani data teks, karena `string` di-encode dalam format UTF-8 sementara `bytes` adalah data mentah. Saat Kita mendeklarasikan variabel `bytes` dengan nilai teks, di belakang layar Solidity akan mengonversinya menjadi representasi heksadesimal.
+
+    ```solidity
+    bytes dynamicBytes = "Hello";
+    ```
+
+    Seperti yang ditunjukkan dalam buku, jika Kita memiliki dua variabel `string public myname1 = "Alexandros";` dan `bytes public myname2 = "Alexandros";`, outputnya akan berbeda. `myname1` akan mengembalikan "Alexandros", sedangkan `myname2` akan mengembalikan representasi *byte*-nya, yaitu `0x416c6578616e64726f73`.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_4-12.png" alt="gambar" width="550"/>
+</p>
+
+[Perbandingan output antara variabel string dan bytes di Remix, satu menampilkan 'Alexandros' dan yang lainnya menampilkan kode heksadesimal. - Figure 4.12]
+
+### Function Visibility Levels
+
+**`Functions`** adalah blok kode yang dapat dieksekusi yang melakukan tugas tertentu. Mereka adalah "kata kerja" dalam bahasa Solidity.
+
+#### Anatomi Fungsi
+
+Sebuah deklarasi fungsi dasar di Solidity terlihat seperti ini:
+
+```solidity
+function helloWorld() public view returns (string memory) {}
+```
+
+  * **`function`**: *Keyword* yang memulai deklarasi fungsi.
+  * **`helloWorld`**: Nama fungsi.
+  * **`()`**: Tempat untuk mendefinisikan parameter (input) untuk fungsi.
+  * **`public`**: Ini adalah **`visibility level`**, yang menentukan siapa yang dapat memanggil fungsi ini.
+  * **`view`**: Ini adalah *state mutability modifier*. `view` berarti fungsi ini hanya "membaca" data dari *blockchain* dan tidak mengubahnya.
+  * **`returns (string memory)`**: Mendeklarasikan tipe data output dari fungsi.
+  * **`{}`**: Tubuh fungsi, tempat logika dieksekusi.
+
+#### Tingkat Visibilitas (Visibility Levels)
+
+Solidity memiliki empat tingkat visibilitas yang sangat penting untuk keamanan:
+
+1.  **`public`**: Fungsi dapat dipanggil oleh siapa saja, baik dari dalam *contract* itu sendiri, dari *contract* turunan, maupun dari *transaction* eksternal.
+2.  **`private`**: Fungsi hanya dapat dipanggil dari dalam *contract* tempat ia didefinisikan. *Contract* turunan tidak dapat memanggilnya.
+3.  **`external`**: Fungsi hanya dapat dipanggil dari luar *contract* (melalui *transaction* atau *contract* lain). Mereka tidak dapat dipanggil secara internal (kecuali dengan sintaks khusus `this.functionName()`). Ini sering kali lebih efisien dari segi *gas* daripada `public`.
+4.  **`internal`**: Mirip dengan `private`, tetapi fungsi juga dapat diakses oleh *contract* yang mewarisinya (*inheritance*).
+
+#### Keyword `view` dan `pure`
+
+  * **`view`**: Fungsi ini berjanji untuk tidak memodifikasi *state* *blockchain*. Ia hanya membaca data. Memanggil fungsi `view` secara eksternal tidak memerlukan *gas*.
+  * **`pure`**: Fungsi ini lebih ketat lagi. Ia berjanji untuk tidak memodifikasi maupun membaca *state* *blockchain*. Logikanya hanya bergantung pada parameter inputnya. Contohnya adalah fungsi matematika murni.
+
+### HelloWorld Contract
+
+Sekarang, kita menggabungkan semua konsep ini untuk membuat *smart contract* "HelloWorld".
+
+**Versi Pertama (Paling Sederhana)**
+Versi ini menggunakan variabel `public` untuk secara otomatis membuat fungsi *getter*.
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.25;
+
+contract HelloWorld {
+    string public helloWorld = "Hello World";
+}
+```
+
+Ketika Kita mendeploy *contract* ini di Remix, sebuah tombol bernama `helloWorld` akan muncul secara otomatis. Jika Kita mengkliknya, itu akan mengembalikan nilai "Hello World".
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_4-14.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_4-15.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan contract HelloWorld yang telah di-deploy di Remix, dengan tombol biru 'helloWorld'. - Figure 4.14 & 4.15]
+
+**Versi Kedua (Menggunakan Fungsi Eksplisit)**
+Versi ini menunjukkan cara mencapai hasil yang sama dengan fungsi yang ditulis secara eksplisit.
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.25;
+
+contract HelloWorld {
+    string helloWorld = "Hello World";
+
+    function returnHelloWorld() public view returns (string memory) {
+        return helloWorld;
+    }
+}
+```
+
+Di sini, kita membuat fungsi `returnHelloWorld` yang bersifat `public` dan `view`. Fungsi ini membaca nilai dari variabel `helloWorld` dan mengembalikannya. Keyword `memory` menandakan bahwa nilai *string* yang dikembalikan disimpan sementara di memori selama eksekusi. Konsep `memory` akan dijelaskan lebih lanjut di bab berikutnya.
+
+---
+
+# Bab 5
+## Membangun Kontrak `ZooManagement`
+
+Bab ini bertujuan untuk memperdalam pemahaman Anda tentang konsep pemrograman Solidity dengan menggunakan contoh praktis, yaitu kontrak `ZooManagement`. Kontrak ini dirancang untuk mengelola data di kebun binatang fiktif, seperti melacak jumlah pengunjung dan mengelola data hewan. Melalui bab ini, Anda akan mempelajari cara menggunakan `structs`, `mappings`, dan `arrays` untuk mengelola kumpulan data yang kompleks. Selain itu, bab ini juga akan memperkenalkan konsep *inheritance* (pewarisan), impor kontrak, serta praktik terbaik untuk efisiensi dan keamanan.
+
+Tujuan utamanya adalah agar Anda dapat membangun sebuah kontrak yang canggih dan mampu menangani kasus penggunaan berbasis data di lingkungan yang terdesentralisasi.
+
+## Mempersiapkan Kontrak `ZooManagement`
+
+Seperti pada bab sebelumnya, kita akan menggunakan Remix IDE. Langkah pertama adalah membersihkan *workspace* dari file-file contoh dan membuat file baru bernama `ZooManagement.sol`.
+
+### 1\. Inisialisasi Kontrak dan Pengelolaan Pengunjung
+
+Kontrak kita dimulai dengan deklarasi lisensi dan versi Solidity, sama seperti praktik terbaik yang telah kita pelajari.
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.26;
+
+contract ZooManagement {
+    // ... konten kontrak akan ditambahkan di sini
+}
+```
+
+> **Catatan Penting tentang Versi `pragma`**: Buku ini mungkin menggunakan versi `0.8.25` atau `0.8.26`. Remix IDE secara *default* akan menggunakan *compiler* versi terbaru. Jika Kita melihat garis berlekuk-lekuk merah di bawah baris `pragma`, itu artinya versi *compiler* Kita tidak cocok. Kita bisa mengubah versi *compiler* di tab "Solidity Compiler" di Remix agar sesuai dengan yang ada di kode, atau, yang lebih disarankan, perbarui versi `pragma` di kode Kita ke versi terbaru yang didukung Remix. Bab ini menjelaskan secara detail cara mengatasi masalah ini, yang merupakan keterampilan praktis yang penting.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_5-1.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar antarmuka Remix IDE yang menunjukkan ikon Solidity Compiler di bilah sisi kiri. - Figure 5.1]
+
+#### **Variabel dan Fungsi Awal**
+
+Kontrak ini pertama-tama akan mengelola jumlah total pengunjung. Untuk itu, kita mendeklarasikan sebuah variabel *state* dan dua fungsi: satu untuk memperbarui jumlah pengunjung dan satu lagi untuk mengambilnya.
+
+```solidity
+contract ZooManagement {
+    uint256 public totalVisitors; 
+
+    function updateVisitorCount(uint256 _newVisitorCount) public {
+        totalVisitors = _newVisitorCount;
+    }
+ 
+    function getTotalVisitors() public view returns(uint256) {
+        return totalVisitors;
+    }
+}
+```
+
+Mari kita bedah kode ini:
+
+  * `uint256 public totalVisitors;`: Kita mendeklarasikan sebuah *state variable* (variabel yang statusnya disimpan secara permanen di *blockchain*) bernama `totalVisitors` dengan tipe `uint256`. *Keyword* `public` secara otomatis membuat sebuah fungsi *getter* dengan nama yang sama (`totalVisitors()`), sehingga kita bisa membaca nilainya dari luar kontrak.
+  * `function updateVisitorCount(uint256 _newVisitorCount) public`: Ini adalah fungsi untuk mengubah nilai `totalVisitors`.
+      * Fungsi ini `public`, artinya bisa dipanggil oleh siapa saja (baik dari luar *blockchain* maupun oleh kontrak lain).
+      * Fungsi ini menerima satu parameter, `_newVisitorCount`, yang merupakan jumlah pengunjung baru.
+      * Di dalam fungsi, `totalVisitors = _newVisitorCount;` adalah operasi penugasan (*assignment*) yang mengubah status variabel `totalVisitors`. Karena operasi ini mengubah *state* *blockchain*, eksekusinya akan memerlukan *gas fee*.
+  * `function getTotalVisitors() public view returns(uint256)`: Fungsi ini digunakan untuk membaca nilai `totalVisitors`.
+      * *Keyword* `view` sangat penting di sini. Ini menandakan bahwa fungsi ini hanya "melihat" atau membaca data dari *blockchain* dan tidak mengubah *state* apa pun. Akibatnya, memanggil fungsi `view` dari luar *blockchain* (misalnya dari DApp) tidak memerlukan *gas fee*.
+      * `returns(uint256)` mendeklarasikan bahwa fungsi ini akan mengembalikan sebuah nilai bertipe `uint256`.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_5-7.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar antarmuka Remix setelah kontrak di-deploy, menunjukkan tombol untuk fungsi updateVisitorCount, getTotalVisitors, dan totalVisitors. - Figure 5.7]
+
+Ketika kontrak ini di-*deploy*, kita bisa memasukkan angka (misalnya `10`) ke dalam fungsi `updateVisitorCount`, dan kemudian memanggil `getTotalVisitors` atau `totalVisitors` untuk melihat bahwa nilainya telah berubah menjadi `10`.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_5-9.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar hasil di Remix setelah memasukkan nilai 10 ke updateVisitorCount dan memanggil getTotalVisitors, yang menunjukkan output 10. - Figure 5.9]
+
+## `Structs` - Mengelompokkan Data Terstruktur
+
+Sejauh ini kita hanya menyimpan satu jenis data (jumlah pengunjung). Bagaimana jika kita ingin menyimpan informasi yang lebih kompleks, seperti data hewan yang memiliki beberapa atribut (spesies, nama, umur)? Di sinilah `struct` berperan.
+
+**Struct** (kependekan dari *structure*) adalah tipe data kustom yang memungkinkan kita untuk mengelompokkan beberapa variabel yang berbeda tipe di bawah satu nama. Ini sangat berguna untuk merepresentasikan objek dunia nyata.
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.26;
+
+contract ZooManagement {
+    uint256 public totalVisitors; 
+    
+    struct Animal {
+        string species;
+        string name;
+        uint256 age;
+    }
+ 
+    Animal public tiger = Animal("Tiger", "Peanut", 3);
+    Animal public bear = Animal("Bear", "Honey", 4);
+    Animal public lion = Animal("Lion", "Simba", 8); // Seharusnya "Lion", bukan "Animal"
+ 
+    function updateVisitorCount(uint256 _newVisitorCount) public {
+        totalVisitors = _newVisitorCount;
+    }
+ 
+    function getTotalVisitors() public view returns(uint256) {
+        return totalVisitors;
+    }
+}
+```
+
+> **Perbaikan Kode**: Dalam buku, contoh untuk `lion` salah memasukkan `"Animal"` sebagai spesies. Seharusnya `"Lion"`. Versi di atas sudah diperbaiki untuk kejelasan.
+> `Animal public lion = Animal("Lion", "Simba", 8);`
+
+Analisis kode baru:
+
+  * `struct Animal { ... }`: Kita mendefinisikan sebuah `struct` baru bernama `Animal`. Di dalamnya, kita mendeklarasikan tiga "kolom" atau *field*: `species` (string), `name` (string), dan `age` (uint256).
+  * `Animal public tiger = Animal("Tiger", "Peanut", 3);`: Ini adalah cara kita membuat sebuah *instance* (contoh nyata) dari `struct` `Animal`.
+      * `Animal public tiger`: Kita mendeklarasikan variabel publik bernama `tiger` yang tipenya adalah `Animal`.
+      * `= Animal("Tiger", "Peanut", 3)`: Kita menginisialisasi variabel ini dengan nilai-nilai yang sesuai dengan urutan *field* di dalam `struct`: spesiesnya "Tiger", namanya "Peanut", dan umurnya 3.
+
+Setelah di-*deploy*, akan muncul tombol-tombol baru untuk `tiger`, `bear`, dan `lion`. Ketika diklik, mereka akan mengembalikan semua data yang terkait dengan hewan tersebut secara terstruktur.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_5-12.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar Remix menunjukkan hasil pemanggilan variabel struct 'bear', 'lion', dan 'tiger', yang menampilkan semua field dan nilainya. - Figure 5.12]
+
+## `Arrays` - Mengelola Daftar Data
+
+Mendeklarasikan setiap hewan sebagai variabel terpisah tidak efisien jika kita memiliki ratusan hewan. Solusinya adalah menggunakan **array**. *Array* adalah struktur data yang dapat menyimpan daftar nilai dengan tipe yang sama.
+
+Solidity mendukung dua jenis *array*:
+
+1.  **Dynamic Arrays**: Ukurannya tidak ditentukan di awal dan bisa bertambah seiring waktu.
+2.  **Fixed-Size Arrays**: Ukurannya ditentukan saat deklarasi dan tidak bisa diubah.
+
+### 1\. Dynamic Arrays
+
+*Dynamic array* lebih fleksibel tetapi bisa lebih mahal dari segi *gas* karena ukurannya yang bisa berubah.
+
+```solidity
+// Kode sebelumnya ...
+struct Animal {
+    string species;
+    string name;
+    uint256 age;
+}
+ 
+Animal[] public listofAnimals; // Deklarasi Dynamic Array
+
+// Hapus deklarasi tiger, bear, lion yang individual
+
+function addAnimal(string memory _species, string memory _name, uint256 _age) public {
+    listofAnimals.push(Animal(_species, _name, _age));
+}
+
+// ... sisa fungsi lainnya
+```
+
+Pembahasan:
+
+  * `Animal[] public listofAnimals;`: Kita mendeklarasikan sebuah *dynamic array* publik bernama `listofAnimals`. Tanda `[]` tanpa angka di dalamnya menandakan bahwa ini adalah *dynamic array*. Tipe data elemen di dalamnya adalah `Animal` (struct yang kita buat).
+  * `function addAnimal(...)`: Fungsi ini sekarang digunakan untuk menambahkan hewan baru ke dalam daftar.
+  * `listofAnimals.push(Animal(_species, _name, _age));`: Ini adalah bagian kuncinya.
+      * `Animal(_species, _name, _age)`: Pertama, kita membuat *instance* `Animal` baru secara sementara (*in-memory*).
+      * `.push(...)`: Kemudian, kita menggunakan metode `.push()` untuk menambahkan *instance* baru ini ke akhir dari *array* `listofAnimals`.
+
+### 2\. Fixed-Size Arrays
+
+Jika kita tahu persis berapa banyak hewan yang akan ada di kebun binatang (misalnya, hanya 3), kita bisa menggunakan *fixed-size array* untuk menghemat *gas*.
+
+```solidity
+// ...
+struct Animal {
+    string species;
+    string name;
+    uint256 age;
+}
+ 
+Animal[3] public listofAnimals; // Deklarasi Fixed-Size Array untuk 3 hewan
+uint256 public animalCount; // Helper untuk melacak indeks
+
+// ... fungsi lainnya ...
+
+function addAnimal(string memory _species, string memory _name, uint256 _age) public {
+    require(animalCount < 3, "Zoo is full");
+ 
+    listofAnimals[animalCount] = Animal(_species, _name, _age);
+ 
+    animalCount++;
+}
+
+function getAnimal(uint256 _index) public view returns (string memory, string memory, uint256) {
+    require(_index < animalCount, "Animal does not exist");
+ 
+    Animal memory animal = listofAnimals[_index];
+ 
+    return (animal.species, animal.name, animal.age);
+}
+```
+
+Analisis:
+
+  * `Animal[3] public listofAnimals;`: Tanda `[3]` mendefinisikan bahwa *array* ini hanya bisa menampung 3 elemen.
+  * `require(animalCount < 3, "Zoo is full");`: Ini adalah sebuah *check* keamanan yang sangat penting. `require` akan memeriksa kondisi di dalamnya. Jika `false`, eksekusi akan berhenti (revert) dan menampilkan pesan error. Ini memastikan kita tidak mencoba menambahkan hewan keempat ke dalam *array* yang hanya berkapasitas tiga.
+  * `listofAnimals[animalCount] = ...`: Kita tidak lagi menggunakan `.push()`. Sebaliknya, kita mengakses elemen *array* berdasarkan indeksnya (`animalCount`) dan menugaskan nilainya.
+  * `animalCount++;`: Setelah menambahkan hewan, kita menaikkan penghitung agar hewan berikutnya ditambahkan di indeks selanjutnya.
+  * `function getAnimal(...)`: Fungsi ini memungkinkan kita untuk mengambil data hewan berdasarkan indeksnya. Ini juga menggunakan `require` untuk memastikan kita tidak mencoba mengakses indeks yang tidak ada.
+
+## `Mappings` - Pencarian Data Efisien dengan Key-Value
+
+*Array* bagus untuk menyimpan daftar, tetapi tidak efisien untuk mencari item tertentu. Jika kita ingin menemukan hewan dengan nama "Simba" di dalam *array* yang berisi 1000 hewan, kita harus mengulang (*iterate*) satu per satu. Di sinilah **mapping** bersinar.
+
+**Mapping** adalah struktur data *key-value* (kunci-nilai), mirip seperti kamus atau *hash table*. Kita menyediakan sebuah "kunci" unik, dan *mapping* akan langsung mengembalikan "nilai" yang terkait. Pencarian ini sangat efisien (*O(1)*), artinya biayanya tetap, tidak peduli seberapa banyak data yang disimpan.
+
+Mari kita modifikasi kontrak *dynamic array* kita untuk menambahkan *mapping*.
+
+```solidity
+// ...
+struct Animal {
+    string species;
+    string name;
+    uint256 age;
+}
+ 
+Animal[] public listofAnimals;
+ 
+mapping (string => uint256) public nameToAge; // Deklarasi Mapping
+
+// ... fungsi lainnya ...
+
+function addAnimal(string memory _species, string memory _name, uint256 _age) public {
+    listofAnimals.push(Animal(_species, _name, _age));
+    nameToAge[_name] = _age; // Menambahkan data ke mapping
+}
+```
+
+Pembahasan:
+
+  * `mapping (string => uint256) public nameToAge;`:
+      * `mapping`: *Keyword* untuk deklarasi.
+      * `(string => uint256)`: Mendefinisikan tipe data. `string` adalah tipe untuk **kunci** (dalam hal ini, nama hewan), dan `uint256` adalah tipe untuk **nilai** (umur hewan).
+      * `public nameToAge`: Mendeklarasikan *mapping* publik bernama `nameToAge`.
+  * `nameToAge[_name] = _age;`: Di dalam fungsi `addAnimal`, setelah menambahkan hewan ke *array*, kita juga menambahkan entri ke *mapping*. Kita menggunakan nama hewan (`_name`) sebagai kunci dan umurnya (`_age`) sebagai nilai.
+
+Sekarang, setelah di-*deploy*, akan ada fungsi baru `nameToAge`. Jika kita memasukkan "Simba" sebagai input, fungsi tersebut akan langsung mengembalikan `8` tanpa perlu mencari di seluruh *array*.
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_5-15.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar Remix menunjukkan pemanggilan mapping 'nameToAge' dengan input "Simba" dan hasilnya adalah "8". - Figure 5.15]
+
+Bab ini juga menunjukkan bagaimana kita bisa membuat beberapa *mapping* untuk menghubungkan berbagai atribut, misalnya `speciesToName`, `ageToName`, dll.
+
+## `Contract Importing` - Menggunakan Kode dari File Lain
+
+Seiring bertambahnya kompleksitas, menyimpan semua kode dalam satu file menjadi tidak praktis. Solidity memungkinkan kita untuk memisahkan kontrak ke dalam beberapa file dan mengimpornya saat dibutuhkan.
+
+**Importing** adalah proses memuat definisi kontrak dari file lain agar bisa digunakan di file saat ini.
+
+```solidity
+// Di file ContractInheritance.sol
+import {ZooManagement} from "./ZooManagement.sol"; // Impor kontrak
+```
+
+Pembahasan Sintaks:
+
+  * `import {ZooManagement} ...`: Kita memberitahu *compiler* bahwa kita ingin mengimpor kontrak spesifik bernama `ZooManagement`.
+  * `from "./ZooManagement.sol";`: Kita menunjukkan lokasi file tempat kontrak tersebut didefinisikan.
+      * `./`: Menandakan direktori saat ini.
+      * `../`: Menandakan direktori induk (satu tingkat di atas).
+      * `NamaFolder/NamaFile.sol`: Menandakan file berada di dalam sub-folder.
+
+Bab ini memberikan contoh yang sangat baik tentang bagaimana path ini berubah tergantung pada lokasi file, sebuah konsep yang sangat penting untuk dipahami saat bekerja dengan proyek yang lebih besar.
+
+## `Inheritance` - Mewarisi Sifat dari Kontrak Lain
+
+**Inheritance** (Pewarisan) adalah mekanisme di mana sebuah kontrak (*child contract*) dapat mewarisi fungsi, variabel, dan *modifier* dari kontrak lain (*parent contract*). Ini adalah pilar dari *Object-Oriented Programming* (OOP) dan sangat berguna untuk penggunaan ulang kode (*code reusability*) dan menciptakan hierarki kontrak.
+
+#### **Tipe-tipe Inheritance**
+
+1.  **Single Inheritance**: Satu *child* mewarisi dari satu *parent*.
+
+    ```solidity
+    contract AddSubtractiontoAdditionContract is CreateNumber {
+        // ...
+    }
+    ```
+
+      * *Keyword* `is` digunakan untuk menandakan pewarisan.
+
+2.  **Multilevel Inheritance**: Sebuah rantai pewarisan (C mewarisi dari B, B mewarisi dari A).
+
+    ```solidity
+    contract CreateNumber { /* ... */ } // Grandparent
+    contract SubtractionContract is CreateNumber { /* ... */ } // Parent
+    contract AdditionContract is SubtractionContract { /* ... */ } // Child
+    ```
+
+3.  **Multiple Inheritance**: Satu *child* mewarisi dari beberapa *parent*.
+
+    ```solidity
+    contract Contract3 is Contract1, Contract2 {
+        // ...
+    }
+    ```
+
+4.  **Hierarchical Inheritance**: Beberapa *child* mewarisi dari satu *parent* yang sama.
+
+    ```solidity
+    contract Contract1 { /* ... */ } // Parent
+    contract Contract2 is Contract1 { /* ... */ } // Child 1
+    contract Contract3 is Contract1 { /* ... */ } // Child 2
+    ```
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_5-30.png" alt="gambar" width="550"/>
+</p>
+
+[Diagram yang mengilustrasikan empat jenis inheritance: Single, Multilevel, Multiple, dan Hierarchical. - Figure 5.30]
+
+#### **Keyword `virtual` dan `override`**
+
+Ini adalah konsep yang sangat penting. Jika sebuah fungsi di *parent contract* akan diubah perilakunya di *child contract*, maka:
+
+  * Fungsi di **parent contract** harus ditandai dengan *keyword* `virtual`.
+  * Fungsi di **child contract** harus ditandai dengan *keyword* `override`.
+
+<!-- end list -->
+
+```solidity
+// Parent Contract
+contract CreateNumber {
+    function addNumber(uint256 _number) public virtual { // Ditandai virtual
+        // ...
+    }
+}
+
+// Child Contract
+contract AddSubtractiontoAdditionContract is CreateNumber {
+    function addNumber(uint256 _newnumber) public override { // Ditandai override
+        // ...
+    }
+}
+```
+
+Jika aturan ini tidak diikuti, *compiler* akan memberikan *error*. Ini adalah mekanisme keamanan untuk memastikan bahwa pengembang sadar ketika mereka mengubah perilaku fungsi yang diwarisi.
+
+## Menerapkan dan Menjalankan Kontrak dari Kontrak Lain (Pola *Factory*)
+
+Terkadang, kita membutuhkan sebuah kontrak yang tugasnya adalah men-*deploy* atau membuat *instance* dari kontrak lain. Pola ini disebut **Factory Pattern**.
+
+```solidity
+// File: ZooManagementFactory.sol
+import {ZooManagement} from "./ZooManagement.sol";
+
+contract ZooManagementFactory {
+    ZooManagement[] public listOfZooManagementContracts;
+
+    function deployZooManagement() public {
+        ZooManagement newZooManagement = new ZooManagement();
+        listOfZooManagementContracts.push(newZooManagement);
+    }
+    
+    function fUpdateVisitorCount(uint256 _zooManagementContractIndex, uint256 _myNewVisitorCount) public {
+        ZooManagement myNewZooManagement = listOfZooManagementContracts[_zooManagementContractIndex];
+        myNewZooManagement.updateVisitorCount(_myNewVisitorCount);
+    }
+    
+    function fGetTotalVisitors(uint256 _zooManagementContractIndex) public view returns (uint256) {
+        ZooManagement myNewZooManagement = listOfZooManagementContracts[_zooManagementContractIndex];
+        return myNewZooManagement.getTotalVisitors();
+    }
+}
+```
+
+Analisis Kode *Factory*:
+
+1.  `ZooManagement[] public listOfZooManagementContracts;`: Kita membuat sebuah *array* untuk menyimpan alamat dari semua kontrak `ZooManagement` yang telah di-*deploy* oleh *factory* ini. Ini sangat penting untuk melacak kontrak-kontrak yang telah dibuat.
+2.  `ZooManagement newZooManagement = new ZooManagement();`: *Keyword* `new` digunakan untuk men-*deploy* sebuah *instance* baru dari kontrak `ZooManagement`. Operasi ini mengembalikan alamat dari kontrak yang baru dibuat.
+3.  `listOfZooManagementContracts.push(newZooManagement);`: Kita menyimpan alamat kontrak baru tersebut ke dalam *array* kita.
+4.  `fUpdateVisitorCount` dan `fGetTotalVisitors`: Ini adalah contoh fungsi "proxy". *Factory* ini dapat berinteraksi dengan kontrak-kontrak yang telah dibuatnya.
+      * Pertama, ia mengambil alamat kontrak target dari *array* berdasarkan indeksnya (`listOfZooManagementContracts[_zooManagementContractIndex]`).
+      * Kemudian, ia memanggil fungsi yang sesuai (`updateVisitorCount` atau `getTotalVisitors`) pada alamat kontrak tersebut.
+
+Pola *factory* sangat kuat dan umum digunakan untuk mengelola ekosistem kontrak yang saling terkait.
+
+### Kesimpulan Bab 5
+
+Kita telah belajar bagaimana mengelola data yang lebih kompleks menggunakan **structs**, **arrays** (baik dinamis maupun tetap), dan **mappings**. Kita juga telah memahami dua konsep fundamental dalam arsitektur perangkat lunak Solidity: **importing** untuk modularitas dan **inheritance** (beserta `virtual` dan `override`) untuk penggunaan ulang kode. Terakhir, Kita diperkenalkan pada **pola factory**, sebuah teknik canggih untuk mengelola siklus hidup kontrak.
+
+---
+
