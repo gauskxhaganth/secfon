@@ -1367,3 +1367,438 @@ Kita telah belajar bagaimana mengelola data yang lebih kompleks menggunakan **st
 
 ---
 
+# Bab 6
+## Beralih ke Lingkungan Pengembangan Profesional
+
+Bab ini akan memandu Anda melalui proses penyiapan *Integrated Development Environment* (IDE) profesional menggunakan **Visual Studio (VS) Code** dan *development framework* **Foundry**. Berbeda dengan Remix yang berbasis web, penyiapan lokal ini memberikan Anda kendali penuh dan skalabilitas untuk proyek-proyek yang lebih kompleks.
+
+Dengan mengikuti bab ini, Anda akan membangun sebuah fondasi yang kokoh untuk membuat *smart contracts* yang canggih. Anda akan belajar memanfaatkan fitur-fitur andalan VS Code seperti *editing* multi-file, integrasi *terminal*, dan *extensions* esensial untuk menyederhanakan proses pengembangan. Menguasai lingkungan ini sangat krusial untuk menulis *smart contracts* yang aman dan mudah dipelihara.
+
+## Bagian 1: Apa itu Microsoft VS Code?
+
+Pada bab-bab sebelumnya, kita telah menggunakan **Remix** sebagai IDE. Remix sangat berguna untuk memulai karena antarmukanya yang sederhana dan tidak memerlukan instalasi. Namun, untuk pengembangan profesional, Remix memiliki beberapa keterbatasan, seperti ketergantungan pada koneksi internet dan performa yang terbatas untuk proyek besar.
+
+**VS Code** adalah salah satu *code editor* terkemuka yang digunakan oleh para pengembang profesional untuk berbagai bahasa pemrograman, termasuk Solidity, JavaScript, Python, dan banyak lagi.
+
+Keunggulan utama VS Code adalah:
+
+  * **Ringan dan Cepat**: VS Code dirancang agar tidak membebani sistem dan dapat dijalankan dengan cepat.
+  * **Cross-Platform**: Tersedia untuk macOS, Windows, dan Linux.
+  * **Dukungan Multi-Bahasa**: Anda dapat bekerja pada berbagai bagian proyek (misalnya, *smart contract* Solidity dan *frontend* JavaScript) dalam satu aplikasi.
+  * **Bekerja Offline**: Anda tidak memerlukan koneksi internet untuk menulis atau mengelola kode Anda.
+
+VS Code memiliki dua edisi utama:
+
+1.  **Stable Edition**: Versi standar yang paling stabil dan direkomendasikan untuk penggunaan sehari-hari.
+2.  **Insiders Edition**: Versi beta yang berisi fitur-fitur terbaru, namun mungkin masih memiliki *bug*.
+
+Untuk mengunduh, Anda dapat mengunjungi situs resminya di `code.visualstudio.com`.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_6-1.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan situs web resmi Visual Studio Code dengan tombol unduh untuk macOS. - Figure 6.1]
+
+## Bagian 2: Tata Letak (Layout) Microsoft Visual Studio Code
+
+Setelah instalasi, Anda akan disambut dengan halaman `Welcome`. Antarmuka VS Code dibagi menjadi beberapa panel utama yang penting untuk dipahami.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_6-3.png" alt="gambar" width="550"/>
+</p>
+
+[Halaman 'Welcome' di VS Code yang menampilkan opsi kustomisasi awal. - Figure 6.3]
+
+### Explorer Pane
+
+Ini adalah panel utama untuk manajemen file dan proyek. Dari sini, Anda bisa membuka folder proyek yang sudah ada atau mengkloning *repository* dari platform seperti GitHub.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_6-4.png" alt="gambar" width="550"/>
+</p>
+
+[Panel Explorer di VS Code, menunjukkan opsi 'Open Folder' dan 'Clone Repository'. - Figure 6.4]
+
+### Search Pane
+
+Panel ini memungkinkan Anda untuk mencari teks di seluruh file dalam proyek Anda. Fitur ini juga mendukung *find and replace*, yang sangat berguna untuk refaktor kode.
+
+### Extensions
+
+*Extensions* adalah program tambahan yang memperluas fungsionalitas VS Code. Ini adalah salah satu kekuatan terbesar VS Code. Bab ini merekomendasikan beberapa *extensions* penting untuk pengembangan Solidity:
+
+  * **Night Owl**: Sebuah tema warna (*theme*) yang nyaman untuk mata, terutama saat bekerja dalam waktu lama.
+  * **Polacode**: Berguna untuk membuat tangkapan layar kode yang terlihat profesional.
+  * **Bookmarks**: Memungkinkan Anda menandai baris-baris kode penting dalam file besar agar mudah dinavigasi.
+  * **Cloak**: Dapat menyembunyikan informasi sensitif (seperti *private keys* atau API *keys*) di editor Anda, sangat berguna saat presentasi atau bekerja di tempat umum.
+  * **Solidity by Juan Blanco**: **Ini adalah *extension* yang wajib diinstal**. Fitur-fiturnya meliputi *syntax highlighting* (pewarnaan sintaks), *code completion* (pelengkapan kode otomatis), dan *linting* (analisis kode untuk potensi *error*).
+  * **Even Better TOML**: Memberikan *syntax highlighting* untuk file `.toml`, yang digunakan untuk konfigurasi Foundry (`foundry.toml`).
+  * **GitHub Copilot**: Asisten AI yang dapat menyarankan pelengkapan kode. Meskipun sangat membantu, buku ini menyarankan untuk tidak menggunakannya saat masih belajar agar Anda terbiasa menulis kode secara manual.
+
+> **Peringatan Keamanan**: *Extensions* tidak selalu diverifikasi oleh Microsoft. Instal hanya *extensions* yang terpercaya, terutama dalam konteks *cryptocurrency* di mana risiko pencurian *private key* sangat tinggi.
+
+## Bagian 3: Fitur Produktivitas di VS Code
+
+### Keyboard Shortcuts
+
+VS Code memiliki banyak *keyboard shortcuts* yang dapat mempercepat alur kerja Anda. Anda dapat melihat dan mengubahnya melalui menu `Settings > Keyboard Shortcuts`. Beberapa yang paling umum digunakan antara lain:
+
+  * **Save File**: `Cmd+S` (macOS) / `Ctrl+S` (Windows)
+  * **Open Terminal**: `Cmd+J` (macOS) / `Ctrl+J` (Windows)
+  * **Open Explorer Pane**: `Cmd+Shift+E` (macOS) / `Ctrl+Shift+E` (Windows)
+  * **Add Comment Line**: `Cmd+/` (macOS) / `Ctrl+/` (Windows)
+
+### Bekerja dengan Beberapa File Secara Bersamaan
+
+VS Code memungkinkan Anda untuk membagi layar editor untuk menampilkan beberapa file sekaligus. Anda dapat menyeret *tab* file ke sisi editor untuk membuat tata letak vertikal, horizontal, atau bahkan grid. Ini sangat berguna untuk membandingkan file, misalnya antara file kontrak dan file *test*-nya.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_6-23.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan VS Code dengan layar terbagi dua, menampilkan Example1.sol di kiri dan Example2.sol di kanan. - Figure 6.23]
+
+### Mirror/Mini-Map
+
+Untuk file yang sangat panjang, fitur *mini-map* di sisi kanan editor memberikan gambaran visual dari seluruh kode, memungkinkan navigasi yang cepat.
+
+### Zen Mode
+
+Fitur ini menyembunyikan semua elemen antarmuka yang tidak perlu, memungkinkan Anda untuk fokus sepenuhnya pada kode yang sedang Anda tulis.
+
+## Bagian 4: Terminal Terintegrasi VS Code
+
+Salah satu fitur paling kuat dari VS Code adalah *terminal* yang terintegrasi. Ini memungkinkan Anda menjalankan perintah *command-line* langsung dari dalam editor.
+
+  * **GUI vs. CLI**: *Graphical User Interface* (GUI) adalah cara kita berinteraksi dengan komputer melalui klik dan jendela. *Command-Line Interface* (CLI) adalah interaksi berbasis teks melalui *terminal*, yang lebih kuat dan presisi untuk tugas-tugas pengembangan.
+  * **Split Terminal**: Sama seperti editor, Anda dapat membagi *terminal* menjadi beberapa panel. Ini memungkinkan Anda menjalankan beberapa proses secara bersamaan, misalnya, menjalankan node Anvil di satu panel dan men-*deploy* kontrak di panel lain.
+  * **Tipe Terminal**: VS Code mendukung berbagai jenis *shell terminal*, termasuk **Bash** dan **Zsh** (umum di macOS/Linux) serta **PowerShell** dan **Cmd** (di Windows).
+
+## Bagian 5: Menginstal Foundry (Langkah Kritis)
+
+**Foundry** adalah *development framework* modern untuk Solidity. Bab ini memandu instalasi Foundry melalui *terminal*.
+
+1.  **Jalankan Perintah Instalasi**: Buka `getfoundry.sh`, salin perintah instalasi, dan tempelkan ke *terminal* Anda.
+
+    ```bash
+    curl -L https://foundry.paradigm.xyz | bash
+    ```
+
+2.  **Troubleshooting (Mengatasi Masalah Dependensi)**: Selama instalasi, Anda mungkin menemukan *error* yang menyatakan ada *library* yang hilang, seperti `libusb`. Untuk mengatasinya, terutama di macOS, Anda perlu menginstal **Homebrew**.
+
+      * **Apa itu Homebrew?** Homebrew adalah *package manager* untuk macOS dan Linux yang memudahkan instalasi perangkat lunak dan *library* yang dibutuhkan oleh pengembang.
+      * **Instalasi Homebrew**: Kunjungi `brew.sh`, salin skrip instalasi, dan jalankan di *terminal* Anda. Proses ini mungkin akan meminta *password* komputer Anda.
+      * Setelah Homebrew terinstal, Anda harus menambahkan path-nya ke profil *shell* Anda sesuai instruksi yang muncul di *terminal* setelah instalasi selesai.
+
+3.  **Selesaikan Instalasi Foundry**: Setelah semua dependensi terpenuhi (termasuk Homebrew jika diperlukan), tutup dan buka kembali *terminal* Anda, lalu jalankan perintah:
+
+    ```bash
+    foundryup
+    ```
+
+    Perintah ini akan mengunduh dan menginstal komponen-komponen Foundry seperti **Forge**, **Cast**, dan **Anvil**.
+
+4.  **Verifikasi Instalasi**: Untuk memastikan Foundry terinstal dengan benar, jalankan perintah berikut:
+
+    ```bash
+    forge --version
+    ```
+
+    Jika berhasil, *terminal* akan menampilkan versi Forge yang terinstal.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_6-47.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menampilkan output "forge 0.2.0" setelah menjalankan perintah forge --version. - Figure 6.47]
+
+## Bagian 6: Memulai Proyek Foundry
+
+Setelah Foundry terinstal, Anda dapat membuat proyek baru.
+
+1.  **Navigasi dan Buat Folder Proyek**: Gunakan *terminal* untuk menavigasi ke direktori kerja Anda.
+
+      * `ls`: Untuk melihat daftar file dan folder saat ini.
+      * `mkdir nama-folder-proyek`: Untuk membuat folder baru.
+      * `cd nama-folder-proyek`: Untuk masuk ke dalam folder tersebut.
+
+2.  **Buka Folder di VS Code**: Dari dalam VS Code, gunakan `File > Open Folder` untuk membuka direktori proyek yang baru saja Anda buat.
+
+3. **Inisialisasi Proyek Foundry**: Buka *terminal* terintegrasi di VS Code (yang sekarang sudah berada di dalam direktori proyek Anda) dan jalankan perintah:
+
+    ```bash
+    forge init
+    ```
+
+    Perintah ini akan secara otomatis membuat struktur proyek standar Foundry, termasuk folder `src` (untuk kode kontrak), `script` (untuk skrip *deployment*), `test` (untuk file *test*), dan file konfigurasi `foundry.toml`.
+    
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_6-60.png" alt="gambar" width="550"/>
+</p>
+
+[Panel Explorer di VS Code menunjukkan struktur folder proyek Foundry yang baru dibuat: lib, script, src, test, dan file lainnya. - Figure 6.60]
+
+### Kesimpulan Bab 6
+
+Bab ini telah memberikan panduan lengkap untuk beralih dari lingkungan pengembangan yang sederhana ke penyiapan lokal yang profesional dan kuat. Anda telah belajar menginstal dan mengkonfigurasi **VS Code** dengan *extensions* yang tepat, serta menguasai instalasi **Foundry**, *framework* pilihan untuk pengembangan Solidity modern. Dengan fondasi ini, Anda kini siap untuk menulis, mengkompilasi, dan mengelola proyek *smart contract* yang lebih kompleks dan aman, yang akan kita bahas di bab-bab selanjutnya.
+
+---
+
+# Bab 7
+## Foundry ZooManagement - Alur Kerja Pengembangan Profesional
+
+### **Pendahuluan**
+
+Setelah di bab sebelumnya kita berhasil mempersiapkan lingkungan pengembangan lokal yang profesional dengan VS Code dan Foundry, Bab 7 ini adalah jembatan yang menghubungkan teori dengan praktik. Kita akan mengambil kontrak `ZooManagement` yang telah kita bangun di Remix dan mengimplementasikannya kembali dalam *workflow* Foundry. Bab ini akan memandu Kita secara menyeluruh melalui setiap langkah: meninjau struktur file proyek, mengkompilasi kontrak, men-*deploy* secara lokal menggunakan Anvil, berinteraksi dengan kontrak yang telah di-*deploy*, hingga men-*deploy* ke jaringan *testnet* publik. Menguasai alur kerja ini adalah fundamental bagi setiap pengembang dan *auditor* Solidity.
+
+### **Bagian 1: Memahami Struktur File Proyek Foundry**
+
+Saat Kita menjalankan `forge init`, Foundry menciptakan sebuah kerangka kerja yang terorganisir. Mari kita bedah setiap file dan folder penting yang dihasilkan, karena ini adalah fondasi dari setiap proyek Foundry.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_7-1.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar panel Explorer di VS Code yang menunjukkan semua file dan folder default dalam proyek Foundry. - Figure 7.1]
+
+  * **Folder `.github/workflows`**: Berisi file konfigurasi untuk **GitHub Actions**. Ini adalah *tools* otomatisasi yang dapat menjalankan tugas-tugas seperti *testing* secara otomatis setiap kali ada perubahan pada kode di *repository* GitHub. File `test.yml` di dalamnya adalah contoh alur kerja untuk menjalankan *test*.
+  * **Folder `lib`**: Folder ini berisi *libraries* atau dependensi eksternal. Secara *default*, di dalamnya terdapat `forge-std`, yaitu *standard library* Foundry yang menyediakan kontrak-kontrak bantuan (seperti `Script.sol` dan `Test.sol`) serta *cheat codes* (`vm`) yang sangat berguna.
+  * **Folder `script`**: Tempat untuk menyimpan skrip *deployment*. File di sini mengikuti konvensi penamaan berakhiran `.s.sol`. Contohnya, `Counter.s.sol`.
+  * **Folder `src`**: Kependekan dari *source*. Di sinilah Kita menyimpan kode sumber (*source code*) dari *smart contract* utama Kita. Contohnya, `Counter.sol`.
+  * **Folder `test`**: Berisi semua kontrak untuk pengujian (*testing*). File di sini mengikuti konvensi penamaan berakhiran `.t.sol`. Contohnya, `Counter.t.sol`.
+  * **File `.gitignore`**: Sebuah file konfigurasi untuk **Git** (sebuah *version control system* yang melacak perubahan pada kode). File ini berisi daftar file atau folder yang harus diabaikan oleh Git, sangat penting untuk mencegah informasi sensitif seperti *private key* terunggah.
+  * **File `foundry.toml`**: File konfigurasi utama untuk proyek Foundry. Kita bisa mengatur versi *compiler*, URL RPC *default*, *gas settings*, dan banyak lagi di sini.
+  * **File `README.md`**: File dokumentasi untuk proyek Kita. Berisi penjelasan, instruksi instalasi, dan cara penggunaan.
+
+### **Bagian 2: Mengkompilasi Kontrak (*Compiling a Contract*)**
+
+Kompilasi adalah proses mengubah kode Solidity menjadi **bytecode** EVM. Ini juga merupakan langkah validasi untuk memastikan tidak ada *syntax error*. Mari kita gunakan `Counter.sol` sebagai contoh.
+
+```solidity
+// File: src/Counter.sol
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.13;
+
+contract Counter {
+    uint256 public number;
+
+    function setNumber(uint256 newNumber) public {
+        number = newNumber;
+    }
+
+    function increment() public {
+        number++;
+    }
+}
+```
+
+Buka *terminal* di VS Code dan jalankan perintah:
+
+```bash
+forge build
+```
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_7-5.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menampilkan output "Compiler run successful\!". - Figure 7.5]
+
+Jika ada *error*, misalnya kita sengaja menghapus kurung kurawal penutup `}` dari kontrak:
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_7-6.png" alt="gambar" width="550"/>
+</p>
+
+[Kode kontrak Counter.sol dengan kurung kurawal penutup yang dihapus. - Figure 7.6]
+
+Maka saat menjalankan `forge build`, Foundry akan memberikan pesan *error* yang sangat jelas:
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_7-7.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menampilkan pesan error kompilasi yang detail, menunjukkan bahwa sebuah '}' hilang. - Figure 7.7]
+
+Ini menunjukkan betapa bergunanya *compiler* dalam proses *debugging* awal.
+
+### **Bagian 3: Pengenalan Anvil - *Node* Blockchain Lokal Anda**
+
+**Anvil** adalah simulasi *node* Ethereum lokal yang merupakan bagian dari Foundry. Ini memungkinkan kita melakukan *testing* dan *deployment* dalam lingkungan yang cepat dan terkontrol.
+
+Untuk menjalankannya, ketik di *terminal*:
+
+```bash
+anvil
+```
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_7-10.png" alt="gambar" width="550"/>
+</p>
+
+[Output terminal saat Anvil dijalankan, menampilkan 10 akun beserta private key, mnemonic, dan detail jaringan. - Figure 7.10]
+
+Mari kita bedah outputnya secara detail:
+
+  * **Available Accounts**: 10 akun *test* yang sudah diisi dana (10,000 ETH palsu).
+  * **Private Keys**: Kunci privat heksadesimal 64-karakter untuk setiap akun.
+  * **Wallet - Mnemonic**: Sebuah frasa 12 kata yang lebih mudah diingat. Dari satu *mnemonic* ini, semua 10 akun tersebut dapat dihasilkan kembali.
+  * **Wallet - Derivation Path**: `m/44'/60'/0'/0` adalah standar (BIP-44) untuk menghasilkan *private key*. `44` merujuk pada BIP-44, `60` adalah tipe koin untuk Ethereum, dan angka `0` berikutnya merujuk pada nomor akun dan indeks alamat.
+  * **Chain ID**: `31337`, ID unik untuk jaringan Anvil.
+  * **RPC URL**: `127.0.0.1:8545`, alamat yang digunakan untuk menghubungkan *tools* lain ke Anvil.
+
+#### **Menghubungkan Anvil ke MetaMask**
+
+Untuk berinteraksi dengan Anvil menggunakan *wallet* grafis:
+
+1.  Buka MetaMask \> Settings \> Networks \> Add a network \> Add a network manually.
+2.  Isi detailnya:
+      * **Network Name**: `Anvil`
+      * **New RPC URL**: `http://127.0.0.1:8545`
+      * **Chain ID**: `31337`
+      * **Currency Symbol**: `ETH`
+3.  Simpan jaringan.
+4.  Selanjutnya, impor salah satu akun Anvil dengan menyalin *private key*-nya dari terminal dan menggunakan fitur "Import account" di MetaMask.
+
+### **Bagian 4: *Deployment* Kontrak Lokal di Anvil**
+
+#### **Metode 1: Menggunakan Skrip *Deployment* (Cara Profesional dan Aman)**
+
+Metode yang paling direkomendasikan adalah menggunakan skrip. Mari kita pindahkan kode `ZooManagement.sol` ke folder `src` dan buat skrip *deployment*-nya di folder `script`.
+
+```solidity
+// File: script/DeployZooManagement.s.sol
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19; // Sesuaikan dengan versi Anda
+
+import {Script} from "forge-std/Script.sol";
+import {ZooManagement} from "../src/ZooManagement.sol";
+
+contract DeployZooManagement is Script {
+    function run() external returns (ZooManagement) {
+        vm.startBroadcast();
+        ZooManagement zooManagement = new ZooManagement();
+        vm.stopBroadcast();
+        return zooManagement;
+    }
+}
+```
+
+  * `import {Script}`: Mengimpor kontrak dasar untuk skrip dari `forge-std`.
+  * `is Script`: Menandakan bahwa ini adalah kontrak skrip.
+  * `vm.startBroadcast()` dan `vm.stopBroadcast()`: *Cheat codes* ini memberitahu Foundry bahwa semua *call* yang terjadi di antara keduanya harus dikirim sebagai transaksi nyata ke *blockchain*.
+
+#### **Manajemen *Private Key* yang Aman (Langkah Krusial)**
+
+Sebelum men-*deploy*, kita harus menyimpan *private key* dengan aman, bukan menempelkannya langsung di *command-line*.
+
+1.  **Buka Terminal Komputer Kita (bukan terminal VS Code, untuk lapisan keamanan tambahan).**
+2.  Jalankan perintah `cast wallet import` untuk menyimpan dan mengenkripsi *private key* Anvil Kita:
+    ```bash
+    cast wallet import my-anvil-wallet --interactive
+    ```
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_7-26.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal meminta untuk memasukkan private key. - Figure 7.26]
+3.  Tempelkan salah satu *private key* dari Anvil.
+4.  Buat *password* untuk mengenkripsi *keystore file* ini.
+5.  Terminal akan mengonfirmasi bahwa *wallet* telah disimpan dan memberikan Kita alamat *keystore*. Simpan alamat ini.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_7-29.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menampilkan pesan sukses bahwa keystore telah disimpan beserta alamatnya. - Figure 7.29]
+
+Sekarang, kembali ke terminal VS Code untuk men-*deploy* skrip:
+
+```bash
+forge script script/ZooManagement.s.sol:DeployZooManagement --rpc-url http://127.0.0.1:8545 --account my-anvil-wallet --broadcast
+```
+
+Foundry akan meminta *password* yang Kita buat tadi. Ini adalah cara yang aman untuk men-*deploy* karena *private key* Kita tidak pernah terekspos dalam bentuk teks biasa di *command-line*.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_7-30.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menampilkan output deployment yang sukses, termasuk alamat deployer, alamat kontrak baru, dan hash transaksi. - Figure 7.30]
+
+### **Bagian 5: Berinteraksi dengan Kontrak Menggunakan Foundry (`cast`)**
+
+**Cast** adalah *tool* CLI dari Foundry untuk melakukan *RPC calls* ke Ethereum, termasuk berinteraksi dengan kontrak.
+
+#### **`cast send`: Mengirim Transaksi yang Mengubah *State***
+
+Untuk memanggil fungsi yang mengubah data, seperti `updateVisitorCount`:
+
+```bash
+cast send <ALAMAT_KONTRAK> "updateVisitorCount(uint256)" 21 --rpc-url http://127.0.0.1:8545 --account my-anvil-wallet
+```
+
+  * Parameter pertama adalah alamat kontrak.
+  * Parameter kedua adalah *function signature* (tanda tangan fungsi) dalam tanda kutip.
+  * Parameter selanjutnya adalah argumen untuk fungsi tersebut (nilai `21`).
+
+#### **`cast call`: Membaca Data dari Kontrak**
+
+Untuk memanggil fungsi `view` atau `pure` yang hanya membaca data, seperti `getTotalVisitors`:
+
+```bash
+cast call <ALAMAT_KONTRAK> "getTotalVisitors()"
+```
+
+Hasilnya akan dalam format *hexadecimal*. Gunakan `cast --to-dec` untuk mengonversinya:
+
+```bash
+cast --to-dec 0x0000000000000000000000000000000000000000000000000000000000000015
+# Output: 21
+```
+
+### **Bagian 6: *Deployment* ke Jaringan *Testnet* (Sepolia)**
+
+Proses ini sangat mirip dengan *deployment* lokal, namun dengan beberapa penyesuaian:
+
+1.  **Dapatkan RPC URL untuk Sepolia**: Buat akun di **Alchemy**, buat "app" baru untuk jaringan Sepolia, dan salin **HTTPS URL**-nya.
+
+2.  **Siapkan Akun Testnet**: Pastikan akun MetaMask Kita memiliki saldo Sepolia ETH dari *faucet*. Kemudian, ekspor *private key* akun tersebut.
+
+    > **PERINGATAN KESELAMATAN YANG SANGAT PENTING**: Seperti yang dijelaskan di buku, tindakan mengekspor *private key* dari *wallet* seperti MetaMask sangat berisiko. Lakukan ini **HANYA** untuk akun *testnet* yang tidak memiliki nilai finansial. **JANGAN PERNAH** lakukan ini untuk akun *mainnet* Kita.
+
+3.  **Impor Private Key Testnet dengan Aman**: Gunakan `cast wallet import` lagi untuk menyimpan *private key* Sepolia Kita dengan nama baru (misalnya, `my-sepolia-wallet`).
+
+4.  **Dapatkan Etherscan API Key**: Buat akun di `etherscan.io` dan dapatkan API *key* gratis. Ini akan memungkinkan Foundry untuk secara otomatis memverifikasi kode sumber kontrak Kita.
+
+5.  **Jalankan Perintah *Deployment***:
+
+    ```bash
+    forge script script/ZooManagement.s.sol:DeployZooManagement \
+    --rpc-url <URL_RPC_ALCHEMY_SEPOLIA_ANDA> \
+    --account my-sepolia-wallet \
+    --sender <ALAMAT_WALLET_SEPOLIA_ANDA> \
+    --etherscan-api-key <API_KEY_ETHERSCAN_ANDA> \
+    --broadcast
+    ```
+
+      * `--broadcast`: Flag ini wajib untuk benar-benar mengirimkan transaksi ke jaringan publik.
+      * `--etherscan-api-key`: Flag untuk verifikasi otomatis.
+
+### **Verifikasi di Etherscan**
+
+Setelah *deployment* berhasil, salin *hash* transaksi dari output terminal, buka `sepolia.etherscan.io`, dan cari *hash* tersebut. Kita akan dapat melihat transaksi pembuatan kontrak Kita, membuktikan bahwa kontrak Kita sekarang hidup di jaringan *testnet* publik dan kodenya sudah terverifikasi.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_7-53.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar Etherscan untuk jaringan Sepolia yang menunjukkan detail transaksi pembuatan kontrak. - Figure 7.53]
+
+### **Kesimpulan Bab 7**
+
+Kita mendapatkan pengalaman dalam menggunakan *toolchain* profesional untuk siklus pengembangan *smart contract* yang lengkap. Kita telah beralih dari lingkungan *online* yang sederhana ke alur kerja lokal yang kuat, mempelajari cara mengkompilasi, men-*deploy* kontrak secara aman, berinteraksi dengannya, dan memverifikasi hasilnya di *block explorer* publik. Keterampilan ini adalah fondasi yang mutlak diperlukan untuk membangun aplikasi terdesentralisasi yang serius dan merupakan bekal esensial untuk memulai analisis keamanan.
+
+---
+
