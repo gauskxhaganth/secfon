@@ -255,17 +255,171 @@ Untuk mengatasi masalah skalabilitas, solusi ***Layer 2*** dibangun "di atas" *b
 
 [Diagram yang mengilustrasikan konsep sharding, di mana sebuah tabel data besar dengan 'Shard Key' dipecah menjadi tiga tabel yang lebih kecil berdasarkan rentang nilai. - Figure 2.3]
 
-* ***Rollups:*** Menggabungkan banyak *transaction off-chain* ke dalam satu *batch* dan mempublikasikan ringkasan datanya ke *Layer 1*.
-    * ***Optimistic Rollups:*** Mengasumsikan semua *transaction* valid secara default dan hanya melakukan komputasi jika ada sengketa (menggunakan ***fraud proofs***).
-    * ***Zero-Knowledge (ZK) Rollups:*** Menggunakan bukti kriptografis canggih (***zero-knowledge proofs***) untuk membuktikan validitas *transaction* tanpa mengungkapkan data apa pun, sehingga meningkatkan skalabilitas dan privas.
-* ***Validiums:*** Mirip dengan ZK-Rollups, tetapi data *transaction* disimpan *off-chain*, memberikan skalabilitas dan privasi yang lebih tinggi lagi.
-* ***Side-Chains:*** *Blockchain* independen yang berjalan paralel dengan *Ethereum* dan terhubung melalui jembatan (*bridges*).
-* ***Sharding:*** Konsep partisi basis data di mana *blockchain* dipecah menjadi beberapa rantai yang lebih kecil (*shards*) yang memproses *transaction* secara paralel (seperti diilustrasikan pada Gambar 2.3).
-* ***Danksharding:*** Evolusi dari *sharding* yang berfokus pada penyediaan ruang data yang masif dan murah (melalui ***data blobs***) untuk *rollups*, secara efektif mengubah *Ethereum* menjadi lapisan penyelesaian (*settlement layer*) yang sangat aman dan terdesentralisasi.
+## Rollups
+
+**Rollups** adalah teknologi Layer 2 yang **memproses transaksi di luar L1 (off-chain)**, lalu **mengirim ringkasan hasilnya ke L1**.
+Jadi:
+
+* Eksekusi transaksi → dilakukan di L2
+* Data hasil transaksi → dikirim ke L1 (Ethereum mainnet)
+
+**Manfaatnya:**
+
+* Mengurangi beban komputasi di L1
+* Biaya jauh lebih murah
+* Throughput tinggi
+
+Ada dua jenis utama:
+
+### Optimistic Rollups
+
+* Disebut *optimistic* karena **diasumsikan semua transaksi valid secara default**.
+* Mereka **tidak langsung membuktikan keabsahan transaksi** saat mengirim ke L1.
+* Tapi mereka memberi **periode tantangan (challenge period)**, biasanya beberapa hari.
+* Jika ada yang mencurigai kecurangan, mereka bisa **mengajukan *fraud proof*** ke L1.
+* Jika terbukti, transaksi penipu dibatalkan dan penipunya kehilangan deposit.
+
+🧠 Contoh: Arbitrum, Optimism
+
+📌 Karakteristik:
+
+* Murah dan throughput tinggi
+* Tapi finalitas (kepastian transaksi valid) lambat → harus tunggu challenge period selesai
+
+### Zero-Knowledge (ZK) Rollups
+
+* ZK-Rollups **tidak mengasumsikan valid**, mereka **membuktikan semua transaksi benar sejak awal**.
+* Setiap batch transaksi dikirim ke L1 bersama **bukti kriptografis (zero-knowledge proof)**.
+* Bukti ini **diverifikasi oleh smart contract di L1**.
+
+🧠 Contoh: zkSync, Starknet, Scroll
+
+📌 Karakteristik:
+
+* Finalitas cepat (karena langsung ada bukti)
+* Lebih kompleks secara teknis (membuat bukti mahal & lambat saat ini)
+* Lebih ramah privasi karena bukti tidak mengungkap data mentah transaksi
+
+## Validiums
+
+* **Mirip ZK-Rollups**, tapi **data transaksi disimpan off-chain** sepenuhnya.
+* L1 hanya menyimpan **bukti validitas**, **bukan data transaksi mentah**.
+* Ini **menghemat ruang dan biaya sangat besar**, karena L1 tidak menyimpan data.
+
+📌 Karakteristik:
+
+* Skalabilitas tinggi (karena data tidak dibebankan ke L1)
+* Tapi **keamanan datanya tergantung pada penyedia data off-chain**, bukan Ethereum → ada risiko jika penyedia data hilang atau jahat
+
+🧠 Contoh: StarkEx (dalam mode validium)
+
+## Sidechains
+
+* **Blockchain terpisah** yang berjalan berdampingan (paralel) dengan Ethereum.
+* Memiliki **konsensus sendiri** dan **validator sendiri**, **bukan dijamin oleh Ethereum**.
+* Terhubung ke Ethereum lewat **jembatan (*bridge*)** untuk transfer aset.
+
+📌 Karakteristik:
+
+* Biaya sangat murah dan throughput tinggi
+* Tapi keamanan bergantung pada jaringan sidechain itu sendiri (jika validator mereka diserang, dana bisa hilang)
+
+🧠 Contoh: Polygon PoS chain, Gnosis Chain
+
+## Sharding
+
+* Teknik untuk **memecah satu blockchain besar jadi banyak *shard* kecil**, masing-masing memproses subset transaksi secara paralel.
+* Setiap shard seperti *mini blockchain* yang menyumbangkan hasilnya ke beacon chain (rangka utama Ethereum).
+
+📌 Tujuan:
+
+* Menambah kapasitas transaksi Ethereum
+* Mengurangi beban setiap node → setiap node hanya perlu memvalidasi shard tertentu
+
+🧠 Catatan:
+
+* Sharding ini rencananya bagian dari roadmap Ethereum, tapi model awal sharding transaksi **diubah menjadi fokus data (lihat Danksharding)**
+
+## Danksharding
+
+* Evolusi dari konsep sharding dalam roadmap Ethereum terbaru.
+* Fokus bukan lagi memproses transaksi, tapi **menyediakan ruang data murah dalam bentuk *data blobs*** untuk rollups.
+* Dengan **proto-danksharding (EIP-4844)**, Ethereum mulai mendukung **blob-carrying transactions** yang jauh lebih murah untuk rollups.
+
+📌 Tujuan:
+
+* Memberikan **ruang data besar dan murah** supaya rollups bisa menyimpan datanya tanpa membebani gas fee L1.
+* Membuat Ethereum menjadi **settlement layer**: tempat rollups memposting bukti dan data ringkasan mereka.
+
+🧠 Dampaknya:
+
+* Rollups menjadi jauh lebih murah
+* Ethereum tetap aman dan ringan karena hanya menyimpan bukti dan data blob, bukan semua transaksi mentah
+
+## Rangkuman Tabel
+
+| Teknologi          | Eksekusi di Mana | Data disimpan di Mana | Jaminan Keamanan                        | Contoh                      |
+| ------------------ | ---------------- | --------------------- | --------------------------------------- | --------------------------- |
+| Optimistic Rollups | L2               | L1                    | Fraud proofs (challenge period)         | Arbitrum, Optimism          |
+| ZK-Rollups         | L2               | L1                    | Validity proofs (langsung diverifikasi) | zkSync, Starknet            |
+| Validiums          | L2               | Off-chain             | Validity proofs, tapi data off-chain    | StarkEx (validium mode)     |
+| Sidechains         | Chain terpisah   | Chain terpisah        | Keamanan sendiri (bukan Ethereum)       | Polygon PoS, Gnosis         |
+| Sharding           | L1               | L1 (per shard)        | Ethereum validator                      | (rencana lama Ethereum)     |
+| Danksharding       | L1               | L1 (data blobs)       | Ethereum validator                      | (roadmap Ethereum sekarang) 
 
 ### Solusi Layer 3
 
-Ini adalah lapisan yang dibangun di atas *Layer 2*, yang dirancang untuk aplikasi yang sangat spesifik seperti *gaming* atau media sosial terdesentralisasi, menawarkan kustomisasi dan efisiensi yang lebih tinggi lagi.
+**Layer 3 adalah jaringan blockchain khusus (application-specific chain)** yang dibangun **di atas Layer 2**, bukan langsung di Layer 1.
+
+🧠 Sederhananya:
+
+> L1 = keamanan dan konsensus dasar
+> L2 = skalabilitas umum untuk semua
+> L3 = eksekusi super cepat untuk aplikasi spesifik
+
+#### Cara Kerja Layer 3
+
+* L3 berjalan **di atas infrastruktur L2** seperti Arbitrum Orbit, zkSync Hyperchains, atau Starknet Appchains.
+* L3 **mewarisi keamanan dari L2 (dan secara tidak langsung dari L1)**, tapi bisa dikonfigurasi secara bebas:
+
+  * Aturan konsensus sendiri
+  * Biaya gas sendiri
+  * Token native sendiri
+  * Mekanisme privasi sendiri
+* Transaksi di L3 → dikumpulkan ke batch → dikirim ke L2 → lalu ke L1 untuk finalitas dan keamanan akhir.
+
+Artinya: mereka **tidak membebani L1 langsung**, sehingga **lebih murah dan lebih cepat**.
+
+#### Contoh Kasus Penggunaan L3
+
+| Bidang                          | Kebutuhan                      | Kenapa Cocok L3                                  |
+| ------------------------------- | ------------------------------ | ------------------------------------------------ |
+| Game blockchain                 | Ribuan transaksi kecil/detik   | Biaya rendah, finalitas cepat, kustomisasi penuh |
+| Media sosial terdesentralisasi  | Banyak interaksi pengguna      | Throughput tinggi, biaya nyaris nol              |
+| DeFi perusahaan (institutional) | Privasi, izin akses, kontrol   | Bisa atur siapa yang bisa akses & melihat data   |
+| Rollup ekosistem besar          | Sub-rollup khusus per aplikasi | Isolasi performa dan biaya dari aplikasi lain    |
+
+#### Perbedaan L2 vs L3
+
+| Aspek              | Layer 2 (L2)                | Layer 3 (L3)                                 |
+| ------------------ | --------------------------- | -------------------------------------------- |
+| Tujuan utama       | Skalabilitas umum           | Skalabilitas & kustomisasi aplikasi spesifik |
+| Dijalankan di atas | Layer 1                     | Layer 2 (yang di atas L1)                    |
+| Biaya transaksi    | Rendah                      | Lebih rendah lagi                            |
+| Keamanan           | Disediakan langsung oleh L1 | Mewarisi keamanan dari L2 → lalu ke L1       |
+| Kustomisasi        | Terbatas                    | Sangat tinggi (token, konsensus, dll)        |
+
+#### Tantangan Layer 3
+
+* **Kompleksitas meningkat** (stack 3 lapisan harus dikelola)
+* **Keamanan tergantung L2** → kalau L2 diserang, semua L3 di atasnya ikut terdampak
+* **Masih sangat baru** → banyak eksperimen, standar belum matang
+
+#### Contoh Nyata L3 Saat Ini
+
+* **Arbitrum Orbit:** Framework untuk membangun L3 di atas Arbitrum Nitro
+* **zkSync Hyperchains:** L3 berbasis ZK-Rollup yang dapat disesuaikan
+* **Starknet Appchains:** Membuat L3 di atas Starknet
 
 ### Ethereum: Menuju Finalisasi
 
@@ -281,3 +435,299 @@ Bab 2 memberikan gambaran arsitektur yang komprehensif. Sebagai seorang auditor,
 
 ---
 
+# Bab 3
+## Wallets, MetaMask, and Block Explorers
+
+Bab ini merupakan fondasi praktis yang sangat penting. Sebelum Kita dapat mengaudit atau mengamankan sebuah *smart contract*, Kita harus terlebih dahulu memahami alat-alat fundamental untuk berinteraksi dengan sebuah *blockchain*. Bab ini memperkenalkan tiga pilar utama: *cryptocurrency wallets* sebagai gerbang Kita ke aset digital, MetaMask sebagai implementasi *browser wallet* yang populer, dan *block explorers* sebagai jendela transparan untuk memverifikasi semua aktivitas *on-chain*.
+
+Bagi seorang auditor, penguasaan materi ini bukan sekadar pengetahuan dasar, melainkan kemampuan inti. Kita akan belajar bagaimana dana dikelola dengan aman, bagaimana interaksi dengan *Decentralized Applications* (DApps) terjadi, dan yang terpenting, bagaimana cara memverifikasi setiap *transaction* dan status *contract* secara independen—sebuah praktik yang merangkum esensi dari moto "jangan percaya, verifikasi" (*don't trust, verify*).
+
+### Memahami Wallets
+
+Di dunia fisik, *wallet* (dompet) adalah tempat Kita menyimpan uang tunai. Namun, dalam dunia *cryptocurrency*, konsep ini sedikit berbeda dan lebih teknis. Sebuah **`wallet`** pada dasarnya bukanlah wadah yang menyimpan *cryptocurrency* Kita. Sebaliknya, *wallet* adalah sebuah antarmuka perangkat lunak (*software*) atau perangkat keras (*hardware*) yang mengelola **kunci kriptografis** Kita. Kunci-kunci inilah yang memberi Kita akses dan kontrol atas aset Kita yang tercatat di *blockchain*.
+
+Ada dua jenis kunci utama:
+* **`Private Key`**: Ini adalah kunci rahasia, mirip dengan kata sandi super penting atau PIN ATM Kita. Siapa pun yang memiliki `private key` Kita dapat mengakses dan membelanjakan dana Kita. Menjaga kerahasiaan `private key` adalah prioritas keamanan tertinggi.
+* **`Public Key`**: Kunci ini berasal dari `private key` Kita dan dapat dibagikan secara bebas. Dari `public key` inilah alamat *wallet* Kita (*wallet address*) dibuat, yang berfungsi seperti nomor rekening bank yang bisa Kita berikan kepada orang lain untuk menerima dana.
+
+Bab ini mengkategorikan *wallets* ke dalam beberapa jenis, masing-masing dengan kelebihan, kekurangan, dan skenario penggunaan yang berbeda.
+
+#### Hosted Wallets
+
+*Hosted wallets* adalah *wallets* di mana `private key` Kita dikelola oleh pihak ketiga, biasanya sebuah bursa *cryptocurrency* (*cryptocurrency exchange*) seperti Binance atau Coinbase. Ini adalah jenis *wallet* yang paling umum digunakan oleh pemula karena kemudahannya.
+
+* **Keuntungan**:
+    * **Kemudahan Penggunaan**: Kita tidak perlu khawatir mengelola `private key` sendiri. Jika Kita lupa kata sandi, biasanya ada opsi pemulihan.
+    * **Tanpa Biaya Tambahan**: Tidak perlu membeli perangkat keras khusus.
+    * **Hemat Waktu**: Tidak perlu belajar tentang berbagai jenis *wallet* dan cara mengamankannya.
+
+* **Kekurangan (Sangat Krusial untuk Auditor)**:
+    * **Sentralisasi**: Ini bertentangan dengan etos desentralisasi. Kita pada dasarnya membuat ulang sistem perbankan tradisional di mana Kita mempercayakan dana Kita kepada pihak ketiga.
+    * **Risiko Pihak Ketiga**: Jika bursa tersebut bangkrut, diretas, atau dikelola oleh pelaku kejahatan, dana Kita kemungkinan besar akan hilang selamanya. Ini adalah poin kegagalan tunggal (*single point of failure*).
+    * **Risiko Regulasi**: Pemerintah dapat memerintahkan bursa untuk membekukan atau menyita aset pengguna.
+
+* **Praktik Terbaik**:
+    1.  **Diversifikasi**: Jika harus menggunakan *hosted wallets*, sebarkan dana Kita di beberapa bursa terkemuka untuk mengurangi risiko jika salah satu bursa gagal.
+    2.  **Bookmark Situs**: Selalu akses situs bursa melalui *bookmark* yang telah Kita simpan untuk menghindari situs *phishing*.
+    3.  **Verifikasi Tim di Komunitas**: Di server Discord atau Telegram, pastikan setiap pengumuman penting (seperti *Airdrop*) datang dari anggota tim resmi yang memiliki lencana terverifikasi.
+
+* **Studi Kasus (Pelajaran dari Kegagalan)**:
+    * **Mount Gox**: Sebuah bursa yang menangani >70% *transaction* Bitcoin pada tahun 2014, bangkrut setelah serangkaian peretasan. Bertahun-tahun kemudian, para pelanggan masih berjuang untuk mendapatkan kembali sebagian kecil dari dana mereka. Ini adalah contoh klasik dari risiko mempercayakan `private key` Kita kepada pihak lain.
+    * **QuadrigaCX**: Bursa asal Kanada ini runtuh setelah pendirinya, Gerald Cotten, dilaporkan meninggal secara misterius di India, membawa serta akses ke `private key` yang menyimpan dana pelanggan senilai hampir $200 juta. Kasus ini menyoroti bahaya ketika hanya satu orang yang memiliki kontrol penuh.
+    * **FTX**: Salah satu bursa terbesar di dunia yang runtuh pada tahun 2022 karena salah urus dana dan penipuan. Kejatuhannya, meskipun didukung oleh tokoh-tokoh terkenal, menegaskan kembali prinsip utama dalam *blockchain*: **"jangan percaya, verifikasi" (*don't trust, verify*)**. Satu-satunya kebenaran yang dapat diandalkan adalah apa yang tercatat *on-chain*.
+
+#### Browser Wallets
+
+*Browser wallets* adalah ekstensi yang terintegrasi langsung ke peramban web Kita, seperti MetaMask. Mereka berfungsi sebagai jembatan yang mudah antara pengguna dan DApps.
+
+* **Keuntungan**:
+    * **Akses Mudah dan Cepat**: Sangat praktis untuk *transaction* sehari-hari bernilai kecil dan interaksi dengan DApps.
+    * **Integrasi DApps**: Memungkinkan koneksi yang mulus ke situs-situs Web3.
+
+* **Kekurangan**:
+    * **Kerentanan Online**: Karena terhubung langsung ke internet, *wallets* ini rentan terhadap serangan *phishing*, situs web berbahaya, dan *malware* yang dapat mencuri `private key` atau `seed phrase` Kita.
+
+* **Studi Kasus (Taktik Penipuan)**:
+    * **Situs Web Berbahaya**: Penipu membuat situs yang terlihat identik dengan situs asli, misalnya `binαnce.com` (menggunakan huruf Yunani 'α') bukan `binance.com`. Ketika pengguna menghubungkan *wallet* mereka, dana mereka akan terkuras.
+    * **Penipuan Lowongan Pekerjaan**: Penipu yang menyamar sebagai perekrut akan melalui proses wawancara yang meyakinkan. Di tahap akhir, mereka meminta kandidat untuk menghubungkan *wallet* mereka ke "situs tim" untuk "menguji fitur". Setelah kepercayaan dibangun, korban akan kehilangan asetnya saat menghubungkan *wallet*.
+
+#### Desktop Wallets
+
+*Desktop wallets* adalah aplikasi yang diunduh dan dijalankan di komputer Kita. Ada dua sub-tipe:
+
+1.  **Desktop Wallet (Full Nodes)**:
+    * **Cara Kerja**: Mengunduh dan menyimpan seluruh riwayat *blockchain*.
+    * **Keuntungan**: Memberikan kontrol dan keamanan penuh, serta berkontribusi pada desentralisasi dan keamanan jaringan. Sulit bagi penyerang untuk menargetkan individu dibandingkan bursa terpusat.
+    * **Kekurangan**: Membutuhkan ruang penyimpanan yang sangat besar (bisa mencapai terabyte) dan waktu sinkronisasi yang lama. Rentan terhadap *malware* di komputer.
+
+2.  **Desktop Wallet (Lightweight)**:
+    * **Cara Kerja**: Tidak mengunduh seluruh *blockchain*. Sebaliknya, ia mengandalkan *full nodes* lain untuk mendapatkan data *transaction* yang relevan.
+    * **Keuntungan**: Lebih hemat ruang dan *bandwidth*. `Private key` tetap disimpan di komputer pengguna, memberikan kontrol penuh.
+    * **Kekurangan**: Bergantung pada pihak ketiga (*full nodes*) untuk data, yang dapat menimbulkan risiko privasi jika *node* tersebut memata-matai *transaction* Kita.
+
+#### Mobile Wallets
+
+*Mobile wallets* adalah aplikasi di ponsel Kita, menawarkan portabilitas dan kemudahan untuk *transaction* saat bepergian.
+
+* **Keuntungan**:
+    * **Portabel dan Nyaman**: Mudah digunakan untuk pembayaran sehari-hari, sering kali dengan pemindaian kode QR.
+    * **Backup**: Dana dapat dipulihkan melalui `seed phrase` jika ponsel hilang atau dicuri.
+
+* **Kekurangan**:
+    * **Risiko Fisik**: PIN atau detail sensitif lainnya dapat terlihat oleh orang lain atau kamera.
+    * **Serangan SIM Swap**: Penyerang dapat mengambil alih nomor telepon Kita untuk melewati otentikasi dua faktor berbasis SMS.
+    * **Malware**: Ponsel juga rentan terhadap aplikasi berbahaya yang dapat mencuri `seed phrase`.
+
+* **Studi Kasus (SIM Swap)**:
+    * Bahkan Vitalik Buterin, pendiri Ethereum, pernah menjadi korban serangan **`SIM swap`**. Penyerang berhasil menguasai akun Twitter-nya dan memposting tautan *phishing*, yang menyebabkan pengikutnya kehilangan dana senilai $700.000. Ini menunjukkan betapa berbahayanya mengandalkan keamanan berbasis nomor telepon.
+
+#### Cold Storage / Hardware Wallet
+
+Ini adalah metode penyimpanan `private key` secara *offline*, dianggap sebagai cara teraman untuk melindungi aset digital dari ancaman online.
+
+* **`Hardware Wallet`**: Perangkat fisik (seperti Trezor atau Ledger) yang menyimpan `private key` Kita secara terisolasi. *Transaction* ditandatangani di dalam perangkat tanpa `private key` pernah meninggalkan perangkat tersebut.
+* **Keuntungan**:
+    * **Keamanan Maksimal**: Isolasi *offline* membuatnya sangat tahan terhadap peretasan dan *malware*.
+    * **Kontrol Penuh**: Pengguna memegang kendali penuh atas `private key` mereka.
+    * **Keamanan Tambahan**: Dilindungi oleh PIN dan frasa pemulihan (*seed phrase*).
+* **Kekurangan**:
+    * **Biaya**: Perangkat ini harus dibeli.
+    * **Kurang Praktis**: Tidak secepat *browser* atau *mobile wallet* untuk *transaction* harian.
+    * **Risiko Rantai Pasokan (*Supply Chain Attack*)**: Perangkat dapat dirusak selama pengiriman. **Selalu beli langsung dari produsen resmi.**
+
+* **Praktik Terbaik**:
+    * Gunakan cadangan logam (*metal backup*) untuk `seed phrase` Kita, bukan hanya kertas, agar tahan terhadap api dan air.
+
+* **Metode Alternatif (DIY Hardware Wallet)**:
+    * Bab ini juga menyarankan cara membuat *hardware wallet* dengan biaya rendah, seperti menggunakan **ponsel lama**. Prosesnya meliputi reset pabrik, menginstal aplikasi seperti **Airgap Vault**, dan kemudian mengisolasi perangkat sepenuhnya dari internet (*air-gapped*).
+    * **Keuntungan**: Hemat biaya, tahan terhadap *supply chain attack*, dan menjaga privasi.
+    * **Kekurangan**: Tidak sekuat *hardware wallet* komersial (misalnya, tidak tahan api/air) dan tidak mendukung semua fitur seperti NFT.
+
+#### Multisignature Wallets
+
+**`Multisignature (multisig) wallets`** adalah *wallets* yang memerlukan lebih dari satu tanda tangan (`private key`) untuk mengotorisasi sebuah *transaction*. Ini bekerja dengan skema "N dari M", di mana N adalah jumlah tanda tangan yang diperlukan dari total M pemilik kunci.
+
+* **Contoh**: Sebuah *wallet* 3 dari 5 memerlukan persetujuan dari 3 `private key` yang berbeda dari total 5 yang terdaftar.
+* **Kegunaan**:
+    * **Organisasi (DAO)**: Mencegah satu individu membuat keputusan sepihak dan menambahkan lapisan akuntabilitas.
+    * **Individu**: Meningkatkan keamanan pribadi. Jika satu kunci Kita dicuri, dana tetap aman karena penyerang masih memerlukan kunci lainnya.
+* **Kelemahan**: Kompleksitas dalam mengelola beberapa `private key`.
+
+#### Hierarchical Deterministic (HD) Wallets
+
+**`HD wallets`** adalah standar modern untuk *wallets*. Mereka menghasilkan sebuah **`master private key`** (biasanya direpresentasikan sebagai `seed phrase`) yang darinya serangkaian `child private key` dan alamat dapat dibuat secara deterministik (dapat diprediksi).
+
+* **Keuntungan**: Menyederhanakan proses *backup*. Kita hanya perlu mencadangkan satu `seed phrase` untuk memulihkan semua alamat yang pernah dibuat oleh *wallet* tersebut. Ini sangat berguna dalam konteks *multisig*.
+* **Kelemahan**: Jika `master private key` (atau `seed phrase`) Kita bocor, semua alamat anak (*child addresses*) juga akan terancam.
+
+### Tutorial Praktis: Menggunakan MetaMask
+
+Bab ini menggunakan MetaMask sebagai contoh utama untuk *browser wallet*. Tujuannya adalah untuk mengakses *testnets*, mendapatkan ETH percobaan dari *faucets*, dan mendeploy *smart contracts* tanpa menggunakan uang sungguhan.
+
+#### Menginstal MetaMask
+
+Proses instalasi dijelaskan langkah demi langkah:
+1.  Kunjungi situs web resmi `metamask.io`. (Sangat penting untuk memastikan URL-nya benar).
+2.  Unduh ekstensi untuk peramban Kita (Chrome, Firefox, Brave, dll.).
+3.  Pilih "Create New Wallet".
+4.  Buat kata sandi. Kata sandi ini hanya untuk mengunci dan membuka ekstensi di peramban Kita, BUKAN `private key` Kita.
+5.  **Langkah Paling Krusial**: MetaMask akan menampilkan **`Secret Recovery Phrase`** atau **`seed phrase`** Kita, yang biasanya terdiri dari 12 kata.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-1.png" alt="gambar" width="550"/>
+</p>
+
+[Contoh 12 kata seed phrase yang dihasilkan oleh MetaMask, seperti mammal, transfer, hint, dll. - Figure 3.1]
+
+    > **PERINGATAN**: `Seed phrase` ini adalah `master key` Kita. Tulis di atas kertas atau logam, simpan di tempat yang sangat aman, dan **JANGAN PERNAH** membagikannya kepada siapa pun atau menyimpannya secara digital (misalnya di komputer atau cloud). Jika Kita kehilangan `seed phrase` ini, dana Kita akan hilang selamanya. Jika orang lain mendapatkannya, mereka dapat mencuri semua dana Kita.
+
+6.  Konfirmasi `seed phrase` Kita, dan instalasi selesai. Kita akan melihat antarmuka utama MetaMask.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-2.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan antarmuka utama ekstensi browser MetaMask setelah instalasi berhasil, menunjukkan saldo 0 ETH. - Figure 3.2]
+
+#### Login Kembali dengan Seed Phrase
+
+Untuk memperkuat pemahaman tentang pentingnya `seed phrase`, bab ini memandu Kita untuk menghapus ekstensi MetaMask dan menginstalnya kembali. Kali ini, alih-alih membuat *wallet* baru, Kita akan memilih "Import An Existing Wallet" dan memasukkan 12 kata `seed phrase` yang telah Kita simpan. Proses ini menunjukkan bahwa selama Kita memiliki `seed phrase`, Kita dapat memulihkan akses ke dana Kita di perangkat apa pun.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-5.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan proses impor seed phrase di MetaMask, di mana pengguna memasukkan 12 kata rahasia. - Figure 3.5]
+
+#### Mengganti Jaringan
+
+*Blockchain* memiliki dua jenis jaringan utama:
+* **`Mainnet`**: Jaringan utama tempat *transaction* bernilai nyata terjadi.
+* **`Testnet`**: Jaringan percobaan yang meniru *mainnet* tetapi menggunakan aset tanpa nilai. Ini adalah tempat bagi *developer* untuk menguji *smart contracts* mereka.
+
+MetaMask secara default terhubung ke Ethereum Mainnet. Bab ini menunjukkan cara beralih ke *testnet* seperti **Sepolia**:
+1.  Klik menu jaringan di pojok kiri atas MetaMask.
+2.  Aktifkan "Show test networks".
+3.  Pilih "Sepolia" dari daftar.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-9.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-10.png" alt="gambar" width="550"/>
+</p>
+
+[Menu pilihan jaringan di MetaMask, dengan tombol 'Show test networks' diaktifkan. - Figure 3.9 & 3.10]
+
+ETH di jaringan Sepolia (SepoliaETH) tidak memiliki nilai di dunia nyata dan hanya digunakan untuk tujuan pengujian.
+
+#### Berinteraksi dengan Faucets
+
+**`Faucets`** adalah situs web atau aplikasi yang memberikan sejumlah kecil ETH *testnet* secara gratis kepada pengguna untuk tujuan pengujian.
+Bab ini mencantumkan beberapa *faucets* terkemuka seperti Alchemy, Infura, dan Chainlink. Namun, banyak dari mereka memerlukan saldo ETH *mainnet* minimal untuk mencegah penyalahgunaan.
+
+Sebagai alternatif, bab ini merekomendasikan `sepolia-faucet.pk910.de`, sebuah *faucet* berbasis *Proof-of-Work* (PoW). Namun, untuk menggunakannya, Kita perlu memverifikasi identitas Kita melalui **Gitcoin Passport** untuk mencapai skor minimum. Ini dilakukan dengan menghubungkan akun-akun seperti GitHub, Google, atau LinkedIn Kita untuk membuktikan bahwa Kita adalah pengguna unik.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-13.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-14.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan faucet Sepolia yang meminta verifikasi melalui Gitcoin Passport sebelum memulai proses mining. - Figure 3.13 & 3.14]
+
+Setelah terverifikasi, Kita bisa memulai proses "mining" untuk mendapatkan SepoliaETH.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-15.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan layar faucet yang sedang dalam proses "mining" SepoliaETH, menunjukkan hashrate dan reward yang terkumpul. - Figure 3.15]
+
+#### Mengirim Transaksi Pertama Anda
+
+Setelah mendapatkan SepoliaETH, bab ini memandu Kita melakukan *transaction* pertama:
+1.  Klik tombol "Send" di MetaMask.
+2.  Masukkan alamat ETH penerima.
+3.  Masukkan jumlah ETH yang akan dikirim (misalnya, 0.01 SepoliaETH).
+4.  MetaMask akan menampilkan perkiraan **`gas fee`**, yaitu biaya untuk memproses *transaction* di jaringan.
+5.  Klik "Confirm". *Transaction* akan dikirim dan statusnya akan berubah dari "Pending" menjadi "Confirmed" setelah beberapa detik.
+
+Selamat, Kita telah berhasil mengirim *transaction cryptocurrency* pertama Kita!
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-20.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan ringkasan transaksi di MetaMask sebelum konfirmasi akhir, menunjukkan jumlah yang akan dikirim dan estimasi gas fee. - Figure 3.20]
+
+### Block Explorers: Jendela Transparan Menuju Blockchain
+
+Karena *blockchain* bersifat publik, semua *transaction* dapat diverifikasi oleh siapa pun. Alat utama untuk melakukan ini adalah **`block explorer`**, sebuah situs web yang berfungsi seperti mesin pencari untuk *blockchain*. Untuk Ethereum, *block explorer* yang paling populer adalah **Etherscan** (`etherscan.io` untuk *mainnet* dan `sepolia.etherscan.io` untuk *testnet* Sepolia).
+
+Bagi seorang auditor, *block explorer* adalah alat yang paling esensial.
+
+#### Anatomi Transaksi di Block Explorer
+
+Dengan mengklik *transaction hash* dari *transaction* yang baru saja Kita kirim, Etherscan akan menampilkan rincian lengkapnya:
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-25.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan detail transaksi di Etherscan, menunjukkan hash, status, nomor blok, dan alamat pengirim/penerima. - Figure 3.25]
+
+* **`Transaction Hash`**: ID unik untuk *transaction* tersebut.
+* **`Status`**: Menunjukkan apakah *transaction* berhasil (*Success*), gagal (*Failed*), atau masih tertunda (*Pending*).
+* **`Block`**: Nomor *block* di mana *transaction* ini dimasukkan.
+* **`Timestamp`**: Waktu kapan *transaction* dikonfirmasi.
+* **`From`**: Alamat pengirim.
+* **`To`**: Alamat penerima.
+* **`Value`**: Jumlah ETH yang ditransfer.
+* **`Transaction Fee`**: Total *gas fee* yang dibayarkan.
+
+#### Anatomi Block di Block Explorer
+
+Kita juga dapat memeriksa seluruh *block*:
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-27.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan detail sebuah blok di Etherscan, menunjukkan tinggi blok, timestamp, jumlah transaksi, dan penggunaan gas. - Figure 3.27]
+
+* **`Block Height`**: Nomor urut *block* sejak *block* pertama (*genesis block*).
+* **`Timestamp`**: Waktu saat *block* divalidasi.
+* **`Transactions`**: Jumlah *transaction* yang termasuk di dalam *block* ini.
+* **`Fee Recipient`**: Alamat *validator* yang menerima *fee* dari *block* ini.
+* **`Gas Used` & `Gas Limit`**: Jumlah *gas* yang digunakan oleh semua *transaction* di *block* dan batas maksimum *gas* per *block*.
+
+#### Menghubungkan ke DApps dan Anatomi Wallet/Contract
+
+Bab ini menggunakan Uniswap sebagai contoh untuk menunjukkan interaksi *wallet* dengan DApp. Prosesnya meliputi mengunjungi situs DApp, mengklik "Connect Wallet", dan memberikan izin di MetaMask.
+
+Lebih penting lagi bagi auditor, Kita dapat menggunakan *block explorer* untuk menganalisis alamat *wallet* atau *smart contract* apa pun. Dengan memasukkan alamat di Etherscan, Kita dapat melihat:
+* **Balance**: Saldo ETH.
+* **Token Holdings**: Daftar semua token ERC-20 dan NFT (ERC-721) yang dimiliki alamat tersebut. Ini sangat berguna untuk mengidentifikasi token mencurigakan atau penipuan.
+* **Transactions**: Riwayat lengkap semua *transaction* yang masuk dan keluar.
+* **Internal Transactions**: *Transaction* yang dipicu oleh *smart contract* lain.
+* **Contract Tab**: Jika alamat tersebut adalah *smart contract*, tab ini sangat penting.
+    * **Code**: Jika *contract* telah diverifikasi, Kita dapat melihat kode sumber Solidity-nya secara langsung di Etherscan.
+    * **Read Contract**: Memungkinkan Kita memanggil semua fungsi `view` dan `pure` dari *contract* tanpa biaya *gas* untuk membaca statusnya.
+    * **Write Contract**: Memungkinkan Kita untuk terhubung dengan *wallet* Kita dan memanggil fungsi yang mengubah status *contract*, yang akan memerlukan *gas fee*.
+    * **Read/Write as Proxy**: Jika *contract* menggunakan pola *proxy* (dibahas di Bab 12), tab ini memungkinkan Kita berinteraksi dengan *logic contract* yang mendasarinya.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-52.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_3-53.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan tab 'Contract' di Etherscan untuk sebuah smart contract yang terverifikasi, menunjukkan kode sumber, serta opsi Read, Write, dan Proxy. - Figure 3.52 & 3.53]
+
+Kita sekarang memiliki kemampuan praktis untuk berinteraksi, mengelola aset, dan yang terpenting, memverifikasi aktivitas di *blockchain* Ethereum. Keterampilan ini akan menjadi dasar saat kita mulai menulis dan mendeploy *smart contract* kita sendiri di bab-bab berikutnya.
