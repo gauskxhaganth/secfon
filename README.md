@@ -3,9 +3,7 @@ Repo ini berisi materi belajar seputar dunia keamanan siber, isinya berdasarkan 
 karena setiap orang punya daya tangkap yang berbeda.
 
 ## Web3
-***(yg saya pelajari dari Buku-buku dan platform belajar lainnya)***
-Rangkuman pribadi Buku-buku:
-
+#### From-Books:
 01. Grokking Bitcoin
 02. Mastering Bitcoin
 03. Mastering Blockchain
@@ -13,5 +11,4 @@ Rangkuman pribadi Buku-buku:
 
 
 ## Web2
-***(yg saya pelajari dari Buku-buku dan platform belajar lainnya)***
-Rangkuman pribadi Buku-buku:
+#### From-Books:
