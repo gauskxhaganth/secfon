@@ -1802,3 +1802,1228 @@ Kita mendapatkan pengalaman dalam menggunakan *toolchain* profesional untuk sikl
 
 ---
 
+# Bab 8
+## Fundraising Contract
+
+Bab ini bertujuan untuk memandu kita membangun sebuah *smart contract* penggalangan dana (*fundraising*) yang praktis. Ini adalah salah-satu aplikasi dunia nyata yang paling umum dan akan mendemonstrasikan beberapa konsep fundamental serta praktik terbaik dalam Solidity. Dengan mengembangkan *contract* ini, kita akan belajar cara menangani pembayaran *cryptocurrency* secara aman, berintegrasi dengan *price feeds* eksternal melalui *oracle* dari Chainlink, serta mengimplementasikan kontrol akses dan langkah-langkah keamanan yang tepat.
+
+Bayangkan sebuah skenario di mana sebuah badan amal ingin menerima donasi dalam bentuk *cryptocurrency* tetapi perlu memastikan nilai minimum donasi tersebut dalam Dolar AS (USD), terlepas dari fluktuasi harga ETH. Hal ini menimbulkan beberapa tantangan teknis:
+
+1.  Bagaimana cara mendapatkan data harga USD/ETH yang andal di dalam *blockchain* (*on-chain*)?
+2.  Bagaimana cara melacak para donatur dan total kontribusi mereka?
+3.  Bagaimana cara memastikan hanya pihak yang berwenang (*authorized*) yang dapat menarik (*withdraw*) dana?
+
+Bab ini akan memandu kita memecahkan tantangan-tantangan tersebut langkah demi langkah.
+
+### Menyiapkan Fundraising Contract
+
+Langkah pertama adalah menyiapkan proyek Foundry baru. Proses ini melibatkan penggunaan *terminal* atau *command-line interface* (CLI) untuk membuat struktur direktori yang diperlukan.
+
+1.  **Navigasi Direktori**: Buka terminal di Visual Studio Code. Perintah `ls` digunakan untuk melihat isi direktori saat ini. Jika Kita berada di direktori proyek sebelumnya (misalnya, `ZooManagement-Foundry`), gunakan `cd ..` untuk kembali ke direktori induk.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-1.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menampilkan isi direktori yang berisi folder ZooManagement-Foundry. - Figure 8.1]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-2.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal setelah menjalankan perintah 'cd ..', sekarang berada di direktori 'beginning-solidity'. - Figure 8.2]
+
+2.  **Membuat Proyek Baru**:
+
+      * Buat direktori baru untuk proyek ini dengan perintah: `mkdir Fundraising-contract`.
+      * Verifikasi pembuatannya dengan `ls`.
+      * Masuk ke direktori baru tersebut dengan `cd Fundraising-contract`.
+      * Inisialisasi proyek Foundry baru dengan `forge init` (atau `forge init --force` jika direktori tidak kosong).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-3.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-4.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menampilkan direktori baru 'Fundraising-contract' telah dibuat. - Figure 8.3 & 8.4]
+
+3.  **Membuka Proyek di VS Code**: Buka folder `Fundraising-contract` yang baru dibuat melalui menu `File > Open Folder`.
+
+4.  **Membersihkan Proyek**: Hapus file `Counter.sol` bawaan dari folder `src`, `script`, dan `test`.
+
+5.  **Membuat File Contract Utama**: Buat file baru di dalam folder `src` dengan nama `Fundraising.sol`.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-5.png" alt="gambar" width="550"/>
+</p>
+
+[Struktur folder proyek Fundraising-contract di VS Code. - Figure 8.5]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-6.png" alt="gambar" width="550"/>
+</p>
+
+[File baru 'Fundraising.sol' dibuat di dalam folder 'src'. - Figure 8.6]
+
+Sekarang kita siap untuk menulis kode *smart contract* pertama kita di dalam `Fundraising.sol`.
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.27;
+
+contract Fundraising {
+    function sendMoney() public payable {
+        require(msg.value > 1e18, "Did not send enough money");
+    }
+}
+```
+
+Mari kita bedah kode awal ini:
+
+  * `//SPDX-License-Identifier: MIT`: Mendefinisikan lisensi *open-source* untuk kode ini.
+  * `pragma solidity 0.8.27;`: Menentukan versi *compiler* Solidity yang akan digunakan.
+  * `contract Fundraising { ... }`: Mendefinisikan sebuah *smart contract* baru dengan nama `Fundraising`.
+  * `function sendMoney() public payable { ... }`:
+      * `public`: *Visibility* fungsi ini adalah `public`, artinya bisa dipanggil baik dari dalam *contract* maupun dari luar (oleh *user* atau *contract* lain).
+      * **`payable`**: Ini adalah *keyword* yang sangat penting. `payable` mengizinkan sebuah fungsi untuk menerima Ether (ETH) saat dipanggil. Tanpa *keyword* ini, setiap upaya untuk mengirim ETH ke fungsi ini akan ditolak (*reverted*).
+  * `require(msg.value > 1e18, "Did not send enough money");`:
+      * `require()`: Ini adalah fungsi validasi. Jika kondisi di dalam kurung pertama bernilai `false`, eksekusi akan berhenti dan *transaction* akan di-*revert*, mengembalikan gas yang tersisa dan menampilkan pesan kesalahan (string di argumen kedua).
+      * **`msg.value`**: Ini adalah *global variable* di Solidity yang berisi jumlah Wei yang dikirim bersamaan dengan pemanggilan fungsi. Wei adalah unit terkecil dari Ether.
+      * **`1e18`**: Ini adalah notasi ilmiah untuk $1 \\times 10^{18}$. Karena 1 Ether setara dengan $10^{18}$ Wei, `1e18` adalah cara singkat untuk merepresentasikan 1 Ether dalam unit Wei. Jadi, baris ini memeriksa apakah jumlah ETH yang dikirim lebih besar dari 1 ETH.
+
+### Oracles
+
+Pada skenario awal, kita ingin donasi minimal setara dengan 10 USD, bukan 1 ETH. Jika kita mengubah kode menjadi seperti ini:
+
+```solidity
+// Kode ini SALAH dan hanya untuk ilustrasi masalah
+uint256 public minimumAmountSent = 10; 
+
+function sendMoney() public payable {
+    require(msg.value > minimumAmountSent, "Did not send enough money");
+}
+```
+
+Kode di atas tidak akan berfungsi karena `msg.value` diukur dalam Wei (unit ETH), sementara `minimumAmountSent` kita maksudkan sebagai USD. *Blockchain* secara inheren adalah sistem deterministik yang terisolasi; ia tidak memiliki pengetahuan tentang dunia luar, termasuk nilai tukar ETH ke USD.
+
+Di sinilah peran **`oracle`** menjadi krusial. Sebuah *blockchain oracle* adalah entitas yang berfungsi sebagai jembatan, menyediakan data dari dunia luar (*off-chain*) ke dalam *blockchain* (*on-chain*).
+
+  * **Inbound Oracles**: Menyediakan data eksternal ke *blockchain*.
+  * **Outbound Oracles**: Mengirim data dari *blockchain* ke sistem eksternal.
+
+**Chainlink** adalah jaringan *oracle* terdesentralisasi yang paling banyak digunakan. Ia menyediakan *data feeds* yang andal, termasuk data harga aset, yang bisa digunakan oleh *smart contracts*.
+
+> **Bagaimana Chainlink Data Feeds Bekerja?**
+> Beberapa penyedia data (*data providers*) menjalankan *node* Chainlink. Mereka mengambil data harga dari berbagai sumber (misalnya, bursa *crypto*). Data ini kemudian diagregasi (*aggregated*) di dalam sebuah *smart contract on-chain* yang disebut *data contract* atau *aggregator*. *Smart contract* kita kemudian dapat memanggil *aggregator* ini untuk mendapatkan data harga yang andal.
+
+Mari kita lihat contoh *price feed* ETH/USD di situs data Chainlink.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-7.png" alt="gambar" width="550"/>
+</p>
+
+[Halaman utama data.chain.link menampilkan berbagai pilihan data. - Figure 8.7]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-8.png" alt="gambar" width="550"/>
+</p>
+
+[Daftar berbagai data feed harga yang tersedia di Chainlink. - Figure 8.8]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-9.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-10.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan detail untuk price feed ETH/USD, menunjukkan harga saat ini, deviasi, dan waktu pembaruan terakhir. - Figure 8.9 & 8.10]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-11.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-12.png" alt="gambar" width="550"/>
+</p>
+
+[Daftar perusahaan yang menjalankan node untuk price feed ETH/USD. - Figure 8.11 & 8.12]
+
+Untuk menggunakan *price feed* ini di dalam kode, kita perlu alamat *contract aggregator*-nya. Alamat ini dapat ditemukan di dokumentasi Chainlink.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-13.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-14.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-15.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-16.png" alt="gambar" width="550"/>
+</p>
+
+[Dokumentasi Chainlink yang menunjukkan cara menemukan alamat price feed. - Figure 8.13, 8.14, 8.15 & 8.16]
+
+Dokumentasi Chainlink juga menyediakan contoh kode untuk mengonsumsi data ini.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-17.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-18.png" alt="gambar" width="550"/>
+</p>
+
+[Contoh kode 'DataConsumerV3' di dokumentasi Chainlink. - Figure 8.17 & 8.18]
+
+Berikut adalah bedah kode dari contoh `DataConsumerV3.sol` tersebut:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.7;
+
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+
+contract DataConsumerV3 {
+    AggregatorV3Interface internal dataFeed;
+
+    constructor() {
+        dataFeed = AggregatorV3Interface(0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43);
+    }
+
+    function getChainlinkDataFeedLatestAnswer() public view returns (int) {
+        (
+            /* uint80 roundID */,
+            int answer,
+            /*uint startedAt*/,
+            /*uint timeStamp*/,
+            /*uint80 answeredInRound*/
+        ) = dataFeed.latestRoundData();
+        return answer;
+    }
+}
+```
+
+  * `import {AggregatorV3Interface} ...`: Mengimpor *interface* standar Chainlink. Sebuah **`interface`** di Solidity mendefinisikan fungsi-fungsi yang dapat dipanggil oleh sebuah *contract* tanpa perlu mengetahui implementasi internalnya.
+  * `constructor()`: *Constructor* adalah fungsi spesial yang hanya dieksekusi sekali saat *contract* di-*deploy*. Di sini, ia menginisialisasi variabel `dataFeed` dengan alamat *contract aggregator* untuk *price feed* BTC/USD di jaringan Sepolia (sebagai contoh).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-19.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-20.png" alt="gambar" width="550"/>
+</p>
+  
+[Detail price feed BTC/USD di Chainlink. - Figure 8.19 & 8.20]
+  * `getChainlinkDataFeedLatestAnswer()`: Fungsi ini memanggil `latestRoundData()` dari *contract* `dataFeed`.
+  * `dataFeed.latestRoundData()`: Fungsi ini mengembalikan beberapa nilai dalam bentuk **`tuple`**. Sebuah `tuple` adalah struktur data yang dapat mengelompokkan beberapa nilai dengan tipe yang berbeda. Nilai yang dikembalikan adalah:
+      * `roundID`: ID dari ronde data.
+      * `answer`: Harga terbaru (nilai yang kita butuhkan).
+      * `startedAt`: *Timestamp* kapan ronde dimulai.
+      * `timeStamp`: *Timestamp* kapan data direkam.
+      * `answeredInRound`: Ronde di mana jawaban dihitung.
+  * `int answer, ...`: Kita hanya tertarik pada nilai `answer`, jadi kita hanya mendeklarasikan variabel untuk nilai tersebut. Variabel lain kita abaikan dengan membiarkannya kosong di dalam `tuple` untuk menghemat gas.
+  * `return answer;`: Fungsi ini mengembalikan harga terbaru.
+
+#### Deploy Price Feed Contract Melalui Remix
+
+Untuk memvalidasi cara kerja *contract oracle*, kita bisa men-*deploy* contoh `DataConsumerV3` di Remix:
+
+1.  Buka Remix dan *paste* kode di atas.
+2.  *Compile contract* tersebut.
+3.  Di tab "Deploy & Run Transactions", ubah *Environment* dari "Remix VM" menjadi **"Injected Provider - MetaMask"**. Pastikan MetaMask Kita terhubung ke jaringan Sepolia.
+4.  Klik `Deploy`. Konfirmasi *transaction* di MetaMask.
+5.  Setelah ter-*deploy*, panggil fungsi `getChainlinkDataFeedLatestAnswer`.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-21.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-22.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-23.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-24.png" alt="gambar" width="550"/>
+</p>
+
+[Antarmuka Remix untuk deploy contract. - Figure 8.21, 8.22, 8.23 & 8.24]
+
+Hasilnya akan menjadi angka yang sangat besar, misalnya `9808072634584`. Ini karena Chainlink melaporkan harga dengan presisi tinggi, biasanya 8 angka desimal. Untuk mendapatkan harga sebenarnya, kita perlu membaginya dengan $10^8$. Jadi, `9808072634584` menjadi $98,080.72634584$.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-25.png" alt="gambar" width="550"/>
+</p>
+
+[Hasil pemanggilan fungsi getChainlinkDataFeedLatestAnswer di Remix. - Figure 8.25]
+
+### Solidity Interfaces dan Integrasi ke Fundraising Contract
+
+Sekarang, mari kita integrasikan fungsionalitas *oracle* ini ke dalam `Fundraising.sol` kita.
+
+1.  **Instal Library Chainlink**: Di terminal proyek Foundry Kita, jalankan perintah:
+    `forge install smartcontractkit/chainlink-brownie-contracts --no-commit`
+    Ini akan mengunduh *contract* Chainlink ke dalam folder `lib` di proyek Kita.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-27.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-28.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-29.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menjalankan perintah forge install untuk kontrak Chainlink. - Figure 8.27, 8.28 & 8.29]
+    
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-30.png" alt="gambar" width="550"/>
+</p>
+
+    [Struktur folder menunjukkan kontrak Chainlink telah terinstal. - Figure 8.30]
+
+2.  **Impor Interface**: Tambahkan `import` statement untuk `AggregatorV3Interface` di `Fundraising.sol`.
+
+    ```solidity
+    import {AggregatorV3Interface} from "lib/chainlink-brownie-contracts/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+    ```
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-31.png" alt="gambar" width="550"/>
+</p>
+
+[Kode import AggregatorV3Interface di VS Code. - Figure 8.31]
+
+3.  **Tambahkan Fungsi Konversi**: Kita akan membuat dua fungsi *helper*.
+
+      * `priceOfOneETHInUSD()`: Fungsi ini akan mengambil harga 1 ETH dalam USD dari *oracle*.
+      * `convertETHToUSD()`: Fungsi ini akan mengkonversi sejumlah Wei menjadi nilai USD-nya.
+
+    <!-- end list -->
+
+    ```solidity
+    // Fungsi untuk mendapatkan harga 1 ETH dalam USD
+    function priceOfOneETHInUSD() public view returns(uint256) {
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+        (, int256 answer,,,) = priceFeed.latestRoundData();
+        // Harga dari Chainlink memiliki 8 desimal. ETH memiliki 18.
+        // Kita kalikan dengan 1e10 untuk membuatnya menjadi 18 desimal agar konsisten.
+        return uint256(answer * 1e10); 
+    }
+
+    // Fungsi untuk mengkonversi sejumlah ETH (dalam Wei) ke USD
+    function convertETHToUSD(uint256 amountOfETH) public view returns(uint256) {
+        uint256 priceOfETH = priceOfOneETHInUSD();
+        // (Harga ETH * Jumlah ETH) / 1e18
+        // Pembagian dengan 1e18 diperlukan untuk menormalkan kembali desimal
+        // karena priceOfETH dan amountOfETH keduanya memiliki 18 desimal.
+        uint256 ethPriceInUSD = (priceOfETH * amountOfETH) / 1e18;
+        return ethPriceInUSD;
+    }
+    ```
+
+    > **Penting tentang Desimal**: Operasi matematika dengan desimal di Solidity memerlukan perhatian khusus. `priceOfETH` dan `amountOfETH` keduanya dalam format 18 desimal. Saat dikalikan, hasilnya akan memiliki 36 desimal. Kita perlu membaginya kembali dengan `1e18` untuk menormalkannya menjadi 18 desimal.
+
+4.  **Update `sendMoney()` dan Tambah Pelacakan Donatur**:
+
+      * Ubah variabel `minimumAmountSent` menjadi `10e18` untuk merepresentasikan 10 USD dengan 18 desimal.
+      * Gunakan `convertETHToUSD(msg.value)` di dalam `require` statement.
+      * Tambahkan sebuah *array* `listOfSenders` dan sebuah *mapping* `amountSentByAddress` untuk melacak siapa yang berdonasi dan berapa jumlah total donasi mereka.
+
+    <!-- end list -->
+
+    ```solidity
+    uint256 public minimumAmountSent = 10e18;
+
+    address[] public listOfSenders;
+    mapping(address => uint256) public amountSentByAddress;
+
+    function sendMoney() public payable {
+        require(convertETHToUSD(msg.value) >= minimumAmountSent, "Did not send enough money");
+        listOfSenders.push(msg.sender);
+        amountSentByAddress[msg.sender] += msg.value;
+    }
+    ```
+
+      * `msg.sender`: Ini adalah *global variable* yang berisi alamat dari *wallet* yang memanggil fungsi ini.
+      * `listOfSenders.push(msg.sender)`: Menambahkan alamat donatur ke dalam *array*.
+      * `amountSentByAddress[msg.sender] += msg.value`: Menambah jumlah donasi ke total donasi dari alamat tersebut di dalam *mapping*. `+=` adalah singkatan dari `x = x + y`.
+
+### Membuat Libraries
+
+Fungsi `priceOfOneETHInUSD` dan `convertETHToUSD` sangat berguna dan bisa digunakan di banyak *contract* lain. Untuk mempromosikan *reusability* (kemampuan untuk digunakan kembali) dan modularitas, kita bisa memindahkannya ke sebuah **`library`**.
+
+Sebuah `library` di Solidity adalah tipe *contract* spesial yang berisi fungsi-fungsi yang dapat digunakan kembali.
+
+1.  Buat file baru di `src` bernama `ETHtoUSDConverter.sol`.
+
+2.  Pindahkan kedua fungsi konversi ke dalam *library* ini.
+
+    ```solidity
+    // File: ETHtoUSDConverter.sol
+    //SPDX-License-Identifier: MIT
+    pragma solidity ^0.8.27;
+
+    import {AggregatorV3Interface} from "lib/chainlink-brownie-contracts/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+
+    library ETHtoUSDConverter {
+        function priceOfOneETHInUSD() internal view returns(uint256) {
+            AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+            (, int256 answer,,,) = priceFeed.latestRoundData();
+            return uint256(answer * 1e10);
+        }
+
+        function convertETHToUSD(uint256 amountOfETH) internal view returns(uint256) {
+            uint256 priceOfETH = priceOfOneETHInUSD();
+            uint256 ethPriceInUSD = (priceOfETH * amountOfETH) / 1e18;
+            return ethPriceInUSD;
+        }
+    }
+    ```
+
+    Perhatikan bahwa *visibility* fungsi diubah menjadi `internal` karena *library* dimaksudkan untuk digunakan oleh *contract* lain.
+
+3.  **Gunakan Library di `Fundraising.sol`**:
+
+      * Hapus kedua fungsi konversi dari `Fundraising.sol`.
+      * Ganti *import* `AggregatorV3Interface` dengan *import* `library` yang baru dibuat.
+      * Gunakan direktif `using ETHtoUSDConverter for uint256;`.
+
+    <!-- end list -->
+
+    ```solidity
+    // File: Fundraising.sol
+    //SPDX-License-Identifier: MIT
+    pragma solidity 0.8.27;
+
+    import {ETHtoUSDConverter} from "./ETHtoUSDConverter.sol";
+
+    contract Fundraising {
+        using ETHtoUSDConverter for uint256;
+        
+        // ... sisa kode ...
+
+        function sendMoney() public payable {
+            require(msg.value.convertETHToUSD() >= minimumAmountSent, "Did not send enough money");
+            // ... sisa logika ...
+        }
+    }
+    ```
+
+    Direktif `using ... for ...` "menempelkan" fungsi-fungsi dari `library` ke tipe data tertentu (`uint256` dalam kasus ini). Hal ini memungkinkan kita untuk memanggil fungsi *library* seolah-olah mereka adalah *method* bawaan dari tipe data tersebut, seperti `msg.value.convertETHToUSD()`. Ini membuat kode lebih bersih dan mudah dibaca.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-33.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-34.png" alt="gambar" width="550"/>
+</p>
+
+[Kode akhir Fundraising.sol dan ETHtoUSDConverter.sol di VS Code. - Figure 8.33 & 8.34]
+
+### Fungsi Withdraw
+
+Setelah dana terkumpul, pemilik *contract* harus bisa menariknya. Fungsi `withdraw` harus dirancang dengan sangat hati-hati untuk mencegah serangan.
+
+#### Pola Keamanan: Checks, Effects, Interactions (CEI)
+
+Untuk auditor, ini adalah salah satu pola paling fundamental. Urutan operasi dalam fungsi yang berinteraksi dengan *contract* lain atau mentransfer dana sangat penting.
+
+1.  **Checks**: Lakukan semua validasi terlebih dahulu (misalnya, apakah pemanggil adalah pemilik).
+2.  **Effects**: Ubah *state* internal *contract* (misalnya, perbarui saldo, reset *mapping*).
+3.  **Interactions**: Lakukan panggilan eksternal atau transfer dana di akhir.
+
+Pola ini mencegah serangan *re-entrancy*, di mana *contract* jahat bisa memanggil kembali fungsi `withdraw` sebelum saldo internal diperbarui, sehingga dapat menguras dana *contract*.
+
+#### Implementasi Fungsi `withdraw`
+
+1.  **Reset Mappings dan Arrays (Effects)**: Sebelum mentransfer dana, kita harus mereset data donatur untuk mencegah mereka tercatat ganda atau dieksploitasi.
+
+      * Gunakan `for` loop untuk mengiterasi melalui `listOfSenders` dan mengatur ulang nilai `amountSentByAddress` untuk setiap donatur menjadi 0.
+      * Reset *array* `listOfSenders` menjadi kosong.
+
+    <!-- end list -->
+
+    ```solidity
+    function withdraw() public {
+        // Effects
+        for (uint256 senderIndex = 0; senderIndex < listOfSenders.length; senderIndex++) {
+            address sender = listOfSenders[senderIndex];
+            amountSentByAddress[sender] = 0;
+        }
+        listOfSenders = new address[](0);
+        
+        // Interactions (akan ditambahkan selanjutnya)
+    }
+    ```
+
+2.  **Mengirim ETH dari Contract (Interactions)**: Ada tiga cara untuk mengirim ETH:
+
+      * **`.transfer()`**: Mengirim 2300 gas, akan *revert* jika gagal. Dianggap usang karena batas gas yang kaku dapat menyebabkan kegagalan pada beberapa *contract* penerima.
+      * **`.send()`**: Sama seperti `.transfer()` tetapi mengembalikan `bool` (`true`/`false`) alih-alih *revert*. Juga dianggap usang karena alasan yang sama.
+      * **`.call{value: ...}("")`**: Ini adalah metode yang direkomendasikan saat ini. Ia meneruskan semua gas yang tersedia dan mengembalikan `bool` untuk status keberhasilan. Fleksibilitasnya membuatnya lebih kuat, tetapi harus digunakan dengan hati-hati.
+
+    Kita akan menggunakan `.call`:
+
+    ```solidity
+    // ... setelah mereset mappings dan array ...
+
+    // Interactions
+    (bool callSuccess,) = payable(msg.sender).call{value: address(this).balance}("");
+    require(callSuccess, "Call failed");
+    ```
+
+      * `payable(msg.sender)`: Mengonversi alamat `msg.sender` menjadi tipe `address payable` agar bisa menerima ETH.
+      * `address(this).balance`: Mengambil seluruh saldo ETH yang dimiliki oleh *contract* ini.
+      * `require(callSuccess, "Call failed")`: Memeriksa apakah transfer berhasil. Jika `call` gagal, `callSuccess` akan `false`, dan *transaction* akan di-*revert*.
+
+### Constructor dan Modifiers (Kontrol Akses)
+
+Saat ini, siapa pun bisa memanggil fungsi `withdraw`. Ini adalah kerentanan kritis. Kita harus membatasinya hanya untuk pemilik *contract*.
+
+1.  **Menetapkan Pemilik dengan `constructor`**:
+
+      * Tambahkan variabel `address public owner;`.
+      * Gunakan `constructor` untuk menetapkan alamat yang men-*deploy* *contract* sebagai `owner`.
+
+    <!-- end list -->
+
+    ```solidity
+    address public owner;
+
+    constructor() {
+        owner = msg.sender;
+    }
+    ```
+
+2.  **Membatasi Akses dengan `require`**: Tambahkan pengecekan di awal fungsi `withdraw`.
+
+    ```solidity
+    function withdraw() public {
+        // Checks
+        require(msg.sender == owner, "Only the owner of the contract can withdraw");
+        // ... Effects and Interactions ...
+    }
+    ```
+
+      * Perhatikan penggunaan `==` (sama dengan) untuk perbandingan, berbeda dari `=` (penetapan nilai).
+
+3.  **Menggunakan `modifier` untuk Kode yang Dapat Digunakan Kembali**: Jika kita memiliki banyak fungsi yang hanya bisa dipanggil oleh pemilik, menyalin `require` statement akan menjadi repetitif. Solusinya adalah **`modifier`**.
+
+      * Sebuah `modifier` adalah blok kode yang dapat "ditempelkan" ke sebuah definisi fungsi untuk mengubah perilakunya.
+
+    <!-- end list -->
+
+    ```solidity
+    modifier onlyTheOwnerCanExecute() {
+        require(msg.sender == owner, "Only owner can withdraw funds");
+        _; // Placeholder: di sinilah kode fungsi asli akan dieksekusi.
+    }
+
+    function withdraw() public onlyTheOwnerCanExecute {
+        // ... Effects and Interactions ...
+    }
+    ```
+
+    Sekarang, logika `onlyOwner` terenkapsulasi di dalam `modifier` dan dapat digunakan kembali di fungsi lain.
+
+### Optimasi Gas dan Peningkatan Kualitas
+
+Bagian terakhir bab ini membahas cara-cara untuk membuat *contract* lebih efisien dan kuat.
+
+#### Immutability dan Constants
+
+Variabel yang nilainya tidak pernah berubah setelah diinisialisasi dapat dioptimalkan untuk menghemat gas.
+
+  * **`constant`**: Untuk nilai yang sudah diketahui saat *compile-time* (sebelum *deploy*). Variabel ini tidak menggunakan slot penyimpanan sama sekali.
+  * **`immutable`**: Untuk nilai yang ditetapkan sekali di dalam `constructor` dan tidak pernah berubah setelahnya. Variabel ini dibaca langsung dari *bytecode* *contract* alih-alih dari penyimpanan, yang jauh lebih murah.
+
+Mari kita terapkan ini:
+
+  * `minimumAmountSent` dapat menjadi `constant`.
+  * `owner` dapat menjadi `immutable`.
+
+<!-- end list -->
+
+```solidity
+uint256 public constant MINIMUM_AMOUNT_SENT = 10e18;
+address public immutable i_owner; // 'i_' adalah konvensi penamaan untuk immutable
+
+constructor() {
+    i_owner = msg.sender;
+}
+```
+
+Perubahan ini secara signifikan mengurangi biaya gas saat *deploy* dan saat menjalankan fungsi yang membaca variabel-variabel ini. Buku ini menunjukkan penghematan gas lebih dari 40,000 unit gas, yang bisa setara dengan beberapa dolar tergantung harga gas.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-57.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-58.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-59.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-60.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-61.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-62.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-63.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-64.png" alt="gambar" width="550"/>
+</p>
+
+[Perbandingan biaya gas sebelum dan sesudah penggunaan 'constant' dan 'immutable'. - Figure 8.57, 8.58, 8.59, 8.60, 8.61, 8.62, 8.63, 8.64]
+
+#### Custom Errors
+
+Pesan kesalahan string dalam `require` statement (`require(..., "Pesan error")`) menggunakan gas karena string tersebut harus disimpan di *bytecode*. Sejak Solidity v0.8.4, kita bisa menggunakan **`custom errors`**.
+
+1.  Definisikan *error* di tingkat atas *contract*.
+2.  Gunakan `if` statement dan `revert` dengan *custom error*.
+
+<!-- end list -->
+
+```solidity
+error NotTheOwner();
+
+modifier onlyTheOwnerCanExecute() {
+    if (msg.sender != i_owner) {
+        revert NotTheOwner();
+    }
+    _;
+}
+```
+
+Ini lebih efisien dari segi gas dibandingkan menggunakan `require` dengan string.
+
+#### Receive dan Fallback Functions
+
+Apa yang terjadi jika seseorang mengirim ETH langsung ke alamat *contract* tanpa memanggil fungsi `sendMoney`? Saat ini, *transaction* tersebut akan berhasil, tetapi donasi mereka tidak akan tercatat di *mapping* atau *array* kita.
+
+Untuk menangani ini, Solidity menyediakan dua fungsi spesial:
+
+  * **`receive() external payable`**: Fungsi ini dieksekusi ketika *contract* menerima ETH tanpa ada data yang dikirim (*calldata* kosong).
+  * **`fallback() external payable`**: Fungsi ini dieksekusi ketika *contract* menerima ETH dengan *calldata*, tetapi tidak ada fungsi lain yang cocok dengan *signature* di *calldata* tersebut.
+
+Kita bisa mengimplementasikannya untuk memanggil `sendMoney` secara internal.
+
+```solidity
+receive() external payable {
+    sendMoney();
+}
+
+fallback() external payable {
+    sendMoney();
+}
+```
+
+Dengan ini, setiap donasi ETH ke alamat *contract*, baik dengan atau tanpa data, akan tercatat dengan benar.
+
+#### Kode Akhir `Fundraising.sol`
+
+Berikut adalah versi final dari `Fundraising.sol` yang menggabungkan semua konsep di atas:
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.27;
+
+import {ETHtoUSDConverter} from "./ETHtoUSDConverter.sol";
+
+error NotTheOwner();
+
+contract Fundraising {
+    using ETHtoUSDConverter for uint256;
+
+    uint256 public constant MINIMUM_AMOUNT_SENT = 10e18;
+    address public immutable i_owner;
+
+    address[] public listOfSenders;
+    mapping(address => uint256) public amountSentByAddress;
+
+    constructor() {
+        i_owner = msg.sender;
+    }
+
+    function sendMoney() public payable {
+        require(msg.value.convertETHToUSD() >= MINIMUM_AMOUNT_SENT, "Did not send enough money");
+        listOfSenders.push(msg.sender);
+        amountSentByAddress[msg.sender] += msg.value;
+    }
+
+    modifier onlyTheOwnerCanExecute() {
+        if (msg.sender != i_owner) {
+            revert NotTheOwner();
+        }
+        _;
+    }
+
+    function withdraw() public onlyTheOwnerCanExecute {
+        // Effects
+        for (uint256 senderIndex = 0; senderIndex < listOfSenders.length; senderIndex++) {
+            address sender = listOfSenders[senderIndex];
+            amountSentByAddress[sender] = 0;
+        }
+        listOfSenders = new address[](0);
+
+        // Interactions
+        (bool callSuccess, ) = i_owner.call{value: address(this).balance}("");
+        require(callSuccess, "Call failed");
+    }
+
+    receive() external payable {
+        sendMoney();
+    }
+
+    fallback() external payable {
+        sendMoney();
+    }
+}
+```
+
+*Catatan: Saya memperbaiki `payable(msg.sender)` di fungsi `withdraw` menjadi `i_owner` karena tujuannya adalah mengirim dana ke pemilik contract, bukan pemanggil fungsi (yang sudah divalidasi sebagai pemilik oleh modifier).*
+
+### Pengujian di Test Network
+
+Bab ini diakhiri dengan panduan langkah demi langkah untuk men-*deploy* dan menguji *contract* ini di Remix menggunakan jaringan Sepolia, yang memvalidasi bahwa semua fungsi bekerja seperti yang diharapkan, termasuk pengiriman dana, pengecekan saldo, dan penarikan dana oleh pemilik.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-36.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.36**
+Kompilasi kontrak dengan mengetik `forge build` di terminal lalu tekan **Enter**.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-37.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.37**
+Buka Remix, lalu buat file untuk kontrak `Fundraiser.sol` dan library `ETHtoUSDConverter.sol`.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-38.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-39.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.38 dan 8.39**
+Setelah membuat file, salin dan tempel kode kontrak dan library ke dalam file masing-masing.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-40.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.40**
+Lakukan dua perubahan penting berikut:
+
+1. Jika diperlukan, ubah versi Solidity ke versi yang disarankan oleh compiler saat kursor diarahkan ke `//SPDX-License-Identifier: MIT`.
+2. Ubah jalur `import` untuk `chainlink-brownie-contracts` dari:
+
+```solidity
+lib/chainlink-brownie-contracts/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol
+```
+
+menjadi:
+
+```solidity
+@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol
+```
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-41.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.41**
+
+Buka bagian **Deploy & Run Transactions** di Remix.
+Ubah **Environment** dari default menjadi **Injected Provider MetaMask**, pastikan kontrak yang akan dideploy adalah `Fundraising.sol`, lalu klik **Deploy**.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-42.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.42**
+
+Setelah kontrak berhasil dideploy, akan muncul daftar fungsi yang tersedia:
+
+* `sendMoney` — untuk mengirim dana ke kontrak
+* `withdraw` — untuk menarik dana dari kontrak
+* `amountSentByAddress` — untuk mengecek total dana yang pernah dikirim oleh sebuah address
+* `minimumAmountSent` — jumlah minimum yang dapat dikirim
+* `owner` — alamat pemilik kontrak
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-43.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.43**
+
+Di panel **Deploy And Run Transactions**, isi kolom **value** dengan `10000000000000000` (16 nol) wei atau `0.01 ETH`.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-44.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.44**
+
+Klik fungsi **sendMoney**, lalu MetaMask akan muncul untuk meminta konfirmasi transaksi.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-45.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.45**
+
+Klik tombol **Confirm** dan tunggu beberapa detik hingga transaksi dikonfirmasi.
+Setelah berhasil, kamu akan melihat kontrak sekarang memiliki `0.01 ETH`.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-46.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.46**
+
+Buka fungsi **amountSentByAddress**, lalu salin alamat MetaMask yang sedang terhubung ke Remix.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-47.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.47**
+
+Tempel alamat tersebut ke kolom **address sender**, lalu klik fungsi **amountSentByAddress**.
+Jumlah total dana yang telah dikirim oleh alamat tersebut akan muncul.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-48.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.48**
+
+Jika kamu mengirim `0.01 ETH` lagi dengan cara yang sama, total yang muncul di **amountSentByAddress** akan menjadi dua kali lipat (`0.02 ETH`).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-49.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.49**
+
+Karena kontrak dideploy oleh alamat yang sama yang mengirim `0.02 ETH`, alamat tersebut bisa menarik kembali dana dengan mengklik **withdraw**.
+Sebelum konfirmasi, cek dulu saldo Sepolia ETH kamu saat ini.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-50.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.50**
+
+MetaMask akan muncul untuk meminta konfirmasi transaksi penarikan dana (**withdraw**).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-51.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.51**
+
+Setelah dikonfirmasi, tunggu beberapa detik hingga transaksi selesai.
+Saldo kontrak akan kembali menjadi `0`.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-52.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.52**
+
+Saldo alamat MetaMask kamu akan bertambah sebesar `~0.0199 ETH` (sedikit kurang dari `0.02` karena ada biaya gas).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-53.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_8-54.png" alt="gambar" width="550"/>
+</p>
+
+**Pada Figure 8.53 dan 8.54**
+
+Di terminal Remix, klik **View on Etherscan** untuk melihat transaksi terbaru antara alamat wallet dan alamat kontrak.
+Klik tautan **To address** untuk melihat alamat kontrak yang dideploy dan daftar transaksi yang terjadi antara akun MetaMask dan kontrak tersebut.
+
+[Langkah-langkah pengujian contract di Remix, mulai dari deploy, mengirim donasi, hingga menarik dana. - Figure 8.36 hingga 8.54]
+
+
+### Rangkuman untuk Calon Auditor
+
+  * **Oracle adalah Vektor Serangan**: Ketergantungan pada *oracle* eksternal adalah titik kritis. Pastikan *oracle* yang digunakan terdesentralisasi (seperti Chainlink) dan pahami mekanisme keamanannya (misalnya, ambang deviasi).
+  * **Pola CEI adalah Wajib**: Setiap fungsi yang mentransfer aset atau melakukan panggilan eksternal harus mengikuti pola *Checks-Effects-Interactions* tanpa kecuali. Ini adalah salah satu hal pertama yang harus Kita cari saat mengaudit.
+  * **Manajemen Akses**: Periksa `constructor`, `modifiers`, dan fungsi yang menggunakan `msg.sender` dengan cermat. Siapa yang memiliki hak istimewa? Bisakah kepemilikan ditransfer? Apakah ada celah dalam logika kontrol akses?
+  * **Optimasi Gas dan Keamanan**: `constant`, `immutable`, dan `custom errors` bukan hanya soal efisiensi. Kode yang lebih sederhana dan lebih murah seringkali lebih mudah diaudit dan memiliki permukaan serangan yang lebih kecil.
+  * **Penanganan ETH**: Pastikan *contract* dapat menangani penerimaan ETH yang tidak terduga melalui `receive()` dan `fallback()` untuk menghindari dana yang "terjebak".
+  * **Aritmatika Desimal**: Periksa semua operasi matematika yang melibatkan nilai dengan jumlah desimal yang berbeda. Kesalahan dalam konversi atau normalisasi dapat menyebabkan kerugian finansial yang signifikan.
+
+Bab ini memberikan fondasi yang sangat kuat untuk membangun aplikasi DeFi yang umum. Konsep-konsep ini akan terus muncul dalam bentuk yang lebih kompleks di bab-bab selanjutnya.
+
+---
+
+# Bab 9
+## Membangun Cryptocurrency ERC-20
+
+Bab ini memperkenalkan Kita pada salah satu standar fundamental dalam ekosistem Ethereum: standar token **ERC-20**. Melalui contoh praktis menggunakan pustaka **OpenZeppelin** dan implementasi manual, Kita akan belajar cara membuat *cryptocurrency token* Kita sendiri yang mematuhi standar **ERC-20** yang diadopsi secara luas.
+
+Tantangan utama dalam menciptakan mata uang digital baru adalah memastikan interoperabilitas—bagaimana agar token tersebut dapat diperdagangkan di berbagai *exchanges*, disimpan di berbagai jenis *wallet*, dan berinteraksi secara mulus dengan aplikasi *blockchain* lainnya. Standar **ERC-20** menyelesaikan masalah ini dengan menyediakan *interface* (antarmuka) standar. Bab ini akan memandu Kita melalui pembuatan token dengan dua pendekatan:
+
+1.  **Menggunakan OpenZeppelin:** Pendekatan praktis yang mengutamakan keamanan dan kecepatan pengembangan.
+2.  **Implementasi Manual:** Pendekatan teoretis untuk memahami mekanisme dasar dan setiap fungsi dari standar **ERC-20**.
+
+Dengan menyelesaikan bab ini, Kita akan memiliki keterampilan untuk membuat dan mendeploy token **ERC-20** Kita sendiri, serta memahami baik kemudahan menggunakan pustaka yang sudah ada maupun mekanika yang mendasarinya.
+
+### Pengenalan ERC-20
+
+**ERC-20** adalah singkatan dari **Ethereum Request for Comment 20**, sebuah standar teknis yang digunakan untuk *smart contracts* di *blockchain* Ethereum untuk implementasi token. Kita bisa menganggap kontrak **ERC-20** sebagai sebuah basis data digital yang tersimpan di *blockchain* Ethereum. Basis data ini melacak siapa pemilik token dan berapa jumlah token yang mereka miliki. Ketika seseorang "mengirim" token, yang sebenarnya terjadi adalah interaksi dengan *smart contract* untuk mengurangi saldo pengirim dan menambah saldo penerima.
+
+Tujuan utama standar ini adalah untuk menciptakan **interoperabilitas** antar token. Dengan adanya standar yang sama, berbagai aplikasi seperti *wallets* dan *decentralized exchanges* (DEXs) dapat berinteraksi dengan token **ERC-20** manapun tanpa perlu implementasi khusus.
+
+Token **ERC-20** adalah **fungible token**. *Fungible* berarti setiap unit token dapat dipertukarkan dengan unit lain yang sejenis tanpa ada perbedaan nilai. Karakteristik utama dari token *fungible* adalah:
+
+  * **Divisible (Dapat Dibagi):** Token dapat dibagi menjadi unit-unit yang lebih kecil. Sama seperti satu dolar dapat dibagi menjadi 100 sen, token **ERC-20** dapat dibagi hingga 18 desimal (standar umum).
+  * **Interchangeable (Dapat Dipertukarkan):** Setiap unit token memiliki nilai yang sama dan dapat saling menggantikan. Satu token UNI dari protokol Uniswap sama nilainya dengan token UNI lainnya.
+
+Dengan standar **ERC-20**, Kita dapat membangun berbagai jenis token, seperti:
+
+  * **Governance tokens:** Token yang memberikan hak suara kepada pemiliknya dalam tata kelola sebuah protokol.
+  * **Security tokens:** Representasi digital dari aset keuangan tradisional seperti saham atau properti, yang memungkinkan kepemilikan fraksional.
+  * **Centralized stablecoins:** Token yang nilainya dipatok ke aset stabil seperti Dolar AS (misalnya, USDT atau USDC) dan dikelola oleh entitas terpusat.
+  * **Decentralized stablecoins/algorithmic stablecoins:** *Stablecoins* yang menjaga stabilitas nilainya melalui mekanisme algoritmis, tanpa dijamin oleh aset di dunia nyata.
+  * **Wrapped tokens:** Token yang merepresentasikan *cryptocurrency* dari *blockchain* lain, seperti Wrapped Bitcoin (**WBTC**) di Ethereum.
+
+### Proses Pembuatan Ethereum Improvement Proposal (EIP)
+
+Untuk memahami mengapa **ERC-20** menjadi standar, penting untuk mengetahui proses di baliknya, yaitu **Ethereum Improvement Proposal (EIP)**. EIP adalah dokumen desain yang menyediakan informasi kepada komunitas Ethereum tentang fitur baru yang diusulkan atau prosesnya. Standar **ERC-20** sendiri merupakan hasil dari **EIP-20**.
+
+Proses pembuatan EIP adalah sebagai berikut:
+
+1.  **Mengembangkan Ide:** Seseorang atau sekelompok orang memiliki ide untuk meningkatkan Ethereum.
+2.  **Menyusun Draf:** Proposal disusun dalam format EIP standar yang mencakup komponen-komponen berikut:
+    1.  Nomor EIP
+    2.  Judul Proposal
+    3.  Penulis (Authors)
+    4.  Tanggal Dibuat
+    5.  **Abstract:** Deskripsi singkat masalah (kurang dari 200 kata).
+    6.  **Motivation:** Alasan mengapa solusi yang ada tidak cukup untuk mengatasi masalah.
+    7.  **Specification:** Deskripsi teknis dari sintaks dan implementasi proposal baru.
+    8.  **Rationale:** Penjelasan mengapa keputusan desain dan spesifikasi tertentu dibuat.
+    9.  **Security Considerations:** Pertimbangan keamanan yang harus diperhatikan oleh *developer* jika EIP diimplementasikan.
+    10. **Backward Compatibility:** Deskripsi tentang kompatibilitas dengan versi sebelumnya dan konsekuensinya.
+    11. **Reference:** Contoh implementasi, jika tersedia dan diperlukan.
+    12. Komponen lain yang dianggap krusial oleh penulis.
+
+[ALT TEXT: [Contoh bagian awal dari dokumen EIP-20 yang menunjukkan judul, penulis, status, dan tipe proposal.] - Figure 9.1]
+
+[ALT TEXT: [Contoh bagian Abstract dan Motivation dari EIP-20, menjelaskan masalah yang ingin dipecahkan.] - Figure 9.2]
+
+[ALT TEXT: [Contoh bagian Specification dari EIP-20 yang mendefinisikan fungsi-fungsi wajib seperti `totalSupply`, `balanceOf`, dan `transfer`.] - Figure 9.3]
+
+### Membangun Token ERC-20 dengan OpenZeppelin
+
+**OpenZeppelin** adalah platform yang menyediakan pustaka *smart contract* yang dapat digunakan kembali, telah diaudit, dan aman. Menggunakannya adalah praktik terbaik dalam industri untuk menghemat waktu dan mengurangi risiko keamanan.
+
+Berikut adalah langkah-langkah untuk membuat token **ERC-20** menggunakan **Foundry** dan **OpenZeppelin**.
+
+**1. Menyiapkan Proyek Foundry**
+Pertama, kita akan membuat direktori baru dan menginisialisasi proyek Foundry di dalamnya.
+
+```bash
+# Membuat direktori baru untuk proyek token
+mkdir beginning-solidity-token
+
+# Masuk ke direktori yang baru dibuat
+cd beginning-solidity-token
+
+# Menginisialisasi proyek Foundry baru
+forge init
+```
+
+[ALT TEXT: [Terminal menunjukkan perintah `ls` untuk melihat direktori saat ini.] - Figure 9.8]
+[ALT TEXT: [Terminal menunjukkan perintah `mkdir beginning-solidity-token`.] - Figure 9.9]
+[ALT TEXT: [Terminal menunjukkan hasil `ls` setelah direktori baru dibuat.] - Figure 9.10]
+[ALT TEXT: [Terminal menunjukkan perintah `cd beginning-solidity-token`.] - Figure 9.11]
+[ALT TEXT: [Terminal menunjukkan output dari perintah `forge init`.] - Figure 9.12]
+
+**2. Membuka Proyek dan Menginstal Kontrak OpenZeppelin**
+Buka folder proyek di VS Code, lalu hapus file `Counter.sol` default dari folder `script`, `src`, dan `test`.
+
+Selanjutnya, instal kontrak OpenZeppelin ke dalam proyek Kita menggunakan Foundry.
+
+```bash
+# Menginstal pustaka kontrak OpenZeppelin versi 5.0.2
+forge install OpenZeppelin/openzeppelin-contracts@5.0.2 --no-commit
+```
+
+Kita juga bisa menggunakan versi terbaru dengan perintah:
+
+```bash
+forge install OpenZeppelin/openzeppelin-contracts --no-commit
+```
+
+[ALT TEXT: [Tangkapan layar dari halaman repositori GitHub OpenZeppelin.] - Figure 9.16]
+[ALT TEXT: [Output terminal yang menunjukkan proses instalasi kontrak OpenZeppelin.] - Figure 9.17]
+
+Setelah instalasi selesai, Kita akan melihat folder `openzeppelin-contracts` di dalam direktori `lib`. Kita dapat memverifikasi file `ERC20.sol` di path: `lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol`.
+
+[ALT TEXT: [Struktur file di VS Code yang menunjukkan path ke file ERC20.sol.] - Figure 9.18]
+[ALT TEXT: [Tampilan kode dari file ERC20.sol di dalam VS Code.] - Figure 9.19]
+
+**3. Membuat Kontrak Token Anda**
+Buat file baru di folder `src` dengan nama `BeginningSolidityToken.sol`. Kode berikut mengimpor dan mewarisi kontrak `ERC20` dari OpenZeppelin.
+
+```solidity
+//SPDX-License-Identifier: MIT
+
+pragma solidity 0.8.27;
+
+import {ERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+
+contract BeginningSolidityToken is ERC20 {
+    constructor(uint256 initialSupply) 
+        ERC20("BeginningSolidityToken", "BST") {
+        _mint(msg.sender, initialSupply);
+    }
+}
+```
+
+Penjelasan Kode:
+
+  * `import {ERC20} from ...`: Mengimpor kontrak `ERC20` dasar dari pustaka OpenZeppelin.
+  * `contract BeginningSolidityToken is ERC20`: Mendeklarasikan kontrak baru yang mewarisi semua fungsionalitas dari `ERC20`.
+  * `constructor(uint256 initialSupply) ERC20("BeginningSolidityToken", "BST")`:
+      * `constructor` dieksekusi hanya sekali saat *deployment*.
+      * Ia menerima `initialSupply` sebagai parameter untuk menentukan jumlah total token yang akan dibuat.
+      * `ERC20("BeginningSolidityToken", "BST")` memanggil `constructor` dari kontrak `ERC20` untuk menetapkan nama token ("BeginningSolidityToken") dan simbolnya ("BST").
+  * `_mint(msg.sender, initialSupply);`: Memanggil fungsi internal `_mint` untuk membuat `initialSupply` jumlah token dan memberikannya ke alamat yang mendeploy kontrak (`msg.sender`).
+
+[ALT TEXT: [Kode `constructor` dari kontrak ERC20.sol OpenZeppelin yang menunjukkan parameter nama dan simbol.] - Figure 9.20]
+
+**4. Mengompilasi Kontrak**
+Simpan file dan kompilasi proyek Kita untuk memastikan tidak ada kesalahan.
+
+```bash
+forge build
+```
+
+[ALT TEXT: [Terminal menunjukkan perintah `forge build` yang sedang dieksekusi.] - Figure 9.21]
+[ALT TEXT: [Pesan sukses "Compiler run successful\!"] - Figure 9.22]
+
+### Membangun ERC-20 Secara Manual
+
+Meskipun menggunakan OpenZeppelin adalah praktik terbaik, membangun token **ERC-20** secara manual dari awal sangat penting untuk memahami cara kerja setiap fungsi. Berikut adalah implementasi lengkapnya.
+
+Buat file baru di `src` bernama `BeginningSolidityTokenManual.sol`.
+
+```solidity
+//SPDX-License-Identifier: MIT
+
+pragma solidity 0.8.27;
+
+contract BeginningSolidityTokenManual {
+
+    // State Variables
+    string private _name;
+    string private _symbol;
+    uint8 private _decimals;
+    uint256 private _totalSupply;
+
+    mapping(address => uint256) private _balances;
+    mapping(address => mapping(address => uint256)) private _allowances;
+
+    // Events
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    // View Functions (Read-only)
+    function name() public view returns (string memory) {
+        return _name;
+    }
+
+    function symbol() public view returns (string memory) {
+        return _symbol;
+    }
+
+    function decimals() public view returns (uint8) {
+        return _decimals;
+    }
+
+    function totalSupply() public view returns (uint256) {
+        return _totalSupply;
+    }
+
+    function balanceOf(address _owner) public view returns (uint256 balance) {
+        return _balances[_owner];
+    }
+
+    // State-Changing Functions
+    function transfer(address _to, uint256 _value) public returns (bool success) {
+        require(_to != address(0), "ERC20: transfer to the zero address");
+        require(_balances[msg.sender] >= _value, "ERC20: transfer amount exceeds balance");
+
+        _balances[msg.sender] -= _value;
+        _balances[_to] += _value;
+        emit Transfer(msg.sender, _to, _value);
+        return true;
+    }
+
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+        require(_from != address(0), "ERC20: transfer from the zero address");
+        require(_to != address(0), "ERC20: transfer to the zero address");
+        require(_balances[_from] >= _value, "ERC20: transfer amount exceeds balance");
+        require(_allowances[_from][msg.sender] >= _value, "ERC20: transfer amount exceeds allowance");
+
+        _balances[_from] -= _value;
+        _balances[_to] += _value;
+        _allowances[_from][msg.sender] -= _value;
+        emit Transfer(_from, _to, _value);
+        return true;
+    }
+
+    function approve(address _spender, uint256 _value) public returns (bool success) {
+        require(_spender != address(0), "ERC20: approve to the zero address");
+
+        _allowances[msg.sender][_spender] = _value;
+        emit Approval(msg.sender, _spender, _value);
+        return true;
+    }
+
+    function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
+        return _allowances[_owner][_spender];
+    }
+}
+```
+
+**Penjelasan Detail Implementasi Manual:**
+
+  * **State Variables:**
+      * `_name`, `_symbol`, `_decimals`: Menyimpan metadata token.
+      * `_totalSupply`: Melacak jumlah total token yang ada.
+      * `_balances`: Sebuah `mapping` dari `address` ke `uint256` untuk melacak saldo setiap pemilik token.
+      * `_allowances`: Sebuah `mapping` bersarang (`address => mapping(address => uint256)`) untuk melacak berapa banyak token yang diizinkan oleh seorang `owner` untuk dibelanjakan oleh `spender`.
+  * **Events:**
+      * `Transfer`: Dipancarkan ketika token ditransfer. `indexed` memungkinkan pencarian *event* berdasarkan alamat pengirim dan penerima.
+      * `Approval`: Dipancarkan ketika `approve` dipanggil.
+  * **Fungsi Wajib (Sesuai Standar ERC-20):**
+      * `name()`, `symbol()`, `decimals()`: Mengembalikan metadata token.
+      * `totalSupply()`: Mengembalikan jumlah total token.
+      * `balanceOf(address _owner)`: Mengembalikan saldo token dari alamat tertentu.
+      * `transfer(address _to, uint256 _value)`: Mengirim `_value` token dari `msg.sender` ke alamat `_to`. Fungsi ini melakukan dua pemeriksaan penting menggunakan `require`: memastikan alamat tujuan bukan *zero address* dan memastikan pengirim memiliki saldo yang cukup.
+      * `approve(address _spender, uint256 _value)`: Memberi izin kepada `_spender` untuk menarik hingga `_value` token dari akun `msg.sender`.
+      * `allowance(address _owner, address _spender)`: Mengembalikan jumlah token yang masih diizinkan untuk ditarik oleh `_spender` dari `_owner`.
+      * `transferFrom(address _from, address _to, uint256 _value)`: Mengizinkan `msg.sender` (sebagai `spender`) untuk mengirim `_value` token dari alamat `_from` ke alamat `_to`. Ini memerlukan `approve` sebelumnya dan melakukan validasi saldo dan *allowance*.
+
+### Mendeploy Cryptocurrency ERC-20 Anda
+
+Setelah membuat kontrak token menggunakan OpenZeppelin, langkah selanjutnya adalah mendeploy-nya. Kita akan membuat *script deployment* menggunakan Foundry.
+
+**1. Membuat Script Deployment**
+Buat file baru di folder `script` bernama `DBeginningSolidityToken.s.sol`.
+
+```solidity
+//SPDX-License-Identifier: MIT
+import {BeginningSolidityToken} from "../src/BeginningSolidityToken.sol";
+import {Script} from "forge-std/Script.sol";
+pragma solidity 0.8.27;
+
+contract DBeginningSolidityToken is Script {
+
+    function run() external {
+        uint256 INITIAL_SUPPLY = 100 ether;
+        vm.startBroadcast();
+        new BeginningSolidityToken(INITIAL_SUPPLY);
+        vm.stopBroadcast();
+    }
+}
+```
+
+Penjelasan Script:
+
+  * `import {BeginningSolidityToken} ...`: Mengimpor kontrak token yang ingin kita deploy.
+  * `import {Script} ...`: Mengimpor kontrak `Script` dari `forge-std` yang menyediakan *helper functions* untuk *deployment*.
+  * `run() external`: Fungsi utama yang akan dieksekusi oleh Foundry.
+  * `uint256 INITIAL_SUPPLY = 100 ether;`: Menetapkan suplai awal token sebanyak 100. Kata kunci `ether` secara otomatis mengonversinya menjadi `100 * 10**18`.
+  * `vm.startBroadcast();`: Perintah *cheat code* dari Foundry untuk mulai menyiarkan *transactions* ke *blockchain*.
+  * `new BeginningSolidityToken(INITIAL_SUPPLY);`: Mendeploy instance baru dari kontrak `BeginningSolidityToken` dengan suplai awal yang telah ditentukan.
+  * `vm.stopBroadcast();`: Menghentikan siaran *transactions*.
+
+**2. Mendeploy ke Anvil (Local Blockchain)**
+Untuk mendeploy secara aman, kita akan mengimpor *private key* dari Anvil ke *keystore* Foundry.
+
+  * Jalankan Anvil di satu terminal: `anvil`.
+  * Salin salah satu *private key* dari output Anvil.
+
+[ALT TEXT: [Terminal menampilkan daftar akun dan private key yang dihasilkan oleh Anvil.] - Figure 9.25]
+
+  * Di terminal lain, impor *private key* tersebut.
+
+<!-- end list -->
+
+```bash
+# Ganti 'BeginningSolidityTokenKey' dengan nama alias yang Kita inginkan
+cast wallet import BeginningSolidityTokenKey --interactive
+```
+
+[ALT TEXT: [Terminal meminta untuk memasukkan password untuk keystore.] - Figure 9.26]
+[ALT TEXT: [Output terminal setelah private key berhasil disimpan, menunjukkan alamatnya.] - Figure 9.27]
+
+  * Sekarang, deploy kontrak menggunakan *script* dan akun yang baru saja Kita simpan.
+
+<!-- end list -->
+
+```bash
+forge script script/DBeginningSolidityToken.s.sol:DBeginningSolidityToken \
+    --rpc-url http://localhost:8545 \
+    --account BeginningSolidityTokenKey \
+    --sender 0x14dc79964da2c08b23698b3d3cc7ca32193d9955 \
+    --broadcast
+```
+
+[ALT TEXT: [Output terminal yang menunjukkan deployment berhasil di Anvil.] - Figure 9.29]
+
+Flag `--sender` harus diisi dengan alamat yang sesuai dengan *private key* yang Kita impor. Setelah memasukkan *password* *keystore*, kontrak akan berhasil dideploy.
+
+Mulai dari konsep dasarnya, proses standardisasinya melalui EIP, hingga implementasi praktis menggunakan OpenZeppelin dan pendekatan manual. Kita juga telah belajar cara mendeploy token Kita secara aman menggunakan Foundry, sebuah keterampilan penting bagi setiap *developer* dan auditor *blockchain*.
+
+---
+
