@@ -3131,12 +3131,29 @@ Untuk memahami urgensi *stablecoin*, bab ini mengajak kita kembali pada tiga fun
 
 Bab ini menekankan signifikansi *stablecoin* dengan data pasar yang menunjukkan kapitalisasi pasar gabungan mereka mencapai **$176+ miliar**. Dominasi *stablecoin* yang dipatok ke USD sangat jelas, menguasai lebih dari 99% dari total pasar.
 
-[ALT TEXT: Grafik yang menunjukkan total nilai gabungan dari semua stablecoin yang didukung fiat di seluruh dunia. - Figure 10.1]
-[ALT TEXT: Grafik batang yang membandingkan kapitalisasi pasar dari tiga stablecoin terbesar yang didukung USD: Tether (USDT), USD Coin (USDC), dan First Digital USD (FDUSD). - Figure 10.2]
-[ALT TEXT: Grafik yang menunjukkan kapitalisasi pasar khusus untuk stablecoin yang dipatok ke USD. - Figure 10.3]
-[ALT TEXT: Grafik yang menampilkan total nilai gabungan dari semua stablecoin yang didukung fiat di seluruh dunia, tidak termasuk yang dipatok ke USD. - Figure 10.4]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-1.png" alt="gambar" width="550"/>
+</p>
 
------
+[Grafik yang menunjukkan total nilai gabungan dari semua stablecoin yang didukung fiat di seluruh dunia. - Figure 10.1]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-2.png" alt="gambar" width="550"/>
+</p>
+
+[Grafik batang yang membandingkan kapitalisasi pasar dari tiga stablecoin terbesar yang didukung USD: Tether (USDT), USD Coin (USDC), dan First Digital USD (FDUSD). - Figure 10.2]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-3.png" alt="gambar" width="550"/>
+</p>
+
+[Grafik yang menunjukkan kapitalisasi pasar khusus untuk stablecoin yang dipatok ke USD. - Figure 10.3]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-4.png" alt="gambar" width="550"/>
+</p>
+
+[ALT TEXT: Grafik yang menampilkan total nilai gabungan dari semua stablecoin yang didukung fiat di seluruh dunia, tidak termasuk yang dipatok ke USD. - Figure 10.4]
 
 ### Tipe-Tipe Stablecoin
 
@@ -3149,21 +3166,49 @@ Bab ini mengkategorikan *stablecoin* berdasarkan dua dimensi utama: tingkat sent
 
 #### 2\. Berdasarkan Mekanisme Jaminan
 
-  * **Traditionally Collateralized:** Dijamin oleh aset dunia nyata seperti mata uang *fiat* atau komoditas. Contoh utamanya adalah **Tether (USDT)**. Untuk setiap 1 USDT yang diterbitkan, Tether Ltd. menyimpan aset senilai 1 USD sebagai cadangan. Model ini sederhana tetapi terpusat
-  .
-    [ALT TEXT: Grafik harga USDT terhadap USD dari 2015-2024 yang menunjukkan stabilitas relatifnya. - Figure 10.5]
-    [ALT TEXT: Logo-logo dari stablecoin terpusat populer: USDT, USDC, BUSD, GUSD, TUSD, USDP. - Figure 10.6]
+  * **Traditionally Collateralized:** Dijamin oleh aset dunia nyata seperti mata uang *fiat* atau komoditas. Contoh utamanya adalah **Tether (USDT)**. Untuk setiap 1 USDT yang diterbitkan, Tether Ltd. menyimpan aset senilai 1 USD sebagai cadangan. Model ini sederhana tetapi terpusat.
+  
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-5.png" alt="gambar" width="550"/>
+</p>
+  
+[Grafik harga USDT terhadap USD dari 2015-2024 yang menunjukkan stabilitas relatifnya. - Figure 10.5]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-6.png" alt="gambar" width="550"/>
+</p>
+
+[Logo-logo dari stablecoin terpusat populer: USDT, USDC, BUSD, GUSD, TUSD, USDP. - Figure 10.6]
+    
   * **Crypto Collateralized:** Dijamin oleh *cryptocurrency* lain yang disimpan dalam *smart contract*. Contoh utamanya adalah **DAI**. Untuk membuat (meminjam) DAI, pengguna harus menyetorkan jaminan *crypto* (seperti ETH) dengan nilai yang lebih tinggi dari jumlah DAI yang mereka pinjam. Ini disebut **over-collateralization**. Protokol ini memperkenalkan konsep **Health Factor**, yaitu rasio keamanan antara nilai jaminan pengguna dan nilai utangnya. Jika *Health Factor* turun di bawah ambang batas aman, posisi pengguna dapat **dilikuidasi** (jaminannya dijual) untuk menutupi utangnya.
   
-    [ALT TEXT: Grafik harga DAI terhadap USD dari 2020-2024 yang menunjukkan stabilitasnya. - Figure 10.7]
-    [ALT TEXT: Logo-logo dari stablecoin terdesentralisasi: DAI, LUSD, sUSD, GHO, RAI, MIM. - Figure 10.8]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-7.png" alt="gambar" width="550"/>
+</p>
+
+[Grafik harga DAI terhadap USD dari 2020-2024 yang menunjukkan stabilitasnya. - Figure 10.7]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-8.png" alt="gambar" width="550"/>
+</p>
+
+[Logo-logo dari stablecoin terdesentralisasi: DAI, LUSD, sUSD, GHO, RAI, MIM. - Figure 10.8]
+    
   * **Algorithmic Stablecoins:** Tidak dijamin oleh aset apa pun, melainkan menggunakan algoritma untuk menjaga stabilitas harga dengan menyesuaikan pasokan. Contohnya adalah **Ampleforth (AMPL)**, yang menggunakan mekanisme **rebase** untuk menambah atau mengurangi jumlah token di semua *wallet* secara proporsional setiap hari untuk menargetkan harga $1.
-    [ALT TEXT: Grafik harga Ampleforth terhadap USD dari 2019-2024 yang menunjukkan volatilitasnya. - Figure 10.9]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-9.png" alt="gambar" width="550"/>
+</p>
+
+[Grafik harga Ampleforth terhadap USD dari 2019-2024 yang menunjukkan volatilitasnya. - Figure 10.9]
+
   * **Hybrid Collateralized:** Menggunakan kombinasi dari berbagai jenis jaminan untuk meningkatkan ketahanan.
 
-[ALT TEXT: Diagram pohon yang memvisualisasikan taksonomi berbagai jenis stablecoin. - Figure 10.10]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-10.png" alt="gambar" width="550"/>
+</p>
 
------
+[Diagram pohon yang memvisualisasikan taksonomi berbagai jenis stablecoin. - Figure 10.10]
 
 ### Membuat Stablecoin (Creating The Stablecoin)
 
@@ -3188,10 +3233,37 @@ Langkah pertama adalah menyiapkan lingkungan pengembangan kita.
     
 6.  Hapus file `Counter.sol` bawaan dan buat file baru `Stablecoin.sol` di dalam folder `src`.
 
-[ALT TEXT: Screenshot terminal yang menunjukkan proses pembuatan dan navigasi direktori. - Figure 10.11, 10.12, 10.13]
-[ALT TEXT: Menu File di VS Code yang menunjukkan opsi Open Folder. - Figure 10.14]
-[ALT TEXT: Tampilan file explorer yang menunjukkan folder proyek yang akan dibuka. - Figure 10.15]
-[ALT TEXT: Tampilan VS Code yang menunjukkan pembuatan file Stablecoin.sol. - Figure 10.16]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-11.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-12.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-13.png" alt="gambar" width="550"/>
+</p>
+
+[Screenshot terminal yang menunjukkan proses pembuatan dan navigasi direktori. - Figure 10.11, 10.12, 10.13]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-14.png" alt="gambar" width="550"/>
+</p>
+
+[Menu File di VS Code yang menunjukkan opsi Open Folder. - Figure 10.14]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-15.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan file explorer yang menunjukkan folder proyek yang akan dibuka. - Figure 10.15]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-16.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan VS Code yang menunjukkan pembuatan file Stablecoin.sol. - Figure 10.16]
 
 #### 2\. Implementasi Kontrak `Stablecoin.sol`
 
@@ -3251,13 +3323,17 @@ contract Stablecoin is ERC20Burnable, Ownable {
       * `onlyOwner`: *Modifier* dari `Ownable` yang memastikan hanya alamat `owner` yang dapat memanggil fungsi ini.
       * `if(_amount == 0)` dan `if (balance < _amount)`: Pemeriksaan keamanan untuk memastikan jumlah yang akan dibakar valid dan tidak melebihi saldo yang ada.
       * `super.burn(_amount);`: Memanggil implementasi asli dari fungsi `burn` di kontrak `ERC20Burnable` untuk melakukan penghancuran token yang sebenarnya. Fungsi `burn` asli dari `ERC20Burnable` dapat dilihat pada gambar berikut.
-        [ALT TEXT: Kode fungsi burn dari kontrak ERC20Burnable.sol. - Figure 10.17]
+  
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-17.png" alt="gambar" width="550"/>
+</p>
+
+[Kode fungsi burn dari kontrak ERC20Burnable.sol. - Figure 10.17]
+
   * **`function mint(address _to, uint256 _amount) external onlyOwner returns (bool)`**: Mendefinisikan fungsi untuk membuat token baru.
       * `external onlyOwner`: Hanya bisa dipanggil dari luar kontrak dan hanya oleh `owner`.
       * `if(_to == address(0))` dan `if(_amount == 0)`: Pemeriksaan keamanan untuk memastikan token tidak dicetak ke alamat nol dan jumlahnya lebih dari nol.
       * `_mint(_to, _amount);`: Memanggil fungsi internal `_mint` dari ERC20 untuk menciptakan token baru dan menambahkannya ke saldo alamat `_to`.
-
------
 
 ### Kerangka Stablecoin (The Stablecoin Skeleton)
 
@@ -3304,7 +3380,11 @@ Selanjutnya, kita definisikan semua variabel dan struktur data yang akan menyimp
   * `error...`: Mendefinisikan semua kondisi kesalahan yang mungkin terjadi.
   * `LIQUIDITATION_THRESHOLD`: Konstanta yang menetapkan batas pinjaman pada 50% dari nilai jaminan. Konsep ini terkait langsung dengan **Health Factor**.
 
-[ALT TEXT: Persamaan matematika yang menunjukkan bagaimana Health Factor dihitung. - Figure 10.18]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_10-18.png" alt="gambar" width="550"/>
+</p>
+
+[Persamaan matematika yang menunjukkan bagaimana Health Factor dihitung. - Figure 10.18]
 
 ```solidity
     mapping(address token => address priceFeed) s_priceFeed;
@@ -3529,3 +3609,401 @@ Selanjutnya, kita definisikan semua variabel dan struktur data yang akan menyimp
 
 ---
 
+# Bab 11
+## Building an ERC-721 Nonfungible Token
+
+Selamat datang di Bab 11. Dalam bab ini, kita akan beralih dari *token fungible* (ERC-20) ke dunia aset digital yang unik: **Nonfungible Tokens (NFTs)**. Sebagai seorang calon auditor, memahami standar **ERC-721** adalah hal yang sangat penting, karena ia membuka berbagai kasus penggunaan baru yang melibatkan kepemilikan aset digital yang unik, mulai dari seni hingga aset dunia nyata.
+
+Kita akan menjelajahi konsep fundamental di balik NFT, cara kerja *metadata*, dan bagaimana kita bisa menggunakan sistem penyimpanan terdesentralisasi seperti **InterPlanetary File System (IPFS)**. Tentu saja, kita akan mempraktikkannya dengan membangun dan men-*deploy* proyek NFT kita sendiri menggunakan Foundry dan *library* OpenZeppelin yang sudah teruji keamanannya.
+
+Di akhir bab ini, Kita tidak hanya akan mampu membuat koleksi NFT Kita sendiri, tetapi juga memahami praktik-praktik terbaik dalam pengembangannya, termasuk cara mengintegrasikannya dengan *marketplace* seperti OpenSea, pertimbangan keamanan, dan optimisasi *gas*.
+
+### Apa Itu NFT?
+
+**NFT** adalah singkatan dari **Nonfungible Token**. Istilah *nonfungible* berarti "tidak dapat dipertukarkan secara setara". Ini adalah perbedaan mendasar antara NFT (standar **ERC-721**) dan token ERC-20:
+
+  * **Fungible (ERC-20):** Setiap unit identik dan memiliki nilai yang sama. Satu Ether sama nilainya dengan Ether lainnya.
+  * **Nonfungible (ERC-721):** Setiap *token* adalah unik, memiliki identitasnya sendiri, dan tidak dapat digantikan oleh *token* lain meskipun berasal dari koleksi yang sama. Bayangkan lukisan Mona Lisa; meskipun ada banyak lukisan lain, tidak ada yang identik dengannya.
+
+NFT memungkinkan representasi digital dari kepemilikan atas aset yang unik. Aset ini bisa sepenuhnya digital (seperti seni digital, item dalam *game*) atau merupakan representasi digital dari aset fisik (*real-world assets* atau RWAs), yang disebut **tokenisasi**.
+
+Penting untuk dipahami bahwa data besar dari sebuah NFT, seperti file gambar atau video, hampir tidak pernah disimpan langsung di *blockchain* Ethereum karena biayanya yang sangat mahal. Sebaliknya, *smart contract* NFT hanya menyimpan sebuah penunjuk (*pointer*) yang disebut **Uniform Resource Identifier (URI)**. URI ini biasanya mengarah ke sebuah file *metadata* (dalam format JSON) yang disimpan secara *off-chain*. File *metadata* inilah yang berisi semua informasi tentang NFT tersebut, seperti nama, deskripsi, atribut, dan link ke file gambar.
+
+Ada dua cara utama untuk menyimpan data *off-chain* ini:
+
+1.  **Server Terpusat:** Mudah tetapi bertentangan dengan prinsip desentralisasi dan memiliki satu titik kegagalan (*single point of failure*).
+2.  **InterPlanetary File System (IPFS):** Jaringan penyimpanan *peer-to-peer* yang terdesentralisasi. Ini adalah standar de facto untuk penyimpanan aset NFT.
+
+Pada dasarnya, sebuah NFT dalam sebuah *smart contract* adalah *token* dengan nomor identifikasi unik (disebut `tokenId`). Misalnya, dalam koleksi 100 NFT, akan ada `tokenId` 0 hingga 99.
+
+### Menyiapkan Proyek NFT
+
+Sebelum kita menulis kode, kita perlu menyiapkan struktur proyek dan menginstal *library* yang diperlukan.
+
+1.  Buka terminal, navigasikan ke folder kerja utama Kita, lalu buat direktori baru dan masuk ke dalamnya:
+
+    ```bash
+    mkdir beginning-solidity-NFT-ERC721
+    cd beginning-solidity-NFT-ERC721
+    ```
+
+    [ALT TEXT: Terminal menunjukkan pembuatan dan masuk ke direktori proyek NFT. - Figure 11.1]
+
+2.  Buka folder ini di VS Code.
+    [ALT TEXT: Jendela file explorer yang menunjukkan folder proyek NFT yang akan dibuka. - Figure 11.2]
+    [ALT TEXT: Pop-up konfirmasi kepercayaan pada penulis folder di VS Code. - Figure 11.3]
+
+3.  Inisialisasi proyek Foundry baru di dalam direktori:
+
+    ```bash
+    forge init
+    ```
+
+    [ALT TEXT: Terminal menjalankan perintah forge init. - Figure 11.4]
+    [ALT TEXT: Terminal menunjukkan pesan sukses setelah inisialisasi Foundry. - Figure 11.5]
+    [ALT TEXT: Tampilan panel Explorer di VS Code setelah proyek Foundry diinisialisasi. - Figure 11.6]
+
+4.  Instal *library* kontrak OpenZeppelin, yang menyediakan implementasi ERC-721 yang aman dan standar:
+
+    ```bash
+    forge install OpenZeppelin/openzeppelin-contracts --no-commit
+    ```
+
+    [ALT TEXT: Halaman GitHub repositori OpenZeppelin Contracts. - Figure 11.7]
+    [ALT TEXT: Terminal sedang mengunduh kontrak OpenZeppelin. - Figure 11.8]
+    [ALT TEXT: Terminal menunjukkan pesan sukses setelah instalasi kontrak. - Figure 11.9]
+
+5.  Setelah instalasi, Kita dapat menemukan implementasi standar `ERC721.sol` di dalam `lib/openzeppelin-contracts/contracts/token/ERC721/`.
+    [ALT TEXT: Panel Explorer VS Code yang menunjukkan folder openzeppelin-contracts di dalam lib. - Figure 11.10]
+    [ALT TEXT: Panel Explorer VS Code yang menunjukkan path lengkap ke file ERC721.sol. - Figure 11.11]
+
+### Pemecahan Kode Kontrak ERC-721 (ERC-721 Contract Breakdown)
+
+Bab ini membedah implementasi standar `ERC721.sol` dari OpenZeppelin untuk memberikan pemahaman fundamental yang mendalam. Mari kita telaah setiap bagiannya secara berurutan.
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import {IERC721} from "./IERC721.sol";
+import {IERC721Metadata} from "./extensions/IERC721Metadata.sol";
+import {ERC721Utils} from "./utils/ERC721Utils.sol";
+import {Context} from "../../utils/Context.sol";
+import {Strings} from "../../utils/Strings.sol";
+import {IERC165, ERC165} from "../../utils/introspection/ERC165.sol";
+import {IERC721Errors} from "../../interfaces/draft-IERC6093.sol";
+```
+
+**Penjelasan `import`:**
+
+  * **`IERC721.sol`**: Mendefinisikan *interface* inti ERC-721. Ini menetapkan fungsi-fungsi wajib seperti `balanceOf`, `ownerOf`, `transferFrom`, dan `approve`.
+  * **`IERC721Metadata.sol`**: *Interface* untuk ekstensi metadata, yang menambahkan fungsi `name`, `symbol`, dan `tokenURI`.
+  * **`ERC721Utils.sol`**: Menyediakan fungsi *helper* penting, terutama `checkOnERC721Received`, untuk memastikan transfer yang aman ke alamat kontrak.
+  * **`Context.sol`**: Utilitas internal OpenZeppelin untuk mendapatkan `msg.sender` dengan cara yang *meta-transaction friendly*.
+  * **`Strings.sol`**: Sebuah *library* untuk operasi pada tipe data `string`, terutama untuk mengubah `uint256` menjadi `string` yang diperlukan untuk membuat `tokenURI`.
+  * **`ERC165.sol`**: Implementasi standar ERC-165 yang memungkinkan kontrak untuk mengiklankan *interface* apa saja yang didukungnya.
+  * **`IERC721Errors.sol`**: Mendefinisikan *custom errors* yang spesifik untuk ERC-721, yang lebih hemat *gas* daripada `require` dengan string.
+
+-----
+
+```solidity
+abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Errors {
+    using Strings for uint256;
+
+    string private _name;
+    string private _symbol;
+
+    mapping(uint256 tokenId => address) private _owners;
+    mapping(address owner => uint256) private _balances;
+    mapping(uint256 tokenId => address) private _tokenApprovals;
+    mapping(address owner => mapping(address operator => bool)) private _operatorApprovals;
+```
+
+**Penjelasan Definisi Kontrak dan State Variables:**
+
+  * **`abstract contract ERC721 is ...`**: Mendefinisikan `ERC721` sebagai `abstract contract`, artinya ia menyediakan implementasi dasar tetapi tidak dimaksudkan untuk di-*deploy* sendirian. Ia harus diwarisi oleh kontrak NFT konkret Kita.
+  * **`using Strings for uint256;`**: "Melampirkan" fungsi-fungsi dari *library* `Strings` ke tipe data `uint256`. Ini memungkinkan kita untuk melakukan hal seperti `tokenId.toString()`.
+  * **`_name` dan `_symbol`**: Variabel `private` untuk menyimpan nama dan simbol koleksi.
+  * **`_owners`**: *Mapping* `private` dari `tokenId` ke `address` pemiliknya. Ini adalah "buku besar" kepemilikan yang sesungguhnya.
+  * **`_balances`**: *Mapping* `private` dari `address` ke `uint256` untuk melacak berapa banyak NFT yang dimiliki oleh setiap alamat.
+  * **`_tokenApprovals`**: *Mapping* `private` untuk mencatat persetujuan (`approval`) untuk satu `tokenId` spesifik. `_tokenApprovals[tokenId]` akan berisi alamat yang disetujui untuk mentransfer token tersebut.
+  * **`_operatorApprovals`**: *Mapping* `private` bersarang. Ini untuk `approval` tingkat "operator", di mana seorang pemilik (`owner`) dapat memberikan izin kepada alamat lain (`operator`) untuk mengelola *semua* NFT miliknya.
+
+-----
+
+```solidity
+    constructor(string memory name_, string memory symbol_) {
+        _name = name_;
+        _symbol = symbol_;
+    }
+```
+
+**Penjelasan `constructor`:**
+
+  * Fungsi ini hanya berjalan sekali saat kontrak di-*deploy*. Tujuannya adalah untuk menginisialisasi nama dan simbol koleksi NFT.
+
+-----
+
+```solidity
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+        return
+            interfaceId == type(IERC721).interfaceId ||
+            interfaceId == type(IERC721Metadata).interfaceId ||
+            super.supportsInterface(interfaceId);
+    }
+```
+
+**Penjelasan `supportsInterface`:**
+
+  * Implementasi dari standar ERC-165. Fungsi ini memungkinkan pihak lain (misalnya, *marketplace*) untuk menanyakan apakah kontrak ini mendukung standar ERC-721 dan ekstensi Metadata-nya.
+
+-----
+
+```solidity
+    function balanceOf(address owner) public view virtual returns (uint256) {
+        if (owner == address(0)) {
+            revert ERC721InvalidOwner(address(0));
+        }
+        return _balances[owner];
+    }
+```
+
+**Penjelasan `balanceOf`:**
+
+  * Mengembalikan jumlah NFT yang dimiliki oleh alamat `owner`. Melakukan pemeriksaan untuk memastikan `owner` bukan alamat nol.
+
+-----
+
+```solidity
+    function ownerOf(uint256 tokenId) public view virtual returns (address) {
+        return _requireOwned(tokenId);
+    }
+```
+
+**Penjelasan `ownerOf`:**
+
+  * Mengembalikan alamat pemilik dari `tokenId` tertentu. Ia memanggil fungsi internal `_requireOwned` yang akan memeriksa apakah token tersebut memang ada.
+
+-----
+
+```solidity
+    function name() public view virtual returns (string memory) {
+        return _name;
+    }
+
+    function symbol() public view virtual returns (string memory) {
+        return _symbol;
+    }
+```
+
+**Penjelasan `name` dan `symbol`:**
+
+  * Fungsi `view` sederhana yang mengembalikan nama dan simbol koleksi.
+
+-----
+
+```solidity
+    function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
+        _requireOwned(tokenId);
+
+        string memory baseURI = _baseURI();
+        return bytes(baseURI).length > 0 ? string.concat(baseURI, tokenId.toString()) : "";
+    }
+```
+
+**Penjelasan `tokenURI`:**
+
+  * Fungsi krusial yang mengembalikan URI metadata untuk `tokenId`.
+  * Ia memanggil `_requireOwned` untuk memastikan token ada.
+  * Ia memanggil `_baseURI` (fungsi internal yang bisa di-*override*) untuk mendapatkan URI dasar.
+  * Kemudian, ia menggabungkan `baseURI` dengan `tokenId` (yang diubah menjadi `string`) untuk membentuk URI lengkap.
+
+-----
+
+```solidity
+    function approve(address to, uint256 tokenId) public virtual {
+        _approve(to, tokenId, _msgSender());
+    }
+```
+
+**Penjelasan `approve`:**
+
+  * Fungsi publik yang memungkinkan pemilik NFT (`msg.sender`) untuk memberikan persetujuan kepada alamat `to` untuk mentransfer `tokenId` tertentu.
+
+-----
+
+```solidity
+    function transferFrom(address from, address to, uint256 tokenId) public virtual {
+        if (to == address(0)) {
+            revert ERC721InvalidReceiver(address(0));
+        }
+
+        address previousOwner = _update(to, tokenId, _msgSender());
+        if (previousOwner != from) {
+            revert ERC721IncorrectOwner(from, tokenId, previousOwner);
+        }
+    }
+```
+
+**Penjelasan `transferFrom`:**
+
+  * Fungsi inti untuk mentransfer token. `msg.sender` haruslah `from` (pemiliknya) atau alamat yang telah disetujui.
+  * Ia memanggil fungsi internal `_update` untuk melakukan perubahan status kepemilikan.
+  * Ia melakukan validasi untuk memastikan penerima bukan alamat nol dan pengirim (`from`) adalah pemilik yang benar.
+
+-----
+
+```solidity
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public virtual {
+        transferFrom(from, to, tokenId);
+        ERC721Utils.checkOnERC721Received(_msgSender(), from, to, tokenId, data);
+    }
+```
+
+**Penjelasan `safeTransferFrom`:**
+
+  * Ini adalah versi `transferFrom` yang lebih aman.
+  * Setelah melakukan transfer biasa, ia memanggil `ERC721Utils.checkOnERC721Received`. Fungsi utilitas ini memeriksa apakah alamat `to` (jika itu adalah sebuah kontrak) mengimplementasikan *interface* penerima ERC-721. Ini untuk mencegah token dikirim ke kontrak yang tidak tahu cara menanganinya, yang bisa menyebabkan token hilang selamanya.
+
+-----
+
+```solidity
+    function _increaseBalance(address account, uint128 value) internal virtual {
+        unchecked {
+            _balances[account] += value;
+        }
+    }
+```
+
+**Penjelasan `_increaseBalance` dan `unchecked`:**
+
+  * Fungsi internal untuk menambah saldo NFT seorang `account`.
+  * **`unchecked`**: Ini adalah blok optimisasi *gas*. Sejak Solidity v0.8.0, operasi aritmatika secara otomatis memeriksa *overflow* (ketika hasil perhitungan melebihi kapasitas tipe data) dan *underflow*. Pemeriksaan ini memakan sedikit *gas*. Blok `unchecked` menonaktifkan pemeriksaan ini. Di sini, ini aman karena hampir tidak mungkin seorang pengguna memiliki NFT sebanyak `type(uint128).max` sehingga penambahan 1 akan menyebabkan *overflow*.
+    [ALT TEXT: Kode kontrak AddNumber. - Figure 11.12]
+    [ALT TEXT: Pesan error karena overflow. - Figure 11.13]
+    [ALT TEXT: Kontrak AddNumber dengan keyword unchecked. - Figure 11.14]
+    [ALT TEXT: Nilai uint8 pada 255. - Figure 11.15]
+    [ALT TEXT: Nilai uint8 kembali ke 0 setelah overflow di dalam blok unchecked. - Figure 11.16]
+
+-----
+
+### Pengenalan IPFS (Introduction to IPFS)
+
+**IPFS** adalah singkatan dari **InterPlanetary File System**, sebuah jaringan penyimpanan file terdistribusi *peer-to-peer*.
+
+  * **Content-Based Addressing:** Berbeda dari web biasa yang menggunakan alamat berbasis lokasi (URL), IPFS menggunakan alamat berbasis konten. Setiap file di-hash untuk menciptakan **Content Identifier (CID)** yang unik. Untuk mengambil file, Kita meminta CID-nya, dan jaringan akan mencarinya dari *node* mana pun yang menyimpannya.
+  * **Imutabilitas:** Konten di IPFS tidak dapat diubah. Jika Kita mengubah file, versi baru akan mendapatkan CID baru.
+  * **Penggunaan dalam NFT:** Developer menyimpan aset NFT (gambar, metadata) di IPFS dan hanya menyimpan URI `ipfs://<CID>` di *smart contract*.
+
+#### Mengunduh, Menginstal, dan Menggunakan IPFS
+
+Bab ini memberikan panduan langkah demi langkah untuk:
+
+1.  **Mengunduh dan Menginstal IPFS Desktop:** Dari situs `ipfs.tech`, unduh installer untuk OS Kita (Windows atau macOS).
+    [ALT TEXT: Proses langkah demi langkah mengunduh dan menginstal IPFS Desktop. - Figure 11.17 hingga 11.25]
+2.  **Menginstal Ekstensi Browser:** Ini mempermudah akses ke konten IPFS.
+    [ALT TEXT: Proses langkah demi langkah menginstal ekstensi browser IPFS. - Figure 11.26 hingga 11.34]
+3.  **Menggunakan IPFS:**
+      * **Mengunggah File:** Buka IPFS Desktop, pergi ke tab "Files", dan impor file Kita.
+      * **Mendapatkan CID:** Setelah diunggah, salin CID dari file tersebut.
+      * **Mengakses File:** Akses file melalui `ipfs://<CID>` di browser (jika ekstensi terinstal) atau melalui *gateway* publik seperti `https://ipfs.io/ipfs/<CID>`.
+        [ALT TEXT: Proses langkah demi langkah menggunakan IPFS untuk mengunggah dan mengakses file. - Figure 11.35 hingga 11.48]
+
+### OpenSea
+
+**OpenSea** adalah *marketplace* NFT terkemuka. Bab ini menunjukkan alur kerja untuk melacak metadata NFT dari OpenSea kembali ke sumbernya di IPFS, memvalidasi transparansi *blockchain*.
+
+[ALT TEXT: Alur kerja dari OpenSea ke Etherscan lalu ke IPFS untuk memverifikasi metadata NFT. - Figure 11.49 hingga 11.59]
+
+### Membuat Kontrak ERC-721 (Versi Sederhana)
+
+Sekarang, kita akan membuat kontrak NFT kita sendiri yang lebih sederhana dengan mewarisi `ERC721` dari OpenZeppelin.
+
+1.  Buat file baru di `src` bernama `NFT.sol`.
+2.  (Opsional) Simpan aset gambar Kita di dalam folder proyek.
+
+[ALT TEXT: Pembuatan file NFT.sol di VS Code. - Figure 11.60]
+[ALT TEXT: Gambar Girl.png di dalam folder picture. - Figure 11.61]
+
+Berikut adalah kode lengkap untuk `NFT.sol`:
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.27;
+
+import {ERC721} from "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
+
+contract NFT is ERC721 {
+    uint256 private s_tokenCounter;
+    mapping(uint256 => string) private s_tokenIDtoURI;
+
+    constructor() ERC721("NFTToken", "NFT") {
+        s_tokenCounter = 0;
+    }
+
+    function mintNFT(string memory tokenUri) public {
+        s_tokenIDtoURI[s_tokenCounter] = tokenUri;
+        _safeMint(msg.sender, s_tokenCounter);
+        s_tokenCounter++;
+    }
+
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        return s_tokenIDtoURI[tokenId];
+    }
+}
+```
+
+**Penjelasan Kode `NFT.sol`:**
+
+  * **`import {ERC721}`**: Mengimpor implementasi standar ERC-721.
+  * **`contract NFT is ERC721`**: Kontrak kita mewarisi semua fungsionalitas ERC-721.
+  * **`s_tokenCounter`**: Penghitung untuk menetapkan `tokenId` yang unik secara berurutan.
+  * **`s_tokenIDtoURI`**: *Mapping* untuk menyimpan URI metadata untuk setiap `tokenId`.
+  * **`constructor()`**: Menginisialisasi koleksi dengan nama "NFTToken" dan simbol "NFT".
+  * **`mintNFT(...)`**: Fungsi publik untuk mencetak NFT baru. Ia menyimpan `tokenUri`, memanggil `_safeMint` untuk menetapkan kepemilikan, dan menaikkan penghitung.
+  * **`tokenURI(...)`**: Menimpa (`override`) fungsi `tokenURI` untuk mengembalikan URI yang kita simpan di *mapping*.
+
+### Menulis Skrip Deployment dan Deploy ke Sepolia
+
+Langkah terakhir adalah men-*deploy* dan berinteraksi dengan kontrak kita menggunakan skrip Foundry.
+
+1.  **Buat Skrip Deployment (`NFT.s.sol`)**: Di folder `script`, skrip ini hanya akan men-*deploy* kontrak `NFT`.
+    ```solidity
+    // ... (kode seperti di buku)
+    contract DeployNFT is Script {
+        function run() external returns (NFT) {
+            vm.startBroadcast();
+            NFT nonfungibleToken = new NFT();
+            vm.stopBroadcast();
+            return nonfungibleToken;
+        }
+    }
+    ```
+2.  **Buat Skrip Interaksi (`ContractForInteractions.s.sol`)**:
+      * Instal *library* Cyfrin Foundry DevOps: `forge install Cyfrin/foundry-devops --no-commit`.
+      * Skrip ini akan mencari *deployment* terbaru dari kontrak `NFT` dan memanggil `mintNFT` di atasnya.
+    <!-- end list -->
+    ```solidity
+    // ... (kode seperti di buku)
+    contract InteractionsNFT is Script {
+        string public constant girl = "ipfs://...";
+
+        function run() external {
+            address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment("NFT", block.chainid);
+            mintNFTOnContract(mostRecentlyDeployed);
+        }
+
+        function mintNFTOnContract(address contractAddress) public {
+            vm.startBroadcast();
+            NFT(contractAddress).mintNFT(girl);
+            vm.stopBroadcast();
+        }
+    }
+    ```
+3.  **Proses Deployment:**
+      * Siapkan *wallet* Kita dengan `cast wallet import`.
+      * Jalankan skrip deployment ke Sepolia testnet dengan `forge script`.
+      * Jalankan skrip interaksi untuk me-*mint* NFT.
+      * Verifikasi transaksi di Etherscan dan impor NFT ke MetaMask Kita.
+
+[ALT TEXT: Seluruh proses deployment dan interaksi, mulai dari pembuatan skrip hingga mengimpor NFT ke MetaMask. - Figure 11.62 hingga 11.86]
