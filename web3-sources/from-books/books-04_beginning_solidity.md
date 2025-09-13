@@ -2753,11 +2753,23 @@ Proses pembuatan EIP adalah sebagai berikut:
     11. **Reference:** Contoh implementasi, jika tersedia dan diperlukan.
     12. Komponen lain yang dianggap krusial oleh penulis.
 
-[ALT TEXT: [Contoh bagian awal dari dokumen EIP-20 yang menunjukkan judul, penulis, status, dan tipe proposal.] - Figure 9.1]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-1.png" alt="gambar" width="550"/>
+</p>
 
-[ALT TEXT: [Contoh bagian Abstract dan Motivation dari EIP-20, menjelaskan masalah yang ingin dipecahkan.] - Figure 9.2]
+[Contoh bagian awal dari dokumen EIP-20 yang menunjukkan judul, penulis, status, dan tipe proposal. - Figure 9.1]
 
-[ALT TEXT: [Contoh bagian Specification dari EIP-20 yang mendefinisikan fungsi-fungsi wajib seperti `totalSupply`, `balanceOf`, dan `transfer`.] - Figure 9.3]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-2.png" alt="gambar" width="550"/>
+</p>
+
+[Contoh bagian Abstract dan Motivation dari EIP-20, menjelaskan masalah yang ingin dipecahkan. - Figure 9.2]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-3.png" alt="gambar" width="550"/>
+</p>
+
+[Contoh bagian Specification dari EIP-20 yang mendefinisikan fungsi-fungsi wajib seperti `totalSupply`, `balanceOf`, dan `transfer`. - Figure 9.3]
 
 ### Membangun Token ERC-20 dengan OpenZeppelin
 
@@ -2778,12 +2790,35 @@ cd beginning-solidity-token
 # Menginisialisasi proyek Foundry baru
 forge init
 ```
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-8.png" alt="gambar" width="550"/>
+</p>
 
-[ALT TEXT: [Terminal menunjukkan perintah `ls` untuk melihat direktori saat ini.] - Figure 9.8]
-[ALT TEXT: [Terminal menunjukkan perintah `mkdir beginning-solidity-token`.] - Figure 9.9]
-[ALT TEXT: [Terminal menunjukkan hasil `ls` setelah direktori baru dibuat.] - Figure 9.10]
-[ALT TEXT: [Terminal menunjukkan perintah `cd beginning-solidity-token`.] - Figure 9.11]
-[ALT TEXT: [Terminal menunjukkan output dari perintah `forge init`.] - Figure 9.12]
+[Terminal menunjukkan perintah `ls` untuk melihat direktori saat ini. - Figure 9.8]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-9.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menunjukkan perintah `mkdir beginning-solidity-token`. - Figure 9.9]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-10.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menunjukkan hasil `ls` setelah direktori baru dibuat. - Figure 9.10]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-11.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menunjukkan perintah `cd beginning-solidity-token`. - Figure 9.11]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-12.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menunjukkan output dari perintah `forge init`. - Figure 9.12]
 
 **2. Membuka Proyek dan Menginstal Kontrak OpenZeppelin**
 Buka folder proyek di VS Code, lalu hapus file `Counter.sol` default dari folder `script`, `src`, dan `test`.
@@ -2801,13 +2836,31 @@ Kita juga bisa menggunakan versi terbaru dengan perintah:
 forge install OpenZeppelin/openzeppelin-contracts --no-commit
 ```
 
-[ALT TEXT: [Tangkapan layar dari halaman repositori GitHub OpenZeppelin.] - Figure 9.16]
-[ALT TEXT: [Output terminal yang menunjukkan proses instalasi kontrak OpenZeppelin.] - Figure 9.17]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-16.png" alt="gambar" width="550"/>
+</p>
+
+[Tangkapan layar dari halaman repositori GitHub OpenZeppelin. - Figure 9.16]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-17.png" alt="gambar" width="550"/>
+</p>
+
+[Output terminal yang menunjukkan proses instalasi kontrak OpenZeppelin. - Figure 9.17]
 
 Setelah instalasi selesai, Kita akan melihat folder `openzeppelin-contracts` di dalam direktori `lib`. Kita dapat memverifikasi file `ERC20.sol` di path: `lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol`.
 
-[ALT TEXT: [Struktur file di VS Code yang menunjukkan path ke file ERC20.sol.] - Figure 9.18]
-[ALT TEXT: [Tampilan kode dari file ERC20.sol di dalam VS Code.] - Figure 9.19]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-18.png" alt="gambar" width="550"/>
+</p>
+
+[Struktur file di VS Code yang menunjukkan path ke file ERC20.sol. - Figure 9.18]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-19.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan kode dari file ERC20.sol di dalam VS Code. - Figure 9.19]
 
 **3. Membuat Kontrak Token Anda**
 Buat file baru di folder `src` dengan nama `BeginningSolidityToken.sol`. Kode berikut mengimpor dan mewarisi kontrak `ERC20` dari OpenZeppelin.
@@ -2837,7 +2890,11 @@ Penjelasan Kode:
       * `ERC20("BeginningSolidityToken", "BST")` memanggil `constructor` dari kontrak `ERC20` untuk menetapkan nama token ("BeginningSolidityToken") dan simbolnya ("BST").
   * `_mint(msg.sender, initialSupply);`: Memanggil fungsi internal `_mint` untuk membuat `initialSupply` jumlah token dan memberikannya ke alamat yang mendeploy kontrak (`msg.sender`).
 
-[ALT TEXT: [Kode `constructor` dari kontrak ERC20.sol OpenZeppelin yang menunjukkan parameter nama dan simbol.] - Figure 9.20]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-20.png" alt="gambar" width="550"/>
+</p>
+
+[Kode `constructor` dari kontrak ERC20.sol OpenZeppelin yang menunjukkan parameter nama dan simbol. - Figure 9.20]
 
 **4. Mengompilasi Kontrak**
 Simpan file dan kompilasi proyek Kita untuk memastikan tidak ada kesalahan.
@@ -2846,8 +2903,17 @@ Simpan file dan kompilasi proyek Kita untuk memastikan tidak ada kesalahan.
 forge build
 ```
 
-[ALT TEXT: [Terminal menunjukkan perintah `forge build` yang sedang dieksekusi.] - Figure 9.21]
-[ALT TEXT: [Pesan sukses "Compiler run successful\!"] - Figure 9.22]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-21.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menunjukkan perintah `forge build` yang sedang dieksekusi. - Figure 9.21]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-22.png" alt="gambar" width="550"/>
+</p>
+
+[Pesan sukses "Compiler run successful\!" - Figure 9.22]
 
 ### Membangun ERC-20 Secara Manual
 
@@ -2993,7 +3059,11 @@ Untuk mendeploy secara aman, kita akan mengimpor *private key* dari Anvil ke *ke
   * Jalankan Anvil di satu terminal: `anvil`.
   * Salin salah satu *private key* dari output Anvil.
 
-[ALT TEXT: [Terminal menampilkan daftar akun dan private key yang dihasilkan oleh Anvil.] - Figure 9.25]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-25.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menampilkan daftar akun dan private key yang dihasilkan oleh Anvil. - Figure 9.25]
 
   * Di terminal lain, impor *private key* tersebut.
 
@@ -3004,8 +3074,17 @@ Untuk mendeploy secara aman, kita akan mengimpor *private key* dari Anvil ke *ke
 cast wallet import BeginningSolidityTokenKey --interactive
 ```
 
-[ALT TEXT: [Terminal meminta untuk memasukkan password untuk keystore.] - Figure 9.26]
-[ALT TEXT: [Output terminal setelah private key berhasil disimpan, menunjukkan alamatnya.] - Figure 9.27]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-26.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal meminta untuk memasukkan password untuk keystore. - Figure 9.26]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-27.png" alt="gambar" width="550"/>
+</p>
+
+[Output terminal setelah private key berhasil disimpan, menunjukkan alamatnya. - Figure 9.27]
 
   * Sekarang, deploy kontrak menggunakan *script* dan akun yang baru saja Kita simpan.
 
@@ -3019,11 +3098,434 @@ forge script script/DBeginningSolidityToken.s.sol:DBeginningSolidityToken \
     --broadcast
 ```
 
-[ALT TEXT: [Output terminal yang menunjukkan deployment berhasil di Anvil.] - Figure 9.29]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_9-29.png" alt="gambar" width="550"/>
+</p>
+
+[Output terminal yang menunjukkan deployment berhasil di Anvil. - Figure 9.29]
 
 Flag `--sender` harus diisi dengan alamat yang sesuai dengan *private key* yang Kita impor. Setelah memasukkan *password* *keystore*, kontrak akan berhasil dideploy.
 
 Mulai dari konsep dasarnya, proses standardisasinya melalui EIP, hingga implementasi praktis menggunakan OpenZeppelin dan pendekatan manual. Kita juga telah belajar cara mendeploy token Kita secara aman menggunakan Foundry, sebuah keterampilan penting bagi setiap *developer* dan auditor *blockchain*.
+
+---
+
+# Bab 10
+## Borrowing and Lending Protocol
+
+Selamat datang di Bab 10. Dalam bab ini, kita akan menyelami salah satu pilar utama dalam ekosistem **Decentralized Finance (DeFi)**, yaitu **stablecoin**. Sebagai seorang calon auditor keamanan, memahami mekanisme di balik *stablecoin* dan protokol pinjaman yang mendasarinya adalah hal yang mutlak. Di sinilah sebagian besar nilai dalam DeFi terkunci dan berbagai vektor serangan yang kompleks dapat muncul.
+
+Bab ini akan memandu Kita melalui konsep-konsep tersebut, mulai dari "mengapa *stablecoin* itu ada" hingga implementasi teknis sebuah protokol pinjaman berjaminan (*collateralized lending protocol*). Kita akan membangun dua *smart contracts*: satu untuk *token stablecoin* itu sendiri, dan satu lagi untuk "kerangka" atau logika inti yang mengatur jaminan, pinjaman, dan likuidasi.
+
+### Apa Itu Stablecoin?
+
+Untuk memahami urgensi *stablecoin*, bab ini mengajak kita kembali pada tiga fungsi utama dari "uang yang baik" (*good money*), sebuah konsep yang diperkenalkan di Bab 1:
+
+1.  **Medium of Exchange (Media Pertukaran):** Alat yang diterima secara luas untuk memfasilitasi perdagangan, menghilangkan inefisiensi sistem barter.
+2.  **Unit of Account (Satuan Hitung):** Standar untuk mengukur dan membandingkan nilai barang dan jasa.
+3.  **Store of Value (Penyimpan Nilai):** Kemampuan untuk mempertahankan daya beli dari waktu ke waktu.
+
+*Cryptocurrency* seperti Bitcoin dan Ether, meskipun unggul dalam aspek desentralisasi dan keamanan, memiliki kelemahan signifikan: **volatilitas**. Harganya yang berfluktuasi secara drastis membuatnya sulit diandalkan untuk ketiga fungsi uang tersebut dalam konteks sehari-hari.
+
+**Stablecoin** hadir sebagai solusi untuk menjembatani masalah ini. Ia adalah jenis *cryptocurrency* yang nilainya dirancang untuk tetap stabil dengan cara dipatok (*pegged*) ke aset lain yang lebih stabil, paling umum adalah mata uang *fiat* seperti Dolar AS (USD).
+
+Bab ini menekankan signifikansi *stablecoin* dengan data pasar yang menunjukkan kapitalisasi pasar gabungan mereka mencapai **$176+ miliar**. Dominasi *stablecoin* yang dipatok ke USD sangat jelas, menguasai lebih dari 99% dari total pasar.
+
+[ALT TEXT: Grafik yang menunjukkan total nilai gabungan dari semua stablecoin yang didukung fiat di seluruh dunia. - Figure 10.1]
+[ALT TEXT: Grafik batang yang membandingkan kapitalisasi pasar dari tiga stablecoin terbesar yang didukung USD: Tether (USDT), USD Coin (USDC), dan First Digital USD (FDUSD). - Figure 10.2]
+[ALT TEXT: Grafik yang menunjukkan kapitalisasi pasar khusus untuk stablecoin yang dipatok ke USD. - Figure 10.3]
+[ALT TEXT: Grafik yang menampilkan total nilai gabungan dari semua stablecoin yang didukung fiat di seluruh dunia, tidak termasuk yang dipatok ke USD. - Figure 10.4]
+
+-----
+
+### Tipe-Tipe Stablecoin
+
+Bab ini mengkategorikan *stablecoin* berdasarkan dua dimensi utama: tingkat sentralisasi dan mekanisme jaminan (*collateral*).
+
+#### 1\. Berdasarkan Tingkat Sentralisasi
+
+  * **Centralized Stablecoins:** Diterbitkan dan dikelola oleh entitas terpusat (misalnya, perusahaan). Aset jaminannya disimpan secara *off-chain* (di luar *blockchain*). Mereka sangat stabil tetapi membutuhkan kepercayaan pada penerbit dan rentan terhadap sensor.
+  * **Decentralized Stablecoins:** Beroperasi secara otonom melalui *smart contracts*. Jaminannya biasanya berupa aset *on-chain* (di atas *blockchain*). Mereka tahan sensor dan transparan, tetapi bisa lebih kompleks dan berisiko.
+
+#### 2\. Berdasarkan Mekanisme Jaminan
+
+  * **Traditionally Collateralized:** Dijamin oleh aset dunia nyata seperti mata uang *fiat* atau komoditas. Contoh utamanya adalah **Tether (USDT)**. Untuk setiap 1 USDT yang diterbitkan, Tether Ltd. menyimpan aset senilai 1 USD sebagai cadangan. Model ini sederhana tetapi terpusat
+  .
+    [ALT TEXT: Grafik harga USDT terhadap USD dari 2015-2024 yang menunjukkan stabilitas relatifnya. - Figure 10.5]
+    [ALT TEXT: Logo-logo dari stablecoin terpusat populer: USDT, USDC, BUSD, GUSD, TUSD, USDP. - Figure 10.6]
+  * **Crypto Collateralized:** Dijamin oleh *cryptocurrency* lain yang disimpan dalam *smart contract*. Contoh utamanya adalah **DAI**. Untuk membuat (meminjam) DAI, pengguna harus menyetorkan jaminan *crypto* (seperti ETH) dengan nilai yang lebih tinggi dari jumlah DAI yang mereka pinjam. Ini disebut **over-collateralization**. Protokol ini memperkenalkan konsep **Health Factor**, yaitu rasio keamanan antara nilai jaminan pengguna dan nilai utangnya. Jika *Health Factor* turun di bawah ambang batas aman, posisi pengguna dapat **dilikuidasi** (jaminannya dijual) untuk menutupi utangnya.
+  
+    [ALT TEXT: Grafik harga DAI terhadap USD dari 2020-2024 yang menunjukkan stabilitasnya. - Figure 10.7]
+    [ALT TEXT: Logo-logo dari stablecoin terdesentralisasi: DAI, LUSD, sUSD, GHO, RAI, MIM. - Figure 10.8]
+  * **Algorithmic Stablecoins:** Tidak dijamin oleh aset apa pun, melainkan menggunakan algoritma untuk menjaga stabilitas harga dengan menyesuaikan pasokan. Contohnya adalah **Ampleforth (AMPL)**, yang menggunakan mekanisme **rebase** untuk menambah atau mengurangi jumlah token di semua *wallet* secara proporsional setiap hari untuk menargetkan harga $1.
+    [ALT TEXT: Grafik harga Ampleforth terhadap USD dari 2019-2024 yang menunjukkan volatilitasnya. - Figure 10.9]
+  * **Hybrid Collateralized:** Menggunakan kombinasi dari berbagai jenis jaminan untuk meningkatkan ketahanan.
+
+[ALT TEXT: Diagram pohon yang memvisualisasikan taksonomi berbagai jenis stablecoin. - Figure 10.10]
+
+-----
+
+### Membuat Stablecoin (Creating The Stablecoin)
+
+Bagian ini memandu kita melalui proses pemrograman untuk menciptakan *token stablecoin* kita sendiri.
+
+#### 1\. Pengaturan Proyek Foundry
+
+Langkah pertama adalah menyiapkan lingkungan pengembangan kita.
+
+1.  Buka terminal dan buat direktori proyek baru: `mkdir beginning-solidity-stablecoin`.
+2.  Masuk ke direktori tersebut: `cd beginning-solidity-stablecoin`.
+3.  Buka folder ini di VS Code.
+4.  Inisialisasi proyek Foundry baru: `forge init --no-commit`.
+5.  Instal *library* kontrak yang kita butuhkan dari Chainlink dan OpenZeppelin:
+    
+    ```bash
+    forge install https://github.com/smartcontractkit/chainlink-brownie-contracts --no-commit
+    ```
+    ```bash
+    forge install https://github.com/OpenZeppelin/openzeppelin-contracts --no-commit
+    ```
+    
+6.  Hapus file `Counter.sol` bawaan dan buat file baru `Stablecoin.sol` di dalam folder `src`.
+
+[ALT TEXT: Screenshot terminal yang menunjukkan proses pembuatan dan navigasi direktori. - Figure 10.11, 10.12, 10.13]
+[ALT TEXT: Menu File di VS Code yang menunjukkan opsi Open Folder. - Figure 10.14]
+[ALT TEXT: Tampilan file explorer yang menunjukkan folder proyek yang akan dibuka. - Figure 10.15]
+[ALT TEXT: Tampilan VS Code yang menunjukkan pembuatan file Stablecoin.sol. - Figure 10.16]
+
+#### 2\. Implementasi Kontrak `Stablecoin.sol`
+
+Kontrak ini akan mendefinisikan *token* kita sebagai sebuah *token* ERC20 standar, dengan tambahan fungsionalitas `burn` (menghancurkan token) dan `mint` (menciptakan token) yang hanya dapat diakses oleh pemilik kontrak.
+
+Berikut adalah kode lengkap untuk `Stablecoin.sol` persis seperti di dalam buku:
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.28;
+
+import {ERC20Burnable, ERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import {Ownable} from "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+
+contract Stablecoin is ERC20Burnable, Ownable {
+    error Stablecoin__MustBeMoreThanZero();
+    error Stablecoin__BurnMoreThanBalance();
+    error Stablecoin__NoMintingtoZeroAddress();
+    error Stablecoin__AmountMustBeMoreThanZero();
+
+    constructor() ERC20("Stablecoin", "SBT") {}
+
+    function burn(uint256 _amount) public override onlyOwner {
+        uint256 balance = balanceOf(msg.sender);
+        if (_amount == 0) {
+            revert Stablecoin__MustBeMoreThanZero();
+        }
+        if (balance < _amount) {
+            revert Stablecoin__BurnMoreThanBalance();
+        }
+        super.burn(_amount);
+    }
+
+    function mint(address _to, uint256 _amount) external onlyOwner returns (bool) {
+        if (_to == address(0)) {
+            revert Stablecoin__NoMintingtoZeroAddress();
+        }
+        if (_amount == 0) {
+            revert Stablecoin__AmountMustBeMoreThanZero();
+        }
+        _mint(_to, _amount);
+        return true;
+    }
+}
+```
+
+**Penjelasan Kode Baris per Baris:**
+
+  * **`import {ERC20Burnable, ERC20} from "...";`**: Mengimpor kontrak `ERC20Burnable` dari *library* OpenZeppelin. Kontrak ini adalah ekstensi dari ERC20 standar yang menambahkan fungsi `burn`.
+  * **`import {Ownable} from "...";`**: Mengimpor kontrak `Ownable` dari OpenZeppelin. Kontrak ini menyediakan mekanisme kontrol akses sederhana di mana satu alamat ditetapkan sebagai `owner` dan memiliki hak istimewa.
+  * **`contract Stablecoin is ERC20Burnable, Ownable`**: Mendefinisikan kontrak `Stablecoin` kita, yang mewarisi semua fungsionalitas dari `ERC20Burnable` (termasuk semua fitur ERC20) dan `Ownable`.
+  * **`error ...();`**: Mendefinisikan beberapa *custom errors*. Ini adalah praktik terbaik di Solidity modern karena lebih hemat *gas* daripada menggunakan `require` dengan pesan string.
+  * **`constructor() ERC20("Stablecoin", "SBT") {}`**: Ini adalah *constructor* kontrak.
+      * `ERC20("Stablecoin", "SBT")`: Memanggil *constructor* dari kontrak induk `ERC20` untuk menetapkan nama token ("Stablecoin") dan simbolnya ("SBT").
+  * **`function burn(uint256 _amount) public override onlyOwner`**: Mendefinisikan fungsi untuk menghancurkan token.
+      * `public override`: Visibilitasnya publik dan ia menimpa (`override`) fungsi `burn` yang sudah ada di `ERC20Burnable`.
+      * `onlyOwner`: *Modifier* dari `Ownable` yang memastikan hanya alamat `owner` yang dapat memanggil fungsi ini.
+      * `if(_amount == 0)` dan `if (balance < _amount)`: Pemeriksaan keamanan untuk memastikan jumlah yang akan dibakar valid dan tidak melebihi saldo yang ada.
+      * `super.burn(_amount);`: Memanggil implementasi asli dari fungsi `burn` di kontrak `ERC20Burnable` untuk melakukan penghancuran token yang sebenarnya. Fungsi `burn` asli dari `ERC20Burnable` dapat dilihat pada gambar berikut.
+        [ALT TEXT: Kode fungsi burn dari kontrak ERC20Burnable.sol. - Figure 10.17]
+  * **`function mint(address _to, uint256 _amount) external onlyOwner returns (bool)`**: Mendefinisikan fungsi untuk membuat token baru.
+      * `external onlyOwner`: Hanya bisa dipanggil dari luar kontrak dan hanya oleh `owner`.
+      * `if(_to == address(0))` dan `if(_amount == 0)`: Pemeriksaan keamanan untuk memastikan token tidak dicetak ke alamat nol dan jumlahnya lebih dari nol.
+      * `_mint(_to, _amount);`: Memanggil fungsi internal `_mint` dari ERC20 untuk menciptakan token baru dan menambahkannya ke saldo alamat `_to`.
+
+-----
+
+### Kerangka Stablecoin (The Stablecoin Skeleton)
+
+Sekarang kita akan membangun `StablecoinSkeleton.sol`, kontrak yang berisi semua logika untuk mengelola jaminan dan pinjaman. Proses ini akan kita lalui langkah demi langkah, sama seperti di buku.
+
+#### 1\. Persiapan Awal Kontrak
+
+Kita mulai dengan membuat file `StablecoinSkeleton.sol` dan menambahkan deklarasi awal.
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.27;
+
+import {Stablecoin} from "./Stablecoin.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/shared/interfaces/AggregatorV3Interface.sol";
+
+contract StablecoinSkeleton is ReentrancyGuard {
+    // ...
+}
+```
+
+*Penjelasan:* Bagian ini mendeklarasikan lisensi, versi Solidity, dan mengimpor semua *interface* dan kontrak yang dibutuhkan. Warisan dari `ReentrancyGuard` akan memberikan kita akses ke *modifier* `nonReentrant`.
+
+#### 2\. Errors, Constants, dan State Variables
+
+Selanjutnya, kita definisikan semua variabel dan struktur data yang akan menyimpan status protokol.
+
+```solidity
+    error StablecoinSkeleton__NeedsMoreThanZero();
+    error StablecoinSkeleton__TokenAddressAndPriceFeedAddressesMustHaveSameLength();
+    error StablecoinSkeleton__NotAllowedToken();
+    error StablecoinSkeleton__TransferFailed();
+    error StablecoinSkeleton__BreaksHealthFactor(uint256 healthFactor);
+    error StablecoinSkeleton__MintingFailed();
+    error StablecoinSkeleton__HealthFactorIsFine();
+
+    uint256 constant LIQUIDITATION_THRESHOLD = 50;
+```
+
+*Penjelasan:*
+
+  * `error...`: Mendefinisikan semua kondisi kesalahan yang mungkin terjadi.
+  * `LIQUIDITATION_THRESHOLD`: Konstanta yang menetapkan batas pinjaman pada 50% dari nilai jaminan. Konsep ini terkait langsung dengan **Health Factor**.
+
+[ALT TEXT: Persamaan matematika yang menunjukkan bagaimana Health Factor dihitung. - Figure 10.18]
+
+```solidity
+    mapping(address token => address priceFeed) s_priceFeed;
+    mapping(address user => mapping(address token => uint256 amount)) s_collateralDeposit;
+    mapping(address user => uint256 amountSBTminted) s_SBTminted;
+
+    address[] s_collateralTokens;
+
+    Stablecoin immutable i_stablecoin;
+```
+
+*Penjelasan:*
+
+  * `s_priceFeed`: *Mapping* dari alamat token jaminan ke alamat *oracle* harganya.
+  * `s_collateralDeposit`: *Mapping* bersarang `user -> token -> jumlah` untuk melacak deposit jaminan.
+  * `s_SBTminted`: *Mapping* `user -> jumlah` untuk melacak utang (stablecoin yang dicetak).
+  * `s_collateralTokens`: *Array* untuk menyimpan daftar alamat token jaminan yang valid.
+  * `i_stablecoin`: Variabel `immutable` untuk menyimpan alamat kontrak `Stablecoin` yang akan dikelola oleh kerangka ini.
+
+#### 3\. Events dan Modifiers
+
+```solidity
+    event CollateralDeposited(address indexed user, address indexed token, uint256 indexed amount);
+    event CollateralRedeemed(address indexed user, address indexed token, uint256 indexed amount);
+
+    modifier collateralMoreThanZero(uint256 _amount) {
+        if (_amount == 0) {
+            revert StablecoinSkeleton__NeedsMoreThanZero();
+        }
+        _;
+    }
+
+    modifier isAllowedToken(address token) {
+        if (s_priceFeed[token] == address(0)) {
+            revert StablecoinSkeleton__NotAllowedToken();
+        }
+        _;
+    }
+```
+
+*Penjelasan:* `CollateralDeposited` adalah sebuah `event` yang akan dicatat di *blockchain* setiap kali ada deposit. Kedua `modifier` adalah fungsi pengecekan yang dapat digunakan kembali: `collateralMoreThanZero` memastikan jumlah transaksi lebih dari nol, dan `isAllowedToken` memastikan token yang digunakan sebagai jaminan valid.
+
+#### 4\. Constructor
+
+```solidity
+    constructor(address[] memory tokenAddresses, address[] memory priceFeedAddress, address stablecoinAddress) {
+        if (tokenAddresses.length != priceFeedAddress.length) {
+            revert StablecoinSkeleton__TokenAddressAndPriceFeedAddressesMustHaveSameLength();
+        }
+        for (uint256 i = 0; i < tokenAddresses.length; i++) {
+            s_priceFeed[tokenAddresses[i]] = priceFeedAddress[i];
+            s_collateralTokens.push(tokenAddresses[i]);
+        }
+        i_stablecoin = Stablecoin(stablecoinAddress);
+    }
+```
+
+*Penjelasan:* `constructor` menginisialisasi protokol. Ia menerima daftar token jaminan dan *price feed*-nya, lalu mengisi *mapping* `s_priceFeed` dan *array* `s_collateralTokens`. Ia juga menyimpan alamat kontrak `Stablecoin`.
+
+#### 5\. Fungsi Inti (sesuai urutan buku)
+
+```solidity
+    function depositCollateralAndMintSBT(address tokenCollateralAddress, uint256 amountCollateral, uint256 amountSBTtoMint) external {
+        depositCollateral(tokenCollateralAddress, amountCollateral);
+        mintSBT(amountSBTtoMint);
+    }
+```
+
+*Penjelasan:* Fungsi `external` ini adalah "pintu masuk" utama bagi pengguna. Ia menggabungkan dua aksi, yaitu menyetor jaminan dan mencetak *stablecoin*, dalam satu transaksi untuk kemudahan pengguna.
+
+```solidity
+    function depositCollateral(address _tokenCollateralAddress, uint256 _amountOfCollateral)
+        public
+        collateralMoreThanZero(_amountOfCollateral)
+        isAllowedToken(_tokenCollateralAddress)
+        nonReentrant
+    {
+        s_collateralDeposit[msg.sender][_tokenCollateralAddress] += _amountOfCollateral;
+        emit CollateralDeposited(msg.sender, _tokenCollateralAddress, _amountOfCollateral);
+        bool success = IERC20(_tokenCollateralAddress).transferFrom(
+            msg.sender,
+            address(this),
+            _amountOfCollateral
+        );
+        if (!success) {
+            revert StablecoinSkeleton__TransferFailed();
+        }
+    }
+```
+
+*Penjelasan:*
+
+  * Fungsi ini menangani logika deposit jaminan.
+  * Ia dilindungi oleh `modifier` `collateralMoreThanZero`, `isAllowedToken`, dan `nonReentrant`.
+  * `s_collateralDeposit[msg.sender][...] += ...;`: Memperbarui status internal terlebih dahulu, mencatat jumlah jaminan yang disetor oleh pengguna.
+  * `emit CollateralDeposited(...)`: Memberi tahu dunia luar tentang deposit ini.
+  * `IERC20(...).transferFrom(...)`: Memanggil kontrak token jaminan untuk mentransfer token dari pengguna ke kontrak ini. Ini hanya berhasil jika pengguna sudah memberikan `approve` sebelumnya.
+
+<!-- end list -->
+
+```solidity
+    function redeemCollateralForSBT(address tokenCollateralAddress, uint256 amountCollateral, uint256 amountSBTtoburn) external {
+        burnSBT(amountSBTtoburn);
+        redeemCollateral(tokenCollateralAddress, amountCollateral);
+    }
+```
+
+*Penjelasan:* Fungsi gabungan untuk membayar utang (burn) dan menarik jaminan (redeem).
+
+```solidity
+    function redeemCollateral(address tokenCollateralAddress, uint256 amountOfCollateral) public collateralMoreThanZero(amountOfCollateral) nonReentrant {
+        s_collateralDeposit[msg.sender][tokenCollateralAddress] -= amountOfCollateral;
+        emit CollateralRedeemed(msg.sender, tokenCollateralAddress, amountOfCollateral);
+        bool success = IERC20(tokenCollateralAddress).transfer(msg.sender, amountOfCollateral);
+        if (!success) {
+            revert StablecoinSkeleton__TransferFailed();
+        }
+    }
+```
+
+*Penjelasan:* Logika untuk menarik jaminan. Status internal (`s_collateralDeposit`) diperbarui *sebelum* `transfer` token kembali ke pengguna, mengikuti pola keamanan Checks-Effects-Interactions.
+
+```solidity
+    function mintSBT(uint256 amountSBTToBeMinted) public collateralMoreThanZero(amountSBTToBeMinted) nonReentrant {
+        s_SBTminted[msg.sender] += amountSBTToBeMinted;
+        revertIfHealthFactorDoesNotWork(msg.sender);
+        bool minted = i_stablecoin.mint(msg.sender, amountSBTToBeMinted);
+        if (!minted) {
+            revert StablecoinSkeleton__MintingFailed();
+        }
+    }
+```
+
+*Penjelasan:* Logika untuk mencetak *stablecoin*.
+
+  * `s_SBTminted[msg.sender] += ...;`: Utang pengguna diperbarui terlebih dahulu.
+  * `revertIfHealthFactorDoesNotWork(msg.sender);`: Pemeriksaan keamanan kritis untuk memastikan posisi pengguna tidak menjadi berisiko setelah meminjam.
+  * `i_stablecoin.mint(...)`: Panggilan eksternal ke kontrak `Stablecoin` untuk membuat token baru.
+
+<!-- end list -->
+
+```solidity
+    function burnSBT(uint256 _amount) public collateralMoreThanZero(_amount) {
+        s_SBTminted[msg.sender] -= _amount;
+        bool success = i_stablecoin.transferFrom(msg.sender, address(this), _amount);
+        if (!success) {
+            revert StablecoinSkeleton__TransferFailed();
+        }
+        i_stablecoin.burn(_amount);
+        revertIfHealthFactorDoesNotWork(msg.sender);
+    }
+```
+
+*Penjelasan:* Logika untuk membayar utang. `transferFrom` digunakan untuk menarik *stablecoin* dari pengguna, kemudian `burn` menghancurkannya.
+
+```solidity
+    function liquidate(address _collateral, address _user, uint256 debtToCover) external collateralMoreThanZero(debtToCover) {
+        uint256 startingUserHealthFactor = healthFactor(_user);
+        if (startingUserHealthFactor >= 1e18) {
+            revert StablecoinSkeleton__HealthFactorIsFine();
+        }
+        uint256 tokenAmountFromDebtCovered = getUSDValue(_collateral, debtToCover);
+        uint256 bonusCollateral = (tokenAmountFromDebtCovered * 10) / 100;
+        uint256 totalCollateralToRedeem = tokenAmountFromDebtCovered + bonusCollateral;
+    }
+```
+
+*Penjelasan:* Logika untuk likuidasi. Memeriksa `healthFactor`, menghitung jumlah jaminan yang akan diberikan kepada *liquidator* termasuk bonus 10%.
+
+```solidity
+    function getAccountInformation(address user) private view returns (uint256 totalSBTMinted, uint256 collateralValueInUSD) {
+        totalSBTMinted = s_SBTminted[user];
+        collateralValueInUSD = getAccountCollateralValue(user);
+    }
+```
+
+*Penjelasan:* Fungsi *helper* privat untuk mendapatkan data agregat akun pengguna.
+
+```solidity
+    function healthFactor(address _user) private view returns (uint256) {
+        (uint256 totalSBTMinted, uint256 collateralValueInUSD) = getAccountInformation(_user);
+        uint256 collateralAdjustedForThreshold = (collateralValueInUSD * LIQUIDITATION_THRESHOLD) / 100;
+        return (collateralAdjustedForThreshold * 1e18) / totalSBTMinted;
+    }
+```
+
+*Penjelasan:* Implementasi matematis dari perhitungan *health factor*.
+
+```solidity
+    function revertIfHealthFactorDoesNotWork(address user) internal view {
+        uint256 userHealthFactor = healthFactor(user);
+        if (userHealthFactor < 1) {
+            revert StablecoinSkeleton__BreaksHealthFactor(userHealthFactor);
+        }
+    }
+```
+
+*Penjelasan:* Fungsi keamanan internal untuk memastikan posisi pengguna tetap sehat.
+
+```solidity
+    function getAccountCollateralValue(address user) public view returns (uint256 totalCollateralValueInUSD) {
+        for (uint256 i = 0; i < s_collateralTokens.length; i++) {
+            address token = s_collateralTokens[i];
+            uint256 amount = s_collateralDeposit[user][token];
+            totalCollateralValueInUSD += getUSDValue(token, amount);
+        }
+        return totalCollateralValueInUSD;
+    }
+```
+
+*Penjelasan:* Menghitung total nilai USD dari semua jaminan yang disetor oleh pengguna dengan melakukan iterasi.
+
+```solidity
+    function getUSDValue(address token, uint256 amount) public view returns (uint256) {
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeed[token]);
+        (, int256 answer, , , ) = priceFeed.latestRoundData();
+        return ((uint256(answer) * 1e10) * amount) / 1e18;
+    }
+```
+
+*Penjelasan:* Fungsi yang berinteraksi dengan Chainlink *oracle* untuk mendapatkan harga, lalu melakukan perhitungan dengan penyesuaian desimal yang tepat.
 
 ---
 
