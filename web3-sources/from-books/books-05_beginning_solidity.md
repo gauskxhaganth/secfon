@@ -3756,8 +3756,6 @@ import {IERC721Errors} from "../../interfaces/draft-IERC6093.sol";
   * **`ERC165.sol`**: Implementasi standar ERC-165 yang memungkinkan kontrak untuk mengiklankan *interface* apa saja yang didukungnya.
   * **`IERC721Errors.sol`**: Mendefinisikan *custom errors* yang spesifik untuk ERC-721, yang lebih hemat *gas* daripada `require` dengan string.
 
------
-
 ```solidity
 abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Errors {
     using Strings for uint256;
@@ -3781,8 +3779,6 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
   * **`_tokenApprovals`**: *Mapping* `private` untuk mencatat persetujuan (`approval`) untuk satu `tokenId` spesifik. `_tokenApprovals[tokenId]` akan berisi alamat yang disetujui untuk mentransfer token tersebut.
   * **`_operatorApprovals`**: *Mapping* `private` bersarang. Ini untuk `approval` tingkat "operator", di mana seorang pemilik (`owner`) dapat memberikan izin kepada alamat lain (`operator`) untuk mengelola *semua* NFT miliknya.
 
------
-
 ```solidity
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
@@ -3793,8 +3789,6 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
 **Penjelasan `constructor`:**
 
   * Fungsi ini hanya berjalan sekali saat kontrak di-*deploy*. Tujuannya adalah untuk menginisialisasi nama dan simbol koleksi NFT.
-
------
 
 ```solidity
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
@@ -3808,8 +3802,6 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
 **Penjelasan `supportsInterface`:**
 
   * Implementasi dari standar ERC-165. Fungsi ini memungkinkan pihak lain (misalnya, *marketplace*) untuk menanyakan apakah kontrak ini mendukung standar ERC-721 dan ekstensi Metadata-nya.
-
------
 
 ```solidity
     function balanceOf(address owner) public view virtual returns (uint256) {
@@ -3836,8 +3828,6 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
 
   * Mengembalikan alamat pemilik dari `tokenId` tertentu. Ia memanggil fungsi internal `_requireOwned` yang akan memeriksa apakah token tersebut memang ada.
 
------
-
 ```solidity
     function name() public view virtual returns (string memory) {
         return _name;
@@ -3851,8 +3841,6 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
 **Penjelasan `name` dan `symbol`:**
 
   * Fungsi `view` sederhana yang mengembalikan nama dan simbol koleksi.
-
------
 
 ```solidity
     function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
@@ -3870,8 +3858,6 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
   * Ia memanggil `_baseURI` (fungsi internal yang bisa di-*override*) untuk mendapatkan URI dasar.
   * Kemudian, ia menggabungkan `baseURI` dengan `tokenId` (yang diubah menjadi `string`) untuk membentuk URI lengkap.
 
------
-
 ```solidity
     function approve(address to, uint256 tokenId) public virtual {
         _approve(to, tokenId, _msgSender());
@@ -3881,8 +3867,6 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
 **Penjelasan `approve`:**
 
   * Fungsi publik yang memungkinkan pemilik NFT (`msg.sender`) untuk memberikan persetujuan kepada alamat `to` untuk mentransfer `tokenId` tertentu.
-
------
 
 ```solidity
     function transferFrom(address from, address to, uint256 tokenId) public virtual {
@@ -3903,8 +3887,6 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
   * Ia memanggil fungsi internal `_update` untuk melakukan perubahan status kepemilikan.
   * Ia melakukan validasi untuk memastikan penerima bukan alamat nol dan pengirim (`from`) adalah pemilik yang benar.
 
------
-
 ```solidity
     function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public virtual {
         transferFrom(from, to, tokenId);
@@ -3916,8 +3898,6 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
 
   * Ini adalah versi `transferFrom` yang lebih aman.
   * Setelah melakukan transfer biasa, ia memanggil `ERC721Utils.checkOnERC721Received`. Fungsi utilitas ini memeriksa apakah alamat `to` (jika itu adalah sebuah kontrak) mengimplementasikan *interface* penerima ERC-721. Ini untuk mencegah token dikirim ke kontrak yang tidak tahu cara menanganinya, yang bisa menyebabkan token hilang selamanya.
-
------
 
 ```solidity
     function _increaseBalance(address account, uint128 value) internal virtual {
@@ -3961,8 +3941,6 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
 </p>
 
 [Nilai uint8 kembali ke 0 setelah overflow di dalam blok unchecked. - Figure 11.16]
-
------
 
 ### Pengenalan IPFS (Introduction to IPFS)
 
@@ -4320,17 +4298,17 @@ Di dalam fungsi ini, *cheat code* `vm.startBroadcast` menyiarkan transaksi ke *b
 
 ### Membuat File `ContractForInteractions.s.sol`
 
-Sebelum melakukan *deployment* kontrak, Anda harus menulis kontrak lain untuk berinteraksi dengan kontrak yang telah di-*deploy*. Ini lebih diutamakan daripada menggunakan `cast` dan berguna ketika tugas berulang, seperti *minting* NFT, perlu ditangani. Ini juga membantu mengotomatiskan tugas-tugas berulang. Namun, karena ini dihitung sebagai *deployment* kontrak pintar tambahan, menggunakan metode `cast` yang ditunjukkan di bab-bab sebelumnya lebih nyaman jika interaksi hanya terjadi sekali.
+Sebelum melakukan *deployment* kontrak, Kita harus menulis kontrak lain untuk berinteraksi dengan kontrak yang telah di-*deploy*. Ini lebih diutamakan daripada menggunakan `cast` dan berguna ketika tugas berulang, seperti *minting* NFT, perlu ditangani. Ini juga membantu mengotomatiskan tugas-tugas berulang. Namun, karena ini dihitung sebagai *deployment* kontrak pintar tambahan, menggunakan metode `cast` yang ditunjukkan di bab-bab sebelumnya lebih nyaman jika interaksi hanya terjadi sekali.
 
-Untuk menulis kontrak ini dengan lebih efisien, Anda harus mengunduh repositori lain dari GitHub. Repositori tersebut, **Foundry DevOps**, dapat ditemukan di tautan GitHub berikut: `https://github.com/Cyfrin/foundry-devops`.
+Untuk menulis kontrak ini dengan lebih efisien, Kita harus mengunduh repositori lain dari GitHub. Repositori tersebut, **Foundry DevOps**, dapat ditemukan di tautan GitHub berikut: `https://github.com/Cyfrin/foundry-devops`.
 
-Untuk mengunduh repositori, Anda harus, seperti biasa, mengetikkan perintah berikut:
+Untuk mengunduh repositori, Kita harus, seperti biasa, mengetikkan perintah berikut:
 
 ```bash
 forge install https://github.com/Cyfrin/foundry-devops --no-commit
 ```
 
-Saat Anda menekan Enter, file-file dari repositori seharusnya sudah terunduh, seperti yang ditunjukkan pada Gambar 11.63.
+Saat Kita menekan Enter, file-file dari repositori seharusnya sudah terunduh, seperti yang ditunjukkan pada Gambar 11.63.
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-63.png" alt="gambar" width="550"/>
@@ -4412,11 +4390,11 @@ Kemudian setelah `vm.startBroadcast`, fungsi ini memanggil fungsi `mintNFT` dari
 
 ### Melakukan *Deployment* Kontrak
 
-Setelah membuat kontrak, Anda harus melakukan *deployment* kontrak dengan skrip *deployment* dan kemudian kontrak dengan interaksinya. Untuk melakukan *deployment* kontrak dengan skrip *deployment*, Anda harus membuat atau menggunakan dompet baru, seperti pada bab sebelumnya. Bab ini akan menampilkan opsi ini di dalam terminal VS Code. Namun, praktik terbaik adalah menggunakan terminal komputer Anda sendiri dalam kasus ini, karena Anda akan menggunakan *private key* Anda untuk berinteraksi dengan kontrak; oleh karena itu, semakin banyak langkah yang diambil untuk mengamankan *private key*, semakin kecil kemungkinan seseorang mendapatkan akses ke sana dan ke dana seseorang.
+Setelah membuat kontrak, Kita harus melakukan *deployment* kontrak dengan skrip *deployment* dan kemudian kontrak dengan interaksinya. Untuk melakukan *deployment* kontrak dengan skrip *deployment*, Kita harus membuat atau menggunakan dompet baru, seperti pada bab sebelumnya. Bab ini akan menampilkan opsi ini di dalam terminal VS Code. Namun, praktik terbaik adalah menggunakan terminal komputer Kita sendiri dalam kasus ini, karena Kita akan menggunakan *private key* Kita untuk berinteraksi dengan kontrak; oleh karena itu, semakin banyak langkah yang diambil untuk mengamankan *private key*, semakin kecil kemungkinan seseorang mendapatkan akses ke sana dan ke dana seseorang.
 
 Ikuti langkah-langkah berikut untuk melakukan *deployment* kontrak:
 
-1.  Untuk memulai, buat dompet baru, ganti teks miring dengan nama yang Anda inginkan untuk dompet:
+1.  Untuk memulai, buat dompet baru, ganti teks miring dengan nama yang Kita inginkan untuk dompet:
 
     ```bash
     cast wallet import <nama_dompet_baru_yang_anda_buat> --interactive
@@ -4434,13 +4412,13 @@ Ikuti langkah-langkah berikut untuk melakukan *deployment* kontrak:
   <img src="images/books-04_beginning_solidity/figure_11-66.png" alt="gambar" width="550"/>
 </p>
 
-3.  Buka MetaMask Anda dan klik panah di samping nomor akun, seperti yang ditunjukkan pada Gambar 11.67.
+3.  Buka MetaMask Kita dan klik panah di samping nomor akun, seperti yang ditunjukkan pada Gambar 11.67.
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-67.png" alt="gambar" width="550"/>
 </p>
 
-4.  Anda akan melihat akun yang Anda miliki. Klik tiga titik di sebelah kanan *Account 1* (atau akun lain yang Anda miliki jika lebih dari satu). Lihat Gambar 11.68.
+4.  Kita akan melihat akun yang Kita miliki. Klik tiga titik di sebelah kanan *Account 1* (atau akun lain yang Kita miliki jika lebih dari satu). Lihat Gambar 11.68.
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-68.png" alt="gambar" width="550"/>
@@ -4452,13 +4430,13 @@ Ikuti langkah-langkah berikut untuk melakukan *deployment* kontrak:
   <img src="images/books-04_beginning_solidity/figure_11-69.png" alt="gambar" width="550"/>
 </p>
 
-Setelah mengklik *Account Details*, Anda akan diarahkan ke alamat dompet dan diberi opsi untuk menampilkan *private key* Anda (lihat Gambar 11.70).
+Setelah mengklik *Account Details*, Kita akan diarahkan ke alamat dompet dan diberi opsi untuk menampilkan *private key* Kita (lihat Gambar 11.70).
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-70.png" alt="gambar" width="550"/>
 </p>
 
-6.  Kata sandi untuk masuk ke dompet MetaMask akan diminta—bukan *seed phrase* tetapi yang dimasukkan saat mengklik logo MetaMask di browser (lihat Gambar 11.71). Masukkan kata sandi Anda.
+6.  Kata sandi untuk masuk ke dompet MetaMask akan diminta—bukan *seed phrase* tetapi yang dimasukkan saat mengklik logo MetaMask di browser (lihat Gambar 11.71). Masukkan kata sandi Kita.
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-71.png" alt="gambar" width="550"/>
@@ -4476,13 +4454,13 @@ Setelah mengklik *Account Details*, Anda akan diarahkan ke alamat dompet dan dib
   <img src="images/books-04_beginning_solidity/figure_11-73.png" alt="gambar" width="550"/>
 </p>
 
-9.  *Private key* yang disalin harus ditempelkan ke ruang *Enter Private Key* (lihat Gambar 11.74). Kunci tersebut tidak akan ditampilkan, tetapi setelah menempelkannya, Anda harus menekan Enter.
+9.  *Private key* yang disalin harus ditempelkan ke ruang *Enter Private Key* (lihat Gambar 11.74). Kunci tersebut tidak akan ditampilkan, tetapi setelah menempelkannya, Kita harus menekan Enter.
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-74.png" alt="gambar" width="550"/>
 </p>
 
-10. Setelah menempelkan *private key*, sebuah kata sandi akan diminta (lihat Gambar 11.75). Ingat kata sandi ini karena akan diminta setiap kali Anda ingin melakukan *deployment* kontrak. Masukkan kata sandi Anda.
+10. Setelah menempelkan *private key*, sebuah kata sandi akan diminta (lihat Gambar 11.75). Ingat kata sandi ini karena akan diminta setiap kali Kita ingin melakukan *deployment* kontrak. Masukkan kata sandi Kita.
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-75.png" alt="gambar" width="550"/>
@@ -4500,11 +4478,11 @@ Setelah mengetik kata sandi dan menekan Enter, sebuah pesan yang mengatakan bahw
     forge script script/NFT.s.sol:DeployNFT --rpc-url https://eth-sepolia.g.alchemy.com/v2/etdMx3mb7nEzJ5n4dmwjUNEYFIkavK1j --account MyWallet --sender 0xd16429e3f253f50cff306b2be8966ce935332116 --etherscan-api-key YRGWIRZAJ8TJPMEFDZZPYGFFUYNXF5II4S --broadcast
     ```
 
-Perlu diingat bahwa alamat *sender* akan berbeda untuk Anda.
+Perlu diingat bahwa alamat *sender* akan berbeda untuk Kita.
 
-Skrip ini melakukan *deployment* skrip dari file `NFT.s.sol` dan khususnya kontrak `DeployNFT`. Ini memberikan URL dari RPC, yaitu dari Ethereum Sepolia, yang dapat Anda temukan dengan kembali ke situs web Alchemy. Kemudian, akunnya adalah `MyWallet`, yang memiliki *private key* yang dibuat sebelumnya; *sender*-nya adalah alamat *Keystore* yang harus Anda simpan dan gunakan setiap kali kontrak pintar di-*deploy*. `etherscan-api-key`, seperti namanya, adalah kunci API yang dapat ditemukan di Etherscan.io setelah registrasi. `broadcast` adalah kata kunci yang menyiarkan perintah ini ke jaringan.
+Skrip ini melakukan *deployment* skrip dari file `NFT.s.sol` dan khususnya kontrak `DeployNFT`. Ini memberikan URL dari RPC, yaitu dari Ethereum Sepolia, yang dapat Kita temukan dengan kembali ke situs web Alchemy. Kemudian, akunnya adalah `MyWallet`, yang memiliki *private key* yang dibuat sebelumnya; *sender*-nya adalah alamat *Keystore* yang harus Kita simpan dan gunakan setiap kali kontrak pintar di-*deploy*. `etherscan-api-key`, seperti namanya, adalah kunci API yang dapat ditemukan di Etherscan.io setelah registrasi. `broadcast` adalah kata kunci yang menyiarkan perintah ini ke jaringan.
 
-12. Setelah memasukkan perintah, Anda akan diminta untuk menambahkan kata sandi dari *keystore* yang ditambahkan sebelumnya (lihat Gambar 11.77).
+12. Setelah memasukkan perintah, Kita akan diminta untuk menambahkan kata sandi dari *keystore* yang ditambahkan sebelumnya (lihat Gambar 11.77).
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-77.png" alt="gambar" width="550"/>
@@ -4524,19 +4502,19 @@ Setelah *deployment*, sebuah pesan akan ditampilkan yang menunjukkan *deployment
     forge script script/ContractForInteractions.s.sol:InteractionsNFT --rpc-url https://eth-sepolia.g.alchemy.com/v2/etdMx3mb7nEzJ5n4dmwjUNEYFIkavK1j --account MyWallet --sender 0xd16429e3f253f50cff306b2be8966ce935332116 --etherscan-api-key YRGWIRZAJ8TJPMEFDZZPYGFFUYNXF5II4S --broadcast
     ```
 
-Setelah menekan Enter di terminal, kata sandi *keystore* akan diminta lagi. Setelah mengisinya dan menekan Enter, Anda harus menunggu beberapa detik hingga kontrak kedua di-*deploy*, dan pesan serupa yang menunjukkan *deployment* berhasil akan ditampilkan (lihat Gambar 11.79).
+Setelah menekan Enter di terminal, kata sandi *keystore* akan diminta lagi. Setelah mengisinya dan menekan Enter, Kita harus menunggu beberapa detik hingga kontrak kedua di-*deploy*, dan pesan serupa yang menunjukkan *deployment* berhasil akan ditampilkan (lihat Gambar 11.79).
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-79.png" alt="gambar" width="550"/>
 </p>
 
-Jika Anda menggulir sedikit ke atas, Anda akan melihat *hash* transaksi yang digunakan untuk melakukan *deployment* kontrak (lihat Gambar 11.80).
+Jika Kita menggulir sedikit ke atas, Kita akan melihat *hash* transaksi yang digunakan untuk melakukan *deployment* kontrak (lihat Gambar 11.80).
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-80.png" alt="gambar" width="550"/>
 </p>
 
-Salin *hash* transaksi tersebut, buka situs web Etherscan testnet Sepolia (`sepolia.etherscan.io`), dan tempelkan *hash* transaksi ke dalam penjelajah, di mana Anda dapat mencari alamat, *hash* transaksi, blok, dan token (lihat Gambar 11.81).
+Salin *hash* transaksi tersebut, buka situs web Etherscan testnet Sepolia (`sepolia.etherscan.io`), dan tempelkan *hash* transaksi ke dalam penjelajah, di mana Kita dapat mencari alamat, *hash* transaksi, blok, dan token (lihat Gambar 11.81).
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-81.png" alt="gambar" width="550"/>
@@ -4554,7 +4532,7 @@ Klik alamat kontrak berwarna biru dari *Interacted With (To)*, yang merupakan ko
   <img src="images/books-04_beginning_solidity/figure_11-83.png" alt="gambar" width="550"/>
 </p>
 
-Di sana, Anda akan melihat alamat kontrak. Klik tombol *Copy Address*. Setelah melakukan ini, buka dompet MetaMask Anda yang dapat ditemukan di browser Anda dan klik tab *NFTs*, dan jika perlu gulir sedikit ke bawah di dalam tab hingga pesan "*Import NFT*" terlihat (lihat Gambar 11.84).
+Di sana, Kita akan melihat alamat kontrak. Klik tombol *Copy Address*. Setelah melakukan ini, buka dompet MetaMask Kita yang dapat ditemukan di browser Kita dan klik tab *NFTs*, dan jika perlu gulir sedikit ke bawah di dalam tab hingga pesan "*Import NFT*" terlihat (lihat Gambar 11.84).
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-84.png" alt="gambar" width="550"/>
@@ -4566,9 +4544,9 @@ Klik tombol *Import NFT* (lihat Gambar 11.85).
   <img src="images/books-04_beginning_solidity/figure_11-85.png" alt="gambar" width="550"/>
 </p>
 
-Setelah mengklik *Import NFT*, sebuah panel akan muncul. Di bagian *Address*, Anda harus menempelkan alamat kontrak pintar yang disalin—kontrak pintar yang me-*mint* dan berinteraksi dengan kontrak `NFT.sol`. Di lokasi *Token ID*, Anda harus menambahkan `0`, yang menunjukkan nomor token NFT yang ingin Anda impor. Karena satu token telah di-*mint* melalui *deployment*, `0` adalah yang pertama. Setelah itu, Anda harus mengklik *Import*.
+Setelah mengklik *Import NFT*, sebuah panel akan muncul. Di bagian *Address*, Kita harus menempelkan alamat kontrak pintar yang disalin—kontrak pintar yang me-*mint* dan berinteraksi dengan kontrak `NFT.sol`. Di lokasi *Token ID*, Kita harus menambahkan `0`, yang menunjukkan nomor token NFT yang ingin Kita impor. Karena satu token telah di-*mint* melalui *deployment*, `0` adalah yang pertama. Setelah itu, Kita harus mengklik *Import*.
 
-Setelah mengklik tombol *Import*, NFT yang di-*mint* dan gambar gadis tersebut dapat ditampilkan di dompet MetaMask Anda (lihat Gambar 11.86).
+Setelah mengklik tombol *Import*, NFT yang di-*mint* dan gambar gadis tersebut dapat ditampilkan di dompet MetaMask Kita (lihat Gambar 11.86).
 
 <p align="center">
   <img src="images/books-04_beginning_solidity/figure_11-86.png" alt="gambar" width="550"/>
@@ -4578,4 +4556,264 @@ Setelah mengklik tombol *Import*, NFT yang di-*mint* dan gambar gadis tersebut d
 
 ---
 
+# Bab 12
+## Upgradable Smart Contracts (Revisi Lengkap)
+
+Bab ini membahas konsep penting mengenai *upgradable smart contracts* dalam Solidity. Pembahasan mencakup tiga strategi utama: *preset versatility*, *contract succession*, dan *proxy-delegated upgrades*. Melalui contoh praktis menggunakan sistem kontrak kebun binatang (`Zoo1` dan `Zoo2`), Kita akan belajar cara mengimplementasikan dan mengelola *upgradable contracts* sambil mempertimbangkan secara cermat pertukaran antara *upgradeability*, desentralisasi, dan keamanan.
+
+### Memperkenalkan Upgradable Contracts
+
+*Smart contract* bersifat *immutable*—sekali di-*deploy*, logikanya tidak dapat diubah. Namun, kebutuhan untuk memperbaiki *bug* atau menambahkan fitur baru seringkali muncul. Tantangannya adalah bagaimana melakukan perubahan tanpa mengorbankan prinsip desentralisasi dan keamanan.
+
+Bab ini menekankan bahwa *upgradable contract* membawa risiko sentralisasi. Jika pengembang bisa mengubah logika kapan saja, pengguna harus percaya bahwa tidak akan ada kode berbahaya yang disisipkan. Oleh karena itu, pemilihan strategi *upgrade* harus dilakukan dengan hati-hati.
+
+Tiga strategi utama yang dibahas adalah:
+
+  * **Preset Versatility Upgrade**: Menambahkan parameter yang dapat diubah di dalam kontrak sejak awal.
+  * **Contract Succession Upgrade**: Men-deploy kontrak baru dan memigrasikan data secara manual.
+  * **Proxy Delegated Upgrade**: Menggunakan *proxy contract* untuk mendelegasikan eksekusi ke *logic contract* yang dapat diganti.
+
+### Preset Versatility Upgrades
+
+Strategi ini mengandalkan kemampuan antisipasi pengembang untuk merancang kontrak dengan fungsi-fungsi yang memungkinkan perubahan parameter di masa depan. Misalnya, mengubah suku bunga atau biaya, tetapi tidak mengubah alur logika fundamental.
+
+  * **Kelebihan**: Mudah diimplementasikan.
+  * **Kekurangan**: Membutuhkan perencanaan matang dan sangat terbatas fleksibilitasnya. Risiko sentralisasi tinggi karena wewenang untuk mengubah parameter biasanya dipegang oleh sekelompok kecil alamat.
+
+#### Pengenalan CertiK
+
+Untuk membantu pengguna yang tidak teknis menilai tingkat kepercayaan suatu proyek, buku ini memperkenalkan **CertiK**, sebuah firma audit keamanan. CertiK menyediakan platform publik untuk melihat skor keamanan berbagai proyek blockchain.
+
+Saat mencari sebuah proyek seperti Uniswap di situs CertiK, pengguna akan melihat halaman hasil pencarian.
+[ALT TEXT: Tampilan hasil pencarian untuk "Uniswap" di situs CertiK - Figure 12.1]
+
+Setelah memilih proyek, akan ditampilkan skor keamanan umum yang mencakup berbagai metrik seperti peringkat, persentil, dan riwayat peringkat 7 hari. Skor ini dipecah menjadi beberapa kategori: *Code*, *Fundamental*, *Operational*, *Market*, *Community*, dan *Governance*.
+[ALT TEXT: Halaman skor keamanan umum untuk Uniswap di CertiK, menunjukkan skor 94.28 dan peringkat \#14 - Figure 12.2]
+
+  * **Kategori Code**: Bagian ini menampilkan hasil audit keamanan. Pengguna bisa melihat siapa yang mengaudit, tanggal audit, dan tautan ke laporan PDF lengkap.
+    [ALT TEXT: Tampilan kategori Code di CertiK, mencantumkan audit yang telah dilakukan pada Uniswap - Figure 12.3]
+    Di dalam laporan audit, terdapat daftar temuan kerentanan (*vulnerability*) yang diklasifikasikan berdasarkan tingkat keparahannya (*severity*). Laporan ini mencakup deskripsi masalah, dampaknya, dan rekomendasi mitigasi.
+    [ALT TEXT: Contoh detail temuan dalam laporan audit, menunjukkan deskripsi isu, dampak, dan mitigasi yang direkomendasikan - Figure 12.4]
+
+  * **Kategori Project Fundamentals**: Memberikan wawasan tentang kesehatan proyek secara keseluruhan, termasuk apakah proyek telah melalui proses *Know Your Customer* (KYC), di *exchange* mana tokennya terdaftar, usia proyek, dan data aktivitas pengguna.
+    [ALT TEXT: Tampilan kategori Project Fundamentals di CertiK untuk Uniswap - Figure 12.5]
+
+  * **Kategori Operational**: Menilai keamanan operasional, termasuk keberadaan program *bug bounty* dan hasil pemindaian keamanan pada situs web proyek (keamanan jaringan, aplikasi, dan DNS).
+    [ALT TEXT: Tampilan kategori Operational di CertiK, menunjukkan hasil pemindaian keamanan - Figure 12.6]
+
+  * **Kategori Governance**: Ini sangat relevan dengan *upgradability*. CertiK melakukan pemindaian sentralisasi untuk mendeteksi fungsi-fungsi berisiko dalam *smart contract*, seperti `self-destruct`, kemampuan `mint` tak terbatas, dan keberadaan *proxy contract*.
+    [ALT TEXT: Tampilan kategori Governance di CertiK, menyoroti pemindaian sentralisasi dan fungsi-fungsi yang berpotensi berisiko - Figure 12.7]
+
+  * **Kategori Market dan Community**: Menampilkan data pasar seperti harga token, volume, dan kapitalisasi pasar, serta metrik aktivitas komunitas di media sosial seperti X (Twitter).
+    [ALT TEXT: Tampilan kategori Market di CertiK, menunjukkan data harga dan volume UNI - Figure 12.8]
+    [ALT TEXT: Tampilan kategori Community di CertiK, menunjukkan data pengikut dan aktivitas di X - Figure 12.9]
+
+### Contract Succession Upgrade
+
+Strategi ini paling menghormati prinsip *immutability* dan desentralisasi. Saat *upgrade* dibutuhkan, tim akan men-*deploy contract* baru dan meminta komunitas untuk bermigrasi.
+
+  * **Kelebihan**: Sangat transparan, menjaga desentralisasi, dan membuat *contract* lebih mudah diaudit karena tidak ada logika *upgrade* yang tersembunyi.
+  * **Kekurangan**: Proses migrasi sangat merepotkan, membutuhkan komunikasi intensif, dan bisa membuat pengguna lelah jika terlalu sering dilakukan. Ada juga risiko pengguna tertipu oleh *contract* palsu selama masa migrasi.
+
+### Proxy Delegated Upgrade
+
+Ini adalah metode paling canggih, di mana **logic** dan **state** dipisahkan.
+
+  * **Proxy Contract**: Alamatnya tetap dan menyimpan semua *state*. Pengguna berinteraksi dengan alamat ini.
+  * **Logic Contract (Implementation)**: Berisi semua kode eksekusi. Alamatnya disimpan di dalam *proxy* dan dapat diubah untuk melakukan *upgrade*.
+
+[ALT TEXT: Diagram hubungan antara Pengguna, Proxy Contract, dan Logic Contract - Figure 12.10]
+
+Untuk proyek yang kompleks, *Diamond Pattern* digunakan, di mana satu *proxy* dapat mendelegasikan panggilan ke beberapa *logic contract* kecil (*facets*), memberikan modularitas dan fleksibilitas yang lebih tinggi.
+
+[ALT TEXT: Diagram Diamond Pattern dengan satu proxy dan beberapa facets - Figure 12.11]
+[ALT TEXT: Diagram Diamond Pattern kedua dengan alur yang berbeda - Figure 12.12]
+[ALT TEXT: Diagram Diamond Pattern ketiga dengan lebih banyak facets - Figure 12.13]
+
+Risiko utama pola ini adalah:
+
+  * **Storage Clashes**: Urutan variabel di *proxy* dan *logic contract* harus sama persis.
+  * **Function Selector Clashes**: Dua fungsi berbeda (satu di *proxy*, satu di *logic contract*) bisa memiliki *selector* 4-*byte* yang sama.
+
+### Menggunakan `delegatecall`
+
+`delegatecall` adalah fungsi *low-level* yang menjadi dasar pola *proxy*. Ia mengeksekusi kode dari *contract* lain tetapi dalam konteks *storage* *contract* pemanggil.
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.26;
+
+contract B {
+    // NOTE: Storage layout must be the same as contract A
+    uint256 public num;
+    address public sender;
+    uint256 public value;
+
+    function setVars(uint256 _num) public payable {
+        num = _num;
+        sender = msg.sender;
+        value = msg.value;
+    }
+}
+
+contract A {
+    uint256 public num;
+    address public sender;
+    uint256 public value;
+
+    function setVars(address _contract, uint256 _num) public payable {
+        // A's storage is set, B is not modified.
+        (bool success, bytes memory data) = _contract.delegatecall(
+            abi.encodeWithSignature("setVars(uint256)", _num)
+        );
+    }
+}
+```
+
+[ALT TEXT: Kode untuk `Contract A` dan `Contract B` di editor Remix - Figure 12.14, 12.15]
+
+**Penjelasan Baris per Baris**:
+
+  * `contract B`: Ini adalah *logic contract* kita. Ia memiliki tiga *state variable*: `num`, `sender`, dan `value`.
+  * `function setVars(uint256 _num) ...`: Fungsi ini memperbarui ketiga *state variable* tersebut berdasarkan input `_num`, `msg.sender` (pemanggil), dan `msg.value` (Ether yang dikirim).
+  * `contract A`: Ini adalah *proxy contract* kita. Ia harus memiliki *storage layout* yang identik dengan `Contract B` agar `delegatecall` bekerja dengan benar.
+  * `_contract.delegatecall(...)`: Baris ini adalah inti dari mekanisme *proxy*.
+      * `delegatecall` dipanggil pada alamat `_contract` (yang akan menjadi alamat `Contract B` yang sudah di-*deploy*).
+      * `abi.encodeWithSignature("setVars(uint256)", _num)`: Ini membuat `calldata`—data biner yang memberitahu EVM fungsi mana yang harus dijalankan (`setVars` dengan parameter `uint256`) dan apa argumennya (`_num`).
+      * **Penting**: Meskipun kode `setVars` dari `B` yang dieksekusi, `msg.sender` dan `msg.value` yang digunakan adalah dari pemanggil `setVars` di `A`, dan *storage* yang diubah adalah *storage* `A`.
+
+Saat didemonstrasikan di Remix, men-*deploy* kedua *contract* dan memanggil `setVars` di `A` (dengan alamat `B` sebagai parameter) akan mengubah *state* di `A`, sementara *state* di `B` tetap tidak tersentuh.
+
+[ALT TEXT: Proses deployment Contract B di Remix - Figure 12.16]
+[ALT TEXT: Hasil pemanggilan setVars di Contract B, state num berubah - Figure 12.17, 12.18]
+[ALT TEXT: Alamat wallet penguji di Remix - Figure 12.19]
+[ALT TEXT: Proses memanggil setVars di Contract A dengan alamat Contract B sebagai argumen - Figure 12.20, 12.21]
+[ALT TEXT: Hasilnya, state di Contract A berubah, sedangkan state di Contract B tidak - Figure 12.22]
+
+**Pencegahan Storage Clash**: Untuk memberikan ruang bagi variabel baru di masa depan, gunakan "gap" *storage* di akhir *logic contract*:
+
+```solidity
+uint256[50] private __gap;
+```
+
+### OpenZeppelin UUPS Proxies
+
+Bagian ini adalah implementasi praktis menggunakan standar UUPS (Universal Upgradeable Proxy Standard) dari OpenZeppelin.
+
+1.  **Setup Proyek**: Buat proyek Foundry baru bernama `beginning-solidity-proxy-contracts` dan buat dua file: `Zoo1.sol` dan `Zoo2.sol`.
+    [ALT TEXT: Tampilan VS Code dengan folder proyek baru dan file Zoo1.sol serta Zoo2.sol - Figure 12.28]
+2.  **Install Library**: *Install* *library* `openzeppelin-contracts-upgradeable` menggunakan Foundry.
+    ```bash
+    forge install OpenZeppelin/openzeppelin-contracts-upgradeable --no-commit
+    ```
+    [ALT TEXT: Tampilan repositori GitHub untuk OpenZeppelin upgradeable contracts - Figure 12.29]
+    [ALT TEXT: Perintah `forge install` di terminal VS Code - Figure 12.30]
+    [ALT TEXT: Pesan sukses setelah instalasi library selesai - Figure 12.31]
+
+#### Mengimpor `UUPSUpgradeable.sol`
+
+`UUPSUpgradeable.sol` adalah `abstract contract` yang menyediakan fungsionalitas inti untuk *upgrade* UUPS.
+[ALT TEXT: File `UUPSUpgradeable.sol` di dalam struktur folder library - Figure 12.33]
+[ALT TEXT: Kode sumber dari `UUPSUpgradeable.sol` - Figure 12.34]
+
+Ia memiliki fungsi `_authorizeUpgrade` yang harus kita implementasikan untuk kontrol akses.
+[ALT TEXT: Deklarasi fungsi `_authorizeUpgrade` di dalam `UUPSUpgradeable.sol` - Figure 12.36]
+
+#### Initializer
+
+Karena `constructor` tidak dapat digunakan dalam pola *proxy*, kita menggunakan fungsi `initialize` yang dipanggil sekali saja. Untuk memastikan ini, kita mengimpor `Initializable.sol` dari OpenZeppelin.
+[ALT TEXT: File `Initializable.sol` di dalam struktur folder library - Figure 12.37]
+[ALT TEXT: Kode sumber dari `Initializable.sol` - Figure 12.38]
+
+Di dalam `constructor` *logic contract*, kita panggil `_disableInitializers()` untuk mencegah inisialisasi ulang.
+[ALT TEXT: Kode fungsi `_disableInitializers` di dalam `Initializable.sol` - Figure 12.39]
+
+**Kode Akhir `Zoo1.sol` (setelah dimodifikasi)**:
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.27;
+
+import {UUPSUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {Initializable} from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
+import {OwnableUpgradeable} from "../lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
+
+contract Zoo1 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+    uint256 internal numberOfVisitors;
+
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize() public initializer {
+        __Ownable_init(msg.sender);
+    }
+
+    function getNumberOfVisitors() external view returns (uint256) {
+        return numberOfVisitors;
+    }
+
+    function version() external pure returns (uint256) {
+        return 1;
+    }
+
+    function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
+        require(newImplementation != address(0), "Invalid implementation address");
+    }
+}
+```
+
+`Zoo2.sol` akan memiliki struktur yang sama, dengan `version()` mengembalikan `2` dan tambahan fungsi `setNumberOfVisitors`.
+
+### Deploying the Proxy Contract
+
+Untuk men-*deploy* sistem ini, kita membuat skrip `DeployZoo.s.sol`. Skrip ini akan men-*deploy* `Zoo1` sebagai *logic contract* awal, lalu men-*deploy* `ERC1967Proxy` yang menunjuk ke alamat `Zoo1`.
+
+Kita perlu meng-*install* paket `openzeppelin-contracts` (yang non-upgradeable) untuk mendapatkan `ERC1967Proxy`.
+[ALT TEXT: Konfirmasi instalasi paket OpenZeppelin di terminal - Figure 12.40]
+
+Konstruktor `ERC1967Proxy` menerima alamat *logic contract* dan *initialization data*.
+[ALT TEXT: Kode konstruktor dari `ERC1967Proxy.sol` - Figure 12.41]
+
+**Kode Akhir `DeployZoo.s.sol`**:
+
+```solidity
+//SPDX-License-Identifier: MIT
+
+pragma solidity 0.8.27;
+
+import {Script} from "forge-std/Script.sol";
+import {Zoo1} from "../src/Zoo1.sol";
+import {ERC1967Proxy} from "../lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+
+contract DeployZoo is Script {
+    function run() external returns (address) {
+        address proxy = deployZoo();
+        return proxy;
+    }
+
+    function deployZoo() public returns (address) {
+        Zoo1 zoo = new Zoo1();
+        ERC1967Proxy proxy = new ERC1967Proxy(address(zoo), "");
+        return address(proxy);
+    }
+}
+```
+
+**Penjelasan Skrip**:
+
+  * `import {ERC1967Proxy} ...`: Mengimpor kontrak *proxy* standar.
+  * `Zoo1 zoo = new Zoo1();`: Men-*deploy logic contract* (`Zoo1`).
+  * `ERC1967Proxy proxy = new ERC1967Proxy(address(zoo), "");`: Men-*deploy proxy* dan mengarahkannya ke alamat `zoo`. Argumen `""` (string kosong) menandakan tidak ada `calldata` untuk inisialisasi saat *deployment*.
+  * `return address(proxy);`: Mengembalikan alamat *proxy*.
+
+Setelah skrip ini dijalankan, sistem *upgradable* siap digunakan. Kompilasi akhir dengan `forge build` akan memastikan tidak ada kesalahan.
+[ALT TEXT: Pesan sukses setelah kompilasi dengan `forge build` di terminal - Figure 12.42]
+
+1-22
+28-31
+33-34
+36-42
+
+---
 
