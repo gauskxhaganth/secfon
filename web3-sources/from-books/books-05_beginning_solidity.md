@@ -3647,11 +3647,25 @@ Sebelum kita menulis kode, kita perlu menyiapkan struktur proyek dan menginstal 
     cd beginning-solidity-NFT-ERC721
     ```
 
-    [ALT TEXT: Terminal menunjukkan pembuatan dan masuk ke direktori proyek NFT. - Figure 11.1]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-1.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menunjukkan pembuatan dan masuk ke direktori proyek NFT. - Figure 11.1]
 
 2.  Buka folder ini di VS Code.
-    [ALT TEXT: Jendela file explorer yang menunjukkan folder proyek NFT yang akan dibuka. - Figure 11.2]
-    [ALT TEXT: Pop-up konfirmasi kepercayaan pada penulis folder di VS Code. - Figure 11.3]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-2.png" alt="gambar" width="550"/>
+</p>
+
+[Jendela file explorer yang menunjukkan folder proyek NFT yang akan dibuka. - Figure 11.2]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-3.png" alt="gambar" width="550"/>
+</p>
+
+[Pop-up konfirmasi kepercayaan pada penulis folder di VS Code. - Figure 11.3]
 
 3.  Inisialisasi proyek Foundry baru di dalam direktori:
 
@@ -3659,9 +3673,23 @@ Sebelum kita menulis kode, kita perlu menyiapkan struktur proyek dan menginstal 
     forge init
     ```
 
-    [ALT TEXT: Terminal menjalankan perintah forge init. - Figure 11.4]
-    [ALT TEXT: Terminal menunjukkan pesan sukses setelah inisialisasi Foundry. - Figure 11.5]
-    [ALT TEXT: Tampilan panel Explorer di VS Code setelah proyek Foundry diinisialisasi. - Figure 11.6]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-4.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menjalankan perintah forge init. - Figure 11.4]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-5.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menunjukkan pesan sukses setelah inisialisasi Foundry. - Figure 11.5]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-6.png" alt="gambar" width="550"/>
+</p>
+
+[Tampilan panel Explorer di VS Code setelah proyek Foundry diinisialisasi. - Figure 11.6]
 
 4.  Instal *library* kontrak OpenZeppelin, yang menyediakan implementasi ERC-721 yang aman dan standar:
 
@@ -3669,13 +3697,37 @@ Sebelum kita menulis kode, kita perlu menyiapkan struktur proyek dan menginstal 
     forge install OpenZeppelin/openzeppelin-contracts --no-commit
     ```
 
-    [ALT TEXT: Halaman GitHub repositori OpenZeppelin Contracts. - Figure 11.7]
-    [ALT TEXT: Terminal sedang mengunduh kontrak OpenZeppelin. - Figure 11.8]
-    [ALT TEXT: Terminal menunjukkan pesan sukses setelah instalasi kontrak. - Figure 11.9]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-7.png" alt="gambar" width="550"/>
+</p>
+
+[Halaman GitHub repositori OpenZeppelin Contracts. - Figure 11.7]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-8.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal sedang mengunduh kontrak OpenZeppelin. - Figure 11.8]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-9.png" alt="gambar" width="550"/>
+</p>
+
+[Terminal menunjukkan pesan sukses setelah instalasi kontrak. - Figure 11.9]
 
 5.  Setelah instalasi, Kita dapat menemukan implementasi standar `ERC721.sol` di dalam `lib/openzeppelin-contracts/contracts/token/ERC721/`.
-    [ALT TEXT: Panel Explorer VS Code yang menunjukkan folder openzeppelin-contracts di dalam lib. - Figure 11.10]
-    [ALT TEXT: Panel Explorer VS Code yang menunjukkan path lengkap ke file ERC721.sol. - Figure 11.11]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-10.png" alt="gambar" width="550"/>
+</p>
+
+[Panel Explorer VS Code yang menunjukkan folder openzeppelin-contracts di dalam lib. - Figure 11.10]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-11.png" alt="gambar" width="550"/>
+</p>
+
+[Panel Explorer VS Code yang menunjukkan path lengkap ke file ERC721.sol. - Figure 11.11]
 
 ### Pemecahan Kode Kontrak ERC-721 (ERC-721 Contract Breakdown)
 
@@ -3879,11 +3931,36 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
 
   * Fungsi internal untuk menambah saldo NFT seorang `account`.
   * **`unchecked`**: Ini adalah blok optimisasi *gas*. Sejak Solidity v0.8.0, operasi aritmatika secara otomatis memeriksa *overflow* (ketika hasil perhitungan melebihi kapasitas tipe data) dan *underflow*. Pemeriksaan ini memakan sedikit *gas*. Blok `unchecked` menonaktifkan pemeriksaan ini. Di sini, ini aman karena hampir tidak mungkin seorang pengguna memiliki NFT sebanyak `type(uint128).max` sehingga penambahan 1 akan menyebabkan *overflow*.
-    [ALT TEXT: Kode kontrak AddNumber. - Figure 11.12]
-    [ALT TEXT: Pesan error karena overflow. - Figure 11.13]
-    [ALT TEXT: Kontrak AddNumber dengan keyword unchecked. - Figure 11.14]
-    [ALT TEXT: Nilai uint8 pada 255. - Figure 11.15]
-    [ALT TEXT: Nilai uint8 kembali ke 0 setelah overflow di dalam blok unchecked. - Figure 11.16]
+  
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-12.png" alt="gambar" width="550"/>
+</p>
+
+[Kode kontrak AddNumber. - Figure 11.12]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-13.png" alt="gambar" width="550"/>
+</p>
+
+[Pesan error karena overflow. - Figure 11.13]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-14.png" alt="gambar" width="550"/>
+</p>
+
+[Kontrak AddNumber dengan keyword unchecked. - Figure 11.14]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-15.png" alt="gambar" width="550"/>
+</p>
+
+[Nilai uint8 pada 255. - Figure 11.15]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-16.png" alt="gambar" width="550"/>
+</p>
+
+[Nilai uint8 kembali ke 0 setelah overflow di dalam blok unchecked. - Figure 11.16]
 
 -----
 
@@ -3900,20 +3977,196 @@ abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Er
 Bab ini memberikan panduan langkah demi langkah untuk:
 
 1.  **Mengunduh dan Menginstal IPFS Desktop:** Dari situs `ipfs.tech`, unduh installer untuk OS Kita (Windows atau macOS).
-    [ALT TEXT: Proses langkah demi langkah mengunduh dan menginstal IPFS Desktop. - Figure 11.17 hingga 11.25]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-17.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-18.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-19.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-20.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-21.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-22.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-23.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-24.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-25.png" alt="gambar" width="550"/>
+</p>
+
+[Proses langkah demi langkah mengunduh dan menginstal IPFS Desktop. - Figure 11.17 hingga 11.25]
+
 2.  **Menginstal Ekstensi Browser:** Ini mempermudah akses ke konten IPFS.
-    [ALT TEXT: Proses langkah demi langkah menginstal ekstensi browser IPFS. - Figure 11.26 hingga 11.34]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-26.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-27.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-28.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-29.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-30.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-31.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-32.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-33.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-34.png" alt="gambar" width="550"/>
+</p>
+
+[Proses langkah demi langkah menginstal ekstensi browser IPFS. - Figure 11.26 hingga 11.34]
 3.  **Menggunakan IPFS:**
       * **Mengunggah File:** Buka IPFS Desktop, pergi ke tab "Files", dan impor file Kita.
       * **Mendapatkan CID:** Setelah diunggah, salin CID dari file tersebut.
       * **Mengakses File:** Akses file melalui `ipfs://<CID>` di browser (jika ekstensi terinstal) atau melalui *gateway* publik seperti `https://ipfs.io/ipfs/<CID>`.
-        [ALT TEXT: Proses langkah demi langkah menggunakan IPFS untuk mengunggah dan mengakses file. - Figure 11.35 hingga 11.48]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-35.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-36.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-37.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-38.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-39.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-40.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-41.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-42.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-43.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-44.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-45.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-46.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-47.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-48.png" alt="gambar" width="550"/>
+</p>
+
+[Proses langkah demi langkah menggunakan IPFS untuk mengunggah dan mengakses file. - Figure 11.35 hingga 11.48]
 
 ### OpenSea
 
 **OpenSea** adalah *marketplace* NFT terkemuka. Bab ini menunjukkan alur kerja untuk melacak metadata NFT dari OpenSea kembali ke sumbernya di IPFS, memvalidasi transparansi *blockchain*.
 
-[ALT TEXT: Alur kerja dari OpenSea ke Etherscan lalu ke IPFS untuk memverifikasi metadata NFT. - Figure 11.49 hingga 11.59]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-49.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-50.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-51.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-52.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-53.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-54.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-55.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-56.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-57.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-58.png" alt="gambar" width="550"/>
+</p>
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-59.png" alt="gambar" width="550"/>
+</p>
+
+[Alur kerja dari OpenSea ke Etherscan lalu ke IPFS untuk memverifikasi metadata NFT. - Figure 11.49 hingga 11.59]
 
 ### Membuat Kontrak ERC-721 (Versi Sederhana)
 
@@ -3922,8 +4175,17 @@ Sekarang, kita akan membuat kontrak NFT kita sendiri yang lebih sederhana dengan
 1.  Buat file baru di `src` bernama `NFT.sol`.
 2.  (Opsional) Simpan aset gambar Kita di dalam folder proyek.
 
-[ALT TEXT: Pembuatan file NFT.sol di VS Code. - Figure 11.60]
-[ALT TEXT: Gambar Girl.png di dalam folder picture. - Figure 11.61]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-60.png" alt="gambar" width="550"/>
+</p>
+
+[Pembuatan file NFT.sol di VS Code. - Figure 11.60]
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-61.png" alt="gambar" width="550"/>
+</p>
+
+[Gambar Girl.png di dalam folder picture. - Figure 11.61]
 
 Berikut adalah kode lengkap untuk `NFT.sol`:
 
@@ -4006,4 +4268,314 @@ Langkah terakhir adalah men-*deploy* dan berinteraksi dengan kontrak kita menggu
       * Jalankan skrip interaksi untuk me-*mint* NFT.
       * Verifikasi transaksi di Etherscan dan impor NFT ke MetaMask Kita.
 
-[ALT TEXT: Seluruh proses deployment dan interaksi, mulai dari pembuatan skrip hingga mengimpor NFT ke MetaMask. - Figure 11.62 hingga 11.86]
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-62.png" alt="gambar" width="550"/>
+</p>
+
+Di dalam file `NFT.s.sol`, ketik kode berikut. Saya akan menjelaskan setiap barisnya.
+
+Baris berikut mendefinisikan lisensi di mana kontrak akan dirilis:
+
+```solidity
+//SPDX-License-Identifier: MIT
+```
+
+Baris berikut mendefinisikan versi Solidity yang akan digunakan oleh kontrak:
+
+```solidity
+pragma solidity ^0.8.27;
+```
+
+Baris berikut mengimpor kontrak `Script` dari path yang ditentukan. Kontrak `Script` memiliki berbagai fungsi pembantu yang membantu proses *deployment* kontrak:
+
+```solidity
+import {Script} from "forge-std/Script.sol";
+```
+
+Baris berikut mengimpor kontrak `NFT` yang ditulis sebelumnya dari path yang ditentukan dan folder `src`:
+
+```solidity
+import {NFT} from "../src/NFT.sol";
+```
+
+Baris berikut mendefinisikan nama kontrak dan mewarisi kontrak `Script`:
+
+```solidity
+contract DeployNFT is Script {
+```
+
+Fungsi `run` adalah fungsi standar yang digunakan saat melakukan *deployment* kontrak melalui skrip. Ini adalah fungsi `external`, yang berarti dapat dipanggil dari luar kontrak, dan mengembalikan tipe kontrak `NFT`.
+
+Di dalam fungsi ini, *cheat code* `vm.startBroadcast` menyiarkan transaksi ke *blockchain*. Di dalamnya, `NFT nonfungibleToken = new NFT()` membuat instance baru dari kontrak `NFT` dan menugaskannya ke variabel `nonfungibleToken`. *Cheat code* `vm.stopBroadcast` kemudian digunakan untuk menghentikan siaran transaksi. Terakhir, di akhir, fungsi ini mengembalikan kontrak `nonfungibleToken`, yang sebelumnya telah diberi nilai dari kontrak `NFT` yang baru saja di-*deploy* dan selanjutnya menjadi kontrak `NFT` yang baru di-*deploy* tersebut.
+
+```solidity
+    function run() external returns(NFT) {
+        vm.startBroadcast();
+        NFT nonfungibleToken = new NFT();
+        vm.stopBroadcast();
+        return nonfungibleToken;
+    }
+}
+```
+
+### Membuat File `ContractForInteractions.s.sol`
+
+Sebelum melakukan *deployment* kontrak, Anda harus menulis kontrak lain untuk berinteraksi dengan kontrak yang telah di-*deploy*. Ini lebih diutamakan daripada menggunakan `cast` dan berguna ketika tugas berulang, seperti *minting* NFT, perlu ditangani. Ini juga membantu mengotomatiskan tugas-tugas berulang. Namun, karena ini dihitung sebagai *deployment* kontrak pintar tambahan, menggunakan metode `cast` yang ditunjukkan di bab-bab sebelumnya lebih nyaman jika interaksi hanya terjadi sekali.
+
+Untuk menulis kontrak ini dengan lebih efisien, Anda harus mengunduh repositori lain dari GitHub. Repositori tersebut, **Foundry DevOps**, dapat ditemukan di tautan GitHub berikut: `https://github.com/Cyfrin/foundry-devops`.
+
+Untuk mengunduh repositori, Anda harus, seperti biasa, mengetikkan perintah berikut:
+
+```bash
+forge install https://github.com/Cyfrin/foundry-devops --no-commit
+```
+
+Saat Anda menekan Enter, file-file dari repositori seharusnya sudah terunduh, seperti yang ditunjukkan pada Gambar 11.63.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-63.png" alt="gambar" width="550"/>
+</p>
+
+File tersebut seharusnya tersedia di folder `lib`, seperti yang ditunjukkan pada Gambar 11.64.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-64.png" alt="gambar" width="550"/>
+</p>
+
+Setelah mengunduh repositori tambahan, saatnya membuat file `ContractForInteractions.s.sol` baru di dalam folder `script` (lihat Gambar 11.65):
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-65.png" alt="gambar" width="550"/>
+</p>
+
+Di dalam kontrak, ketik kode berikut. Seperti biasa, saya akan menjelaskan setiap barisnya.
+
+Baris berikut mendefinisikan lisensi di mana kontrak akan dirilis:
+
+```solidity
+//SPDX-License-Identifier: MIT
+```
+
+Baris berikut mendefinisikan versi Solidity yang akan digunakan oleh kontrak:
+
+```solidity
+pragma solidity ^0.8.27;
+```
+
+Baris `import` berikut mengimpor kontrak `Script` dengan berbagai fungsi pembantu untuk membantu *deployment* kontrak:
+
+```solidity
+import {Script} from "forge-std/Script.sol";
+```
+
+Baris berikut mengimpor kontrak `DevOpsTools` yang baru diunduh dari lokasi yang ditentukan:
+
+```solidity
+import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
+```
+
+Baris berikut mengimpor kontrak `NFT` yang dibuat sebelumnya dari folder `src`:
+
+```solidity
+import {NFT} from "../src/NFT.sol";
+
+contract InteractionsNFT is Script {
+```
+
+Baris berikut mendefinisikan sebuah *string constant* publik. Namanya adalah `girl`, dan nilainya diatur ke URI token dari NFT yang akan di-*mint*:
+
+```solidity
+    string public constant girl = "ipfs://bafkreictv3p474nfilkyufpkeh2kqvll5kwxwobtupxpvesxpsufjc2xym";
+```
+
+Fungsi `run` eksternal berikut mendefinisikan alamat lokal dengan nama `mostRecentlyDeployed`. Kemudian, dengan menggunakan `DevOpsTools`, ia mengaturnya ke alamat kontrak `NFT` yang paling baru di-*deploy* di *blockchain* melalui kata kunci `block.chainid`, yang mengidentifikasi nomor ID spesifik dari sebuah *blockchain* dan kemudian memanggil fungsi `mintNFTOnContract` dari alamat tersebut.
+
+```solidity
+    function run() external {
+        address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment("NFT", block.chainid);
+        mintNFTOnContract(mostRecentlyDeployed);
+    }
+```
+
+Fungsi `mintNFTOnContract` berikut memiliki parameter lokal berupa alamat dengan nama `contractAddress`, dan fungsi ini bersifat publik. Di dalam fungsi itu sendiri, `vm.startBroadcast` dimulai, yang merupakan *cheat code* yang disediakan oleh kontrak `Script`. Ini memungkinkan transaksi apa pun setelah `vm.startBroadcast` disiarkan ke *blockchain*. Ketika pasangannya, `vm.stopBroadcast`, digunakan, siaran transaksi ke *blockchain* berakhir.
+
+Kemudian setelah `vm.startBroadcast`, fungsi ini memanggil fungsi `mintNFT` dari kontrak `NFT` di alamat kontrak yang ditentukan dan me-*mint* NFT `girl`. Terakhir, `vm.stopBroadcast` digunakan di akhir untuk menghentikan siaran transaksi ke *blockchain*.
+
+```solidity
+    function mintNFTOnContract(address contractAddress) public {
+        vm.startBroadcast();
+        NFT(contractAddress).mintNFT(girl);
+        vm.stopBroadcast();
+    }
+}
+```
+
+### Melakukan *Deployment* Kontrak
+
+Setelah membuat kontrak, Anda harus melakukan *deployment* kontrak dengan skrip *deployment* dan kemudian kontrak dengan interaksinya. Untuk melakukan *deployment* kontrak dengan skrip *deployment*, Anda harus membuat atau menggunakan dompet baru, seperti pada bab sebelumnya. Bab ini akan menampilkan opsi ini di dalam terminal VS Code. Namun, praktik terbaik adalah menggunakan terminal komputer Anda sendiri dalam kasus ini, karena Anda akan menggunakan *private key* Anda untuk berinteraksi dengan kontrak; oleh karena itu, semakin banyak langkah yang diambil untuk mengamankan *private key*, semakin kecil kemungkinan seseorang mendapatkan akses ke sana dan ke dana seseorang.
+
+Ikuti langkah-langkah berikut untuk melakukan *deployment* kontrak:
+
+1.  Untuk memulai, buat dompet baru, ganti teks miring dengan nama yang Anda inginkan untuk dompet:
+
+    ```bash
+    cast wallet import <nama_dompet_baru_yang_anda_buat> --interactive
+    ```
+
+    Contohnya:
+
+    ```bash
+    cast wallet import MyWallet --interactive
+    ```
+
+2.  Tekan Enter. Terminal akan meminta *private key*, seperti yang ditunjukkan pada Gambar 11.66.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-66.png" alt="gambar" width="550"/>
+</p>
+
+3.  Buka MetaMask Anda dan klik panah di samping nomor akun, seperti yang ditunjukkan pada Gambar 11.67.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-67.png" alt="gambar" width="550"/>
+</p>
+
+4.  Anda akan melihat akun yang Anda miliki. Klik tiga titik di sebelah kanan *Account 1* (atau akun lain yang Anda miliki jika lebih dari satu). Lihat Gambar 11.68.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-68.png" alt="gambar" width="550"/>
+</p>
+
+5.  Setelah mengklik tiga titik, opsi untuk mengklik *Account Details* akan muncul (lihat Gambar 11.69). Klik itu.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-69.png" alt="gambar" width="550"/>
+</p>
+
+Setelah mengklik *Account Details*, Anda akan diarahkan ke alamat dompet dan diberi opsi untuk menampilkan *private key* Anda (lihat Gambar 11.70).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-70.png" alt="gambar" width="550"/>
+</p>
+
+6.  Kata sandi untuk masuk ke dompet MetaMask akan diminta—bukan *seed phrase* tetapi yang dimasukkan saat mengklik logo MetaMask di browser (lihat Gambar 11.71). Masukkan kata sandi Anda.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-71.png" alt="gambar" width="550"/>
+</p>
+
+7.  Setelah mengetik kata sandi dan mengklik *Confirm*, sebuah opsi untuk menahan untuk menampilkan *private key* akan muncul. Klik dan, seperti pesan pada Gambar 11.72, tahan hingga *private key* terungkap.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-72.png" alt="gambar" width="550"/>
+</p>
+
+8.  Setelah *private key* terungkap (lihat Gambar 11.73), salin dan kembali ke VS Code dan Foundry.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-73.png" alt="gambar" width="550"/>
+</p>
+
+9.  *Private key* yang disalin harus ditempelkan ke ruang *Enter Private Key* (lihat Gambar 11.74). Kunci tersebut tidak akan ditampilkan, tetapi setelah menempelkannya, Anda harus menekan Enter.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-74.png" alt="gambar" width="550"/>
+</p>
+
+10. Setelah menempelkan *private key*, sebuah kata sandi akan diminta (lihat Gambar 11.75). Ingat kata sandi ini karena akan diminta setiap kali Anda ingin melakukan *deployment* kontrak. Masukkan kata sandi Anda.
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-75.png" alt="gambar" width="550"/>
+</p>
+
+Setelah mengetik kata sandi dan menekan Enter, sebuah pesan yang mengatakan bahwa *Keystore* telah disimpan akan muncul. Pesan ini akan memberikan alamat yang harus disalin dan disimpan, karena akan diperlukan setiap kali kontrak pintar di-*deploy* (lihat Gambar 11.76).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-76.png" alt="gambar" width="550"/>
+</p>
+
+11. Langkah selanjutnya adalah melakukan *deployment* kedua kontrak mulai dari `NFT.s.sol`. Di terminal, ketik berikut ini:
+
+    ```bash
+    forge script script/NFT.s.sol:DeployNFT --rpc-url https://eth-sepolia.g.alchemy.com/v2/etdMx3mb7nEzJ5n4dmwjUNEYFIkavK1j --account MyWallet --sender 0xd16429e3f253f50cff306b2be8966ce935332116 --etherscan-api-key YRGWIRZAJ8TJPMEFDZZPYGFFUYNXF5II4S --broadcast
+    ```
+
+Perlu diingat bahwa alamat *sender* akan berbeda untuk Anda.
+
+Skrip ini melakukan *deployment* skrip dari file `NFT.s.sol` dan khususnya kontrak `DeployNFT`. Ini memberikan URL dari RPC, yaitu dari Ethereum Sepolia, yang dapat Anda temukan dengan kembali ke situs web Alchemy. Kemudian, akunnya adalah `MyWallet`, yang memiliki *private key* yang dibuat sebelumnya; *sender*-nya adalah alamat *Keystore* yang harus Anda simpan dan gunakan setiap kali kontrak pintar di-*deploy*. `etherscan-api-key`, seperti namanya, adalah kunci API yang dapat ditemukan di Etherscan.io setelah registrasi. `broadcast` adalah kata kunci yang menyiarkan perintah ini ke jaringan.
+
+12. Setelah memasukkan perintah, Anda akan diminta untuk menambahkan kata sandi dari *keystore* yang ditambahkan sebelumnya (lihat Gambar 11.77).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-77.png" alt="gambar" width="550"/>
+</p>
+
+Masukkan kata sandi, tekan Enter, dan tunggu beberapa detik saat kontrak berhasil di-*deploy* di jaringan Sepolia.
+
+Setelah *deployment*, sebuah pesan akan ditampilkan yang menunjukkan *deployment* berhasil (lihat Gambar 11.78).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-78.png" alt="gambar" width="550"/>
+</p>
+
+13. Setelah kontrak pertama berhasil di-*deploy*, kontrak kedua, yang akan berinteraksi dengan kontrak yang sudah di-*deploy* melalui *minting* NFT, juga harus di-*deploy*. Untuk melakukannya, ketik berikut ini di terminal:
+
+    ```bash
+    forge script script/ContractForInteractions.s.sol:InteractionsNFT --rpc-url https://eth-sepolia.g.alchemy.com/v2/etdMx3mb7nEzJ5n4dmwjUNEYFIkavK1j --account MyWallet --sender 0xd16429e3f253f50cff306b2be8966ce935332116 --etherscan-api-key YRGWIRZAJ8TJPMEFDZZPYGFFUYNXF5II4S --broadcast
+    ```
+
+Setelah menekan Enter di terminal, kata sandi *keystore* akan diminta lagi. Setelah mengisinya dan menekan Enter, Anda harus menunggu beberapa detik hingga kontrak kedua di-*deploy*, dan pesan serupa yang menunjukkan *deployment* berhasil akan ditampilkan (lihat Gambar 11.79).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-79.png" alt="gambar" width="550"/>
+</p>
+
+Jika Anda menggulir sedikit ke atas, Anda akan melihat *hash* transaksi yang digunakan untuk melakukan *deployment* kontrak (lihat Gambar 11.80).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-80.png" alt="gambar" width="550"/>
+</p>
+
+Salin *hash* transaksi tersebut, buka situs web Etherscan testnet Sepolia (`sepolia.etherscan.io`), dan tempelkan *hash* transaksi ke dalam penjelajah, di mana Anda dapat mencari alamat, *hash* transaksi, blok, dan token (lihat Gambar 11.81).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-81.png" alt="gambar" width="550"/>
+</p>
+
+Setelah menempelkan *hash* transaksi, klik tombol kaca pembesar biru untuk melihat hasil dari *hash* transaksi tersebut (lihat Gambar 11.82).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-82.png" alt="gambar" width="550"/>
+</p>
+
+Klik alamat kontrak berwarna biru dari *Interacted With (To)*, yang merupakan kontrak yang di-*deploy* (lihat Gambar 11.83).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-83.png" alt="gambar" width="550"/>
+</p>
+
+Di sana, Anda akan melihat alamat kontrak. Klik tombol *Copy Address*. Setelah melakukan ini, buka dompet MetaMask Anda yang dapat ditemukan di browser Anda dan klik tab *NFTs*, dan jika perlu gulir sedikit ke bawah di dalam tab hingga pesan "*Import NFT*" terlihat (lihat Gambar 11.84).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-84.png" alt="gambar" width="550"/>
+</p>
+
+Klik tombol *Import NFT* (lihat Gambar 11.85).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-85.png" alt="gambar" width="550"/>
+</p>
+
+Setelah mengklik *Import NFT*, sebuah panel akan muncul. Di bagian *Address*, Anda harus menempelkan alamat kontrak pintar yang disalin—kontrak pintar yang me-*mint* dan berinteraksi dengan kontrak `NFT.sol`. Di lokasi *Token ID*, Anda harus menambahkan `0`, yang menunjukkan nomor token NFT yang ingin Anda impor. Karena satu token telah di-*mint* melalui *deployment*, `0` adalah yang pertama. Setelah itu, Anda harus mengklik *Import*.
+
+Setelah mengklik tombol *Import*, NFT yang di-*mint* dan gambar gadis tersebut dapat ditampilkan di dompet MetaMask Anda (lihat Gambar 11.86).
+
+<p align="center">
+  <img src="images/books-04_beginning_solidity/figure_11-86.png" alt="gambar" width="550"/>
+</p>
+
+[Seluruh proses deployment dan interaksi, mulai dari pembuatan skrip hingga mengimpor NFT ke MetaMask. - Figure 11.62 hingga 11.86]
+
+---
+
+
