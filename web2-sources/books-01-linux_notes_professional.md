@@ -442,10 +442,6 @@ anotherFile
 
 ---
 
-Tentu, ini adalah kelanjutan terjemahannya.
-
------
-
 # **Bab 2**
 
 # **Mendeteksi Nama dan Versi Distribusi Linux**
@@ -486,8 +482,6 @@ Ubuntu 12.04.5 LTS \n \l
 Jangan gunakan berkas `/etc/debian_version` karena isinya tidak cocok dengan nama distribusi\!
 
 Perhatikan bahwa cara ini juga akan berfungsi pada distribusi non-keluarga Debian seperti Fedora, RHEL, atau openSUSE — tetapi `lsb_release` mungkin tidak terinstal.
-
------
 
 ## **Bagian 2.2: Mendeteksi distribusi berbasis systemd yang Anda gunakan**
 
@@ -544,8 +538,6 @@ $ ( source /etc/os-release && echo "$PRETTY_NAME" )
 Fedora 24 (Workstation Edition)
 ```
 
------
-
 ## **Bagian 2.3: Mendeteksi distribusi RHEL / CentOS / Fedora yang sedang Anda gunakan**
 
 Lihat isi dari **/etc/redhat-release**
@@ -565,8 +557,6 @@ Description:    Fedora release 24 (Twenty Four)
 Release:        24
 Codename:       TwentyFour
 ```
-
------
 
 ## **Bagian 2.4: Uname - Mencetak informasi tentang sistem saat ini**
 
@@ -600,8 +590,6 @@ Semua opsi:
   * **`--help`** - Menampilkan pesan bantuan, dan keluar.
   * **`--version`** - Menampilkan informasi versi, dan keluar.
 
------
-
 ## **Bagian 2.5: Mendeteksi informasi dasar tentang distro Anda**
 
 Cukup jalankan **`uname -a`**.
@@ -612,8 +600,6 @@ Pada Arch:
 $ uname -a
 Linux nokia 4.6.4-1-ARCH #1 SMP PREEMPT Mon Jul 11 19:12:32 CEST 2016 x86_64 GNU/Linux
 ```
-
------
 
 ## **Bagian 2.6: Menggunakan GNU coreutils**
 
@@ -662,4 +648,200 @@ DISTRIB_DESCRIPTION="Ubuntu 14.04 LTS"
 
 ---
 
+## **Bab 3: Mendapatkan informasi kernel Linux yang sedang berjalan**
+
+### **Bagian 3.1: Mendapatkan detail kernel Linux**
+
+Kita dapat menggunakan perintah `uname` dengan berbagai opsi untuk mendapatkan detail lengkap dari kernel yang sedang berjalan.
+
+```bash
+uname -a
+```
+
+```
+Linux df1-ws-5084 4.4.0-64-generic #85-Ubuntu SMP Mon Feb 20 11:50:30 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+```
+
+Sesuai dengan *man page*, berikut adalah beberapa opsi lainnya:
+
+**Penggunaan:** `uname [OPSI]...`
+
+Mencetak informasi sistem tertentu. Jika tanpa OPSI, sama dengan `-s`.
+
+  * `-a, --all`
+      * Cetak semua informasi, dalam urutan berikut, kecuali hilangkan `-p` dan `-i` jika tidak diketahui.
+  * `-s, --kernel-name`
+      * Cetak nama kernel.
+  * `-n, --nodename`
+      * Cetak nama *hostname* node jaringan.
+  * `-r, --kernel-release`
+      * Cetak rilis kernel.
+  * `-v, --kernel-version`
+      * Cetak versi kernel.
+  * `-m, --machine`
+      * Cetak nama perangkat keras mesin.
+  * `-p, --processor`
+      * Cetak tipe prosesor (tidak portabel).
+  * `-i, --hardware-platform`
+      * Cetak platform perangkat keras (tidak portabel).
+  * `-o, --operating-system`
+      * Cetak sistem operasi.
+  * `--help`
+      * Tampilkan bantuan ini dan keluar.
+  * `--version`
+      * Keluarkan informasi versi dan keluar.
+
+---
+
+## **Bab 4: Shell**
+
+*Shell* mengeksekusi sebuah program sebagai respons terhadap *prompt*-nya. Ketika Anda memberikan sebuah perintah, *shell* akan mencari program tersebut, lalu mengeksekusinya. Sebagai contoh, ketika Anda memberikan perintah `ls`, *shell* akan mencari utilitas/program bernama `ls`, dan kemudian menjalankannya di dalam *shell*. Argumen dan opsi yang Anda berikan bersama utilitas dapat memengaruhi hasil yang Anda dapatkan. *Shell* juga dikenal sebagai **CLI**, atau *command line interface* (antarmuka baris perintah).
+
+### **Bagian 4.1: Mengubah shell default**
+
+Sebagian besar distribusi modern akan hadir dengan **BASH** (*Bourne Again SHell*) yang sudah terpasang dan dikonfigurasi sebagai *shell* default. Perintah (sebenarnya sebuah *binary executable*, sebuah ELF) yang bertanggung jawab untuk mengubah *shell* di Linux adalah `chsh` (*change shell*).
+
+Kita bisa terlebih dahulu memeriksa *shell* mana saja yang sudah terpasang dan dikonfigurasi di mesin kita dengan menggunakan perintah `chsh -l`, yang akan menghasilkan keluaran seperti ini:
+
+```bash
+[user@localhost ~]$ chsh -l
+/bin/sh
+/bin/bash
+/sbin/nologin
+/usr/bin/sh
+/usr/bin/bash
+/usr/sbin/nologin
+/usr/bin/fish
+```
+
+Pada beberapa distribusi Linux, `chsh -l` tidak valid. Dalam kasus ini, daftar semua *shell* yang tersedia dapat ditemukan di dalam berkas `/etc/shells`. Anda dapat menampilkan isi berkas tersebut dengan `cat`:
+
+```bash
+[user@localhost ~]$ cat /etc/shells
+# /etc/shells: valid login shells
+/bin/sh
+/bin/bash
+/sbin/nologin
+/usr/bin/sh
+/usr/bin/bash
+/usr/sbin/nologin
+/usr/bin/fish
+```
+
+Sekarang kita bisa memilih *shell* default baru kita, contohnya `fish`, dan mengkonfigurasikannya menggunakan `chsh -s`:
+
+```bash
+[user@localhost ~]$ chsh -s /usr/bin/fish
+Changing shell for user.
+Password:
+Shell changed.
+```
+
+*(Mengubah shell untuk pengguna.)*
+*(Kata sandi:)*
+*(Shell diubah.)*
+
+Sekarang yang tersisa hanyalah melakukan siklus *log-off* dan *log-on*, dan nikmati *shell* default baru kita.
+
+Jika Anda ingin mengubah *shell* default untuk pengguna yang berbeda, dan Anda memiliki hak administratif di mesin tersebut, Anda dapat melakukannya dengan menggunakan `chsh` sebagai *root*. Jadi, dengan asumsi kita ingin mengubah *shell* default `user_2` menjadi `fish`, kita akan menggunakan perintah yang sama seperti sebelumnya, tetapi dengan tambahan nama pengguna lain, `chsh -s /usr/bin/fish user_2`.
+
+Untuk memeriksa apa *shell* default saat ini, kita dapat melihat variabel lingkungan `$SHELL`, yang menunjuk ke path *shell* default kita. Jadi, setelah perubahan kita, kita akan mendapatkan hasil yang mirip dengan ini:
+
+```bash
+~  echo $SHELL
+/usr/bin/fish
+```
+
+**Opsi `chsh`:**
+
+  * `-s shell`
+      * Mengatur `shell` sebagai *login shell*.
+  * `-l, --list-shells`
+      * Mencetak daftar *shell* yang tercantum di `/etc/shells` dan keluar.
+  * `-h, --help`
+      * Mencetak pesan penggunaan dan keluar.
+  * `-v, --version`
+      * Mencetak informasi versi dan keluar.
+
+### **Bagian 4.2: Utilitas Shell Dasar**
+
+#### **Menyesuaikan Prompt Shell**
+
+*Prompt* perintah default dapat diubah agar terlihat berbeda dan lebih singkat. Jika direktori saat ini panjang, *prompt* perintah default menjadi terlalu besar. Menggunakan `PS1` menjadi berguna dalam kasus-kasus ini. Perintah yang pendek dan disesuaikan akan terlihat cantik dan elegan. Pada tabel di bawah, `PS1` telah digunakan dengan sejumlah argumen untuk menunjukkan berbagai bentuk *prompt shell*. *Prompt* perintah default terlihat seperti ini: `user@host ~ $`, dalam kasus saya terlihat seperti ini: `bruce@gotham ~ $`. Ini dapat diubah sesuai tabel di bawah:
+
+| Perintah | Kegunaan |
+| :--- | :--- |
+| `PS1='\w $ '` | `~ $` *prompt shell* sebagai nama direktori. Dalam hal ini direktori root adalah Root. |
+| `PS1='\h $ '` | `gotham $` *prompt shell* sebagai *hostname*. |
+| `PS1='\u $ '` | `bruce $` *prompt shell* sebagai nama pengguna. |
+| `PS1='\t $ '` | `22:37:31 $` *prompt shell* dalam format 24 jam. |
+| `PS1='@ $ '` | `10:37 PM` *prompt shell* dalam format waktu 12 jam. |
+| `PS1='! $ '` | `732` akan menampilkan nomor riwayat perintah di tempat *prompt shell*. |
+| `PS1='dude $ '`| `dude $` akan menampilkan *prompt shell* sesuai keinginan Anda. |
+
+#### **Beberapa perintah shell dasar**
+
+| Perintah | Kegunaan |
+| :--- | :--- |
+| **Ctrl-k** | potong (*cut/kill*). |
+| **Ctrl-y** | tempel (*yank/paste*). |
+| **Ctrl-a** | akan membawa kursor ke awal baris. |
+| **Ctrl-e** | akan membawa kursor ke akhir baris. |
+| **Ctrl-d** | akan menghapus karakter setelah/di kursor. |
+| **Ctrl-l** | akan membersihkan layar/terminal. |
+| **Ctrl-u** | akan membersihkan semua yang ada di antara *prompt* dan kursor. |
+| **Ctrl-\_** | akan membatalkan hal terakhir yang diketik pada baris perintah. |
+| **Ctrl-c** | akan menginterupsi/menghentikan pekerjaan/proses yang berjalan di *foreground*. |
+| **Ctrl-r** | pencarian terbalik dalam riwayat. |
+| `~/.bash_history` | menyimpan 500 perintah/kejadian terakhir yang digunakan pada *shell*. |
+| `history` | akan menampilkan riwayat perintah. |
+| `history | grep <key-word>` | akan menampilkan semua perintah dalam riwayat yang memiliki kata kunci `<key-word>` (berguna saat Anda hanya ingat sebagian dari perintah yang pernah digunakan). |
+
+### **Bagian 4.3: Membuat Alias Perintah Anda Sendiri**
+
+Jika Anda lelah menggunakan perintah yang panjang di bash, Anda dapat membuat alias perintah Anda sendiri.
+
+Cara terbaik untuk melakukannya adalah dengan memodifikasi (atau membuat jika belum ada) sebuah berkas bernama `.bash_aliases` di folder *home* Anda. Sintaks umumnya adalah:
+
+```bash
+alias nama_alias='perintah_asli'
+```
+
+di mana `perintah_asli` adalah perintah yang Anda beri nama baru dan `nama_alias` adalah nama baru yang Anda berikan.
+
+Sebagai contoh:
+
+```bash
+alias install='sudo apt-get -y install'
+```
+
+memetakan alias perintah baru `install` ke perintah asli `sudo apt-get -y install`. Ini berarti bahwa ketika Anda menggunakan `install` di terminal, ini akan diinterpretasikan oleh bash sebagai `sudo apt-get -y install`.
+
+### **Bagian 4.4: Menemukan file di sistem Anda**
+
+Menggunakan bash, Anda dapat dengan mudah menemukan sebuah berkas dengan perintah `locate`. Sebagai contoh, katakanlah Anda sedang mencari berkas `mykey.pem`:
+
+```bash
+locate mykey.pem
+```
+
+Terkadang nama berkas bisa aneh, misalnya Anda mungkin memiliki berkas seperti `random7897_mykey_0fidw.pem`. Katakanlah Anda mencari berkas ini tetapi Anda hanya ingat bagian `mykey` dan `pem`. Anda dapat menggabungkan perintah `locate` dengan `grep` menggunakan *pipe* seperti ini:
+
+```bash
+locate pem | grep mykey
+```
+
+Perintah ini akan menampilkan semua hasil yang mengandung kedua bagian tersebut.
+
+Perhatikan bahwa tidak semua sistem memiliki utilitas `locate` yang terpasang, dan banyak yang memilikinya tetapi belum mengaktifkannya. `locate` cepat dan efisien karena secara berkala memindai sistem Anda dan menyimpan nama serta lokasi setiap berkas dalam *cache*, tetapi jika pengumpulan data itu tidak diaktifkan, maka ia tidak dapat memberi tahu Anda apa pun. Anda dapat menggunakan `updatedb` untuk memulai pemindaian sistem berkas secara manual guna memperbarui info yang disimpan di *cache* tentang berkas di sistem Anda.
+
+Jika Anda tidak memiliki `locate` yang berfungsi, Anda dapat beralih ke utilitas `find`:
+
+```bash
+find / -name mykey.pem -print
+```
+
+Perintah ini kurang lebih setara dengan `locate mykey.pem` tetapi harus memindai sistem berkas Anda setiap kali Anda menjalankannya untuk mencari berkas yang dimaksud, alih-alih menggunakan data dari *cache*. Ini jelas lebih lambat dan kurang efisien, tetapi lebih *real-time*. Utilitas `find` dapat melakukan lebih dari sekadar menemukan berkas, tetapi deskripsi lengkap kemampuannya berada di luar cakupan contoh ini.
+
+---
 
