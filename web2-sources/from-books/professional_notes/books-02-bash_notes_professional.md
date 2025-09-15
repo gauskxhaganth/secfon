@@ -313,3 +313,79 @@ $uglify && echo "akan meng-uglify... uglify = $uglify"
 
 ---
 
+# Bab 2
+## *Shebang* pada Skrip**
+
+### **Bagian 2.1: *Shebang* Env**
+
+Untuk mengeksekusi berkas skrip dengan *executable* `bash` yang ditemukan di variabel lingkungan `PATH` menggunakan *executable* `env`, baris pertama dari berkas skrip harus menunjukkan path absolut ke *executable* `env` dengan argumen `bash`:
+
+```bash
+#!/usr/bin/env bash
+```
+
+Path `env` dalam *shebang* akan diresolusi dan digunakan hanya jika skrip diluncurkan secara langsung seperti ini:
+
+```bash
+script.sh
+```
+
+Skrip tersebut harus memiliki izin eksekusi.
+
+*Shebang* akan diabaikan ketika interpreter `bash` secara eksplisit ditunjukkan untuk mengeksekusi sebuah skrip:
+
+```bash
+bash script.sh
+```
+
+### **Bagian 2.2: *Shebang* Langsung**
+
+Untuk mengeksekusi berkas skrip dengan interpreter `bash`, baris pertama dari berkas skrip harus menunjukkan path absolut ke *executable* `bash` yang akan digunakan:
+
+```bash
+#!/bin/bash
+```
+
+Path `bash` dalam *shebang* akan diresolusi dan digunakan hanya jika skrip diluncurkan secara langsung seperti ini:
+
+```bash
+./script.sh
+```
+
+Skrip tersebut harus memiliki izin eksekusi.
+
+*Shebang* akan diabaikan ketika interpreter `bash` secara eksplisit ditunjukkan untuk mengeksekusi sebuah skrip:
+
+```bash
+bash script.sh
+```
+### **Bagian 2.3: *Shebang* Lainnya**
+
+Ada dua jenis program yang dikenali oleh kernel. Program **biner** diidentifikasi oleh *header* **ELF** (*Extensible Loadable Format*), yang biasanya dihasilkan oleh sebuah kompilator. Yang kedua adalah **skrip** dari berbagai jenis.
+
+Jika sebuah berkas dimulai pada baris paling pertama dengan urutan `#!`, maka string berikutnya harus merupakan *pathname* dari sebuah interpreter. Jika kernel membaca baris ini, ia akan memanggil interpreter yang disebutkan oleh *pathname* tersebut dan memberikan semua kata berikutnya di baris ini sebagai argumen kepada interpreter. Jika tidak ada berkas bernama "something" atau "wrong":
+
+```bash
+#!/bin/bash something wrong
+echo "Baris ini tidak akan pernah tercetak"
+```
+
+`bash` akan mencoba mengeksekusi argumennya `"something wrong"` yang tidak ada. Nama berkas skrip juga akan ditambahkan. Untuk melihat ini dengan jelas, gunakan *shebang* `echo`:
+
+```bash
+#"/bin/echo something wrong
+```
+
+```bash
+# dan sekarang panggil skrip ini yang bernama "thisscript" seperti ini:
+# thisscript one two
+
+# keluarannya akan menjadi:
+something wrong ./thisscript one two
+```
+
+Beberapa program seperti `awk` menggunakan teknik ini untuk menjalankan skrip yang lebih panjang yang berada di dalam sebuah berkas di disk.
+
+---
+
+
