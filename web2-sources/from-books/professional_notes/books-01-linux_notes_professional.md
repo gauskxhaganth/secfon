@@ -18,8 +18,6 @@ Di Linux, `..` mewakili direktori induk dan `.` mewakili direktori saat ini. Ole
 
 Tabel di bawah ini mencantumkan beberapa perintah manajemen berkas yang paling sering digunakan.
 
------
-
 ### **Navigasi Direktori**
 
 | Perintah | Kegunaan |
@@ -29,7 +27,6 @@ Tabel di bawah ini mencantumkan beberapa perintah manajemen berkas yang paling s
 | **`cd ~`** atau hanya **`cd`** | Menavigasi ke direktori *home* pengguna saat ini. |
 | **`cd ..`** | Pindah ke direktori induk dari direktori saat ini (perhatikan spasi antara `cd` dan `..`). |
 
------
 
 ### **Melihat Daftar Berkas di Dalam Direktori**
 
@@ -44,7 +41,6 @@ Tabel di bawah ini mencantumkan beberapa perintah manajemen berkas yang paling s
 | **`ls -lR`** | Menampilkan semua subdirektori secara rekursif. |
 | **`tree`** | Akan menghasilkan representasi pohon (*tree*) dari sistem berkas, dimulai dari direktori saat ini. |
 
------
 
 ### **Membuat, Menyalin, dan Menghapus Berkas/Direktori**
 
@@ -61,7 +57,6 @@ Tabel di bawah ini mencantumkan beberapa perintah manajemen berkas yang paling s
 | **`mkdir -p nama-dir/nama-dir`** | Membuat hierarki direktori. Membuat direktori induk sesuai kebutuhan jika belum ada. Anda dapat menentukan beberapa direktori. |
 | **`touch namaberkas`** | Membuat berkas `namaberkas` jika belum ada, jika sudah ada, maka akan mengubah *timestamp* berkas ke waktu saat ini. |
 
------
 
 ### **Izin dan Grup Berkas/Direktori**
 
@@ -76,7 +71,6 @@ Tabel di bawah ini mencantumkan beberapa perintah manajemen berkas yang paling s
 | **`chgrp pemilik_grup namaberkas`** | Mengubah kepemilikan grup utama dari berkas `namaberkas` ke grup `pemilik_grup`. |
 | **`chgrp -R pemilik_grup nama-dir`** | Mengubah kepemilikan grup utama dari direktori `nama-dir` ke grup `pemilik_grup` secara rekursif. Untuk mengubah kepemilikan grup direktori dan semua yang ada di dalamnya, gunakan perintah ini. |
 
------
 
 ## **Bagian 1.2: Hello World**
 
@@ -92,7 +86,6 @@ Ini akan menghasilkan keluaran sebagai berikut:
 Hello World
 ```
 
------
 
 ## **Bagian 1.3: Utilitas Dasar Linux**
 
@@ -117,7 +110,6 @@ Linux memiliki perintah untuk hampir semua tugas dan sebagian besar di antaranya
 | **`whatis vim`** | Menampilkan deskripsi satu baris dari `vim`. |
 | **`<nama-perintah> --help`** | Menampilkan informasi penggunaan tentang `<nama-alat>`. Terkadang `perintah -h` juga berfungsi, tetapi tidak untuk semua perintah. |
 
------
 
 ### **Identifikasi Pengguna dan Siapa Saja di Dunia Linux**
 
@@ -134,7 +126,6 @@ Linux memiliki perintah untuk hampir semua tugas dan sebagian besar di antaranya
 | **`lastb`** | Menunjukkan semua upaya *login* yang gagal ke dalam sistem. |
 | **`chmod`** | Mengubah izin - baca, tulis, eksekusi (*read, write, execute*) dari sebuah berkas atau direktori. |
 
------
 
 ### **Informasi Terkait Proses**
 
@@ -145,7 +136,6 @@ Linux memiliki perintah untuk hampir semua tugas dan sebagian besar di antaranya
 | **`ps -u root`** | Menampilkan semua proses dan perintah yang sedang dijalankan oleh `root`. |
 | **`ps aux`** | Menampilkan semua proses oleh semua pengguna di sistem saat ini. |
 
------
 
 ## **Bagian 1.4: Mencari Berkas Berdasarkan Pola pada Nama/Konten**
 
@@ -218,7 +208,6 @@ Untuk info lebih lanjut:
 man grep
 ```
 
------
 
 ## **Bagian 1.5: Manipulasi Berkas**
 
@@ -328,7 +317,6 @@ rm -rf myFirstDirectory
 
 **Perlu diingat bahwa saat menghapus direktori, pastikan Anda menghapus `./` bukan `/`, karena itu akan menghapus seluruh sistem berkas Anda.**
 
------
 
 ## **Bagian 1.6: Detail Berkas/Direktori**
 
@@ -626,7 +614,6 @@ Di sini Anda dapat melihat hal-hal berikut:
 
 Saya akan menyambut siapa pun untuk menambahkan hasil untuk sistem RHEL, dan SuSe.
 
------
 
 ## **Bagian 2.7: Menemukan nama dan nomor rilis OS linux Anda (baik debian & rpm)**
 
