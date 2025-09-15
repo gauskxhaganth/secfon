@@ -2417,7 +2417,7 @@ Unduh arsip sumber - Ini untuk pengguna yang ingin membangun ulang paket standar
 1.  Pasang paket-paket berikut:
     ```bash
     sudo apt-get build-dep linux-image-`uname -r`
-    ```
+z    ```
 
 #### **Opsi C) Unduh paket sumber dan bangun (*build*)**
 
