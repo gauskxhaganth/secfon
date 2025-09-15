@@ -1332,3 +1332,677 @@ $ sudo iotop
 
 ---
 
+# Bab 7
+## Perintah `ls`
+
+### **Bagian 7.1: Opsi untuk perintah `ls`**
+
+Daftar lengkap opsi:
+
+  * **`ls -a`**: Tampilkan semua berkas termasuk berkas tersembunyi yang diawali dengan `.`.
+  * **`ls --color`**: Daftar berwarna `[=always/never/auto]`.
+  * **`ls -d`**: Tampilkan direktori - dengan akhiran `*/`.
+  * **`ls -F`**: Tambahkan satu karakter dari `*/=>@|` pada entri.
+  * **`ls -i`**: Tampilkan nomor indeks *inode* berkas.
+  * **`ls -l`**: Tampilkan dengan format panjang - menunjukkan izin (*permission*).
+  * **`ls -la`**: Tampilkan format panjang termasuk berkas tersembunyi.
+  * **`ls -lh`**: Tampilkan format panjang dengan ukuran berkas yang mudah dibaca.
+  * **`ls -ls`**: Tampilkan dengan format panjang beserta ukuran berkas.
+  * **`ls -r`**: Tampilkan dalam urutan terbalik.
+  * **`ls -R`**: Tampilkan pohon direktori secara rekursif.
+  * **`ls -s`**: Tampilkan ukuran berkas.
+  * **`ls -S`**: Urutkan berdasarkan ukuran berkas.
+  * **`ls -t`**: Urutkan berdasarkan waktu & tanggal.
+  * **`ls -X`**: Urutkan berdasarkan nama ekstensi.
+
+### **Bagian 7.2: Perintah `ls` dengan opsi yang paling sering digunakan**
+
+`ls` menunjukkan berkas dan direktori di direktori kerja saat ini (jika tidak ada argumen yang diberikan). (Secara *default*, ini tidak menampilkan berkas tersembunyi yang diawali dengan `.`)
+
+```bash
+user@ubuntu14:/usr$ ls
+bin    games    include   lib    lib32   local   sbin   share   src
+```
+
+Untuk melihat semua berkas (termasuk berkas/folder tersembunyi), gunakan `ls -a` ATAU `ls --all`.
+
+```bash
+user@ubuntu14:/usr$ ls -a
+.    ..    bin    games    include    lib    lib32    local    sbin    share    src
+```
+
+Untuk membedakan antara berkas, folder, *symbolic link*, dan lainnya, gunakan `ls -F` ATAU `ls --classify`.
+
+```bash
+user@ubuntu14:~$ ls -F
+bash_profile_course  chat_apps/      Desktop/     Downloads/        foxitsoftware/  Public/     test/
+bin/                 ClionProjects/  Documents/   IDE/              Music/          Pictures/   Templates/  Videos/
+```
+
+Di sini, karakter di akhir nama digunakan untuk membedakan berkas dan folder.
+
+  * **`/`** menunjukkan direktori.
+  * **`*`** menunjukkan berkas yang dapat dieksekusi (*executable*).
+  * **`@`** menunjukkan *symbolic link*.
+
+Untuk mendapatkan detail lebih lanjut tentang berkas dan direktori, gunakan `ls -l`.
+
+```bash
+user@ubuntu14:~/example$ ls -l
+total 6464
+-rw-r--r-- 1 dave dave      41 Dec 24 12:19 Z.txt
+drwxr-xr-x 2 user group    4096 Dec 24 12:00 a_directory
+-rw-r--r-- 1 user group       6 Dec 24 12:01 a_file
+lrwxrwxrwx 1 user group       6 Dec 24 12:04 a_link -> a_file
+-rw-r--r-- 1 user group       6 Dec 24 12:03 a_newer_file
+-rw-r----- 1 user group 6586816 Dec 24 12:07 big.zip
+```
+
+Dalam contoh ini, ukuran total dari konten adalah 6460KB.
+Kemudian ada entri untuk setiap berkas/direktori dalam urutan abjad dengan huruf besar sebelum huruf kecil.
+
+  * Karakter pertama adalah **tipe** (misalnya `d` - direktori, `l` - tautan/*link*).
+  * 9 karakter berikutnya menunjukkan **izin (*permission*)** untuk pengguna (*user*), grup (*group*), dan lainnya (*other*).
+  * Ini diikuti oleh jumlah ***hard link***, kemudian **nama pemilik** dan **grup**.
+  * Kolom berikutnya adalah **ukuran dalam byte**. Ini dapat ditampilkan dalam bentuk yang ramah manusia dengan menambahkan opsi `-h`, misalnya `6586816` ditampilkan sebagai `6.3M`.
+  * Setelah itu diikuti oleh **stempel waktu (*timestamp*)** (biasanya waktu modifikasi).
+  * Kolom terakhir adalah **nama**. Catatan: untuk tautan (*link*), target dari tautan tersebut juga akan ditampilkan.
+  
+---
+
+# Bab 8
+## Kompresi Berkas dengan perintah `tar`
+
+### **Opsi Umum**
+
+| Opsi | Keterangan |
+| :--- | :--- |
+| **-c --create** | Buat arsip baru. |
+| **-x --extract** | Ekstrak berkas dari sebuah arsip. |
+| **-t --list** | Tampilkan isi dari sebuah arsip. |
+| **-f --file=ARCHIVE** | Gunakan berkas arsip atau direktori ARSIP. |
+| **-v --verbose** | Tampilkan daftar berkas yang diproses secara rinci. |
+
+### **Opsi Kompresi**
+
+| Opsi | Keterangan |
+| :--- | :--- |
+| **-a --auto-compress**| Gunakan akhiran arsip untuk menentukan program kompresi. |
+| **-j --bzip2** | Filter arsip melalui `bzip2`. |
+| **-J --xz --lzma** | Filter arsip melalui `xz`. |
+| **-z --gzip** | Filter arsip melalui `gzip`. |
+
+### **Bagian 8.1: Mengompres sebuah folder**
+
+Perintah ini membuat sebuah arsip sederhana dari sebuah folder:
+
+```bash
+tar -cf ./my-archive.tar ./my-folder/
+```
+
+Keluaran *verbose* (rinci) menunjukkan berkas dan direktori mana yang ditambahkan ke arsip, gunakan opsi `-v`:
+
+```bash
+tar -cvf ./my-archive.tar ./my-folder/
+```
+
+Untuk mengarsipkan folder yang dikompres dengan 'gzip', Anda harus menggunakan opsi `-z`:
+
+```bash
+tar -czf ./my-archive.tar.gz ./my-folder/
+```
+
+Sebagai alternatif, Anda dapat mengompres arsip dengan 'bzip2', dengan menggunakan opsi `-j`:
+
+```bash
+tar -cjf ./my-archive.tar.bz2 ./my-folder/
+```
+
+Atau kompres dengan 'xz', dengan menggunakan opsi `-J`:
+
+```bash
+tar -cJf ./my-archive.tar.xz ./my-folder/
+```
+
+### **Bagian 8.2: Mengekstrak folder dari sebuah arsip**
+
+Berikut adalah contoh untuk mengekstrak folder dari sebuah arsip ke lokasi saat ini:
+
+```bash
+tar -xf nama-arsip.tar
+```
+
+Jika Anda ingin mengekstrak folder dari arsip ke tujuan tertentu:
+
+```bash
+tar -xf nama-arsip.tar -C ./direktori/tujuan
+```
+
+### **Bagian 8.3: Menampilkan isi dari sebuah arsip**
+
+Menampilkan isi dari sebuah berkas arsip tanpa mengekstraknya:
+
+```bash
+tar -tf archive.tar.gz
+```
+
+```
+Folder-In-Archive/
+Folder-In-Archive/file1
+Folder-In-Archive/Another-Folder/
+Folder-In-Archive/Another-Folder/file2
+```
+
+### **Bagian 8.4: Menampilkan konten arsip**
+
+Berikut adalah contoh menampilkan konten:
+
+```bash
+tar -tvf archive.tar
+```
+
+Opsi `-t` digunakan untuk menampilkan daftar. Untuk menampilkan konten dari arsip `tar.gz`, Anda juga harus menggunakan opsi `-z`:
+
+```bash
+tar -tzvf archive.tar.gz
+```
+
+### **Bagian 8.5: Mengompres dan mengecualikan satu atau beberapa folder**
+
+Jika Anda ingin mengekstrak sebuah folder, tetapi Anda ingin mengecualikan satu atau beberapa folder selama ekstraksi, Anda dapat menggunakan opsi `--exclude`.
+
+```bash
+tar -cf archive.tar ./my-folder/ --exclude="my-folder/sub1" --exclude="my-folder/sub3"
+```
+
+Dengan pohon folder ini:
+
+```
+my-folder/
+├── sub1/
+├── sub2/
+└── sub3/
+```
+
+Hasilnya akan menjadi:
+
+```
+./archive.tar
+└── my-folder/
+    └── sub2/
+```
+
+### **Bagian 8.6: Menghapus komponen awal (*leading components*)**
+
+Untuk menghapus sejumlah komponen awal, gunakan opsi `--strip-components`:
+`--strip-components=JUMLAH`
+
+> Hapus `JUMLAH` komponen awal dari nama berkas saat ekstraksi.
+
+Sebagai contoh, untuk menghapus folder awal, gunakan:
+
+```bash
+tar -xf --strip-components=1 nama-arsip.tar
+```
+
+---
+
+# Bab 9
+## Layanan (*Services*)
+
+### **Bagian 9.1: Menampilkan daftar layanan yang berjalan di Ubuntu**
+
+Untuk mendapatkan daftar layanan di sistem Anda, Anda dapat menjalankan:
+
+```bash
+service --status-all
+```
+
+Keluaran dari `service --status-all` menampilkan status layanan yang dikendalikan oleh **System V**.
+
+Tanda **`+`** menunjukkan layanan sedang berjalan, tanda **`-`** menunjukkan layanan yang berhenti. Anda dapat melihat ini dengan menjalankan `service NAMA_LAYANAN status` untuk layanan yang bertanda `+` dan `-`.
+
+Beberapa layanan dikelola oleh **Upstart**. Anda dapat memeriksa status semua layanan Upstart dengan `sudo initctl list`. Setiap layanan yang dikelola oleh Upstart juga akan muncul dalam daftar yang diberikan oleh `service --status-all` tetapi akan ditandai dengan **`?`**.
+
+ref: [https://askubuntu.com/questions/407075/how-to-read-service-status-all-results](https://askubuntu.com/questions/407075/how-to-read-service-status-all-results)
+
+### **Bagian 9.2: Manajemen layanan Systemd**
+
+#### **Menampilkan Daftar Layanan**
+
+  * **`systemctl`**
+    Untuk menampilkan daftar layanan yang sedang berjalan.
+  * **`systemctl --failed`**
+    Untuk menampilkan daftar layanan yang gagal (*failed*).
+
+#### **Mengelola Target (Mirip dengan Runlevel di SysV)**
+
+  * **`systemctl get-default`**
+    Untuk menemukan target *default* untuk sistem Anda.
+  * **`systemctl set-default <nama-target>`**
+    Untuk mengatur target *default* untuk sistem Anda.
+
+#### **Mengelola Layanan saat Berjalan (*Runtime*)**
+
+  * **`systemctl start [nama-layanan]`**
+    Untuk memulai sebuah layanan.
+  * **`systemctl stop [nama-layanan]`**
+    Untuk menghentikan sebuah layanan.
+  * **`systemctl restart [nama-layanan]`**
+    Untuk memulai ulang (*restart*) sebuah layanan.
+  * **`systemctl reload [nama-layanan]`**
+    Untuk meminta layanan memuat ulang konfigurasinya.
+  * **`systemctl status [nama-layanan]`**
+    Untuk menunjukkan status terkini dari sebuah layanan.
+
+#### **Mengelola *Autostart* Layanan**
+
+  * **`systemctl is-enabled [nama-layanan]`**
+    Untuk menunjukkan apakah sebuah layanan diaktifkan saat sistem *booting*.
+  * **`systemctl is-active [nama-layanan]`**
+    Untuk menunjukkan apakah sebuah layanan sedang aktif (berjalan).
+  * **`systemctl enable [nama-layanan]`**
+    Untuk mengaktifkan sebuah layanan saat sistem *booting*.
+  * **`systemctl disable [nama-layanan]`**
+    Untuk menonaktifkan sebuah layanan saat sistem *booting*.
+
+#### **Menyamarkan Layanan (*Masking Services*)**
+
+  * **`systemctl mask [nama-layanan]`**
+    Untuk menyamarkan (*mask*) sebuah layanan (Membuatnya sulit untuk memulai layanan secara tidak sengaja).
+  * **`systemctl unmask [nama-layanan]`**
+    Untuk membuka samaran (*unmask*) sebuah layanan.
+
+#### **Memulai Ulang Systemd**
+
+  * **`systemctl daemon-reload`**
+  
+---
+
+# Bab 10
+## Mengelola Layanan (*Services*)**
+
+### **Bagian 10.1: Mendiagnosis masalah pada sebuah layanan**
+
+Pada sistem yang menggunakan **systemd**, seperti Fedora \>= 15, Ubuntu (Server dan Desktop) \>= 15.04, dan RHEL/CentOS \>= 7:
+
+```bash
+systemctl status [service-name]
+```
+
+...di mana `[service-name]` adalah layanan yang dimaksud; contohnya, `systemctl status sshd`.
+Perintah ini akan menampilkan informasi status dasar dan setiap kesalahan (*error*) terbaru yang tercatat.
+
+Anda dapat melihat kesalahan lebih lanjut dengan `journalctl`. Sebagai contoh, `journalctl -xe` akan memuat 1000 catatan terakhir ke dalam *pager* (seperti `less`), dan langsung melompat ke bagian akhir. Anda juga dapat menggunakan `journalctl -f`, yang akan mengikuti pesan *log* saat pesan-pesan tersebut masuk.
+
+Untuk melihat *log* dari layanan tertentu, gunakan *flag* `-t`, seperti ini:
+
+```bash
+journalctl -f -t sshd
+```
+
+Opsi berguna lainnya termasuk `-p` untuk prioritas (`-p warnings` untuk melihat hanya peringatan dan di atasnya), `-b` untuk "sejak *boot* terakhir", dan `-S` untuk "sejak" — dengan menggabungkan itu, kita bisa melakukan:
+
+```bash
+journalctl -p err -S yesterday
+```
+
+untuk melihat semua item yang dicatat sebagai *error* sejak kemarin.
+
+Jika `journalctl` tidak tersedia, atau jika Anda mengikuti *log error* aplikasi yang tidak menggunakan *journal* sistem, perintah `tail` dapat digunakan untuk menunjukkan beberapa baris terakhir dari sebuah berkas. *Flag* yang berguna untuk `tail` adalah `-f` (untuk "*follow*"), yang menyebabkan `tail` terus menampilkan data saat ditambahkan ke berkas. Untuk melihat pesan dari sebagian besar layanan di sistem:
+
+```bash
+tail -f /var/log/messages
+```
+
+Atau, jika layanan tersebut memiliki hak istimewa (*privileged*), dan mungkin mencatat data sensitif:
+
+```bash
+tail -f /var/log/secure
+```
+
+Beberapa layanan memiliki berkas *log* sendiri, contoh yang baik adalah `auditd`, daemon audit linux, yang lognya disimpan di `/var/log/audit/`. Jika Anda tidak melihat keluaran dari layanan Anda di `/var/log/messages`, coba cari *log* spesifik layanan di `/var/log/`.
+
+### **Bagian 10.2: Memulai dan Menghentikan Layanan**
+
+Pada sistem yang menggunakan skrip init gaya **System-V**, seperti RHEL/CentOS 6:
+
+```bash
+service <service> start
+service <service> stop
+```
+
+Pada sistem yang menggunakan **systemd**, seperti Ubuntu (Server dan Desktop) \>= 15.04, dan RHEL/CentOS \>= 7:
+
+```bash
+systemctl <service> dnsmasq
+systemctl <service> dnsmasq
+```
+
+*[**Catatan Penerjemah:** Teks asli pada bagian ini tampaknya mengandung kesalahan ketik. Perintah yang benar untuk memulai dan menghentikan layanan dengan `systemctl` seharusnya adalah `systemctl start <service>` dan `systemctl stop <service>`.]*
+
+### **Bagian 10.3: Mendapatkan status sebuah layanan**
+
+Pada sistem yang menggunakan skrip init gaya **System-V**, seperti RHEL/CentOS 6:
+
+```bash
+service <service> status
+```
+
+Pada sistem yang menggunakan **systemd**, seperti Ubuntu (Server dan Desktop) \>= 15.04, dan RHEL/CentOS \>= 7.0:
+
+```bash
+systemctl status <service>
+```
+
+---
+
+# Bab 11
+## Memodifikasi Pengguna**
+
+| Parameter | Detail |
+| :--- | :--- |
+| **`username`** | Nama pengguna. Jangan gunakan huruf kapital, jangan gunakan titik, jangan diakhiri dengan tanda hubung, tidak boleh mengandung titik dua, tanpa karakter khusus. Tidak boleh diawali dengan angka. |
+
+### **Bagian 11.1: Mengatur kata sandi Anda sendiri**
+
+```bash
+passwd
+```
+
+### **Bagian 11.2: Mengatur kata sandi pengguna lain**
+
+Jalankan perintah berikut sebagai **root**:
+
+```bash
+passwd username
+```
+
+### **Bagian 11.3: Menambahkan pengguna**
+
+Jalankan perintah berikut sebagai **root**:
+
+```bash
+useradd username
+```
+
+### **Bagian 11.4: Menghapus pengguna**
+
+Jalankan perintah berikut sebagai **root**:
+
+```bash
+userdel username
+```
+
+### **Bagian 11.5: Menghapus pengguna beserta folder *home*-nya**
+
+Jalankan perintah berikut sebagai **root**:
+
+```bash
+userdel -r username
+```
+
+### **Bagian 11.6: Menampilkan daftar grup tempat pengguna saat ini berada**
+
+```bash
+groups
+```
+
+Informasi lebih detail tentang ID numerik pengguna dan grup dapat ditemukan dengan perintah `id`.
+
+### **Bagian 11.7: Menampilkan daftar grup tempat seorang pengguna berada**
+
+```bash
+groups username
+```
+
+Informasi lebih detail tentang ID numerik pengguna dan grup dapat ditemukan dengan `id username`.
+
+---
+
+# Bab 12
+## Perintah `tee`
+
+### **Opsi**
+
+| Opsi | Deskripsi |
+| :--- | :--- |
+| **-a, --append** | Tambahkan (*append*) ke BERKAS yang diberikan. Jangan menimpa. |
+| **-i, --ignore-interrupts** | Abaikan sinyal interupsi. |
+| **--help** | Tampilkan pesan bantuan, dan keluar. |
+| **--version** | Tampilkan informasi versi, dan keluar. |
+
+**`tee` - membaca dari masukan standar dan menulis ke keluaran standar dan berkas.**
+
+Perintah `tee` dinamai dari **sambungan-T** (*T-splitter*) dalam perpipaan, yang membagi aliran air ke dua arah dan berbentuk seperti huruf T kapital.
+
+`tee` menyalin data dari masukan standar ke setiap BERKAS, dan juga ke keluaran standar. Akibatnya, `tee` **menduplikasi masukannya**, mengarahkannya ke beberapa keluaran sekaligus.
+
+### **Bagian 12.1: Menulis keluaran ke stdout, dan juga ke sebuah berkas**
+
+Perintah berikut hanya menampilkan keluaran di layar (*stdout*).
+
+```bash
+$ ls
+```
+
+Perintah berikut hanya menulis keluaran ke berkas dan tidak ke layar.
+
+```bash
+$ ls > file
+```
+
+Perintah berikut (dengan bantuan perintah `tee`) menulis keluaran **baik ke layar (*stdout*) maupun ke berkas**.
+
+```bash
+$ ls | tee file
+```
+
+### **Bagian 12.2: Menulis keluaran dari tengah rantai *pipe* ke sebuah berkas dan mengembalikannya ke *pipe***
+
+Anda juga dapat menggunakan perintah `tee` untuk menyimpan keluaran dari sebuah perintah di dalam berkas dan mengarahkan keluaran yang sama ke perintah lain.
+
+Perintah berikut akan menulis entri *crontab* saat ini ke dalam berkas `crontab-backup.txt` **dan** meneruskan entri *crontab* tersebut ke perintah `sed`, yang akan melakukan substitusi. Setelah substitusi, hasilnya akan ditambahkan sebagai pekerjaan *cron* baru.
+
+```bash
+$ crontab -l | tee crontab-backup.txt | sed 's/old/new/' | crontab –
+```
+
+### **Bagian 12.3: Menulis keluaran ke beberapa berkas**
+
+Anda dapat menyalurkan (*pipe*) keluaran Anda ke beberapa berkas (termasuk terminal Anda) dengan menggunakan `tee` seperti ini:
+
+```bash
+$ ls | tee file1 file2 file3
+```
+
+### **Bagian 12.4: Memerintahkan `tee` untuk menambahkan (*append*) ke berkas**
+
+Secara *default*, perintah `tee` akan menimpa berkas yang ada. Anda dapat memerintahkan `tee` untuk menambahkan (*append*) ke berkas menggunakan opsi `–a` seperti yang ditunjukkan:
+
+```bash
+$ ls | tee –a file
+```
+
+---
+
+# Bab 13
+## Secure Shell (SSH)
+
+*Secure shell* digunakan untuk mengakses server dari klien dari jarak jauh melalui koneksi terenkripsi. **OpenSSH** digunakan sebagai alternatif untuk koneksi Telnet yang juga mencapai akses *shell* jarak jauh tetapi tidak terenkripsi. Klien OpenSSH sudah terpasang secara *default* pada sebagian besar distribusi GNU/Linux dan digunakan untuk terhubung ke server. Contoh-contoh ini menunjukkan cara menggunakan paket SSH untuk menerima koneksi SSH dan terhubung ke *host* lain.
+
+### **Bagian 13.1: Menghubungkan ke server jarak jauh**
+
+Untuk terhubung ke server, kita harus menggunakan SSH pada klien sebagai berikut:
+
+```bash
+# ssh -p port pengguna@alamat-server
+```
+
+  * **port** - Port SSH server yang sedang mendengarkan (port *default* adalah 22).
+  * **pengguna** - Harus merupakan pengguna yang ada di server dengan hak istimewa SSH.
+  * **alamat server** - IP/Domain dari server.
+
+Sebagai contoh dunia nyata, mari kita berpura-pura Anda sedang membuat sebuah situs web. Perusahaan yang Anda pilih untuk meng-hosting situs Anda memberitahu bahwa servernya berlokasi di `web-servers.com` pada port kustom `2020` dan nama akun Anda `usr1` telah dipilih untuk membuat pengguna di server dengan hak istimewa SSH. Dalam kasus ini, perintah SSH yang digunakan adalah sebagai berikut:
+
+```bash
+# ssh -p 2020 usr1@web-servers.com
+```
+
+Jika nama akun di sistem jarak jauh sama dengan yang ada di klien lokal, Anda dapat menghilangkan nama pengguna. Jadi jika Anda adalah `usr1` di kedua sistem, maka Anda cukup menggunakan `web-servers.com` alih-alih `usr1@web-servers.com`.
+
+Ketika server yang ingin Anda hubungi tidak dapat diakses secara langsung oleh Anda, Anda dapat mencoba menggunakan sakelar `ProxyJump` untuk terhubung melaluinya lewat server lain yang dapat Anda akses dan dapat terhubung ke server yang diinginkan.
+
+```bash
+# ssh -J usr1@10.0.0.1:2020 usr2@10.0.0.2 -p 2222
+```
+
+Ini akan memungkinkan Anda terhubung ke server `10.0.0.2` (menjalankan ssh di port 2222) melalui server di `10.0.0.1` (menjalankan ssh di port 2020). Tentu saja, Anda perlu memiliki akun di kedua server tersebut. Perhatikan juga bahwa sakelar `-J` diperkenalkan di OpenSSH versi 7.3.
+
+### **Bagian 13.2: Memasang paket OpenSSH**
+
+Baik untuk terhubung ke server SSH jarak jauh maupun untuk menerima koneksi SSH, keduanya memerlukan instalasi `openssh`.
+
+**Debian:**
+
+```bash
+# apt-get install openssh
+```
+
+**Arch Linux:**
+
+```bash
+# pacman -S openssh
+```
+
+**Yum:**
+
+```bash
+# yum install openssh
+```
+
+### **Bagian 13.3: Mengonfigurasi server SSH untuk menerima koneksi**
+
+Pertama, kita harus menyunting berkas konfigurasi *daemon* SSH. Meskipun pada distribusi Linux yang berbeda lokasinya mungkin berbeda, biasanya berkas ini disimpan di `/etc/ssh/sshd_config`.
+
+Gunakan editor teks Anda untuk mengubah nilai yang diatur dalam berkas ini, semua baris yang diawali dengan `#` adalah komentar dan karakter ini harus dihapus agar dapat berlaku. Berikut adalah daftar rekomendasinya:
+
+  * `Port` (pilih angka antara 0 - 65535, biasanya lebih besar dari empat digit)
+  * `PasswordAuthentication yes`
+  * `AllowUsers user1 user2 ...dst`
+
+Perlu dicatat bahwa lebih baik **menonaktifkan login dengan kata sandi sama sekali** dan menggunakan **Kunci SSH** untuk keamanan yang lebih baik seperti yang dijelaskan dalam dokumen ini.
+
+### **Bagian 13.4: Koneksi tanpa kata sandi (menggunakan pasangan kunci)**
+
+Pertama-tama, Anda harus memiliki pasangan kunci (*key pair*). Jika Anda belum memilikinya, lihat topik 'Menghasilkan kunci publik dan privat'.
+
+Pasangan kunci Anda terdiri dari kunci privat (`id_rsa`) dan kunci publik (`id_rsa.pub`). Yang perlu Anda lakukan hanyalah menyalin kunci publik ke *host* jarak jauh dan menambahkan isinya ke berkas `~/.ssh/authorized_keys`.
+
+Salah satu cara sederhana untuk melakukannya adalah:
+
+```bash
+ssh <pengguna>@<ssh-server> 'cat >> ~/.ssh/authorized_keys' < id_rsa.pub
+```
+
+Setelah kunci publik ditempatkan dengan benar di direktori *home* pengguna Anda, Anda hanya perlu login menggunakan kunci privat yang sesuai:
+
+```bash
+ssh <pengguna>@<ssh-server> -i id_rsa
+```
+
+### **Bagian 13.5: Menghasilkan kunci publik dan privat**
+
+Untuk menghasilkan kunci bagi klien SSH:
+
+```bash
+ssh-keygen [-t rsa | rsa1 | dsa ] [-C <komentar>] [-b bits]
+```
+
+Sebagai contoh:
+
+```bash
+ssh-keygen -t rsa -b 4096 -C emailku@email.com
+```
+
+Lokasi *default* adalah `~/.ssh/id_rsa` untuk kunci privat dan `~/.ssh/id_rsa.pub` untuk kunci publik.
+
+Untuk info lebih lanjut, silakan kunjungi `man.openbsd.org`.
+
+### **Bagian 13.6: Menonaktifkan layanan ssh**
+
+Ini akan menonaktifkan layanan sisi server SSH, yang jika diperlukan, akan memastikan bahwa klien tidak dapat terhubung melalui ssh.
+
+**Ubuntu**
+
+```bash
+sudo service ssh stop
+sudo systemctl disable sshd.service
+```
+
+**Debian**
+
+```bash
+sudo /etc/init.d/ssh stop
+sudo systemctl disable sshd.service
+```
+
+**Arch Linux**
+
+```bash
+sudo killall sshd
+sudo systemctl disable sshd.service
+```
+
+---
+
+# Bab 14
+## SCP
+
+### **Bagian 14.1: Salin Aman (*Secure Copy*)**
+
+Perintah `scp` digunakan untuk menyalin berkas secara aman **ke** atau **dari** tujuan jarak jauh. Jika berkas berada di direktori kerja saat ini, hanya nama berkas saja yang cukup. Jika tidak, diperlukan path lengkap yang menyertakan *hostname* jarak jauh, contohnya:
+
+```
+pengguna_jarakjauh@beberapa_server.org:/path/ke/berkas
+```
+
+#### **Menyalin berkas lokal di CWD Anda ke direktori baru**
+
+```bash
+scp berkaslokal.txt /home/teman/share/
+```
+
+#### **Menyalin berkas jarak jauh ke direktori kerja Anda saat ini**
+
+```bash
+scp rocky@arena51.net:/home/rocky/game/data.txt ./
+```
+
+#### **Menyalin berkas dari satu lokasi jarak jauh ke lokasi jarak jauh lainnya**
+
+```bash
+scp mars@universe.org:/beacon/light/bitmap.conf jupiter@universe.org:/beacon/night/
+```
+
+Untuk menyalin direktori dan sub-direktori, gunakan opsi rekursif **'-r'** pada `scp`.
+
+```bash
+scp -r user@192.168.0.4:~/project/* ./workspace/
+```
+
+### **Bagian 15.2: Penggunaan Dasar**
+
+```bash
+# Salin berkas jarak jauh ke direktori lokal
+scp user@remotehost.com:/remote/path/to/foobar.md /local/dest
+
+# Salin berkas lokal ke direktori jarak jauh
+scp foobar.md user@remotehost.com:/remote/dest
+
+# Berkas kunci dapat digunakan (sama seperti ssh)
+scp -i my_key.pem foobar.md user@remotehost.com:/remote/dest
+```
+
+---
+
