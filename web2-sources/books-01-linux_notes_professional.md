@@ -1,8 +1,8 @@
-# **Bab 1**
+# Bab 1
 
-# **Memulai dengan GNU/Linux**
+## Memulai dengan GNU/Linux
 
-## **Bagian 1.1: Perintah Manajemen Berkas**
+### **Bagian 1.1: Perintah Manajemen Berkas**
 
 Linux menggunakan beberapa konvensi untuk direktori saat ini dan direktori induk. Hal ini bisa sedikit membingungkan bagi pemula. Setiap kali Anda berada di terminal Linux, Anda akan berada di dalam apa yang disebut **direktori kerja saat ini** (*current working directory*). Sering kali, *command prompt* Anda akan menampilkan seluruh direktori kerja, atau hanya bagian terakhir dari direktori tersebut. *Prompt* Anda bisa terlihat seperti salah satu dari berikut ini:
 
@@ -442,11 +442,10 @@ anotherFile
 
 ---
 
-# **Bab 2**
+# Bab 2
+## **Mendeteksi Nama dan Versi Distribusi Linux**
 
-# **Mendeteksi Nama dan Versi Distribusi Linux**
-
-## **Bagian 2.1: Mendeteksi distribusi berbasis Debian yang sedang Anda gunakan**
+### **Bagian 2.1: Mendeteksi distribusi berbasis Debian yang sedang Anda gunakan**
 
 Cukup jalankan **`lsb_release -a`**.
 
@@ -648,7 +647,8 @@ DISTRIB_DESCRIPTION="Ubuntu 14.04 LTS"
 
 ---
 
-## **Bab 3: Mendapatkan informasi kernel Linux yang sedang berjalan**
+# Bab 3
+## Mendapatkan informasi kernel Linux yang sedang berjalan**
 
 ### **Bagian 3.1: Mendapatkan detail kernel Linux**
 
@@ -693,7 +693,8 @@ Mencetak informasi sistem tertentu. Jika tanpa OPSI, sama dengan `-s`.
 
 ---
 
-## **Bab 4: Shell**
+# Bab 4
+## Shell
 
 *Shell* mengeksekusi sebuah program sebagai respons terhadap *prompt*-nya. Ketika Anda memberikan sebuah perintah, *shell* akan mencari program tersebut, lalu mengeksekusinya. Sebagai contoh, ketika Anda memberikan perintah `ls`, *shell* akan mencari utilitas/program bernama `ls`, dan kemudian menjalankannya di dalam *shell*. Argumen dan opsi yang Anda berikan bersama utilitas dapat memengaruhi hasil yang Anda dapatkan. *Shell* juga dikenal sebagai **CLI**, atau *command line interface* (antarmuka baris perintah).
 
@@ -842,6 +843,505 @@ find / -name mykey.pem -print
 ```
 
 Perintah ini kurang lebih setara dengan `locate mykey.pem` tetapi harus memindai sistem berkas Anda setiap kali Anda menjalankannya untuk mencari berkas yang dimaksud, alih-alih menggunakan data dari *cache*. Ini jelas lebih lambat dan kurang efisien, tetapi lebih *real-time*. Utilitas `find` dapat melakukan lebih dari sekadar menemukan berkas, tetapi deskripsi lengkap kemampuannya berada di luar cakupan contoh ini.
+
+---
+
+# Bab 5
+## Memeriksa Ruang Disk**
+
+### **Bagian 5.1: Memeriksa Penggunaan Disk pada Direktori**
+
+Terkadang, Anda mungkin perlu mencari tahu direktori mana yang menghabiskan berapa banyak ruang disk, terutama ketika Anda menggunakan `df -h` dan menyadari bahwa ruang disk yang tersedia sudah menipis.
+
+#### **du:**
+
+Perintah `du` merangkum penggunaan disk dari sekumpulan BERKAS, secara rekursif untuk direktori.
+
+Perintah ini sering digunakan dengan opsi `-sh`:
+
+  * `-s, --summarize`
+      * Hanya menampilkan total untuk setiap argumen.
+  * `-h, --human-readable`
+      * Mencetak ukuran dalam format yang dapat dibaca manusia (contoh: 1K, 234M, 2G).
+
+Untuk merangkum penggunaan disk dari berkas-berkas di direktori saat ini, kita menggunakan:
+
+```bash
+du -sh *
+```
+
+Contoh keluaran:
+
+```
+572K    Documents
+208M    Downloads
+4,0K    Music
+724K    Pictures
+4,0K    Public
+4,0K    Templates
+4,0K    Videos
+```
+
+Kita juga dapat menyertakan berkas tersembunyi (*hidden files*) dengan menggunakan:
+
+```bash
+du -sh .[!.]* *
+```
+
+Contoh keluaran:
+
+```
+6,3M    .atom
+4,0K    .bash_history
+4,0K    .bash_logout
+8,0K    .bashrc
+350M    .cache
+195M    .config
+12K     .dbus
+4,0K    .dmrc
+44K     .gconf
+60K     .gem
+520K    .gimp-2.8
+28K     .gnome
+4,0K    .ICEauthority
+8,3M    .local
+8,0K    .nano
+404K    .nv
+36K     .pki
+4,0K    .profile
+8,0K    .ssh
+0       .sudo_as_admin_successful
+4,0K    .Xauthority
+4,0K    .xsession-errors
+4,0K    .xsession-errors.old
+572K    Documents
+208M    Downloads
+4,0K    Music
+724K    Pictures
+4,0K    Public
+4,0K    Templates
+4,0K    Videos
+```
+
+Ketiga, Anda dapat menambahkan total pada keluaran dengan menambahkan opsi `-c`:
+
+```bash
+du -sch .[!.]* *
+```
+
+Hasil:
+
+```
+.
+.
+.
+4,0K    Templates
+4,0K    Videos
+769M    total
+```
+
+Yang paling penting, menggunakan perintah `du` dengan benar pada direktori *root* adalah tindakan penyelamat untuk menemukan aplikasi/layanan atau pengguna mana yang menghabiskan ruang disk Anda secara tidak wajar. Misalnya, dalam kasus ketersediaan ruang disk yang sangat rendah untuk server web dan email, alasannya bisa jadi adalah serangan spam ke layanan email Anda, dan Anda dapat mendiagnosisnya hanya dengan menggunakan perintah `du`.
+
+**Memeriksa penggunaan disk pada direktori root:**
+
+```bash
+sudo du -sch /.[!.]* /*
+```
+
+Contoh keluaran:
+
+```
+16K     /.VolumeIcon.icns
+24K     /.VolumeIcon.png
+13M     /bin
+57M     /boot
+4,0K    /cdrom
+620K    /dev
+13M     /etc
+779M    /home
+0       /initrd.img
+406M    /lib
+3,9M    /lib32
+4,0K    /lib64
+16K     /lost+found
+4,0K    /media
+4,0K    /mnt
+367M    /opt
+du: tidak dapat mengakses '/proc/18221/task/18221/fd/4': Tidak ada berkas atau direktori seperti itu
+du: tidak dapat mengakses '/proc/18221/task/18221/fdinfo/4': Tidak ada berkas atau direktori seperti itu
+du: tidak dapat mengakses '/proc/18221/fd/4': Tidak ada berkas atau direktori seperti itu
+du: tidak dapat mengakses '/proc/18221/fdinfo/4': Tidak ada berkas atau direktori seperti itu
+0       /proc
+20K     /root
+du: tidak dapat mengakses '/run/user/1000/gvfs': Izin ditolak
+9,4M    /run
+13M     /sbin
+4,0K    /srv
+0       /sys
+72K     /tmp
+3,5G    /usr
+639M    /var
+0       /vmlinuz
+5,8G    total
+```
+
+Terakhir, metode terbaik terbentuk ketika Anda menambahkan nilai ambang batas ukuran untuk direktori agar mengabaikan yang berukuran kecil. Perintah ini hanya akan menampilkan folder dengan ukuran lebih dari 1GB yang terletak di bawah direktori *root* hingga ke cabang terjauh dari seluruh pohon direktori di sistem berkas Anda:
+
+```bash
+sudo du --threshold=1G -ch /.[!.]* /*
+```
+
+Contoh keluaran:
+
+```
+1,4G    /usr/lib
+1,8G    /usr/share
+3,5G    /usr
+5,8G    total
+```
+
+### **Bagian 5.2: Memeriksa Ruang Disk**
+
+Sudah menjadi hal yang biasa untuk ingin memeriksa status berbagai partisi/drive di server/komputer Anda untuk melihat seberapa penuh partisinya. Perintah berikut adalah yang ingin Anda jalankan:
+
+```bash
+df -h
+```
+
+Ini akan menghasilkan keluaran yang mirip dengan berikut ini:
+
+```
+[root@mail ~]# df -h
+Filesystem                      Size  Used Avail Use% Mounted on
+/dev/mapper/VolGroup-lv_root     19G  1.6G   16G   9% /
+tmpfs                           245M     0  245M   0% /dev/shm
+/dev/sda1                       485M   47M  413M  11% /boot
+```
+
+Dalam contoh dasar ini, kita dapat melihat bahwa partisi `/` hanya terpakai 9%.
+
+Untuk contoh yang lebih kompleks yang juga mencakup penggunaan `df` untuk melihat berbagai *mountpoint*, lihat di bawah ini:
+
+```
+[root@mail ~]# df -h
+Filesystem                Size  Used Avail Use% Mounted on
+/dev/mapper/VG-root       1.9T  1.7T   89G  95% /
+/dev/mapper/VG-var        431G  145G  264G  36% /var
+devtmpfs                  7.8G  204K  7.8G   1% /dev
+tmpfs                     7.8G  4.0K  7.8G   1% /dev/shm
+/dev/md1                  495M  126M  344M  27% /boot
+ku.example.com:9421       2.5T  487G  2.0T  20% /mnt/test
+tmpfs                     500M   86M  415M  18% /var/ngx_pagespeed_cache
+```
+
+Dalam contoh ini, kita memiliki partisi `/` yang penuh 95% bersama dengan partisi `/var` tambahan yang hanya penuh 36%. Ada juga *mount* jaringan eksternal sebesar 2T yang di-*mount* di `/mnt/test` dan *mount* ramdisk/tmpfs sebesar 500M yang di-*mount* di `/var/ngx_pagespeed_cache`.
+
+---
+
+# Bab 6
+## Mendapatkan Informasi Sistem**
+
+Kumpulan perintah untuk mengambil informasi terkait sistem.
+
+### **Bagian 6.1: Statistik tentang CPU, Memori, Jaringan, dan Disk (operasi I/O)**
+
+Untuk mendapatkan statistik umum tentang komponen utama, keluarga perintah `stat` di Linux sangatlah berguna.
+
+#### **CPU**
+
+Untuk mendapatkan statistik terkait prosesor, Anda dapat menggunakan perintah `mpstat`, tetapi dengan beberapa opsi, perintah ini akan memberikan visibilitas yang lebih baik:
+
+```bash
+$ mpstat 2 10
+```
+
+#### **Memori**
+
+Kita semua tahu perintah `free` untuk menunjukkan jumlah RAM (yang tersisa), tetapi untuk melihat semua statistik termasuk operasi I/O:
+
+```bash
+$ vmstat 2 10
+```
+
+#### **Disk**
+
+Untuk mendapatkan informasi umum tentang operasi disk Anda secara *real-time*, Anda dapat memanfaatkan `iostat`.
+
+```bash
+$ iostat -kx 2
+```
+
+#### **Jaringan**
+
+Untuk dapat melihat apa yang terjadi dengan layanan jaringan Anda, Anda dapat menggunakan `netstat`.
+
+```bash
+$ netstat -ntlp # soket TCP yang terbuka
+$ netstat -nulp # soket UDP yang terbuka
+$ netstat -nxlp # soket Unix yang terbuka
+```
+
+Tetapi Anda mungkin merasa pemantauan untuk melihat lalu lintas jaringan secara *real-time* lebih berguna:
+
+```bash
+$ sudo iftop
+```
+
+#### **Opsional**
+
+Untuk menghasilkan statistik secara *real-time* yang terkait dengan operasi I/O di semua komponen, Anda dapat menggunakan `dstat`. Alat ini adalah pengganti serbaguna untuk `vmstat`, `iostat`, dan `ifstat`.
+
+### **Bagian 6.2: Menggunakan alat seperti lscpu dan lshw**
+
+Dengan menggunakan alat seperti `lscpu`, ini adalah cara mudah untuk mendapatkan informasi CPU.
+
+```bash
+$ lscpu
+```
+
+```
+Architecture:          x86_64
+CPU op-mode(s):        32-bit, 64-bit
+Byte Order:            Little Endian
+CPU(s):                4
+On-line CPU(s) list:   0-3
+Thread(s) per core:    1
+Core(s) per socket:    4
+Socket(s):             1
+NUMA node(s):          1
+Vendor ID:             GenuineIntel
+CPU family:            6
+Model:                 23
+Stepping:              10
+CPU MHz:               1998.000
+BogoMIPS:              5303.14
+Virtualization:        VT-x
+L1d cache:             32K
+L1i cache:             32K
+L2 cache:              2048K
+NUMA node0 CPU(s):     0-3
+```
+
+Dengan menggunakan alat `lshw`
+
+```bash
+$ lshw | grep cpu
+```
+
+```
+df1-ws-5084
+description: Computer
+width: 64 bits
+capabilities: vsyscall32
+    *-core
+          description: Motherboard
+          physical id: 0
+          *-memory
+               description: System memory
+               physical id: 0
+               size: 5881MiB
+          *-cpu
+               product: Intel(R) Pentium(R) CPU G3220 @ 3.00GHz
+               vendor: Intel Corp.
+               physical id: 1
+               bus info: cpu@0
+               size: 3GHz
+               capacity: 3GHz
+               width: 64 bits
+```
+
+### **Bagian 6.3: Menampilkan Daftar Perangkat Keras**
+
+**Ubuntu:**
+`lshw` adalah alat kecil untuk mengekstrak informasi terperinci tentang konfigurasi perangkat keras mesin. Ia dapat melaporkan konfigurasi memori yang tepat, versi *firmware*, konfigurasi *mainboard*, versi dan kecepatan CPU, konfigurasi *cache*, kecepatan *bus*, dll.
+
+```bash
+$ sudo lshw | less (atau more)
+$ sudo lshw -html > myhardware.html
+$ sudo lshw -xml > myhardware.xml
+```
+
+Untuk menampilkan info PCI
+
+```bash
+$ lspci -tv
+```
+
+Untuk melihat info USB
+
+```bash
+$ lsusb -tv
+```
+
+Untuk menampilkan informasi BIOS
+
+```bash
+$ dmidecode -q | less
+```
+
+Untuk melihat informasi spesifik tentang disk (disk `sda` dalam contoh), Anda dapat menggunakan:
+
+```bash
+$ hdparm -i /dev/sda
+```
+
+Beberapa utilitas/perintah tambahan akan membantu mengumpulkan beberapa informasi ekstra:
+
+```bash
+# Berapa lama total disk (sistem) ini telah menyala
+$ smartctl -A /dev/sda | grep Power_On_Hours
+
+# Lakukan tes kecepatan baca pada disk sda
+$ hdparm -tT /dev/sda
+
+# Uji blok yang tidak dapat dibaca pada disk sda
+$ badblocks -s /dev/sda
+```
+
+### **Bagian 6.4: Menemukan informasi model/kecepatan CPU**
+
+**Ubuntu:**
+
+```bash
+$ cat /proc/cpuinfo
+```
+
+Contoh Keluaran:
+
+```
+processor       : 0
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 15
+model name      : Intel(R) Core(TM)2 Quad CPU    Q6600  @ 2.40GHz
+stepping        : 11
+cpu MHz         : 1596.000
+cache size      : 4096 KB
+physical id     : 0
+siblings        : 4
+core id         : 0
+cpu cores       : 4
+apicid          : 0
+initial apicid  : 0
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 10
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx lm constant_tsc arch_perfmon pebs bts rep_good pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm lahf_lm tpr_shadow vnmi flexpriority
+bogomips        : 4800.18
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 36 bits physical, 48 bits virtual
+power management:
+
+....
+..
+
+processor       : 3
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 15
+model name      : Intel(R) Core(TM)2 Quad CPU    Q6600  @ 2.40GHz
+stepping        : 11
+cpu MHz         : 1596.000
+cache size      : 4096 KB
+physical id     : 0
+siblings        : 4
+core id         : 3
+cpu cores       : 4
+apicid          : 3
+initial apicid  : 3
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 10
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx lm constant_tsc arch_perfmon pebs bts rep_good pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm lahf_lm tpr_shadow vnmi flexpriority
+bogomips        : 4800.30
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 36 bits physical, 48 bits virtual
+power management:
+```
+
+Menghitung jumlah prosesor (termasuk *core*):
+
+```bash
+$ grep -c processor /proc/cpuinfo
+```
+
+### **Bagian 6.5: Pemantauan proses dan pengumpulan informasi**
+
+Secara keseluruhan, Anda memiliki dua cara untuk memantau proses di *host* linux.
+
+#### **Pemantauan statis**
+
+Perintah yang paling banyak digunakan adalah `ps` (yaitu, *process status*). Perintah ini digunakan untuk memberikan informasi tentang proses yang sedang berjalan, termasuk nomor identifikasi proses (PID) mereka.
+
+Berikut beberapa opsi yang berguna untuk mengumpulkan informasi spesifik.
+
+Menampilkan daftar proses dalam hierarki
+
+```bash
+$ ps -e -o pid,args --forest
+```
+
+Menampilkan daftar proses yang diurutkan berdasarkan penggunaan % CPU
+
+```bash
+$ ps -e -o pcpu,cpu,nice,state,cputime,args --sort pcpu | sed '/^ 0.0 /d'
+```
+
+Menampilkan daftar proses yang diurutkan berdasarkan penggunaan memori (KB).
+
+```bash
+$ ps -e -orss=,args= | sort -b -k1,1n | pr -TW$COLUMNS
+```
+
+Menampilkan semua *thread* untuk proses tertentu (proses "firefox-bin" dalam contoh)
+
+```bash
+$ ps -C firefox-bin -L -o pid,tid,pcpu,state
+```
+
+Setelah menemukan proses tertentu, Anda dapat mengumpulkan informasi yang terkait dengannya menggunakan `lsof` untuk menampilkan daftar *path* yang dibuka oleh ID proses tersebut.
+
+```bash
+$ lsof -p $$
+```
+
+Atau berdasarkan *path*, cari tahu daftar proses yang membuka *path* yang ditentukan.
+
+```bash
+$ lsof ~
+```
+
+#### **Pemantauan interaktif**
+
+Alat yang paling umum dikenal untuk pemantauan dinamis adalah:
+
+```bash
+$ top
+```
+
+Ini adalah perintah yang sebagian besar sudah menjadi *default* yang memiliki banyak sekali opsi untuk memfilter dan menyajikan informasi secara *real-time* (dibandingkan dengan perintah `ps`).
+
+Namun, masih ada opsi yang lebih canggih yang dapat dipertimbangkan dan dipasang sebagai pengganti `top`.
+
+```bash
+$ htop -d 5
+```
+
+atau
+
+```bash
+$ atop
+```
+
+Yang memiliki kemampuan untuk mencatat semua aktivitas ke dalam berkas log (secara *default* `atop` akan mencatat semua aktivitas setiap 600 detik). Ke dalam daftar ini, ada beberapa perintah khusus seperti `iotop` atau `iftop`.
+
+```bash
+$ sudo iotop
+```
 
 ---
 
