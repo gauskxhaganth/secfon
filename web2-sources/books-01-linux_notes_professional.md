@@ -442,3 +442,224 @@ anotherFile
 
 ---
 
+Tentu, ini adalah kelanjutan terjemahannya.
+
+-----
+
+# **Bab 2**
+
+# **Mendeteksi Nama dan Versi Distribusi Linux**
+
+## **Bagian 2.1: Mendeteksi distribusi berbasis Debian yang sedang Anda gunakan**
+
+Cukup jalankan **`lsb_release -a`**.
+
+Pada Debian:
+
+```bash
+$ lsb_release -a
+No LSB modules are available.
+Distributor ID: Debian
+Description:    Debian GNU/Linux testing (stretch)
+Release:        testing
+Codename:       stretch
+```
+
+Pada Ubuntu:
+
+```bash
+$ lsb_release -a
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description:    Ubuntu 14.04.4 LTS
+Release:        14.04
+Codename:       trusty
+```
+
+Jika Anda tidak memiliki `lsb_release` yang terinstal, Anda mungkin ingin mencoba menebak, sebagai contoh, ada berkas `/etc/issue` yang sering kali berisi nama distribusi. Contohnya, pada Ubuntu:
+
+```bash
+$ cat /etc/issue
+Ubuntu 12.04.5 LTS \n \l
+```
+
+Jangan gunakan berkas `/etc/debian_version` karena isinya tidak cocok dengan nama distribusi\!
+
+Perhatikan bahwa cara ini juga akan berfungsi pada distribusi non-keluarga Debian seperti Fedora, RHEL, atau openSUSE — tetapi `lsb_release` mungkin tidak terinstal.
+
+-----
+
+## **Bagian 2.2: Mendeteksi distribusi berbasis systemd yang Anda gunakan**
+
+Metode ini akan berfungsi pada versi modern dari Arch, CentOS, CoreOS, Debian, Fedora, Mageia, openSUSE, Red Hat Enterprise Linux, SUSE Linux Enterprise Server, Ubuntu, dan lainnya. Penerapannya yang luas menjadikannya pendekatan pertama yang ideal, dengan beralih ke metode lain jika Anda juga perlu mengidentifikasi sistem yang lebih lama.
+
+Lihat isi **/etc/os-release**. Secara spesifik, lihat variabel **`NAME`**, **`VERSION`**, **`ID`**, **`VERSION_ID`**, dan **`PRETTY_NAME`**.
+
+Pada Fedora, berkas ini mungkin terlihat seperti:
+
+```
+NAME=Fedora
+VERSION="24 (Workstation Edition)"
+ID=fedora
+VERSION_ID=24
+PRETTY_NAME="Fedora 24 (Workstation Edition)"
+ANSI_COLOR="0;34"
+CPE_NAME="cpe:/o:fedoraproject:fedora:24"
+HOME_URL="https://fedoraproject.org/"
+BUG_REPORT_URL="https://bugzilla.redhat.com/"
+REDHAT_BUGZILLA_PRODUCT="Fedora"
+REDHAT_BUGZILLA_PRODUCT_VERSION=24
+REDHAT_SUPPORT_PRODUCT="Fedora"
+REDHAT_SUPPORT_PRODUCT_VERSION=24
+PRIVACY_POLICY_URL=https://fedoraproject.org/wiki/Legal:PrivacyPolicy
+VARIANT="Workstation Edition"
+VARIANT_ID=workstation
+```
+
+Pada CentOS, berkas ini mungkin terlihat seperti ini:
+
+```
+NAME="CentOS Linux"
+VERSION="7 (Core)"
+ID="centos"
+ID_LIKE="rhel fedora"
+VERSION_ID="7"
+PRETTY_NAME="CentOS Linux 7 (Core)"
+ANSI_COLOR="0;31"
+CPE_NAME="cpe:/o:centos:centos:7"
+HOME_URL="https://www.centos.org/"
+BUG_REPORT_URL="https://bugs.centos.org/"
+CENTOS_MANTISBT_PROJECT="CentOS-7"
+CENTOS_MANTISBT_PROJECT_VERSION="7"
+REDHAT_SUPPORT_PRODUCT="centos"
+REDHAT_SUPPORT_PRODUCT_VERSION="7"
+```
+
+Berkas ini didokumentasikan di situs web freedesktop; pada prinsipnya, ini tidak spesifik untuk systemd — tetapi akan ada di semua distribusi berbasis systemd.
+
+Dari *bash shell*, seseorang dapat mengambil sumber (*source*) berkas `/etc/os-release` dan kemudian menggunakan berbagai variabel secara langsung, seperti ini:
+
+```bash
+$ ( source /etc/os-release && echo "$PRETTY_NAME" )
+Fedora 24 (Workstation Edition)
+```
+
+-----
+
+## **Bagian 2.3: Mendeteksi distribusi RHEL / CentOS / Fedora yang sedang Anda gunakan**
+
+Lihat isi dari **/etc/redhat-release**
+
+```bash
+cat /etc/redhat-release
+```
+
+Berikut adalah keluaran dari mesin Fedora 24: `Fedora release 24 (Twenty Four)`
+
+Seperti yang disebutkan dalam tanggapan berbasis Debian, Anda juga dapat menggunakan perintah **`lsb_release -a`**, yang menghasilkan keluaran ini dari mesin Fedora 24:
+
+```
+LSB Version:    :core-4.1-amd64:core-4.1-noarch:cxx-4.1-amd64:cxx-4.1-noarch:desktop-4.1-amd64:desktop-4.1-noarch:languages-4.1-amd64:languages-4.1-noarch:printing-4.1-amd64:printing-4.1-noarch
+Distributor ID: Fedora
+Description:    Fedora release 24 (Twenty Four)
+Release:        24
+Codename:       TwentyFour
+```
+
+-----
+
+## **Bagian 2.4: Uname - Mencetak informasi tentang sistem saat ini**
+
+`Uname` adalah singkatan dari *unix name*. Cukup ketik `uname` di konsol untuk mendapatkan informasi tentang sistem operasi Anda.
+
+```
+uname [OPSI]
+```
+
+Jika tidak ada OPSI yang ditentukan, `uname` mengasumsikan opsi `-s`.
+
+  * **`-a`** atau **`--all`** - Mencetak semua informasi, mengabaikan `-p` dan `-i` jika informasinya tidak diketahui.
+
+Contoh:
+
+```bash
+> uname -a
+SunOS hope 5.7 Generic_106541-08 sun4m sparc SUNW,SPARCstation-10
+```
+
+Semua opsi:
+
+  * **`-s, --kernel-name`** - Mencetak nama kernel.
+  * **`-n, --nodename`** - Mencetak nama *hostname* node jaringan.
+  * **`-r, --kernel-release`** - Mencetak rilis kernel.
+  * **`-v, --kernel-version`** - Mencetak versi kernel.
+  * **`-m, --machine`** - Mencetak nama perangkat keras mesin.
+  * **`-p, --processor`** - Mencetak tipe prosesor, atau "unknown".
+  * **`-i, --hardware-platform`** - Mencetak platform perangkat keras, atau "unknown".
+  * **`-o, --operating-system`** - Mencetak sistem operasi.
+  * **`--help`** - Menampilkan pesan bantuan, dan keluar.
+  * **`--version`** - Menampilkan informasi versi, dan keluar.
+
+-----
+
+## **Bagian 2.5: Mendeteksi informasi dasar tentang distro Anda**
+
+Cukup jalankan **`uname -a`**.
+
+Pada Arch:
+
+```bash
+$ uname -a
+Linux nokia 4.6.4-1-ARCH #1 SMP PREEMPT Mon Jul 11 19:12:32 CEST 2016 x86_64 GNU/Linux
+```
+
+-----
+
+## **Bagian 2.6: Menggunakan GNU coreutils**
+
+Jadi, *GNU coreutils* seharusnya tersedia di semua sistem berbasis Linux (tolong koreksi saya jika saya salah di sini).
+
+Jika Anda tidak tahu sistem apa yang Anda gunakan, Anda mungkin tidak bisa langsung melompat ke salah satu contoh di atas, oleh karena itu ini mungkin menjadi langkah pertama Anda.
+
+```bash
+$ uname -a
+```
+
+Pada sistem saya, ini memberi saya hasil sebagai berikut...
+
+```
+Linux Scibearspace 3.16.0-4-amd64 #1 SMP Debian 3.16.7-ckt25-2+deb8u3 (2016-07-02) x86_64 GNU/Linux
+```
+
+Di sini Anda dapat melihat hal-hal berikut:
+
+  * `Scibearspace` : nama pc saya
+  * `Scibearspace` : nama pc saya
+  * `3.16.0-4-amd64` : kernel dan arsitekturnya
+  * `SMP Debian 3.16.7-CKT25-2+deb8u3` : memberitahu saya bahwa saya menjalankan Debian dengan kernel 3.16
+  * Akhirnya bagian terakhir saya menjalankan Debian 8 (update 3).
+
+Saya akan menyambut siapa pun untuk menambahkan hasil untuk sistem RHEL, dan SuSe.
+
+-----
+
+## **Bagian 2.7: Menemukan nama dan nomor rilis OS linux Anda (baik debian & rpm)**
+
+Sebagian besar distro linux menyimpan info versinya di berkas `/etc/lsb-release` (debian) atau `/etc/redhat-release` (berbasis RPM). Menggunakan perintah generik di bawah ini seharusnya bisa membantu Anda melewati sebagian besar turunan Debian dan RPM seperti Linux Mint dan Cent-Os.
+
+Contoh pada Mesin Ubuntu:
+
+```bash
+cat /etc/*release
+```
+
+```
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=14.04
+DISTRIB_CODENAME=trusty
+DISTRIB_DESCRIPTION="Ubuntu 14.04 LTS"
+```
+
+---
+
+
