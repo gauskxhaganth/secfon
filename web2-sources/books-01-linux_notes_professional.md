@@ -1,7 +1,3 @@
-Tentu, ini adalah terjemahan dan format yang telah dirapikan dari teks yang Anda berikan.
-
------
-
 # **Bab 1**
 
 # **Memulai dengan GNU/Linux**
