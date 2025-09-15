@@ -2006,3 +2006,439 @@ scp -i my_key.pem foobar.md user@remotehost.com:/remote/dest
 
 ---
 
+# Bab 15
+## GnuPG (GPG)
+ 
+**GnuPG** adalah sistem manajemen kunci canggih yang memungkinkan penandatanganan atau enkripsi data secara aman. **GPG** adalah alat baris perintah (*command-line*) yang digunakan untuk membuat dan memanipulasi kunci GnuPG.
+
+GnuPG paling banyak digunakan untuk koneksi **SSH** (*Secure Shell*) tanpa kata sandi atau otentikasi interaktif apa pun, yang secara signifikan meningkatkan tingkat keamanan.
+
+Bagian-bagian berikut menjelaskan cara membuat, menggunakan, dan menjaga keamanan kunci GnuPG.
+
+### **Bagian 15.1: Mengekspor kunci publik Anda**
+
+Agar pasangan kunci publik-privat Anda berguna, Anda harus membuat kunci publik Anda tersedia secara bebas untuk orang lain. Pastikan Anda hanya bekerja dengan **kunci publik** Anda di sini, karena Anda **tidak boleh membagikan kunci privat Anda**. Anda dapat mengekspor kunci publik Anda dengan perintah berikut:
+
+```bash
+gpg —armor —export ALAMAT_EMAIL > public_key.asc
+```
+
+di mana `ALAMAT_EMAIL` adalah alamat email yang terkait dengan kunci tersebut.
+
+Sebagai alternatif, Anda dapat mengunggah kunci publik Anda ke server kunci publik seperti `keys.gnupg.net` agar orang lain dapat menggunakannya. Untuk melakukannya, masukkan perintah berikut di terminal:
+
+```bash
+gpg —list-keys
+```
+
+Kemudian, cari string 8 digit (ID primer) yang terkait dengan kunci yang ingin Anda ekspor. Selanjutnya, jalankan perintah:
+
+```bash
+gpg —send-keys ID_PRIMER
+```
+
+di mana `ID_PRIMER` adalah ID aktual dari kunci tersebut.
+
+Sekarang, kunci publik telah diunggah ke server kunci dan tersedia untuk umum.
+
+### **Bagian 15.2: Membuat dan menggunakan kunci GnuPG dengan cepat**
+
+Pasang `haveged` (contoh `sudo apt-get install haveged`) untuk mempercepat proses pembuatan *byte* acak. Kemudian:
+
+```bash
+gpg --gen-key
+gpg --list-keys
+```
+
+menghasilkan keluaran:
+
+```
+pub   2048R/NNNNNNNN 2016-01-01
+uid                  Nama <nama@contoh.com>
+sub   2048R/xxxxxxxx 2016-01-01
+```
+
+Kemudian publikasikan:
+
+```bash
+gpg --keyserver pgp.mit.edu --send-keys NNNNNNNN
+```
+
+Selanjutnya, rencanakan untuk pencabutan (*revoke*): [https://www.hackdiary.com/2004/01/18/revoking-a-gpg-key/](https://www.hackdiary.com/2004/01/18/revoking-a-gpg-key/)
+
+---
+
+# Bab 16
+## Konfigurasi Jaringan**
+
+Dokumen ini mencakup dasar-dasar jaringan TCP/IP, administrasi jaringan, dan konfigurasi sistem. Linux dapat mendukung beberapa perangkat jaringan. Nama perangkat diberi nomor yang dimulai dari nol dan terus bertambah. Sebagai contoh, komputer dengan dua NIC akan memiliki dua perangkat berlabel `eth0` dan `eth1`.
+
+### **Bagian 16.1: Resolusi DNS lokal**
+
+Berkas: `/etc/hosts` berisi daftar *host* yang akan diresolusi secara lokal (bukan oleh DNS).
+
+Contoh isi berkas:
+
+```
+127.0.0.1       localhost.localdomain   localhost
+XXX.XXX.XXX.XXX your-node-name.your-domain.com node-name
+```
+
+Format berkas untuk `hosts` ditentukan oleh RFC 952.
+
+### **Bagian 16.2: Mengonfigurasi server DNS untuk resolusi nama domain**
+
+Berkas: `/etc/resolv.conf` berisi daftar server DNS untuk resolusi nama domain.
+
+Contoh isi berkas:
+
+```
+nameserver 8.8.8.8 # Alamat IP dari server nama primer
+nameserver 8.8.4.4 # Alamat IP dari server nama sekunder
+```
+
+Jika Anda menggunakan server DNS internal, Anda dapat memvalidasi apakah server ini me-resolusi nama DNS dengan benar menggunakan perintah `dig`:
+
+```bash
+$ dig google.com @your.dns.server.com +short
+```
+
+### **Bagian 16.3: Melihat dan memanipulasi rute (*routes*)**
+
+#### **Memanipulasi tabel rute IP menggunakan `route`**
+
+**Menampilkan tabel rute**
+
+```bash
+$ route # Menampilkan daftar rute dan juga me-resolusi nama host
+$ route -n # Menampilkan daftar rute tanpa me-resolusi nama host untuk hasil yang lebih cepat
+```
+
+**Menambah/Menghapus rute**
+
+| Opsi | Deskripsi |
+| :--- | :--- |
+| `add` atau `del` | Tambah atau hapus rute. |
+| `-host x.x.x.x` | Tambah rute ke satu *host* yang diidentifikasi oleh alamat IP. |
+| `-net x.x.x.x` | Tambah rute ke sebuah jaringan yang diidentifikasi oleh alamat jaringan. |
+| `gw x.x.x.x` | Tentukan *gateway* jaringan. |
+| `netmask x.x.x.x`| Tentukan *netmask* jaringan. |
+| `default` | Tambah rute *default*. |
+
+**Contoh:**
+
+```bash
+# Tambah rute ke sebuah host
+$ route add -host x.x.x.x eth1
+
+# Tambah rute ke sebuah jaringan
+$ route add -net 2.2.2.0 netmask 255.255.255.0 eth0
+
+# Sebagai alternatif, Anda juga bisa menggunakan format cidr untuk menambahkan rute ke jaringan
+route add -net 2.2.2.0/24 eth0
+
+# Tambah gateway default
+$ route add default gw 2.2.2.1 eth0
+
+# Hapus rute
+$ route del -net 2.2.2.0/24
+```
+
+#### **Memanipulasi tabel rute IP menggunakan `ip`**
+
+**Menampilkan tabel rute**
+
+```bash
+$ ip route show # Tampilkan daftar tabel rute
+```
+
+**Menambah/Menghapus rute**
+| Opsi | Deskripsi |
+| :--- | :--- |
+| `add`, `del`, `change`, `append`, `replace` | Ubah sebuah rute. |
+| `show` atau `flush` | Perintah ini menampilkan isi tabel rute atau menghapusnya. |
+| `restore` | Pulihkan informasi tabel rute dari `stdin`. |
+| `get` | Perintah ini mendapatkan satu rute ke tujuan dan mencetak isinya persis seperti yang dilihat oleh kernel. |
+
+**Contoh:**
+
+```bash
+# Atur gateway default ke 1.2.3.254
+$ ip route add default via 1.2.3.254
+
+# Menambahkan rute default (untuk semua alamat) melalui gateway lokal 192.168.1.1 yang dapat dijangkau pada perangkat eth0
+$ ip route add default via 192.168.1.1 dev eth0
+```
+
+### **Bagian 16.4: Mengonfigurasi *hostname* untuk sistem lain di jaringan Anda**
+
+Anda dapat mengonfigurasi sistem Linux (atau macOS) Anda untuk mengikat sebuah pengidentifikasi `<hostname>` ke alamat IP sistem lain di jaringan Anda. Anda dapat mengonfigurasinya:
+
+  * **Untuk seluruh sistem (*Systemwide*)**. Anda harus memodifikasi berkas `/etc/hosts`. Anda hanya perlu menambahkan baris baru ke berkas tersebut yang berisi:
+    1.  alamat IP sistem jarak jauh `<ip_rem>`,
+    2.  satu atau lebih spasi kosong, dan
+    3.  pengidentifikasi `<hostname>`.
+  * **Untuk satu pengguna**. Anda harus memodifikasi berkas `~/.hosts` --- Anda harus membuatnya terlebih dahulu. Caranya tidak sesederhana untuk seluruh sistem. Di sini Anda dapat melihat penjelasannya.
+
+Misalnya, Anda bisa menambahkan baris ini menggunakan alat Unix `cat`. Misalkan Anda ingin melakukan `ping` ke PC di jaringan lokal Anda yang alamat IP-nya adalah `192.168.1.44` dan Anda ingin merujuk ke alamat IP tersebut hanya dengan `remote_pc`. Maka Anda harus menulis di *shell* Anda:
+
+```bash
+$ sudo cat 192.168.1.44 remote_pc
+```
+
+*[**Catatan Penerjemah:** Perintah `cat` di atas tidak benar untuk tujuan ini. Perintah yang benar untuk menambahkan baris ke `/etc/hosts` adalah `echo "192.168.1.44 remote_pc" | sudo tee -a /etc/hosts`.]*
+
+Kemudian Anda dapat melakukan `ping` tersebut hanya dengan:
+
+```bash
+$ ping remote_pc
+```
+
+### **Bagian 16.5: Detail Antarmuka (*Interface*)**
+
+#### **Ifconfig**
+
+**Tampilkan semua antarmuka yang tersedia di mesin**
+
+```bash
+$ ifconfig -a
+```
+
+**Tampilkan detail dari antarmuka tertentu**
+
+  * **Sintaks:** `$ ifconfig <antarmuka>`
+  * **Contoh:**
+
+<!-- end list -->
+
+```bash
+$ ifconfig eth0
+```
+
+```
+eth0      Link encap:Ethernet  HWaddr xx:xx:xx:xx:xx:xx
+          inet addr:x.x.x.x  Bcast:x.x.x.x  Mask:x.x.x.x
+          inet6 addr: xxxx::xxx:xxxx:xxxx:xxxx/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:4426618 errors:0 dropped:1124 overruns:0 frame:0
+          TX packets:189171 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:382611580 (382.6 MB)  TX bytes:36923665 (36.9 MB)
+          Interrupt:16 Memory:fb5e0000-fb600000
+```
+
+#### **Ethtool** - menanyakan pengaturan driver jaringan dan perangkat keras
+
+  * **Sintaks:** `$ ethtool <antarmuka>`
+  * **Contoh:**
+
+<!-- end list -->
+
+```bash
+$ ethtool eth0
+```
+
+```
+Settings for eth0:
+        Supported ports: [ TP ]
+        Supported link modes:   10baseT/Half 10baseT/Full
+                                100baseT/Half 100baseT/Full
+                                1000baseT/Full
+        Supported pause frame use: No
+        Supports auto-negotiation: Yes
+        Advertised link modes:  10baseT/Half 10baseT/Full
+                                100baseT/Half 100baseT/Full
+                                1000baseT/Full
+        Advertised pause frame use: No
+        Advertised auto-negotiation: Yes
+        Speed: 1000Mb/s
+        Duplex: Full
+        Port: Twisted Pair
+        PHYAD: 1
+        Transceiver: internal
+        Auto-negotiation: on
+        MDI-X: on (auto)
+        Supports Wake-on: pumbg
+        Wake-on: g
+        Current message level: 0x00000007 (7)
+                               drv probe link
+        Link detected: yes
+```
+
+#### **ip** - menampilkan / memanipulasi rute, perangkat, kebijakan rute, dan terowongan
+
+  * **Sintaks:** `$ ip { link | ... | route | macsec }` (silakan lihat `man ip` untuk daftar objek lengkap)
+  * **Contoh**
+
+<!-- end list -->
+
+```bash
+# Tampilkan daftar antarmuka jaringan
+$ ip link show
+
+# Ganti nama antarmuka eth0 menjadi wan
+$ ip link set dev eth0 name wan
+
+# Aktifkan (atau nonaktifkan) antarmuka eth0
+$ ip link set dev eth0 up
+
+# Tampilkan daftar alamat untuk antarmuka
+$ ip addr show
+
+# Tambah (atau hapus) ip dan mask (255.255.255.0)
+$ ip addr add 1.2.3.4/24 brd + dev eth0
+```
+
+### **Bagian 16.6: Menambahkan IP ke sebuah antarmuka**
+
+Alamat IP untuk sebuah antarmuka dapat diperoleh melalui **DHCP** atau penetapan **Statis**.
+
+  * **DHCP**
+    Jika Anda terhubung ke jaringan dengan server DHCP yang berjalan, perintah `dhclient` dapat memperoleh alamat IP untuk antarmuka Anda.
+    ```bash
+    $ dhclient <antarmuka>
+    ```
+    atau sebagai alternatif, Anda dapat membuat perubahan pada berkas `/etc/network/interfaces` agar antarmuka diaktifkan saat *boot* dan memperoleh IP DHCP.
+    ```
+    auto eth0
+    iface eth0 inet dhcp
+    ```
+  * **Konfigurasi Statis (Perubahan Permanen)** menggunakan berkas `/etc/network/interfaces`
+    Jika Anda ingin mengonfigurasi pengaturan antarmuka secara statis (perubahan permanen), Anda dapat melakukannya di berkas `/etc/network/interfaces`.
+    **Contoh:**
+    ```
+    auto eth0 # Aktifkan antarmuka saat boot
+    iface eth0 inet static
+        address 10.10.70.10
+        netmask 255.255.0.0
+        gateway 10.10.1.1
+        dns-nameservers 10.10.1.20
+        dns-nameservers 10.10.1.30
+    ```
+    Perubahan ini akan tetap ada bahkan setelah sistem di-*reboot*.
+  * **Konfigurasi Statis (Perubahan Sementara)** menggunakan utilitas `ifconfig`
+    Alamat IP statis dapat ditambahkan ke antarmuka menggunakan utilitas `ifconfig` sebagai berikut:
+    ```bash
+    $ ifconfig <antarmuka> <alamat-ip>/<mask> up
+    ```
+    **Contoh:**
+    ```bash
+    $ ifconfig eth0 10.10.50.100/16 up
+    ```
+
+---
+
+# Bab 17
+## Mengubah *root* (`chroot`)
+
+Mengubah *root* (`chroot`) adalah operasi yang mengubah direktori *root* yang tampak untuk proses yang sedang berjalan dan proses turunannya (*children*). Sebuah program yang dijalankan dalam lingkungan yang dimodifikasi seperti ini tidak dapat mengakses berkas dan perintah di luar pohon direktori lingkungan tersebut.
+
+### **Bagian 17.1: Persyaratan**
+
+  * **Hak akses root**
+  * Lingkungan Linux lain yang berfungsi, seperti boot dari **Live CD** atau distribusi yang sudah ada
+  * **Arsitektur lingkungan yang cocok** antara sumber `chroot` dan tujuannya (periksa arsitektur lingkungan saat ini dengan `uname -m`)
+  * **Modul kernel** yang mungkin Anda butuhkan di lingkungan `chroot` harus dimuat (misalnya, dengan `modprobe`)
+
+### **Bagian 17.2: Mengubah *root* secara manual di dalam sebuah direktori**
+
+1.  Pastikan Anda memenuhi semua persyaratan, sesuai dengan bagian **Persyaratan**.
+2.  *Mount* sistem berkas API sementara:
+    ```bash
+    cd /lokasi/root/baru
+    mount -t proc proc proc/
+    mount --rbind /sys sys/
+    mount --rbind /dev dev/
+    mount --rbind /run run/ (opsional)
+    ```
+3.  Jika Anda perlu menggunakan koneksi internet di lingkungan `chroot`, salin detail DNS:
+    ```bash
+    cp /etc/resolv.conf etc/resolv.conf
+    ```
+4.  Ubah *root* ke `/lokasi/root/baru`, dengan menentukan *shell* (dalam contoh ini `/bin/bash`):
+    ```bash
+    chroot /lokasi/root/baru /bin/bash
+    ```
+5.  Setelah melakukan `chroot`, mungkin perlu untuk memuat konfigurasi bash lokal:
+    ```bash
+    source /etc/profile
+    source ~/.bashrc
+    ```
+6.  Secara opsional, buat *prompt* yang unik agar dapat membedakan lingkungan `chroot` Anda:
+    ```bash
+    export PS1="(chroot) $PS1"
+    ```
+7.  Setelah selesai dengan `chroot`, Anda dapat keluar melaluinya dengan:
+    ```bash
+    exit
+    ```
+8.  *Unmount* sistem berkas sementara:
+    ```bash
+    cd /
+    umount --recursive /lokasi/root/baru
+    ```
+
+### **Bagian 17.3: Alasan menggunakan `chroot`**
+
+Mengubah *root* biasanya dilakukan untuk melakukan **pemeliharaan sistem** pada sistem di mana proses *booting* dan/atau *login* tidak lagi memungkinkan.
+
+Contoh umum penggunaannya adalah:
+
+  * Menginstal ulang **bootloader**
+  * Membangun ulang citra (*image*) **initramfs**
+  * Meningkatkan atau menurunkan versi **paket**
+  * Mengatur ulang **kata sandi** yang terlupa
+  * Membangun perangkat lunak di lingkungan *root* yang **bersih**
+ 
+  
+---
+
+#Bab 18
+## Mengompilasi kernel Linux
+
+### **Bagian 21.1: Kompilasi Kernel Linux di Ubuntu**
+
+**Peringatan:** pastikan Anda memiliki setidaknya **15 GB** ruang disk kosong.
+
+#### **Kompilasi di Ubuntu \>=13.04**
+
+#### **Opsi A) Gunakan Git**
+
+Gunakan `git` jika Anda ingin tetap sinkron dengan kode sumber kernel Ubuntu terbaru. Instruksi terperinci dapat ditemukan di *Kernel Git Guide*. Repositori `git` tidak menyertakan berkas-berkas kontrol yang diperlukan, jadi Anda harus membuatnya dengan:
+
+```bash
+fakeroot debian/rules clean
+```
+
+#### **Opsi B) Unduh arsip sumber (*source archive*)**
+
+Unduh arsip sumber - Ini untuk pengguna yang ingin membangun ulang paket standar Ubuntu dengan *patch* tambahan. Gunakan perintah berikut untuk menginstal dependensi *build* dan mengekstrak sumbernya (ke direktori saat ini):
+
+1.  Pasang paket-paket berikut:
+    ```bash
+    sudo apt-get build-dep linux-image-`uname -r`
+    ```
+
+#### **Opsi C) Unduh paket sumber dan bangun (*build*)**
+
+Ini untuk pengguna yang ingin memodifikasi, atau bermain-main dengan, kode sumber kernel Ubuntu yang sudah di-*patch*.
+
+1.  Ambil kode sumber kernel terbaru dari `kernel.org`.
+2.  Ekstrak arsip ke sebuah direktori dan masuk ke dalamnya:
+    ```bash
+    tar xf linux-*.tar.xz
+    cd linux-*
+    ```
+3.  Bangun antarmuka konfigurasi `ncurses`:
+    ```bash
+    make menuconfig
+    ```
+4.  Untuk menerima konfigurasi *default*, tekan `→` untuk menyorot **`< Exit >`** lalu tekan `Return`.
+5.  Tekan `Return` lagi untuk menyimpan konfigurasi.
+6.  Gunakan `make` untuk membangun kernel:
+    ```bash
+    make
+    ```
+    Perhatikan bahwa Anda dapat menggunakan *flag* `-j<jumlah-core>` untuk mengompilasi berkas secara paralel dan memanfaatkan banyak inti prosesor.
+
+Citra (*image*) kernel yang terkompresi dapat ditemukan di `arch/[arch]/boot/bzImage`, di mana `[arch]` sama dengan keluaran dari `uname -a`.
