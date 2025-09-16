@@ -4291,3 +4291,735 @@ echo "2 tambah 1 adalah $x"
 
 ---
 
+# Bab 23
+## Skrip dengan Parameter
+
+### Bagian 23.1: Parsing Beberapa Parameter
+
+Untuk mem-parsing banyak parameter, cara yang lebih disukai adalah dengan menggunakan *while loop*, pernyataan *case*, dan `shift`. `shift` digunakan untuk "membuang" parameter pertama dalam seri, membuat apa yang tadinya `$2`, sekarang menjadi `$1`. Ini berguna untuk memproses argumen satu per satu.
+
+```bash
+#!/bin.bash
+# Muat parameter yang ditentukan pengguna
+while [[ $# -gt 0 ]]
+do
+    case "$1" in
+        -a|--valueA)
+        valA="$2"
+        shift
+        ;;
+        -b|--valueB)
+        valB="$2"
+        shift
+        ;;
+        --help|*)
+        echo "Penggunaan:"
+        echo "  --valueA \"nilai\""
+        echo "  --valueB \"nilai\""
+        echo "  --help"
+        exit 1
+        ;;
+    esac
+    shift
+done
+
+echo "A: $valA"
+echo "B: $valB"
+```
+
+**Input dan Output**
+
+```
+$ ./multipleParams.sh --help
+Penggunaan:
+  --valueA "nilai"
+  --valueB "nilai"
+  --help
+
+$ ./multipleParams.sh
+A:
+B:
+
+$ ./multipleParams.sh --valueB 2
+A:
+B: 2
+
+$ ./multipleParams.sh --valueB 2 --valueA "hello world"
+A: hello world
+B: 2
+```
+
+### Bagian 23.2: Parsing argumen menggunakan for loop
+
+Contoh sederhana yang menyediakan opsi:
+
+| Opsi | Alt. Opsi | Detail |
+| :--- | :--- | :--- |
+| `-h` | `--help` | Tampilkan bantuan |
+| `-v` | `--version` | Tampilkan info versi |
+| `-dr path` | `--doc-root path` | Opsi yang mengambil parameter sekunder (sebuah path) |
+| `-i` | `--install` | Opsi boolean (true/false) |
+| `-*` | | Opsi tidak valid |
+
+```bash
+#!/bin.bash
+dr=''
+install=false
+skip=false
+for op in "$@";do
+    if $skip;then skip=false;continue;fi
+    case "$op" in
+        -v|--version)
+        echo "$ver_info"
+        shift
+        exit 0
+        ;;
+        -h|--help)
+        echo "$help"
+        shift
+        exit 0
+        ;;
+        -dr|--doc-root)
+        shift
+        if [[ "$1" != "" ]]; then
+            dr="${1/%\//}"
+            shift
+            skip=true
+        else
+            echo "E: Argumen hilang untuk opsi -dr"
+            exit 1
+        fi
+        ;;
+        -i|--install)
+        install=true
+        shift
+        ;;
+        -*)
+        echo "E: Opsi tidak valid: $1"
+        shift
+        exit 1
+        ;;
+    esac
+done
+```
+
+### Bagian 23.3: Skrip pembungkus (Wrapper script)
+
+Skrip pembungkus adalah skrip yang "membungkus" skrip atau perintah lain untuk menyediakan fungsionalitas tambahan atau hanya untuk membuat sesuatu menjadi tidak terlalu membosankan.
+
+Misalnya, `egrep` yang sebenarnya di sistem GNU/Linux baru digantikan oleh skrip pembungkus bernama `egrep`. Begini tampilannya:
+
+```bash
+#!/bin/sh
+exec grep -E "$@"
+```
+
+Jadi, ketika Anda menjalankan `egrep` di sistem seperti itu, Anda sebenarnya menjalankan `grep -E` dengan semua argumen diteruskan.
+
+Secara umum, jika Anda ingin menjalankan skrip/perintah contoh `exmp` dengan skrip lain `mexmp`, maka skrip pembungkus `mexmp` akan terlihat seperti:
+
+```bash
+#!/bin/sh
+exmp "$@" # Tambahkan opsi lain sebelum "$@"
+# atau
+# /path/lengkap/ke/exmp "$@"
+```
+
+### Bagian 23.4: Mengakses Parameter
+
+Saat mengeksekusi skrip Bash, parameter yang dilewatkan ke skrip dinamai sesuai dengan posisinya: `$1` adalah nama parameter pertama, `$2` adalah nama parameter kedua, dan seterusnya.
+
+Parameter yang hilang hanya dievaluasi sebagai string kosong. Memeriksa keberadaan parameter dapat dilakukan sebagai berikut:
+
+```bash
+if [ -z "$1" ]; then
+    echo "Tidak ada argumen yang diberikan"
+fi
+```
+
+**Mendapatkan semua parameter**
+`$@` dan `$*` adalah cara berinteraksi dengan semua parameter skrip. Merujuk pada halaman manual Bash, kita melihat bahwa:
+
+  * `$*`: Diperluas ke parameter posisional, dimulai dari satu. Ketika ekspansi terjadi di dalam tanda kutip ganda, itu diperluas menjadi satu kata tunggal dengan nilai setiap parameter dipisahkan oleh karakter pertama dari variabel khusus `IFS`.
+  * `$@`: Diperluas ke parameter posisional, dimulai dari satu. Ketika ekspansi terjadi di dalam tanda kutip ganda, setiap parameter diperluas menjadi kata yang terpisah.
+
+**Mendapatkan jumlah parameter**
+`$#` mendapatkan jumlah parameter yang dilewatkan ke skrip. Kasus penggunaan yang umum adalah untuk memeriksa apakah jumlah argumen yang sesuai dilewatkan:
+
+```bash
+if [ $# -eq 0 ]; then
+    echo "Tidak ada argumen yang diberikan"
+fi
+```
+
+**Contoh 1**
+Loop melalui semua argumen dan periksa apakah mereka adalah file:
+
+```bash
+for item in "$@"
+do
+    if [[ -f $item ]]; then
+        echo "$item adalah sebuah file"
+    fi
+done
+```
+
+**Contoh 2**
+Loop melalui semua argumen dan periksa apakah mereka adalah file:
+
+```bash
+for (( i = 1; i <= $#; ++ i ))
+do
+    item=${@:$i:1}
+    if [[ -f $item ]]; then
+        echo "$item adalah sebuah file"
+    fi
+done
+```
+
+### Bagian 23.5: Membagi string menjadi array di Bash
+
+Katakanlah kita memiliki parameter String dan kita ingin membaginya berdasarkan koma.
+`my_param="foo,bar,bash"`
+
+Untuk membagi string ini berdasarkan koma kita dapat menggunakan;
+`IFS=',' read -r -a array <<< "$my_param"`
+
+Di sini, `IFS` adalah variabel khusus yang disebut *Internal field separator* yang mendefinisikan karakter atau karakter yang digunakan untuk memisahkan pola menjadi token untuk beberapa operasi.
+
+Untuk mengakses elemen individual:
+`echo "${array[0]}"`
+
+Untuk melakukan iterasi pada elemen:
+
+```bash
+for element in "${array[@]}"
+do
+    echo "$element"
+done
+```
+
+Untuk mendapatkan indeks dan nilainya:
+
+```bash
+for index in "${!array[@]}"
+do
+    echo "$index ${array[index]}"
+done
+```
+
+# Bab 24
+## Substitusi histori Bash
+
+### Bagian 24.1: Referensi Cepat
+
+**Interaksi dengan histori**
+
+```bash
+# Daftar semua perintah sebelumnya
+history
+# Hapus histori, berguna jika Anda tidak sengaja memasukkan kata sandi
+history -c
+```
+
+**Penanda Peristiwa (Event designators)**
+
+```bash
+# Diperluas ke baris n dari histori bash
+!n
+# Diperluas ke perintah terakhir
+!!
+# Diperluas ke perintah terakhir yang dimulai dengan "teks"
+!text
+# Diperluas ke perintah terakhir yang berisi "teks"
+!?text
+# Diperluas ke perintah n baris yang lalu
+!-n
+# Diperluas ke perintah terakhir dengan kemunculan pertama "foo" diganti oleh "bar"
+^foo^bar^
+# Diperluas ke perintah saat ini
+!#
+```
+
+**Penanda Kata (Word designators)**
+Ini dipisahkan oleh `:` dari penanda peristiwa yang mereka rujuk. Titik dua dapat dihilangkan jika penanda kata tidak dimulai dengan angka: `!^` sama dengan `!:^`.
+
+```bash
+# Diperluas ke argumen pertama dari perintah terbaru
+!^
+# Diperluas ke argumen terakhir dari perintah terbaru (singkatan dari !!:$)
+!$
+# Diperluas ke argumen ketiga dari perintah terbaru
+!:3
+# Diperluas ke argumen x hingga y (inklusif) dari perintah terakhir
+# x dan y bisa berupa angka atau karakter jangkar ^ $
+!:x-y
+# Diperluas ke semua kata dari perintah terakhir kecuali yang ke-0
+# Setara dengan :^-$
+!*
+```
+
+**Pengubah (Modifiers)**
+Ini memodifikasi penanda peristiwa atau kata sebelumnya.
+
+```bash
+# Penggantian dalam ekspansi menggunakan sintaks sed
+# Memungkinkan flag sebelum s dan pemisah alternatif
+:s/foo/bar/ #mengganti bar untuk kemunculan pertama foo
+:gs|foo|bar| #mengganti bar untuk semua foo
+
+# Hapus path terkemuka dari argumen terakhir ("tail")
+:t
+# Hapus path membuntuti dari argumen terakhir ("head")
+:h
+# Hapus ekstensi file dari argumen terakhir
+:r
+```
+
+Jika variabel Bash `HISTCONTROL` berisi `ignorespace` atau `ignoreboth` (atau, sebagai alternatif, `HISTIGNORE` berisi pola `[ ]*`), Anda dapat mencegah perintah Anda disimpan dalam histori Bash dengan mengawalinya dengan spasi:
+
+```bash
+ # Perintah ini tidak akan disimpan dalam histori
+ foo
+# Perintah ini akan disimpan
+bar
+```
+
+### Bagian 24.2: Ulangi perintah sebelumnya dengan sudo
+
+```bash
+$ apt-get install r-base
+E: Could not open lock file /var/lib/dpkg/lock - open (13: Permission denied)
+E: Unable to lock the administration directory (/var/lib/dpkg/), are you root?
+$ sudo !!
+sudo apt-get install r-base
+[sudo] password for <user>:
+```
+
+### Bagian 24.3: Cari dalam histori perintah berdasarkan pola
+
+Tekan `control + r` dan ketik sebuah pola.
+
+Misalnya, jika Anda baru saja menjalankan `man 5 crontab`, Anda dapat menemukannya dengan cepat dengan mulai mengetik "crontab". Prompt akan berubah seperti ini:
+`(reverse-i-search)`cr': man 5 crontab\`
+
+`'cr'` di sana adalah string yang saya ketik sejauh ini. Ini adalah pencarian inkremental, jadi saat Anda terus mengetik, hasil pencarian diperbarui agar sesuai dengan perintah terbaru yang berisi pola tersebut.
+
+Tekan tombol panah kiri atau kanan untuk mengedit perintah yang cocok sebelum menjalankannya, atau tombol `enter` untuk menjalankan perintah.
+
+Secara default, pencarian menemukan perintah yang paling baru dieksekusi yang cocok dengan pola. Untuk kembali lebih jauh dalam histori, tekan `control + r` lagi. Anda dapat menekannya berulang kali sampai Anda menemukan perintah yang diinginkan.
+
+### Bagian 24.4: Beralih ke direktori yang baru dibuat dengan \!\#:N
+
+```bash
+$ mkdir backup_download_directory && cd !#:1
+mkdir backup_download_directory && cd backup_download_directory
+```
+
+Ini akan menggantikan argumen ke-N dari perintah saat ini. Dalam contoh, `!#:1` diganti dengan argumen pertama, yaitu `backup_download_directory`.
+
+### Bagian 24.5: Menggunakan \!$
+
+Anda dapat menggunakan `!$` untuk mengurangi pengulangan saat menggunakan baris perintah:
+
+```bash
+$ echo ping
+ping
+$ echo !$
+ping
+```
+
+Anda juga dapat membangun di atas pengulangan:
+
+```bash
+$ echo !$ pong
+ping pong
+$ echo !$, a great game
+pong, a great game
+```
+
+Perhatikan bahwa dalam contoh terakhir kita tidak mendapatkan `ping pong, a great game` karena argumen terakhir yang dilewatkan ke perintah sebelumnya adalah `pong`, kita dapat menghindari masalah seperti ini dengan menambahkan tanda kutip.
+
+### Bagian 24.6: Ulangi perintah sebelumnya dengan substitusi
+
+```bash
+$ mplayer Lecture_video_part1.mkv
+$ ^1^2^
+mplayer Lecture_video_part2.mkv
+```
+
+Perintah ini akan menggantikan `1` dengan `2` di perintah yang dieksekusi sebelumnya. Ini hanya akan menggantikan kemunculan pertama dari string dan setara dengan `!!:s/1/2/`.
+
+Jika Anda ingin mengganti semua kemunculan, Anda harus menggunakan `!!:gs/1/2/` atau `!!:as/1/2/`.
+
+---
+
+# Bab 25
+## Matematika
+
+### Bagian 25.1: Matematika menggunakan dc
+
+`dc` adalah salah satu program tertua di Unix.
+Ia menggunakan notasi Polandia terbalik, yang berarti Anda pertama-tama menumpuk angka, lalu operasi. Misalnya `1+1` ditulis sebagai `1 1+`.
+
+Untuk mencetak elemen dari atas tumpukan, gunakan perintah `p`:
+
+```bash
+echo '2 3 + p' | dc
+5
+```
+
+Anda dapat meningkatkan presisi menggunakan perintah `k`. `2k` akan menggunakan 2 desimal:
+
+```bash
+dc <<< '2k 4 3 / p'
+1.33
+```
+
+`bc` adalah preprocessor untuk `dc`.
+
+### Bagian 25.2: Matematika menggunakan kemampuan bash
+
+Perhitungan aritmatika juga dapat dilakukan tanpa melibatkan program lain seperti ini:
+Perkalian: `echo $((5 * 2))`
+Pembagian: `echo $((5 / 2))`
+Modulo: `echo $((5 % 2))`
+Pangkat: `echo $((5 ** 2))`
+
+### Bagian 25.3: Matematika menggunakan bc
+
+`bc` adalah bahasa kalkulator presisi arbitrer.
+
+```bash
+echo '2 + 3' | bc
+5
+```
+
+Untuk aritmatika titik-mengambang, Anda dapat mengimpor pustaka standar `bc -l`:
+
+```bash
+echo '12 / 5' | bc -l
+2.40000000000000000000
+```
+
+Ini dapat digunakan untuk membandingkan ekspresi:
+
+```bash
+echo '8 > 5' | bc
+1
+```
+
+### Bagian 25.4: Matematika menggunakan expr
+
+`expr` mengevaluasi ekspresi dan menulis hasilnya ke output standar.
+Aritmatika dasar: `expr 2 + 3`
+Saat mengalikan, Anda perlu meng-escape tanda `*`: `expr 2 \* 3`
+Ini hanya mendukung integer.
+
+-----
+
+# Bab 26
+## Aritmatika Bash
+
+| Parameter | Detail |
+| :--- | :--- |
+| EXPRESSION | Ekspresi untuk dievaluasi |
+
+### Bagian 26.1: Aritmatika sederhana dengan (( ))
+
+```bash
+#!/bin/bash
+echo $(( 1 + 2 ))
+# Output: 3
+```
+
+### Bagian 26.2: Perintah aritmatika
+
+**let**
+`let num=1+2`
+Anda memerlukan tanda kutip jika ada spasi atau karakter globbing.
+`let 'num = 1 + 2' #benar`
+
+**(( ))**
+`((a=$a+1))`
+`((a += 1))`
+Kita bisa menggunakan `(())` di `if`. Contoh:
+`if (( a > 1 )); then echo "a lebih besar dari 1"; fi`
+
+### Bagian 26.3: Aritmatika sederhana dengan expr
+
+```bash
+#!/bin/bash
+expr 1 + 2
+# Output: 3
+```
+
+---
+
+# Bab 27
+## Lingkup (Scoping)
+
+### Bagian 27.1: Lingkup dinamis dalam aksi
+
+Lingkup dinamis berarti pencarian variabel terjadi dalam lingkup di mana sebuah fungsi dipanggil, bukan di mana ia didefinisikan.
+
+```bash
+$ x=3
+$ func1 () { echo "di func1: $x"; }
+$ func2 () { local x=9; func1; }
+$ func2
+di func1: 9
+$ func1
+di func1: 3
+```
+
+Dalam bahasa dengan lingkup leksikal, `func1` akan selalu mencari di lingkup global untuk nilai `x`.
+Dalam bahasa dengan lingkup dinamis, `func1` mencari di lingkup di mana ia dipanggil.
+
+---
+
+# Bab 28
+## Substitusi Proses
+
+### Bagian 28.1: Bandingkan dua file dari web
+
+Berikut ini membandingkan dua file dengan `diff` menggunakan substitusi proses alih-alih membuat file sementara.
+`diff <(curl http://www.example.com/page1) <(curl http://www.example.com/page2)`
+
+### Bagian 28.2: Memberi makan while loop dengan output perintah
+
+Ini memberi makan *while loop* dengan output dari perintah `grep`:
+
+```bash
+while IFS=":" read -r user _
+do
+    # "$user" menampung nama pengguna di /etc/passwd
+done < <(grep "hello" /etc/passwd)
+```
+
+### Bagian 28.3: Menggabungkan file
+
+Sudah diketahui umum bahwa Anda tidak dapat menggunakan file yang sama untuk input dan output dalam perintah yang sama. Misalnya, `$ cat header.txt body.txt >body.txt` tidak melakukan apa yang Anda inginkan. Pada saat `cat` membaca `body.txt`, file tersebut telah dipotong oleh pengalihan dan menjadi kosong.
+
+Satu-satunya cara untuk menambahkan file di depan file lain adalah dengan membuat file perantara.
+
+### Bagian 28.4: Streaming file melalui beberapa program sekaligus
+
+Ini menghitung jumlah baris dalam file besar dengan `wc -l` sambil secara bersamaan mengompresnya dengan `gzip`. Keduanya berjalan secara bersamaan.
+`tee >(wc -l >&2) < bigfile | gzip > bigfile.gz`
+
+### Bagian 28.5: Dengan perintah paste
+
+Untuk membandingkan konten dua direktori:
+`paste <( ls /path/to/directory1 ) <( ls /path/to/directory2 )`
+
+### Bagian 28.6: Untuk menghindari penggunaan sub-shell
+
+Salah satu aspek utama dari substitusi proses adalah memungkinkan kita menghindari penggunaan sub-shell saat menyalurkan perintah. Ini dapat ditunjukkan dengan contoh sederhana. Variabel yang dimodifikasi dalam *while loop* yang menerima input dari *pipe* akan kehilangan nilainya setelah loop selesai karena loop berjalan di sub-shell.
+**Salah (nilai `count` akan hilang):**
+
+```bash
+count=0
+find . -type f -print | while IFS= read -r _; do
+    ((count++))
+done
+```
+
+Substitusi proses akan menyelesaikan masalah dengan menghindari penggunaan operator `|`:
+**Benar (nilai `count` akan dipertahankan):**
+
+```bash
+count=0
+while IFS= read -r _; do
+    ((count++))
+done < <(find . -maxdepth 1 -type f -print)
+```
+
+---
+
+# Bab 29
+## Penyelesaian Terprogram
+
+### Bagian 29.1: Penyelesaian sederhana menggunakan fungsi
+
+```bash
+_mycompletion() {
+    local command_name="$1"
+    local current_word="$2"
+    local previous_word="$3"
+    # COMPREPLY adalah array yang harus diisi dengan kemungkinan penyelesaian
+    COMPREPLY=( $(compgen -W 'hello world' -- "$current_word") )
+}
+complete -F _mycompletion mycommand
+```
+
+Contoh Penggunaan:
+
+```bash
+$ mycommand [TAB][TAB]
+hello world
+```
+
+### Bagian 29.2: Penyelesaian sederhana untuk opsi dan nama file
+
+Contoh ini menunjukkan penyelesaian yang lebih kompleks yang menyediakan opsi yang berbeda berdasarkan argumen sebelumnya.
+
+```bash
+_nuance_tune_opts ()
+{
+    local curr_arg prev_arg
+    curr_arg=${COMP_WORDS[COMP_CWORD]}
+    prev_arg=${COMP_WORDS[COMP_CWORD-1]}
+    # Opsi "config" mengambil argumen file
+    case "$prev_arg" in
+        -config)
+            COMPREPLY=( $( /bin/ls -1 ) )
+            return 0
+            ;;
+    esac
+    # Gunakan compgen untuk menyediakan penyelesaian untuk semua opsi yang diketahui.
+    COMPREPLY=( $(compgen -W '-analyze -experiment ...' -- $curr_arg ) );
+}
+complete -o filenames -F _nuance_tune_opts nuance_tune
+```
+
+---
+
+# Bab 30
+## Menyesuaikan PS1
+
+### Bagian 30.1: Mewarnai dan menyesuaikan prompt terminal
+
+Berikut adalah contoh pengaturan `PS1` yang kompleks dengan warna dan informasi git.
+
+```bash
+gitPS1(){
+    gitps1=$(git branch 2>/dev/null | grep '*')
+    gitps1="${gitps1:+ (${gitps1/#\* /})}"
+    echo "$gitps1"
+}
+
+timeNow(){
+    echo "$(date +%r)"
+}
+
+if [ "$color_prompt" = yes ]; then
+    if [ x$EUID = x0 ]; then # Pengguna root
+        PS1='...'
+    else # Pengguna biasa
+        PS1='...'
+    fi
+else
+    PS1='[$(timeNow)] \u@\h \w$(gitPS1) :/$ '
+fi
+```
+
+**Referensi Warna:**
+
+```bash
+txtblk='\e[0;30m' # Hitam - Reguler
+txtred='\e[0;31m' # Merah
+...
+txtrst='\e[0m'    # Reset Teks
+```
+
+**Catatan:**
+
+  * Buat perubahan di file `~/.bashrc` atau `/etc/bashrc` atau `~/.bash_profile`.
+  * Jalankan `source ~/.bashrc` setelah menyimpan file.
+
+### Bagian 30.2: Tampilkan nama cabang git di prompt terminal
+
+```bash
+gitPS1(){
+    gitps1=$(git branch 2>/dev/null | grep '*')
+    gitps1="${gitps1:+ (${gitps1/#\* /})}"
+    echo "$gitps1"
+}
+PS1='\u@\h:\w$(gitPS1)$ '
+```
+
+Ini akan memberi Anda prompt seperti ini: `user@Host:/path (master)$`
+
+### Bagian 30.3: Tampilkan waktu di prompt terminal
+
+```bash
+timeNow(){
+    echo "$(date +%r)"
+}
+PS1='[$(timeNow)] \u@\h:\w$ '
+```
+
+Ini akan memberi Anda prompt seperti ini: `[05:34:37 PM] user@Host:/path$`
+
+### Bagian 30.4: Tampilkan cabang git menggunakan PROMPT\_COMMAND
+
+Metode alternatif untuk menampilkan cabang git adalah dengan menggunakan `PROMPT_COMMAND`, yang dieksekusi setiap kali `PS1` ditampilkan.
+
+```bash
+function prompt_command {
+    if git status > /dev/null 2>&1; then
+        export GIT_STATUS=$(git status | grep 'On branch' | cut -b 10-)
+    else
+        export GIT_STATUS=""
+    fi
+}
+PROMPT_COMMAND=prompt_command
+PS1="\$GIT_STATUS \u@\h:\w\$ "
+```
+
+### Bagian 30.5: Ubah prompt PS1
+
+Untuk mengubah `PS1`, Anda hanya perlu mengubah nilai variabel shell `PS1`. Selain teks biasa, sejumlah karakter khusus yang di-escape dengan backslash didukung:
+
+| Format | Aksi |
+| :--- | :--- |
+| `\d` | tanggal dalam format "Weekday Month Date" |
+| `\h` | nama host hingga '.' pertama |
+| `\H` | nama host lengkap |
+| `\n` | baris baru |
+| `\t` | waktu saat ini dalam format 24 jam HH:MM:SS |
+| `\u` | nama pengguna pengguna saat ini |
+| `\w` | direktori kerja saat ini, dengan `$HOME` disingkat dengan tilde |
+| `\W` | nama dasar dari direktori kerja saat ini |
+| `\!` | nomor histori dari perintah ini |
+| `\$` | jika UID efektif adalah 0, \#, jika tidak, $ |
+| `\\` | sebuah backslash |
+| `\[` | memulai urutan karakter non-cetak |
+| `\]` | mengakhiri urutan karakter non-cetak |
+
+Contohnya, kita bisa mengatur `PS1` menjadi:
+`PS1="\u@\h:\w\$ "`
+Dan itu akan menghasilkan: `user@machine:~$`
+
+### Bagian 30.6: Tampilkan status kembali dan waktu perintah sebelumnya
+
+Cuplikan berikut menempatkan indikator visual untuk status kembali perintah sebelumnya di awal `PS1`.
+
+```bash
+# -KODE-WARNA-ANSI- #
+Color_Off="\033[0m"
+Red="\033[0;31m"
+Green="\033[0;32m"
+
+function __stat() {
+    if [ $? -eq 0 ]; then
+        echo -en "$Green ✔ $Color_Off "
+    else
+        echo -en "$Red ✘ $Color_Off "
+    fi
+}
+
+PS1='$(__stat)'
+PS1+="[\t] "
+PS1+="\e[0;33m\u@\h\e[0m:\e[1;34m\w\e[0m \n$ "
+export PS1
+```
+
+<p align="center">
+  <img src="images/book-02/figure-30.6.png" alt="gambar" width="580"/>
+</p>
+
+---
+
+
