@@ -247,8 +247,6 @@ Untuk melihat daftar semua *built-in* dengan deskripsi singkat, gunakan:
 help -d
 ```
 
------
-
 ### **Bagian 1.6: Hello World dalam mode "Debug"**
 
 ```bash
@@ -287,8 +285,6 @@ Hello World\n
 expr: non-integer argument
 + v=
 ```
-
------
 
 ### **Bagian 1.7: Menangani Argumen Bernama**
 
@@ -664,10 +660,6 @@ total 444
 ```
 
 ---
-
-Tentu, ini adalah kelanjutan terjemahannya.
-
------
 
 ## Bab 5: Menggunakan cat
 
@@ -2061,7 +2053,7 @@ if false; then
 fi
 ```
 
------
+---
 
 ## Bab 12: Array
 
@@ -4716,7 +4708,7 @@ Aritmatika dasar: `expr 2 + 3`
 Saat mengalikan, Anda perlu meng-escape tanda `*`: `expr 2 \* 3`
 Ini hanya mendukung integer.
 
------
+---
 
 # Bab 26
 ## Aritmatika Bash
@@ -5022,4 +5014,1275 @@ export PS1
 
 ---
 
+# Bab 31
+## Ekspansi Kurung Kurawal (*Brace Expansion*)
 
+### Bagian 31.1: Mengubah ekstensi nama file
+
+```bash
+$ mv filename.{jar,zip}
+```
+
+Ini akan diekspansi menjadi `mv filename.jar filename.zip`.
+
+---
+
+### Bagian 31.2: Membuat direktori untuk mengelompokkan file berdasarkan bulan dan tahun
+
+```bash
+$ mkdir 20{09..11}-{01..12}
+```
+
+Menjalankan perintah `ls` akan menunjukkan bahwa direktori-direktori berikut telah dibuat:
+
+```
+2009-01 2009-04 2009-07 2009-10 2010-01 2010-04 2010-07 2010-10 2011-01 2011-04 2011-07 2011-10
+2009-02 2009-05 2009-08 2009-11 2010-02 2010-05 2010-08 2010-11 2011-02 2011-05 2011-08 2011-11
+2009-03 2009-06 2009-09 2009-12 2010-03 2010-06 2010-09 2010-12 2011-03 2011-06 2011-09 2011-12
+```
+
+Menempatkan angka `0` di depan `9` dalam contoh memastikan angka-angka tersebut diisi dengan satu angka `0` di depannya (*padding*). Anda juga bisa mengisi angka dengan beberapa angka nol, contohnya:
+
+```bash
+$ echo {001..10}
+001 002 003 004 005 006 007 008 009 010
+```
+
+### Bagian 31.3: Membuat cadangan *dotfiles*
+
+```bash
+$ cp .vimrc{,.bak}
+```
+
+Ini akan diekspansi menjadi perintah `cp .vimrc .vimrc.bak`.
+
+### Bagian 31.4: Menggunakan penambahan (*increments*)
+
+```bash
+$ echo {0..10..2}
+0 2 4 6 8 10
+```
+
+Parameter ketiga digunakan untuk menentukan penambahan, yaitu `{start..end..increment}`.
+Penggunaan penambahan tidak terbatas hanya pada angka.
+
+```bash
+$ for c in {a..z..5}; do echo -n $c; done
+afkpuz
+```
+
+### Bagian 31.5: Menggunakan ekspansi kurung kurawal untuk membuat daftar
+
+Bash dapat dengan mudah membuat daftar dari karakter alfanumerik.
+
+```bash
+# daftar dari a sampai z
+$ echo {a..z}
+a b c d e f g h i j k l m n o p q r s t u v w x y z
+
+# urutan terbalik dari z ke a
+$ echo {z..a}
+z y x w v u t s r q p o n m l k j i h g f e d c b a
+
+# angka
+$ echo {1..20}
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+
+# dengan angka nol di depan
+$ echo {01..20}
+01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20
+
+# angka terbalik
+$ echo {20..1}
+20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
+
+# terbalik dengan angka nol di depan
+$ echo {20..01}
+20 19 18 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01
+
+# menggabungkan beberapa kurung kurawal
+$ echo {a..d}{1..3}
+a1 a2 a3 b1 b2 b3 c1 c2 c3 d1 d2 d3
+```
+
+Ekspansi kurung kurawal adalah ekspansi paling pertama yang terjadi, jadi tidak dapat digabungkan dengan ekspansi lainnya. Hanya karakter dan angka yang dapat digunakan.
+
+Ini tidak akan berhasil: `echo {$(date +$H)..24}`
+
+### Bagian 31.6: Membuat Beberapa Direktori dengan Sub-Direktori
+
+```bash
+mkdir -p toplevel/sublevel_{01..09}/{child1,child2,child3}
+```
+
+Ini akan membuat folder tingkat atas bernama `toplevel`, sembilan folder di dalam `toplevel` bernama `sublevel_01`, `sublevel_02`, dst. Kemudian di dalam sublevel tersebut: folder `child1`, `child2`, `child3`, memberikan Anda:
+
+```
+toplevel/sublevel_01/child1
+toplevel/sublevel_01/child2
+toplevel/sublevel_01/child3
+toplevel/sublevel_02/child1
+```
+
+dan seterusnya. Saya merasa ini sangat berguna untuk membuat beberapa folder dan sub-folder untuk tujuan spesifik saya, dengan satu perintah bash. Ganti variabel untuk membantu mengotomatisasi/mem-parsing informasi yang diberikan ke skrip.
+
+---
+
+# Bab 32
+getopts: *parsing* parameter-posisional yang cerdas
+
+| Parameter | Detail                                      |
+| :-------- | :------------------------------------------ |
+| optstring | Karakter opsi yang akan dikenali            |
+| name      | Nama tempat opsi yang di-*parse* disimpan   |
+
+### Bagian 32.1: pingnmap
+
+```bash
+#!/bin/bash
+# Nama skrip: pingnmap
+# Skenario: Admin sistem di perusahaan X lelah dengan pekerjaan monoton
+# melakukan ping dan nmap, jadi dia memutuskan untuk menyederhanakan pekerjaan menggunakan skrip.
+# Tugas yang ingin ia capai adalah
+# 1. Ping - dengan jumlah maksimal 5 - alamat IP/domain yang diberikan. DAN/ATAU
+# 2. Periksa apakah port tertentu terbuka dengan alamat IP/domain yang diberikan.
+# Dan getopts datang untuk membantunya.
+# Gambaran singkat tentang opsi-opsi
+# n : untuk nmap
+# t : untuk ping
+# i : Opsi untuk memasukkan alamat IP
+# p : Opsi untuk memasukkan port
+# v : Opsi untuk mendapatkan versi skrip
+
+while getopts ':nti:p:v' opt
+#meletakkan : di awal akan menekan pesan error untuk opsi yang tidak valid
+do
+case "$opt" in
+'i')ip="${OPTARG}"
+;;
+'p')port="${OPTARG}"
+;;
+'n')nmap_yes=1;
+;;
+'t')ping_yes=1;
+;;
+'v')echo "pingnmap version 1.0.0"
+;;
+*) echo "Opsi tidak valid $opt"
+echo "Penggunaan : "
+echo "pingmap -[n|t[i|p]|v]"
+;;
+esac
+done
+
+if [ ! -z "$nmap_yes" ] && [ "$nmap_yes" -eq "1" ]
+then
+if [ ! -z "$ip" ] && [ ! -z "$port" ]
+then
+nmap -p "$port" "$ip"
+fi
+fi
+
+if [ ! -z "$ping_yes" ] && [ "$ping_yes" -eq "1" ]
+then
+if [ ! -z "$ip" ]
+then
+ping -c 5 "$ip"
+fi
+fi
+
+shift $(( OPTIND - 1 )) # Memproses argumen tambahan
+if [ ! -z "$@" ]
+then
+echo "Argumen palsu di akhir : $@"
+fi
+```
+
+**Keluaran**
+
+```
+$ ./pingnmap -nt -i google.com -p 80
+Starting Nmap 6.40 ( http://nmap.org ) at 2016-07-23 14:31 IST
+Nmap scan report for google.com (216.58.197.78)
+Host is up (0.034s latency).
+rDNS record for 216.58.197.78: maa03s21-in-f14.1e100.net
+PORT
+STATE SERVICE
+80/tcp open http
+Nmap done: 1 IP address (1 host up) scanned in 0.22 seconds
+PING google.com (216.58.197.78) 56(84) bytes of data.
+64 bytes from maa03s21-in-f14.1e100.net (216.58.197.78): icmp_seq=1 ttl=57 time=29.3 ms
+64 bytes from maa03s21-in-f14.1e100.net (216.58.197.78): icmp_seq=2 ttl=57 time=30.9 ms
+64 bytes from maa03s21-in-f14.1e100.net (216.58.197.78): icmp_seq=3 ttl=57 time=34.7 ms
+64 bytes from maa03s21-in-f14.1e100.net (216.58.197.78): icmp_seq=4 ttl=57 time=39.6 ms
+64 bytes from maa03s21-in-f14.1e100.net (216.58.197.78): icmp_seq=5 ttl=57 time=32.7 ms
+--- google.com ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4007ms
+rtt min/avg/max/mdev = 29.342/33.481/39.631/3.576 ms
+
+$ ./pingnmap -v
+pingnmap version 1.0.0
+
+$ ./pingnmap -h
+Invalid option ?
+Usage :
+pingmap -[n|t[i|p]|v]
+
+$ ./pingnmap -v
+pingnmap version 1.0.0
+
+$ ./pingnmap -h
+Invalid option ?
+Usage :
+pingmap -[n|t[i|p]|v]
+```
+---
+
+# Bab 33
+## Debugging (Menelusuri Kesalahan)
+
+### Bagian 33.1: Memeriksa sintaks skrip dengan "-n"
+
+*Flag* `-n` memungkinkan Anda untuk memeriksa sintaks sebuah skrip tanpa harus menjalankannya:
+
+```bash
+~> $ bash -n testscript.sh
+testscript.sh: line 128: unexpected EOF while looking for matching `"'
+testscript.sh: line 130: syntax error: unexpected end of file
+```
+
+### Bagian 33.2: Debugging menggunakan bashdb
+
+Bashdb adalah sebuah utilitas yang mirip dengan gdb, di mana Anda dapat melakukan hal-hal seperti mengatur *breakpoint* pada sebuah baris atau fungsi, mencetak isi variabel, Anda dapat memulai ulang eksekusi skrip, dan lainnya.
+
+Anda biasanya dapat menginstalnya melalui manajer paket Anda, contohnya di Fedora:
+
+```bash
+sudo dnf install bashdb
+```
+
+Atau dapatkan dari halaman utamanya. Kemudian Anda dapat menjalankannya dengan skrip Anda sebagai parameter:
+
+```bash
+bashdb <YOUR SCRIPT>
+```
+
+Berikut adalah beberapa perintah untuk memulai:
+
+  * `l` - tampilkan baris lokal, tekan `l` lagi untuk menggulir ke bawah
+  * `s` - langkah ke baris berikutnya
+  * `print $VAR` - tampilkan isi dari variabel
+  * `restart` - menjalankan ulang skrip bash, ia akan memuat ulang skrip sebelum eksekusi.
+  * `eval` - evaluasi beberapa perintah kustom, contoh: `eval echo hi`
+  * `b` - atur *breakpoint* pada baris tertentu
+  * `c` - lanjutkan sampai *breakpoint* tertentu
+  * `i b` - info tentang *breakpoint*
+  * `d` - hapus *breakpoint* pada baris \#
+  * `shell` - luncurkan sub-shell di tengah eksekusi, ini berguna untuk memanipulasi variabel
+
+Untuk informasi lebih lanjut, saya merekomendasikan untuk membaca manualnya:
+[http://www.rodericksmith.plus.com/outlines/manuals/bashdbOutline.html](http://www.rodericksmith.plus.com/outlines/manuals/bashdbOutline.html)
+
+Lihat juga halaman utama:
+[http://bashdb.sourceforge.net/](http://bashdb.sourceforge.net/)
+
+### Bagian 33.3: Debugging skrip bash dengan "-x"
+
+Gunakan `"-x"` untuk mengaktifkan keluaran *debug* dari baris yang dieksekusi. Ini dapat dijalankan pada seluruh sesi atau skrip, atau diaktifkan secara terprogram di dalam sebuah skrip.
+
+Jalankan skrip dengan keluaran *debug* diaktifkan:
+
+```bash
+$ bash -x myscript.sh
+```
+
+Atau
+
+```bash
+$ bash --debug myscript.sh
+```
+
+Nyalakan *debugging* di dalam sebuah skrip bash. Secara opsional, ini dapat dimatikan kembali, meskipun keluaran *debug* secara otomatis direset ketika skrip selesai.
+
+```bash
+#!/bin/bash
+set -x
+# Aktifkan debugging
+# beberapa kode di sini
+set +x
+# Nonaktifkan keluaran debugging.
+```
+
+---
+
+# Bab 34
+## Pencocokan Pola dan Ekspresi Reguler
+
+### Bagian 34.1: Mendapatkan grup yang ditangkap dari pencocokan regex terhadap sebuah string
+
+```bash
+a='I am a simple string with digits 1234'
+pat='(.*) ([0-9]+)'
+[[ "$a" =~ $pat ]]
+echo "${BASH_REMATCH[0]}"
+echo "${BASH_REMATCH[1]}"
+echo "${BASH_REMATCH[2]}"
+```
+
+**Keluaran:**
+
+```
+I am a simple string with digits 1234
+I am a simple string with digits
+1234
+```
+
+### Bagian 34.2: Perilaku ketika sebuah glob tidak cocok dengan apa pun
+
+**Persiapan**
+
+```bash
+$ mkdir globbing
+$ cd globbing
+$ mkdir -p folder/{sub,another}folder/content/deepfolder/
+touch macy stacy tracy "file with space" folder/{sub,another}folder/content/deepfolder/file
+.hiddenfile
+$ shopt -u nullglob
+$ shopt -u failglob
+$ shopt -u dotglob
+$ shopt -u nocaseglob
+$ shopt -u extglob
+$ shopt -u globstar
+```
+
+Jika glob tidak cocok dengan apa pun, hasilnya ditentukan oleh opsi `nullglob` dan `failglob`. Jika keduanya tidak diatur, Bash akan mengembalikan glob itu sendiri jika tidak ada yang cocok.
+
+```bash
+$ echo no*match
+no*match
+```
+
+Jika `nullglob` diaktifkan maka tidak ada (null) yang dikembalikan:
+
+```bash
+$ shopt -s nullglob
+$ echo no*match
+
+$
+```
+
+Jika `failglob` diaktifkan maka pesan kesalahan akan dikembalikan:
+
+```bash
+$ shopt -s failglob
+$ echo no*match
+bash: no match: no*match
+$
+```
+
+Perhatikan, bahwa opsi `failglob` mengesampingkan opsi `nullglob`, yaitu, jika `nullglob` dan `failglob` keduanya diatur, maka - jika tidak ada kecocokan - sebuah kesalahan akan dikembalikan.
+
+### Bagian 34.3: Memeriksa apakah sebuah string cocok dengan ekspresi reguler
+
+**Versi ≥ 3.0**
+
+Periksa apakah sebuah string terdiri dari tepat 8 digit:
+
+```bash
+$ date=20150624
+$ [[ $date =~ ^[0-9]{8}$ ]] && echo "yes" || echo "no"
+yes
+$ date=hello
+$ [[ $date =~ ^[0-9]{8}$ ]] && echo "yes" || echo "no"
+no
+```
+
+### Bagian 34.4: Pencocokan Regex
+
+```bash
+pat='[^0-9]+([0-9]+)'
+s='I am a string with some digits 1024'
+[[ $s =~ $pat ]] # $pat harus tanpa tanda kutip
+echo "${BASH_REMATCH[0]}"
+echo "${BASH_REMATCH[1]}"
+```
+
+**Keluaran:**
+
+```
+I am a string with some digits 1024
+1024
+```
+
+Daripada menetapkan regex ke sebuah variabel (`$pat`), kita juga bisa melakukan:
+
+```bash
+[[ $s =~ [^0-9]+([0-9]+) ]]
+```
+
+**Penjelasan**
+
+  * Konstruksi `[[ $s =~ $pat ]]` melakukan pencocokan regex.
+  * Grup yang ditangkap, yaitu hasil pencocokan, tersedia dalam sebuah *array* bernama `BASH_REMATCH`.
+  * Indeks ke-0 dalam *array* `BASH_REMATCH` adalah total kecocokan.
+  * Indeks ke-i dalam *array* `BASH_REMATCH` adalah grup ke-i yang ditangkap, di mana i = 1, 2, 3 ...
+
+### Bagian 34.5: Glob `*`
+
+**Persiapan**
+
+```bash
+$ mkdir globbing
+$ cd globbing
+$ mkdir -p folder/{sub,another}folder/content/deepfolder/
+touch macy stacy tracy "file with space" folder/{sub,another}folder/content/deepfolder/file
+.hiddenfile
+$ shopt -u nullglob
+$ shopt -u failglob
+$ shopt -u dotglob
+$ shopt -u nocaseglob
+$ shopt -u extglob
+$ shopt -u globstar
+```
+
+Tanda bintang `*` mungkin adalah glob yang paling umum digunakan. Ia hanya mencocokkan *String* apa pun.
+
+```bash
+$ echo *acy
+macy stacy tracy
+```
+
+Satu tanda `*` tidak akan mencocokkan file dan folder yang berada di subfolder.
+
+```bash
+$ echo *
+emptyfolder folder macy stacy tracy
+$ echo folder/*
+folder/anotherfolder folder/subfolder
+```
+
+### Bagian 34.6: Glob `**`
+
+**Versi ≥ 4.0**
+
+**Persiapan**
+
+```bash
+$ mkdir globbing
+$ cd globbing
+$ mkdir -p folder/{sub,another}folder/content/deepfolder/
+touch macy stacy tracy "file with space" folder/{sub,another}folder/content/deepfolder/file
+.hiddenfile
+$ shopt -u nullglob
+$ shopt -u failglob
+$ shopt -u dotglob
+$ shopt -u nocaseglob
+$ shopt -u extglob
+$ shopt -s globstar
+```
+
+Bash dapat menginterpretasikan dua tanda bintang yang berdekatan sebagai satu glob. Dengan opsi `globstar` diaktifkan, ini dapat digunakan untuk mencocokkan folder yang berada lebih dalam di struktur direktori.
+
+```bash
+echo **
+emptyfolder folder folder/anotherfolder folder/anotherfolder/content
+folder/anotherfolder/content/deepfolder folder/anotherfolder/content/deepfolder/file
+folder/subfolder folder/subfolder/content folder/subfolder/content/deepfolder
+folder/subfolder/content/deepfolder/file macy stacy tracy
+```
+
+`**` dapat dianggap sebagai ekspansi *path*, tidak peduli seberapa dalam *path* tersebut. Contoh ini mencocokkan file atau folder apa pun yang dimulai dengan `deep`, terlepas dari seberapa dalam ia bersarang:
+
+```bash
+$ echo **/deep*
+folder/anotherfolder/content/deepfolder folder/subfolder/content/deepfolder
+```
+
+### Bagian 34.7: Glob `?`
+
+**Persiapan**
+
+```bash
+$ mkdir globbing
+$ cd globbing
+$ mkdir -p folder/{sub,another}folder/content/deepfolder/
+touch macy stacy tracy "file with space" folder/{sub,another}folder/content/deepfolder/file
+.hiddenfile
+$ shopt -u nullglob
+$ shopt -u failglob
+$ shopt -u dotglob
+$ shopt -u nocaseglob
+$ shopt -u extglob
+$ shopt -u globstar
+```
+
+`?` hanya mencocokkan tepat satu karakter.
+
+```bash
+$ echo ?acy
+macy
+$ echo ??acy
+stacy tracy
+```
+
+### Bagian 34.8: Glob `[ ]`
+
+**Persiapan**
+
+```bash
+$ mkdir globbing
+$ cd globbing
+$ mkdir -p folder/{sub,another}folder/content/deepfolder/
+touch macy stacy tracy "file with space" folder/{sub,another}folder/content/deepfolder/file
+.hiddenfile
+$ shopt -u nullglob
+$ shopt -u failglob
+$ shopt -u dotglob
+$ shopt -u nocaseglob
+$ shopt -u extglob
+$ shopt -u globstar
+```
+
+Jika ada kebutuhan untuk mencocokkan karakter spesifik maka `[]` dapat digunakan. Karakter apa pun di dalam `[]` akan dicocokkan tepat satu kali.
+
+```bash
+$ echo [m]acy
+macy
+$ echo [st][tr]acy
+stacy tracy
+```
+
+Namun, glob `[]` lebih serbaguna dari itu. Ia juga memungkinkan pencocokan negatif dan bahkan mencocokkan rentang karakter dan kelas karakter. Pencocokan negatif dicapai dengan menggunakan `!` atau `^` sebagai karakter pertama setelah `[`.
+
+Kita dapat mencocokkan `stacy` dengan:
+
+```bash
+$ echo [!t][^r]acy
+stacy
+```
+
+Di sini kita memberitahu bash bahwa kita ingin mencocokkan hanya file yang tidak diawali dengan `t` dan huruf kedua bukan `r` dan file tersebut diakhiri dengan `acy`.
+
+Rentang dapat dicocokkan dengan memisahkan sepasang karakter dengan tanda hubung (`-`). Karakter apa pun yang berada di antara kedua karakter penutup tersebut - inklusif - akan dicocokkan. Contohnya, `[r-t]` setara dengan `[rst]`.
+
+```bash
+$ echo [r-t][r-t]acy
+stacy tracy
+```
+
+Kelas karakter dapat dicocokkan dengan `[:class:]`, contohnya, untuk mencocokkan file yang mengandung spasi.
+
+```bash
+$ echo *[[:blank:]]*
+file with space
+```
+
+### Bagian 34.9: Mencocokkan file tersembunyi
+
+**Persiapan**
+
+```bash
+$ mkdir globbing
+$ cd globbing
+$ mkdir -p folder/{sub,another}folder/content/deepfolder/
+touch macy stacy tracy "file with space" folder/{sub,another}folder/content/deepfolder/file
+.hiddenfile
+$ shopt -u nullglob
+$ shopt -u failglob
+$ shopt -u dotglob
+$ shopt -u nocaseglob
+$ shopt -u extglob
+$ shopt -u globstar
+```
+
+Opsi bawaan Bash `dotglob` memungkinkan untuk mencocokkan file dan folder tersembunyi, yaitu, file dan folder yang dimulai dengan `.`.
+
+```bash
+$ shopt -s dotglob
+$ echo *
+file with space folder .hiddenfile macy stacy tracy
+```
+
+### Bagian 34.10: Pencocokan tanpa membedakan huruf besar-kecil (*Case insensitive*)
+
+**Persiapan**
+
+```bash
+$ mkdir globbing
+$ cd globbing
+$ mkdir -p folder/{sub,another}folder/content/deepfolder/
+touch macy stacy tracy "file with space" folder/{sub,another}folder/content/deepfolder/file
+.hiddenfile
+$ shopt -u nullglob
+$ shopt -u failglob
+$ shopt -u dotglob
+$ shopt -u nocaseglob
+$ shopt -u extglob
+$ shopt -u globstar
+```
+
+Mengatur opsi `nocaseglob` akan mencocokkan glob dengan cara yang tidak membedakan huruf besar-kecil.
+
+```bash
+$ echo M*
+M*
+$ shopt -s nocaseglob
+$ echo M*
+macy
+```
+
+### Bagian 34.11: *Globbing* yang Diperluas
+
+**Versi ≥ 2.02**
+
+**Persiapan**
+
+```bash
+$ mkdir globbing
+$ cd globbing
+$ mkdir -p folder/{sub,another}folder/content/deepfolder/
+touch macy stacy tracy "file with space" folder/{sub,another}folder/content/deepfolder/file
+.hiddenfile
+$ shopt -u nullglob
+$ shopt -u failglob
+$ shopt -u dotglob
+$ shopt -u nocaseglob
+$ shopt -u extglob
+$ shopt -u globstar
+```
+
+Opsi bawaan Bash `extglob` dapat memperluas kemampuan pencocokan sebuah glob.
+
+```bash
+shopt -s extglob
+```
+
+Sub-pola berikut merupakan glob yang diperluas yang valid:
+
+  * `?(pattern-list)` – Mencocokkan nol atau satu kemunculan dari pola yang diberikan
+  * `*(pattern-list)` – Mencocokkan nol atau lebih kemunculan dari pola yang diberikan
+  * `+(pattern-list)` – Mencocokkan satu atau lebih kemunculan dari pola yang diberikan
+  * `@(pattern-list)` – Mencocokkan salah satu dari pola yang diberikan
+  * `!(pattern-list)` – Mencocokkan apa pun kecuali salah satu dari pola yang diberikan
+
+`pattern-list` adalah daftar glob yang dipisahkan oleh `|`.
+
+```bash
+$ echo *([r-t])acy
+stacy tracy
+$ echo *([r-t]|m)acy
+macy stacy tracy
+$ echo ?([a-z])acy
+macy
+```
+
+`pattern-list` itu sendiri bisa menjadi glob diperluas lain yang bersarang. Pada contoh di atas kita telah melihat bahwa kita dapat mencocokkan `tracy` dan `stacy` dengan `*(r-t)`. Glob diperluas ini sendiri dapat digunakan di dalam glob diperluas yang dinegasikan `!(pattern-list)` untuk mencocokkan `macy`.
+
+```bash
+$ echo !(*([r-t]))acy
+macy
+```
+
+Ini mencocokkan apa pun yang tidak dimulai dengan nol atau lebih kemunculan huruf `r`, `s`, dan `t`, yang hanya menyisakan `macy` sebagai kemungkinan kecocokan.
+
+---
+
+# Bab 35
+## Mengubah Shell
+
+### Bagian 35.1: Menemukan shell saat ini
+
+Ada beberapa cara untuk menentukan shell saat ini.
+
+```bash
+echo $0
+ps -p $$
+echo $SHELL
+```
+
+### Bagian 35.2: Menampilkan daftar shell yang tersedia
+
+Untuk menampilkan daftar *login shell* yang tersedia:
+
+```bash
+cat /etc/shells
+```
+
+Contoh:
+
+```bash
+$ cat /etc/shells
+# /etc/shells: valid login shells
+/bin/sh
+/bin/dash
+/bin/bash
+/bin/rbash
+```
+
+### Bagian 35.3: Mengubah shell
+
+Untuk mengubah bash saat ini, jalankan perintah-perintah ini.
+
+```bash
+export SHELL=/bin/bash
+exec /bin/bash
+```
+
+Untuk mengubah bash yang terbuka saat *startup*, edit `.profile` dan tambahkan baris-baris ini.
+
+---
+
+# Bab 36
+## Variabel Internal
+
+Gambaran umum tentang variabel internal Bash, di mana, bagaimana, dan kapan menggunakannya.
+
+### Bagian 36.1: Sekilas Variabel Internal Bash
+
+| Variabel | Detail |
+| :--- | :--- |
+| **`$*` / `$@`** | Parameter posisional fungsi/skrip (argumen). Diekspansi sebagai berikut: `$*` dan `$@` sama dengan `$1 $2 ...` (perhatikan bahwa umumnya tidak masuk akal untuk membiarkannya tanpa tanda kutip). `"$*"` sama dengan `"$1 $2 ..."`¹. `"$@"` sama dengan `"$1" "$2" ...`. \<br\> ¹ Argumen dipisahkan oleh karakter pertama dari `$IFS`, yang tidak harus berupa spasi. |
+| **`$#`** | Jumlah parameter posisional yang dilewatkan ke skrip atau fungsi. |
+| **`$!`** | ID Proses dari perintah terakhir (paling kanan untuk *pipeline*) dalam pekerjaan yang paling baru dimasukkan ke latar belakang (perhatikan bahwa ini tidak selalu sama dengan ID grup proses pekerjaan saat kontrol pekerjaan diaktifkan). |
+| **`$$`** | ID dari proses yang mengeksekusi bash. |
+| **`$?`** | Status keluar dari perintah terakhir. |
+| **`$n`** | Parameter posisional, di mana n=1, 2, 3, ..., 9. |
+| **`${n}`** | Parameter posisional (sama seperti di atas), tetapi n bisa \> 9. |
+| **`$0`** | Dalam skrip, *path* yang digunakan untuk memanggil skrip; dengan `bash -c 'printf "%s\n" "$0"' name args'`: `name` (argumen pertama setelah skrip inline), jika tidak, `argv[0]` yang diterima oleh bash. |
+| **`$_`** | *Field* terakhir dari perintah terakhir. |
+| **`$IFS`** | Pemisah *field* internal. |
+| **`$PATH`** | Variabel lingkungan PATH yang digunakan untuk mencari file yang dapat dieksekusi. |
+| **`$OLDPWD`** | Direktori kerja sebelumnya. |
+| **`$PWDP`** | Direktori kerja saat ini. |
+| **`$FUNCNAME`** | *Array* nama fungsi dalam tumpukan panggilan eksekusi (*execution call stack*). |
+| **`$BASH_SOURCE`** | *Array* yang berisi *path* sumber untuk elemen dalam *array* `FUNCNAME`. Dapat digunakan untuk mendapatkan *path* skrip. |
+| **`$BASH_ALIASES`** | *Array* asosiatif yang berisi semua alias yang didefinisikan saat ini. |
+| **`$BASH_REMATCH`** | *Array* hasil pencocokan dari pencocokan regex terakhir. |
+| **`$BASH_VERSION`** | *String* versi Bash. |
+| **`$BASH_VERSINFO`** | Sebuah *array* berisi 6 elemen dengan informasi versi Bash. |
+| **`$BASH`** | *Path* absolut ke shell Bash yang sedang dieksekusi saat ini (ditentukan secara heuristik oleh bash berdasarkan `argv[0]` dan nilai `$PATH`; mungkin salah dalam kasus-kasus tertentu). |
+| **`$BASH_SUBSHELL`** | Tingkat *subshell* Bash. |
+| **`$UID`** | ID Pengguna riil (bukan efektif jika berbeda) dari proses yang menjalankan bash. |
+| **`$PS1`** | *Prompt* baris perintah utama; lihat Menggunakan Variabel PS\*. |
+| **`$PS2`** | *Prompt* baris perintah sekunder (digunakan untuk masukan tambahan). |
+| **`$PS3`** | *Prompt* baris perintah tersier (digunakan dalam *loop* `select`). |
+| **`$PS4`** | *Prompt* baris perintah kuaterner (digunakan untuk menambahkan info dengan keluaran *verbose*). |
+| **`$RANDOM`** | Integer pseudo-acak antara 0 dan 32767. |
+| **`$REPLY`** | Variabel yang digunakan oleh `read` secara *default* ketika tidak ada variabel yang ditentukan. Juga digunakan oleh `SELECT` untuk mengembalikan nilai yang diberikan pengguna. |
+| **`$PIPESTATUS`** | Variabel *array* yang menyimpan nilai status keluar dari setiap perintah dalam *pipeline* latar depan yang paling baru dieksekusi. |
+
+**Catatan:** Penetapan Variabel tidak boleh memiliki spasi sebelum dan sesudahnya. `a=123` bukan `a = 123`. Yang terakhir (tanda sama dengan yang diapit spasi) secara terpisah berarti menjalankan perintah `a` dengan argumen `=` dan `123`, meskipun juga terlihat dalam operator perbandingan string (yang secara sintaksis merupakan argumen untuk `[` atau `[[` atau tes apa pun yang Anda gunakan).
+
+### Bagian 36.2: `$@`
+
+`"$@"` diekspansi menjadi semua argumen baris perintah sebagai kata-kata terpisah. Ini berbeda dari `"$*"` yang diekspansi menjadi semua argumen sebagai satu kata tunggal.
+
+`"$@"` sangat berguna untuk melakukan *loop* melalui argumen dan menangani argumen dengan spasi.
+
+Anggap kita berada dalam sebuah skrip yang kita panggil dengan dua argumen, seperti ini:
+
+```bash
+$ ./script.sh " 1 2 " " 3  4 "
+```
+
+Variabel `$*` atau `$@` akan diekspansi menjadi `$1 $2`, yang pada gilirannya akan diekspansi menjadi `1 2 3 4` jadi *loop* di bawah ini:
+
+```bash
+for var in $*; do # sama untuk for var in $@; do
+echo \\<"$var"\\>
+done
+```
+
+akan mencetak untuk keduanya:
+
+```
+<1>
+<2>
+<3>
+<4>
+```
+
+Sementara `"$*"` akan diekspansi menjadi `"$1 $2"` yang pada gilirannya akan diekspansi menjadi `" 1 2   3  4 "` dan dengan demikian *loop*:
+
+```bash
+for var in "$*"; do
+echo \\<"$var"\\>
+done
+```
+
+hanya akan memanggil `echo` satu kali dan akan mencetak:
+
+```
+< 1 2   3  4 >
+```
+
+Dan akhirnya `"$@"` akan diekspansi menjadi `"$1" "$2"`, yang akan diekspansi menjadi `" 1 2 "` `" 3  4 "` dan dengan demikian *loop*:
+
+```bash
+for var in "$@"; do
+echo \\<"$var"\\>
+done
+```
+
+akan mencetak:
+
+```
+< 1 2 >
+< 3  4 >
+```
+
+dengan demikian menjaga spasi internal dalam argumen dan pemisahan argumen. Perhatikan bahwa konstruksi `for var in "$@"; do ...` sangat umum dan idiomatik sehingga menjadi *default* untuk *loop* `for` dan dapat disingkat menjadi `for var; do ...`.
+
+### Bagian 36.3: `$#`
+
+Untuk mendapatkan jumlah argumen baris perintah atau parameter posisional - ketik:
+
+```bash
+#!/bin/bash
+echo "$#"
+```
+
+Ketika dijalankan dengan tiga argumen, contoh di atas akan menghasilkan keluaran:
+
+```bash
+~> $ ./testscript.sh firstarg secondarg thirdarg
+3
+```
+
+### Bagian 36.4: `$HISTSIZE`
+
+Jumlah maksimum perintah yang diingat:
+
+```bash
+~> $ echo $HISTSIZE
+1000
+```
+
+### Bagian 36.5: `$FUNCNAME`
+
+Untuk mendapatkan nama fungsi saat ini - ketik:
+
+```bash
+my_function()
+{
+echo "Fungsi ini adalah $FUNCNAME"
+}
+# Ini akan menghasilkan "Fungsi ini adalah my_function"
+```
+
+Instruksi ini tidak akan mengembalikan apa pun jika Anda mengetiknya di luar fungsi:
+
+```bash
+my_function
+echo "Fungsi ini adalah $FUNCNAME"
+# Ini akan menghasilkan "Fungsi ini adalah"
+```
+
+### Bagian 36.6: `$HOME`
+
+Direktori *home* dari pengguna.
+
+```bash
+~> $ echo $HOME
+/home/user
+```
+
+### Bagian 36.7: `$IFS`
+
+Berisi *string* Internal Field Separator yang digunakan bash untuk memecah *string* saat perulangan, dll. *Default*-nya adalah karakter spasi putih: `\n` (baris baru), `\t` (tab), dan spasi. Mengubah ini menjadi sesuatu yang lain memungkinkan Anda untuk memecah *string* menggunakan karakter yang berbeda:
+
+```bash
+IFS=","
+INPUTSTR="a,b,c,d"
+for field in ${INPUTSTR}; do
+echo $fielddone
+```
+
+Keluaran dari kode di atas adalah:
+
+```
+a
+b
+c
+d
+```
+
+**Catatan:** Ini bertanggung jawab atas fenomena yang dikenal sebagai *word splitting*.
+
+### Bagian 36.8: `$OLDPWD`
+
+`OLDPWD` (OLDPrintWorkingDirectory) berisi direktori sebelum perintah `cd` terakhir:
+
+```bash
+~> $ cd directory
+directory> $ echo $OLDPWD
+/home/user
+```
+
+### Bagian 36.9: `$PWD`
+
+`PWD` (PrintWorkingDirectory) Direktori kerja saat ini tempat Anda berada:
+
+```bash
+~> $ echo $PWD
+/home/user
+~> $ cd directory
+directory> $ echo $PWD
+/home/user/directory
+```
+
+### Bagian 36.10: `$1 $2 $3` dst..
+
+Parameter posisional yang dilewatkan ke skrip baik dari baris perintah atau fungsi:
+
+```bash
+#!/bin/bash
+# $n adalah parameter posisional ke-n
+echo "$1"
+echo "$2"
+echo "$3"
+```
+
+Keluaran dari kode di atas adalah:
+
+```bash
+~> $ ./testscript.sh firstarg secondarg thirdarg
+firstarg
+secondarg
+thirdarg
+```
+
+Jika jumlah argumen posisional lebih besar dari sembilan, kurung kurawal harus digunakan.
+
+```bash
+# "set -- " menetapkan parameter posisional
+set -- 1 2 3 4 5 6 7 8 nine ten eleven twelve
+# baris berikut akan menghasilkan 10, bukan 1, karena nilai $1 yaitu angka 1
+# akan digabungkan dengan 0 berikutnya
+echo $10
+# menghasilkan 1
+echo ${10} # menghasilkan ten
+# untuk menunjukkannya dengan jelas:
+set -- arg{1..12}
+echo $10
+echo ${10}
+```
+
+### Bagian 36.11: `$*`
+
+Akan mengembalikan semua parameter posisional dalam satu *string* tunggal.
+
+**testscript.sh:**
+
+```bash
+#!/bin/bash
+echo "$*"
+```
+
+Jalankan skrip dengan beberapa argumen:
+
+```bash
+./testscript.sh firstarg secondarg thirdarg
+```
+
+**Keluaran:**
+
+```
+firstarg secondarg thirdarg
+```
+
+### Bagian 36.12: `$!`
+
+ID Proses (pid) dari pekerjaan terakhir yang dijalankan di latar belakang:
+
+```bash
+~> $ ls &
+testfile1 testfile2
+[1]+ Done
+~> $ echo $!
+21715
+ls
+```
+
+### Bagian 36.13: `$?`
+
+Status keluar dari fungsi atau perintah yang terakhir dieksekusi. Biasanya `0` berarti OK, apa pun selain itu akan menunjukkan kegagalan:
+
+```bash
+~> $ ls *.blah;echo $?
+ls: cannot access *.blah: No such file or directory
+2
+~> $ ls;echo $?
+testfile1 testfile2
+0
+```
+
+### Bagian 36.14: `$$`
+
+ID Proses (pid) dari proses saat ini:
+
+```bash
+~> $ echo $$
+13246
+```
+
+### Bagian 36.15: `$RANDOM`
+
+Setiap kali parameter ini direferensikan, sebuah integer acak antara 0 dan 32767 akan dihasilkan. Menetapkan nilai ke variabel ini akan menjadi *seed* untuk generator angka acak (sumber).
+
+```bash
+~> $ echo $RANDOM
+27119
+~> $ echo $RANDOM
+1349
+```
+
+### Bagian 36.16: `$BASHPID`
+
+ID Proses (pid) dari *instance* Bash saat ini. Ini tidak sama dengan variabel `$$`, tetapi seringkali memberikan hasil yang sama. Ini baru di Bash 4 dan tidak berfungsi di Bash 3.
+
+```bash
+~> $ echo "\$\$ pid = $$ BASHPID = $BASHPID"
+$$ pid = 9265 BASHPID = 9265
+```
+
+### Bagian 36.17: `$BASH_ENV`
+
+Sebuah variabel lingkungan yang menunjuk ke file *startup* Bash yang dibaca saat sebuah skrip dipanggil.
+
+### Bagian 36.18: `$BASH_VERSINFO`
+
+Sebuah *array* yang berisi informasi versi lengkap yang dipecah menjadi elemen-elemen, jauh lebih nyaman daripada `$BASH_VERSION` jika Anda hanya mencari versi mayor:
+
+```bash
+~> $ for ((i=0; i<=5; i++)); do echo "BASH_VERSINFO[$i] = ${BASH_VERSINFO[$i]}"; done
+BASH_VERSINFO[0] = 3
+BASH_VERSINFO[1] = 2
+BASH_VERSINFO[2] = 25
+BASH_VERSINFO[3] = 1
+BASH_VERSINFO[4] = release
+BASH_VERSINFO[5] = x86_64-redhat-linux-gnu
+```
+
+### Bagian 36.19: `$BASH_VERSION`
+
+Menampilkan versi bash yang sedang berjalan, ini memungkinkan Anda untuk memutuskan apakah Anda dapat menggunakan fitur-fitur canggih:
+
+```bash
+~> $ echo $BASH_VERSION
+4.1.2(1)-release
+```
+
+### Bagian 36.20: `$EDITOR`
+
+Editor *default* yang akan dipanggil oleh skrip atau program apa pun, biasanya `vi` atau `emacs`.
+
+```bash
+~> $ echo $EDITOR
+vi
+```
+
+### Bagian 36.21: `$HOSTNAME`
+
+Nama host yang ditetapkan ke sistem saat *startup*.
+
+```bash
+~> $ echo $HOSTNAME
+mybox.mydomain.com
+```
+
+### Bagian 36.22: `$HOSTTYPE`
+
+Variabel ini mengidentifikasi perangkat keras, ini bisa berguna dalam menentukan biner mana yang akan dieksekusi:
+
+```bash
+~> $ echo $HOSTTYPE
+x86_64
+```
+
+### Bagian 36.23: `$MACHTYPE`
+
+Mirip dengan `$HOSTTYPE` di atas, ini juga mencakup informasi tentang OS serta perangkat keras.
+
+```bash
+~> $ echo $MACHTYPE
+x86_64-redhat-linux-gnu
+```
+
+### Bagian 36.24: `$OSTYPE`
+
+Mengembalikan informasi tentang jenis OS yang berjalan di mesin, misalnya.
+
+```bash
+~> $ echo $OSTYPE
+linux-gnu
+```
+
+### Bagian 36.25: `$PATH`
+
+Jalur pencarian untuk menemukan biner untuk perintah. Contoh umum termasuk `/usr/bin` dan `/usr/local/bin`.
+Ketika seorang pengguna atau skrip mencoba menjalankan sebuah perintah, jalur-jalur di `$PATH` dicari untuk menemukan file yang cocok dengan izin eksekusi.
+
+Direktori-direktori di `$PATH` dipisahkan oleh karakter `:`.
+
+```bash
+~> $ echo "$PATH"
+/usr/kerberos/bin:/usr/local/bin:/bin:/usr/bin
+```
+
+Jadi, sebagai contoh, dengan `$PATH` di atas, jika Anda mengetik `lss` di *prompt*, shell akan mencari `/usr/kerberos/bin/lss`, kemudian `/usr/local/bin/lss`, kemudian `/bin/lss`, kemudian `/usr/bin/lss`, dalam urutan ini, sebelum menyimpulkan bahwa tidak ada perintah seperti itu.
+
+### Bagian 36.26: `$PPID`
+
+ID Proses (pid) dari induk skrip atau shell, artinya proses yang memanggil skrip atau shell saat ini.
+
+```bash
+~> $ echo $$
+13016
+~> $ echo $PPID
+13015
+```
+
+### Bagian 36.27: `$SECONDS`
+
+Jumlah detik sebuah skrip telah berjalan. Ini bisa menjadi cukup besar jika ditampilkan di shell:
+
+```bash
+~> $ echo $SECONDS
+98834
+```
+
+### Bagian 36.28: `$SHELLOPTS`
+
+Daftar hanya-baca dari opsi-opsi yang diberikan kepada bash saat *startup* untuk mengontrol perilakunya:
+
+```bash
+~> $ echo $SHELLOPTS
+braceexpand:emacs:hashall:histexpand:history:interactive-comments:monitor
+```
+
+### Bagian 36.29: `$_`
+
+Mengeluarkan *field* terakhir dari perintah terakhir yang dieksekusi, berguna untuk mendapatkan sesuatu untuk diteruskan ke perintah lain:
+
+```bash
+~> $ ls *.sh;echo $_
+testscript1.sh testscript2.sh
+testscript2.sh
+```
+
+Ini memberikan *path* skrip jika digunakan sebelum perintah lain:
+
+**test.sh:**
+
+```bash
+#!/bin/bash
+echo "$_"
+```
+
+**Keluaran:**
+
+```bash
+~> $ ./test.sh # menjalankan test.sh
+./test.sh
+```
+
+**Catatan:** Ini bukan cara yang pasti untuk mendapatkan *path* skrip.
+
+### Bagian 36.30: `$GROUPS`
+
+Sebuah *array* yang berisi nomor grup tempat pengguna berada:
+
+```bash
+#!/usr/bin/env bash
+echo Anda ditugaskan ke grup berikut:
+for group in ${GROUPS[@]}; do
+IFS=: read -r name dummy number members < <(getent group $group )
+printf "nama: %-10s nomor: %-15s anggota: %s\n" "$name" "$number" "$members"
+done
+```
+
+### Bagian 36.31: `$LINENO`
+
+Mengeluarkan nomor baris dalam skrip saat ini. Sebagian besar berguna saat melakukan *debug* skrip.
+
+```bash
+#!/bin/bash
+# ini adalah baris 2
+echo something # ini adalah baris 3
+echo $LINENO # Akan menghasilkan 4
+```
+
+### Bagian 36.32: `$SHLVL`
+
+Ketika perintah `bash` dieksekusi, sebuah shell baru dibuka. Variabel lingkungan `$SHLVL` menyimpan jumlah level shell tempat shell saat ini berjalan.
+
+Di jendela terminal baru, mengeksekusi perintah berikut akan menghasilkan hasil yang berbeda berdasarkan distribusi Linux yang digunakan.
+
+```bash
+echo $SHLVL
+```
+
+Menggunakan Fedora 25, keluarannya adalah "3". Ini menunjukkan bahwa, saat membuka shell baru, perintah bash awal dieksekusi dan melakukan tugas. Perintah bash awal mengeksekusi proses anak (perintah bash lain) yang, pada gilirannya, mengeksekusi perintah bash terakhir untuk membuka shell baru. Ketika shell baru terbuka, ia berjalan sebagai proses anak dari 2 proses shell lainnya, oleh karena itu keluarannya adalah "3".
+
+Dalam contoh berikut (dengan asumsi pengguna menjalankan Fedora 25), keluaran `$SHLVL` di shell baru akan diatur ke "3". Setiap kali perintah bash dieksekusi, `$SHLVL` bertambah satu.
+
+```bash
+~> $ echo $SHLVL
+3
+~> $ bash
+~> $ echo $SHLVL
+4
+~> $ bash
+~> $ echo $SHLVL
+5
+```
+
+Dapat dilihat bahwa mengeksekusi perintah `bash` (atau mengeksekusi skrip bash) membuka shell baru. Sebagai perbandingan, *sourcing* sebuah skrip menjalankan kode di shell saat ini.
+
+**test1.sh**
+
+```bash
+#!/usr/bin/env bash
+echo "Halo dari test1.sh. Level shell saya adalah $SHLVL"
+source "test2.sh"
+```
+
+**test2.sh**
+
+```bash
+#!/usr/bin/env bash
+echo "Halo dari test2.sh. Level shell saya adalah $SHLVL"
+```
+
+**run.sh**
+
+```bash
+#!/usr/bin/env bash
+echo "Halo dari run.sh. Level shell saya adalah $SHLVL"
+./test1.sh
+```
+
+**Eksekusi:**
+
+```bash
+chmod +x test1.sh && chmod +x run.sh
+./run.sh
+```
+
+**Keluaran:**
+
+```
+Halo dari run.sh. Level shell saya adalah 4
+Halo dari test1.sh. Level shell saya adalah 5
+Halo dari test2.sh. Level shell saya adalah 5
+```
+
+### Bagian 36.33: `$UID`
+
+Variabel hanya-baca yang menyimpan nomor ID pengguna:
+
+```bash
+~> $ echo $UID
+12345
+```
