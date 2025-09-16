@@ -3507,3 +3507,787 @@ Untuk menemukan semua file tipe `.txt` dari direktori saat ini saja, lakukan:
 
 ---
 
+# Bab 18
+## Menggunakan sort
+
+| Opsi | Makna |
+| :--- | :--- |
+| `-u` | Membuat setiap baris output unik |
+
+`sort` adalah perintah Unix untuk mengurutkan data dalam file dalam urutan tertentu.
+
+### Bagian 18.1: Mengurutkan output perintah
+
+Perintah `sort` digunakan untuk mengurutkan daftar baris.
+
+**Input dari sebuah file**
+
+```bash
+sort file.txt
+```
+
+**Input dari sebuah perintah**
+Anda dapat mengurutkan output perintah apa pun. Dalam contoh ini, daftar file mengikuti sebuah pola.
+
+```bash
+find * -name pattern | sort
+```
+
+### Bagian 18.2: Membuat output unik
+
+Jika setiap baris dari output perlu unik, tambahkan opsi `-u`.
+
+Untuk menampilkan pemilik file dalam folder:
+
+```bash
+ls -l | awk '{print $3}' | sort -u
+```
+
+### Bagian 18.3: Pengurutan numerik
+
+Misalkan kita memiliki file ini:
+
+```
+test>>cat file
+10.Gryffindor
+4.Hogwarts
+2.Harry
+3.Dumbledore
+1.The sorting hat
+```
+
+Untuk mengurutkan file ini secara numerik, gunakan `sort` dengan opsi `-n`:
+
+```
+test>>sort -n file
+```
+
+Ini seharusnya mengurutkan file seperti di bawah ini:
+
+```
+1.The sorting hat
+2.Harry
+3.Dumbledore
+4.Hogwarts
+10.Gryffindor
+```
+
+**Membalik urutan pengurutan**: Untuk membalik urutan pengurutan, gunakan opsi `-r`.
+
+Untuk membalik urutan pengurutan file di atas, gunakan:
+
+```
+sort -rn file
+```
+
+Ini seharusnya mengurutkan file seperti di bawah ini:
+
+```
+10.Gryffindor
+4.Hogwarts
+3.Dumbledore
+2.Harry
+1.The sorting hat
+```
+
+### Bagian 18.4: Urutkan berdasarkan kunci (keys)
+
+Misalkan kita memiliki file ini:
+
+```
+test>>cat Hogwarts
+Harry       Malfoy      Gryffindor  Slytherin
+Hermione    Goyle
+Ron         Snape
+Ron         Goyle
+Rowena      Ravenclaw
+Lockhart    Olivander
+Flitwick
+Helga       Hufflepuff
+Tonks
+Newt        Sprout
+```
+
+Untuk mengurutkan file ini menggunakan kolom sebagai kunci, gunakan opsi `k`:
+
+```
+test>>sort -k 2 Hogwarts
+```
+
+Ini akan mengurutkan file dengan kolom 2 sebagai kuncinya:
+
+```
+Ron         Goyle
+Hermione    Goyle
+Harry       Malfoy      Gryffindor  Slytherin
+Ron         Snape
+Flitwick
+Lockhart    Olivander
+Rowena      Ravenclaw
+Sprout
+Tonks
+Helga       Hufflepuff
+Newt
+```
+
+Sekarang jika kita harus mengurutkan file dengan kunci sekunder bersama dengan kunci primer, gunakan:
+
+```
+sort -k 2,2 -k 1,1 Hogwarts
+```
+
+Ini pertama-tama akan mengurutkan file dengan kolom 2 sebagai kunci primer, dan kemudian mengurutkan file dengan kolom 1 sebagai kunci sekunder:
+
+```
+Hermione
+Ron
+Harry       Gryffindor  Slytherin
+Ron
+Goyle
+Goyle
+Malfoy
+Snape
+Lockhart
+Flitwick
+Rowena      Ravenclaw
+Olivander
+Tonks
+Sprout
+Helga       Hufflepuff
+Newt
+```
+
+Jika kita perlu mengurutkan file dengan lebih dari 1 kunci, maka untuk setiap opsi `-k` kita perlu menentukan di mana pengurutan berakhir. Jadi `-k1,1` berarti mulai pengurutan di kolom pertama dan akhiri pengurutan di kolom pertama.
+
+**Opsi -t**
+Dalam contoh sebelumnya, file memiliki pembatas default - tab. Dalam kasus mengurutkan file yang memiliki pembatas non-default, kita memerlukan opsi `-t` untuk menentukan pembatas. Misalkan kita memiliki file seperti di bawah ini:
+
+```
+test>>cat file
+5.|Gryffindor
+4.|Hogwarts
+2.|Harry
+3.|Dumbledore
+1.|The sorting hat
+```
+
+Untuk mengurutkan file ini sesuai dengan kolom kedua, gunakan:
+
+```
+test>>sort -t "|" -k 2 file
+```
+
+Ini akan mengurutkan file seperti di bawah ini:
+
+```
+3.|Dumbledore
+5.|Gryffindor
+2.|Harry
+4.|Hogwarts
+1.|The sorting hat
+```
+---
+
+# Bab 19
+## Sourcing
+
+### Bagian 19.1: Melakukan sourcing pada sebuah file
+
+Melakukan *sourcing* pada sebuah file berbeda dari eksekusi, karena semua perintah dievaluasi dalam konteks sesi bash saat ini - ini berarti bahwa setiap variabel, fungsi, atau alias yang didefinisikan akan tetap ada selama sesi Anda.
+
+Buat file yang ingin Anda *source*, `sourceme.sh`:
+
+```bash
+#!/bin/bash
+export A="hello_world"
+alias sayHi="echo Hi"
+sayHello() {
+    echo Hello
+}
+```
+
+Dari sesi Anda, lakukan *source* pada file tersebut:
+
+```bash
+$ source sourceme.sh
+```
+
+Sejak saat itu, Anda memiliki semua sumber daya dari file yang di-*source* tersedia:
+
+```bash
+$ echo $A
+hello_world
+$ sayHi
+Hi
+$ sayHello
+Hello
+```
+
+Perhatikan bahwa perintah `.` adalah sinonim dari `source`, sehingga Anda cukup menggunakan:
+
+```bash
+$ . sourceme.sh
+```
+
+### Bagian 19.2: Melakukan sourcing pada lingkungan virtual (virtual environment)
+
+Saat mengembangkan beberapa aplikasi pada satu mesin, menjadi berguna untuk memisahkan dependensi ke dalam lingkungan virtual.
+
+Dengan penggunaan `virtualenv`, lingkungan ini di-*source* ke dalam shell Anda sehingga ketika Anda menjalankan perintah, itu berasal dari lingkungan virtual tersebut.
+
+Ini paling umum diinstal menggunakan `pip`.
+
+```bash
+pip install https://github.com/pypa/virtualenv/tarball/15.0.2
+```
+
+Buat lingkungan baru:
+
+```bash
+virtualenv --python=python3.5 my_env
+```
+
+Aktifkan lingkungan:
+
+```bash
+source my_env/bin/activate
+```
+---
+
+# Bab 20
+## Here documents dan here strings
+
+### Bagian 20.1: Jalankan perintah dengan here document
+
+```bash
+ssh -p 21 example@example.com <<EOF
+echo 'printing pwd'
+echo "\$(pwd)"
+ls -a
+find '*.txt'
+EOF
+```
+
+`$` di-escape karena kita tidak ingin itu diperluas oleh shell saat ini, yaitu `$(pwd)` akan dieksekusi di shell jarak jauh.
+
+Cara lain:
+
+```bash
+ssh -p 21 example@example.com <<'EOF'
+echo 'printing pwd'
+echo "$(pwd)"
+ls -a
+find '*.txt'
+EOF
+```
+
+**Catatan**: Penutup `EOF` harus berada di awal baris (Tidak ada spasi sebelumnya). Jika indentasi diperlukan, tab dapat digunakan jika Anda memulai heredoc Anda dengan `<<-`. Lihat contoh *Indenting here documents* dan *Limit Strings* untuk informasi lebih lanjut.
+
+### Bagian 20.2: Mengindentasi here documents
+
+Anda dapat mengindentasi teks di dalam *here documents* dengan tab, Anda perlu menggunakan operator pengalihan `<<-` alih-alih `<<`:
+
+```bash
+$ cat <<- EOF
+    This is some content indented with tabs `\t`.
+    You cannot indent with spaces you __have__ to use tabs.
+    Bash will remove empty space before these lines.
+    __Note__: Be sure to replace spaces with tabs when copying this example.
+EOF
+```
+
+`$` adalah karakter khusus di dalam here-document dan akan diperluas kecuali jika di-escape atau di-quote.
+
+Penggunaan praktis dari ini (seperti yang disebutkan di `man bash`) adalah dalam skrip shell, misalnya:
+
+```bash
+if cond; then
+    cat <<- EOF
+        hello
+        there
+    EOF
+fi
+```
+
+Sudah menjadi kebiasaan untuk mengindentasi baris-baris di dalam blok kode seperti pada pernyataan `if` ini, untuk keterbacaan yang lebih baik. Tanpa sintaks operator `<<-`, kita akan terpaksa menulis kode di atas seperti ini:
+
+```bash
+if cond; then
+cat << EOF
+hello
+there
+EOF
+fi
+```
+
+Itu sangat tidak enak dibaca, dan akan jauh lebih buruk dalam skrip realistis yang lebih kompleks.
+
+### Bagian 20.3: Membuat sebuah file
+
+Penggunaan klasik dari *here documents* adalah untuk membuat file dengan mengetikkan kontennya:
+
+```bash
+cat > fruits.txt << EOF
+apple
+orange
+lemon
+EOF
+```
+
+*Here-document* adalah baris-baris antara `<< EOF` dan `EOF`.
+*Here-document* ini menjadi input dari perintah `cat`. Perintah `cat` hanya mengeluarkan inputnya, dan dengan menggunakan operator pengalihan output `>` kita mengalihkannya ke file `fruits.txt`.
+
+Sebagai hasilnya, file `fruits.txt` akan berisi baris-baris:
+
+```
+apple
+orange
+lemon
+```
+
+Aturan biasa dari pengalihan output berlaku: jika `fruits.txt` tidak ada sebelumnya, itu akan dibuat. Jika sudah ada sebelumnya, isinya akan dipotong (*truncated*).
+
+### Bagian 20.4: Here strings
+
+**Versi ≥ 2.05b**
+Anda dapat memberi makan perintah menggunakan *here strings* seperti ini:
+
+```bash
+$ awk '{print $2}' <<< "hello world - how are you?"
+world
+$ awk '{print $1}' <<< "hello how are you
+> she is fine"
+hello
+she
+```
+
+Anda juga dapat memberi makan *while loop* dengan *here string*:
+
+```bash
+$ while IFS=" " read -r word1 word2 rest
+> do
+>   echo "$word1"
+> done <<< "hello how are you - i am fine"
+hello
+```
+
+### Bagian 20.5: Menjalankan beberapa perintah dengan sudo
+
+```bash
+sudo -s <<EOF
+a='var'
+echo 'Running several commands with sudo'
+mktemp -d
+echo "\$a"
+EOF
+```
+
+`$a` perlu di-escape untuk mencegahnya diperluas oleh shell saat ini.
+
+Atau:
+
+```bash
+sudo -s <<'EOF'
+a='var'
+echo 'Running several commands with sudo'
+mktemp -d
+echo "$a"
+EOF
+```
+
+### Bagian 20.6: Limit Strings
+
+Sebuah *heredoc* menggunakan *limitstring* untuk menentukan kapan harus berhenti mengonsumsi input. *Limitstring* penutup harus:
+
+  * Berada di awal baris.
+  * Menjadi satu-satunya teks di baris itu. **Catatan**: Jika Anda menggunakan `<<-`, *limitstring* dapat diawali dengan tab `\t`.
+
+**Benar:**
+
+```bash
+cat <<limitstring
+line 1
+line 2
+limitstring
+```
+
+Ini akan menghasilkan:
+
+```
+line 1
+line 2
+```
+
+**Penggunaan yang salah:**
+
+```bash
+cat <<limitstring
+line 1
+line 2
+  limitstring
+```
+
+Karena `limitstring` pada baris terakhir tidak persis di awal baris, shell akan terus menunggu input lebih lanjut, sampai ia melihat baris yang dimulai dengan `limitstring` dan tidak berisi apa-apa lagi. Hanya setelah itu ia akan berhenti menunggu input, dan melanjutkan untuk meneruskan *here-document* ke perintah `cat`.
+
+Perhatikan bahwa ketika Anda mengawali *limitstring* awal dengan tanda hubung (`-`), setiap tab di awal baris akan dihapus sebelum di-parsing, sehingga data dan *limit string* dapat diindentasi dengan tab (untuk kemudahan membaca dalam skrip shell).
+
+```bash
+cat <<-limitstring
+    line 1
+    has a tab each before the words line and has
+        line 2 has two leading tabs
+limitstring
+```
+
+akan menghasilkan:
+
+```
+line 1
+has a tab each before the words line and has
+line 2 has two leading tabs
+```
+
+dengan tab di awal (tetapi bukan tab internal) dihapus.
+
+---
+
+# Bab 21
+## Quoting (Pemberian Tanda Kutip)
+
+### Bagian 21.1: Tanda kutip ganda untuk substitusi variabel dan perintah
+
+Substitusi variabel hanya boleh digunakan di dalam tanda kutip ganda.
+
+```bash
+calculation='2 * 3'
+echo "$calculation"     # mencetak 2 * 3
+echo $calculation       # mencetak 2, daftar file di direktori saat ini, dan 3
+echo "$(($calculation))" # mencetak 6
+```
+
+Di luar tanda kutip ganda, `$var` mengambil nilai `var`, membaginya menjadi bagian-bagian yang dibatasi spasi, dan menafsirkan setiap bagian sebagai pola glob (wildcard). Kecuali Anda menginginkan perilaku ini, selalu letakkan `$var` di dalam tanda kutip ganda: `"$var"`.
+
+Hal yang sama berlaku untuk substitusi perintah: `"$(mycommand)"` adalah output dari `mycommand`, `$(mycommand)` adalah hasil dari pemisahan+glob pada output.
+
+```bash
+echo "$var"              # baik
+echo "$(mycommand)"      # baik
+another=$var             # juga berfungsi, penugasan secara implisit dikutip ganda
+make -D THING=$var       # BURUK! Ini bukan penugasan bash.
+make -D THING="$var"     # baik
+make -D "THING=$var"     # juga baik
+```
+
+Substitusi perintah mendapatkan konteks kutipannya sendiri. Menulis substitusi bersarang secara sewenang-wenang mudah karena parser akan melacak kedalaman sarang alih-alih secara serakah mencari karakter `"` pertama.
+Contoh:
+`echo "formatted text: $(printf "a + b = %04d" "${c}")"`
+
+Argumen variabel untuk substitusi perintah harus dikutip ganda di dalam ekspansi juga:
+`echo "$(mycommand "$arg1" "$arg2")"`
+
+### Bagian 21.2: Perbedaan antara tanda kutip ganda dan tanda kutip tunggal
+
+| Tanda Kutip Ganda | Tanda Kutip Tunggal |
+| :--- | :--- |
+| Memungkinkan ekspansi variabel | Mencegah ekspansi variabel |
+| Memungkinkan ekspansi histori jika diaktifkan | Mencegah ekspansi histori |
+| Memungkinkan substitusi perintah | Mencegah substitusi perintah |
+| `*` dan `@` dapat memiliki arti khusus | `*` dan `@` selalu literal |
+| Dapat berisi kutip tunggal atau kutip ganda | Kutip tunggal tidak diizinkan di dalam kutip tunggal |
+| `$`, `` ` ``, `"`, `\` dapat di-escape dengan `\` untuk mencegah arti khususnya | Semuanya adalah literal |
+
+**Properti yang sama untuk keduanya:**
+
+  * Mencegah globbing
+  * Mencegah pemisahan kata
+
+**Contoh:**
+
+```bash
+$ echo "!cat"
+echo "cat file"
+cat file
+$ echo '!cat'
+!cat
+
+$ echo "\"'\""
+"'"
+
+$ a='var'
+$ echo '$a'
+$a
+$ echo "$a"
+var
+```
+
+### Bagian 21.3: Baris baru dan karakter kontrol
+
+Baris baru dapat disertakan dalam string yang dikutip tunggal atau ganda. Perhatikan bahwa backslash-newline tidak menghasilkan baris baru, jeda baris diabaikan.
+
+```bash
+newline1='
+'
+newline2="
+"
+newline3=$'\n'
+empty=\
+echo "Line${newline1}break"
+echo "Line${newline2}break"
+echo "Line${newline3}break"
+echo "No line break${empty} here"
+```
+
+Di dalam string *dollar-quote*, backslash-huruf atau backslash-oktal dapat digunakan untuk menyisipkan karakter kontrol, seperti di banyak bahasa pemrograman lain.
+
+```bash
+echo $'Tab: [\t]'
+echo $'Tab again: [\009]'
+echo $'Form feed: [\f]'
+echo $'Line\nbreak'
+```
+
+### Bagian 21.4: Mengutip teks literal
+
+Semua contoh dalam paragraf ini mencetak baris:
+`!"#$&'()*;<=>?@[\]^`{|}\~\`
+
+Sebuah **backslash** mengutip karakter berikutnya, yaitu karakter berikutnya ditafsirkan secara harfiah. Satu pengecualian adalah baris baru: backslash-newline diperluas menjadi string kosong.
+`echo \!\"\#\$\&\'\(\)\*\;\<\=\>\?\ \ \@\[\\\]\^\`{|}\~\`
+
+Semua teks di antara **tanda kutip tunggal** (kutipan maju `'`, juga dikenal sebagai apostrof) dicetak secara harfiah. Bahkan backslash berarti dirinya sendiri, dan tidak mungkin menyertakan tanda kutip tunggal; sebaliknya, Anda dapat menghentikan string literal, menyertakan tanda kutip tunggal literal dengan backslash, dan memulai string literal lagi. Dengan demikian urutan 4 karakter `'\''` secara efektif memungkinkan untuk menyertakan tanda kutip tunggal dalam string literal.
+`echo '!"#$&'\''()*;<=>?@[\]^`{|}\~'\`
+
+**Dollar-single-quote** memulai string literal `$'…'` seperti banyak bahasa pemrograman lain, di mana backslash mengutip karakter berikutnya.
+`echo $'!"#$&\'()*;<=>?@[\\]^`{|}\~'\`
+
+**Tanda kutip ganda** `"` membatasi string semi-literal di mana hanya karakter `"`, `\`, `$`, dan `` ` `` yang mempertahankan arti khususnya. Karakter-karakter ini memerlukan backslash sebelumnya.
+
+Secara interaktif, waspadalah bahwa `!` memicu ekspansi histori di dalam tanda kutip ganda: `"!oops"` mencari perintah lama yang berisi `oops`; `"\!oops"` tidak melakukan ekspansi histori tetapi mempertahankan backslash. Ini tidak terjadi dalam skrip.
+
+---
+
+# Bab 22
+## Ekspresi Kondisional
+
+### Bagian 22.1: Tes tipe file
+
+Operator kondisional `-e` menguji apakah sebuah file ada (termasuk semua jenis file: direktori, dll.).
+
+```bash
+if [[ -e $filename ]]; then
+    echo "$filename ada"
+fi
+```
+
+Ada juga tes untuk jenis file tertentu.
+
+```bash
+if [[ -f $filename ]]; then
+    echo "$filename adalah file reguler"
+elif [[ -d $filename ]]; then
+    echo "$filename adalah direktori"
+elif [[ -p $filename ]]; then
+    echo "$filename adalah named pipe"
+elif [[ -S $filename ]]; then
+    echo "$filename adalah named socket"
+elif [[ -b $filename ]]; then
+    echo "$filename adalah block device"
+elif [[ -c $filename ]]; then
+    echo "$filename adalah character device"
+fi
+
+if [[ -L $filename ]]; then
+    echo "$filename adalah symbolic link (ke semua jenis file)"
+fi
+```
+
+Untuk *symbolic link*, selain `-L`, tes ini berlaku untuk target, dan mengembalikan *false* untuk link yang rusak.
+
+```bash
+if [[ -L $filename || -e $filename ]]; then
+    echo "$filename ada (tapi mungkin symbolic link yang rusak)"
+fi
+if [[ -L $filename && ! -e $filename ]]; then
+    echo "$filename adalah symbolic link yang rusak"
+fi
+```
+
+### Bagian 22.2: Perbandingan dan pencocokan string
+
+Perbandingan string menggunakan operator `==` di antara string yang dikutip. Operator `!=` meniadakan perbandingan.
+
+```bash
+if [[ "$string1" == "$string2" ]]; then
+    echo "\$string1 dan \$string2 identik"
+fi
+if [[ "$string1" != "$string2" ]]; then
+    echo "\$string1 dan \$string2 tidak identik"
+fi
+```
+
+Jika sisi kanan tidak dikutip maka itu adalah pola wildcard yang dicocokkan dengan `$string1`.
+
+```bash
+string='abc'
+pattern1='a*'
+pattern2='x*'
+if [[ "$string" == $pattern1 ]]; then
+    # tes ini benar
+    echo "String $string cocok dengan pola $pattern1"
+fi
+if [[ "$string" != $pattern2 ]]; then
+    # tes ini benar
+    echo "String $string tidak cocok dengan pola $pattern2"
+fi
+```
+
+Operator `<` dan `>` membandingkan string dalam urutan leksikografis.
+Ada tes uner untuk string kosong.
+
+```bash
+if [[ -n "$string" ]]; then
+    echo "$string tidak kosong"
+fi
+if [[ -z "$string" ]]; then
+    echo "$string kosong"
+fi
+```
+
+Untuk membedakan antara kosong dan tidak disetel, gunakan:
+
+| `$string` adalah: | tidak disetel | kosong | tidak kosong |
+| :--- | :--- | :--- | :--- |
+| `[[ -z ${string} ]]` | true | true | false |
+| `[[ -z ${string+x} ]]` | true | false | false |
+| `[[ -z ${string-x} ]]` | false | true | false |
+| `[[ -n ${string} ]]` | false | false | true |
+| `[[ -n ${string+x} ]]` | false | true | true |
+| `[[ -n ${string-x} ]]` | true | false | true |
+
+### Bagian 22.3: Tes pada status keluar sebuah perintah
+
+  * Status keluar 0: sukses
+  * Status keluar selain 0: gagal
+
+Untuk menguji status keluar sebuah perintah:
+
+```bash
+if command;then
+    echo 'sukses'
+else
+    echo 'gagal'
+fi
+```
+
+### Bagian 22.4: Tes satu baris
+
+Anda dapat melakukan hal-hal seperti ini:
+
+```bash
+[[ $s = 'something' ]] && echo 'cocok' || echo "tidak cocok"
+[[ $s == 'something' ]] && echo 'cocok' || echo "tidak cocok"
+[[ $s != 'something' ]] && echo "tidak cocok" || echo "cocok"
+[[ $s -eq 10 ]] && echo 'sama' || echo "tidak sama"
+(( $s == 10 )) && echo 'sama' || echo 'tidak sama'
+```
+
+Tes satu baris untuk status keluar:
+
+```bash
+command && echo 'keluar dengan 0' || echo 'keluar bukan 0'
+cmd && cmd1 && echo 'perintah sebelumnya berhasil' || echo 'salah satunya gagal'
+cmd || cmd1 #Jika cmd gagal, coba cmd1
+```
+
+### Bagian 22.5: Perbandingan file
+
+```bash
+if [[ $file1 -ef $file2 ]]; then
+    echo "$file1 dan $file2 adalah file yang sama"
+fi
+```
+
+“File yang sama” berarti memodifikasi salah satu file di tempat akan memengaruhi yang lain.
+
+Jika Anda ingin membandingkan dua file byte demi byte, gunakan utilitas `cmp`.
+
+```bash
+if cmp -s -- "$file1" "$file2"; then
+    echo "$file1 dan $file2 memiliki konten yang identik"
+else
+    echo "$file1 dan $file2 berbeda"
+fi
+```
+
+Untuk menghasilkan daftar perbedaan yang dapat dibaca manusia antara file teks, gunakan utilitas `diff`.
+
+```bash
+if diff -u "$file1" "$file2"; then
+    echo "$file1 dan $file2 memiliki konten yang identik"
+else
+    : # perbedaan antara file-file telah didaftar
+fi
+```
+
+### Bagian 22.6: Tes akses file
+
+```bash
+if [[ -r $filename ]]; then
+    echo "$filename adalah file yang dapat dibaca"
+fi
+if [[ -w $filename ]]; then
+    echo "$filename adalah file yang dapat ditulis"
+fi
+if [[ -x $filename ]]; then
+    echo "$filename adalah file yang dapat dieksekusi"
+fi
+```
+
+Waspadai *race conditions* (TOCTOU): hanya karena tes berhasil sekarang tidak berarti itu masih valid di baris berikutnya. Biasanya lebih baik untuk mencoba mengakses file, dan menangani kesalahan, daripada menguji terlebih dahulu.
+
+### Bagian 22.7: Perbandingan numerik
+
+Perbandingan numerik menggunakan operator `-eq` dan kawan-kawan.
+
+```bash
+if [[ $num1 -eq $num2 ]]; then
+    echo "$num1 == $num2"
+fi
+if [[ $num1 -le $num2 ]]; then
+    echo "$num1 <= $num2"
+fi
+```
+
+Ada enam operator numerik:
+
+  * `-eq` sama dengan
+  * `-ne` tidak sama dengan
+  * `-le` kurang dari atau sama dengan
+  * `-lt` kurang dari
+  * `-ge` lebih besar dari atau sama dengan
+  * `-gt` lebih besar dari
+
+Perhatikan bahwa operator `<` dan `>` di dalam `[[ … ]]` membandingkan string, bukan angka.
+
+```bash
+if [[ 9 -lt 10 ]]; then
+    echo "9 berada sebelum 10 dalam urutan numerik"
+fi
+if [[ 9 > 10 ]]; then
+    echo "9 berada setelah 10 dalam urutan leksikografis"
+fi
+```
+
+Sebagai alternatif, gunakan sintaks ekspresi aritmatika `((…))`, yang melakukan perhitungan integer dalam sintaks seperti C/Java.
+
+```bash
+x=2
+if ((2*x == 4)); then
+    echo "2 kali 2 adalah 4"
+fi
+((x += 1))
+echo "2 tambah 1 adalah $x"
+```
+
+---
+
