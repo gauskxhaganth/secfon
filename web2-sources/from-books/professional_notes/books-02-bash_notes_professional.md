@@ -8288,3 +8288,344 @@ Tanpa `eval set -- "$argv"` menghasilkan `-h --` alih-alih yang diinginkan (`-h 
 
 ---
 
+# Bab 62
+## Jaringan dengan Bash
+
+Bash sering digunakan dalam manajemen dan pemeliharaan server dan klaster. Informasi yang berkaitan dengan perintah-perintah khas yang digunakan oleh operasi jaringan, kapan harus menggunakan perintah mana untuk tujuan apa, serta contoh-contoh aplikasi yang unik dan/atau menarik harus disertakan.
+
+### Bagian 62.1: Perintah-perintah Jaringan
+
+**`ifconfig`**
+
+Perintah di atas akan menampilkan semua antarmuka (*interface*) aktif dari mesin dan juga memberikan informasi tentang:
+
+1.  Alamat IP yang ditetapkan ke antarmuka
+2.  Alamat MAC dari antarmuka
+3.  Alamat *broadcast*
+4.  *Byte* yang Ditransmisikan dan Diterima
+
+Beberapa contoh:
+
+  * `ifconfig -a`
+    Perintah di atas juga akan menampilkan antarmuka yang dinonaktifkan.
+  * `ifconfig eth0`
+    Perintah di atas hanya akan menampilkan antarmuka `eth0`.
+  * `ifconfig eth0 192.168.1.100 netmask 255.255.255.0`
+    Perintah di atas akan menetapkan IP statis ke antarmuka `eth0`.
+  * `ifup eth0`
+    Perintah di atas akan mengaktifkan antarmuka `eth0`.
+  * `ifdown eth0`
+    Perintah di bawah ini akan menonaktifkan antarmuka `eth0`.
+
+**`ping`**
+
+Perintah di atas (*Packet Internet Grouper*) adalah untuk menguji konektivitas antara dua *node*.
+
+  * `ping -c2 8.8.8.8`
+    Perintah di atas akan melakukan `ping` atau menguji konektivitas dengan server Google selama 2 detik (lebih tepatnya, mengirim 2 paket).
+
+**`traceroute`**
+
+Perintah di atas digunakan dalam pemecahan masalah untuk mengetahui jumlah *hop* (lompatan) yang diperlukan untuk mencapai tujuan.
+
+**`netstat`**
+
+Perintah di atas (*Network statistics*) memberikan info koneksi dan statusnya.
+
+**`dig www.google.com`**
+
+Perintah di atas (*domain information grouper*) menanyakan informasi terkait DNS.
+
+**`nslookup www.google.com`**
+
+Perintah di atas menanyakan DNS dan mencari tahu alamat IP yang sesuai dengan nama situs web.
+
+**`route`**
+
+Perintah di atas digunakan untuk memeriksa informasi rute Jaringan. Pada dasarnya ini menunjukkan tabel *routing* Anda.
+
+  * `route add default gw 192.168.1.1 eth0`
+    Perintah di atas akan menambahkan rute *default* dari jaringan Antarmuka `eth0` ke `192.168.1.1` di tabel *routing*.
+  * `route del default`
+    Perintah di atas akan menghapus rute *default* dari tabel *routing*.
+
+---
+
+# Bab 63
+## Paralel
+
+| Opsi | Deskripsi |
+| :--- | :--- |
+| **`-j n`** | Jalankan `n` pekerjaan secara paralel. |
+| **`-k`** | Pertahankan urutan yang sama. |
+| **`-X`** | Argumen ganda dengan penggantian konteks. |
+| **`--colsep regexp`** | Pisahkan masukan pada `regexp` untuk penggantian posisional. |
+| **`{} {.} {/} {/.} {#}`**| *String* pengganti. |
+| **`{3} {3.} {3/} {3/.}`**| *String* pengganti posisional. |
+| **`-S sshlogin`** | Contoh: `foo@server.example.com`. |
+| **`--trc {}.bar`** | Singkatan untuk `--transfer --return {}.bar --cleanup`. |
+| **`--onall`** | Jalankan perintah yang diberikan dengan argumen pada semua `sshlogin`. |
+| **`--nonall`** | Jalankan perintah yang diberikan tanpa argumen pada semua `sshlogin`. |
+| **`--pipe`** | Pisahkan `stdin` (masukan standar) ke beberapa pekerjaan. |
+| **`--recend str`** | Pemisah akhir rekaman untuk `--pipe`. |
+| **`--recstart str`** | Pemisah awal rekaman untuk `--pipe`. |
+
+Pekerjaan di GNU Linux dapat diparalelkan menggunakan GNU parallel. Sebuah pekerjaan dapat berupa satu perintah atau skrip kecil yang harus dijalankan untuk setiap baris dalam masukan. Masukan khasnya adalah daftar file, daftar *host*, daftar pengguna, daftar URL, atau daftar tabel. Sebuah pekerjaan juga bisa berupa perintah yang membaca dari sebuah *pipe*.
+
+### Bagian 63.1: Memparalelkan tugas berulang pada daftar file
+
+Banyak pekerjaan berulang dapat dilakukan lebih efisien jika Anda memanfaatkan lebih banyak sumber daya komputer Anda (yaitu CPU dan RAM). Di bawah ini adalah contoh menjalankan beberapa pekerjaan secara paralel.
+
+Misalkan Anda memiliki `< list of files >`, katakanlah keluaran dari `ls`. Juga, anggap file-file ini dikompresi dengan `bz2` dan urutan tugas berikut perlu dioperasikan padanya.
+
+1.  Dekompresi file `bz2` menggunakan `bzcat` ke `stdout`.
+2.  *Grep* (misalnya, filter) baris dengan kata kunci spesifik menggunakan `grep <some key word>`.
+3.  Salurkan (*pipe*) keluarannya untuk digabungkan menjadi satu file `gzip`.
+
+Menjalankan ini menggunakan *while-loop* mungkin terlihat seperti ini:
+
+```bash
+filenames="file_list.txt"
+while read -r line
+do
+  name="$line"
+  ## ambil baris dengan kata 'puppies' di dalamnya
+  bzcat $line | grep puppies | gzip >> output.gz
+done < "$filenames"
+```
+
+Menggunakan GNU Parallel, kita dapat menjalankan 3 pekerjaan paralel sekaligus hanya dengan melakukan:
+
+```bash
+parallel -j 3 "bzcat {} | grep puppies" ::: $( cat filelist.txt ) | gzip > output.gz
+```
+
+Perintah ini sederhana, ringkas, dan lebih efisien ketika jumlah file dan ukuran file besar. Pekerjaan dimulai oleh `parallel`, opsi `-j 3` meluncurkan 3 pekerjaan paralel dan masukan ke pekerjaan paralel diambil oleh `:::`. Keluarannya akhirnya disalurkan ke `gzip > output.gz`.
+
+### Bagian 63.2: Memparalelkan `STDIN`
+
+Sekarang, bayangkan kita memiliki 1 file besar (misalnya 30 GB) yang perlu dikonversi, baris per baris. Katakanlah kita memiliki skrip, `convert.sh`, yang melakukan `<tugas>` ini. Kita dapat menyalurkan isi file ini ke `stdin` agar `parallel` dapat mengambil dan bekerja dengannya dalam potongan-potongan seperti:
+
+```bash
+<stdin> | parallel --pipe --block <block size> -k <task> > output.txt
+```
+
+di mana `<stdin>` dapat berasal dari apa saja seperti `cat <file>`.
+
+Sebagai contoh yang dapat direproduksi, tugas kita adalah `nl -n rz`. Ambil file apa saja, milik saya akan `data.bz2`, dan berikan ke `<stdin>`:
+
+```bash
+bzcat data.bz2 | nl | parallel --pipe --block 10M -k nl -n rz | gzip > ouptput.gz
+```
+
+Contoh di atas mengambil `<stdin>` dari `bzcat data.bz2 | nl`, di mana saya menyertakan `nl` hanya sebagai bukti konsep bahwa keluaran akhir `output.gz` akan disimpan dalam urutan saat diterima. Kemudian, `parallel` membagi `<stdin>` menjadi potongan-potongan berukuran 10 MB, dan untuk setiap potongan, ia melewatkannya melalui `nl -n rz` di mana ia hanya menambahkan nomor yang diratakan ke kanan (lihat `nl --help` untuk detail lebih lanjut). Opsi `--pipe` memberitahu `parallel` untuk membagi `<stdin>` menjadi beberapa pekerjaan dan `--block` menentukan ukuran blok. Opsi `-k` menentukan bahwa urutan harus dipertahankan.
+
+Keluaran akhir Anda akan terlihat seperti ini:
+
+```
+000001
+000002
+000003
+000004
+000005
+...
+000587
+000588
+000589
+000590
+000591
+1
+2
+3
+4
+5<data>
+<data>
+<data>
+<data>
+<data>
+552409
+552410
+552411
+552412
+552413<data>
+<data>
+<data>
+<data>
+<data>
+```
+
+File asli saya memiliki 552.413 baris. Kolom pertama mewakili pekerjaan paralel, dan kolom kedua mewakili penomoran baris asli yang diberikan ke `parallel` dalam potongan-potongan. Anda akan melihat bahwa urutan di kolom kedua (dan sisa file) dipertahankan.
+
+---
+
+# Bab 64
+## Mendekode URL
+
+### Bagian 64.1: Contoh Sederhana
+
+**URL yang Di-*encode***:
+`http%3A%2F%2Fwww.foo.com%2Findex.php%3Fid%3Dqwerty`
+
+Gunakan perintah ini untuk mendekode URL:
+
+```bash
+echo "http%3A%2F%2Fwww.foo.com%2Findex.php%3Fid%3Dqwerty" | sed -e "s/%\([0-9A-F][0-9A-F]\)/\\\\\x\1/g" | xargs -0 echo -e
+```
+
+**URL yang Di-decode (hasil perintah)**:
+`http://www.foo.com/index.php?id=qwerty`
+
+### Bagian 64.2: Menggunakan `printf` untuk mendekode *string*
+
+```bash
+#!bin/bash
+$ string='Question%20-%20%22how%20do%20I%20decode%20a%20percent%20encoded%20string%3F%22%0AAnswer%20%20%20-%20Use%20printf%20%3A)'
+$ printf '%b\n' "${string//%/\\x}"
+
+# hasilnya
+Question - "how do I decode a percent encoded string?"
+Answer   - Use printf :)
+```
+
+---
+
+# Bab 65
+## Pola Desain (*Design Patterns*)
+
+Mencapai beberapa pola desain umum di Bash.
+
+### Bagian 65.1: Pola Publikasi/Langganan (Pub/Sub)
+
+Ketika sebuah proyek Bash berubah menjadi sebuah pustaka (*library*), menambahkan fungsionalitas baru bisa menjadi sulit. Nama fungsi, variabel, dan parameter biasanya perlu diubah dalam skrip yang menggunakannya. Dalam skenario seperti ini, sangat membantu untuk memisahkan kode dan menggunakan pola desain berbasis peristiwa (*event driven*). Dalam pola tersebut, skrip eksternal dapat berlangganan (*subscribe*) ke sebuah peristiwa. Ketika peristiwa itu dipicu (dipublikasikan), skrip dapat mengeksekusi kode yang didaftarkannya dengan peristiwa tersebut.
+
+**pubsub.sh:**
+
+```bash
+#!/usr/bin/env bash
+#
+# Simpan path ke direktori skrip ini di variabel env global
+#
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+#
+# Array yang akan berisi semua peristiwa yang terdaftar
+#
+EVENTS=()
+
+function action1() {
+  echo "Aksi #1 dilakukan ${2}"
+}
+function action2() {
+  echo "Aksi #2 dilakukan"
+}
+
+#
+# @desc :: Mendaftarkan sebuah peristiwa
+# @param :: string $1 - Nama peristiwa. Pada dasarnya sebuah alias untuk nama fungsi
+# @param :: string $2 - Nama fungsi yang akan dipanggil
+# @param :: string $3 - Path lengkap ke skrip yang menyertakan fungsi yang dipanggil
+#
+function subscribe() {
+  EVENTS+=("${1};${2};${3}")
+}
+
+#
+# @desc :: Mempublikasikan sebuah peristiwa
+# @param :: string $1 - Nama peristiwa yang sedang dipublikasikan
+#
+function publish() {
+  for event in ${EVENTS[@]}; do
+    local IFS=";"
+    read -r -a event <<< "$event"
+    if [[ "${event[0]}" == "${1}" ]]; then
+      ${event[1]} "$@"
+    fi
+  done
+}
+
+#
+# Daftarkan peristiwa kita dan fungsi yang menanganinya
+#
+subscribe "/do/work" "action1" "${DIR}"
+subscribe "/do/more/work" "action2" "${DIR}"
+subscribe "/do/even/more/work" "action1" "${DIR}"
+
+#
+# Jalankan peristiwa kita
+#
+publish "/do/work"
+publish "/do/more/work"
+publish "/do/even/more/work" "lagi"
+```
+
+**Jalankan:**
+
+```bash
+chmod +x pubsub.sh
+./pubsub.sh
+```
+
+---
+
+# Bab 66
+## Kesalahan Umum (*Pitfalls*)
+
+### Bagian 66.1: Spasi Putih Saat Menetapkan Variabel
+
+Spasi putih sangat penting saat menetapkan variabel.
+
+```bash
+foo = 'bar' # tidak benar
+foo= 'bar'  # tidak benar
+foo='bar'   # benar
+```
+
+Dua yang pertama akan menghasilkan kesalahan sintaks (atau lebih buruk, menjalankan perintah yang salah). Contoh terakhir akan dengan benar menetapkan variabel `$foo` ke teks "bar".
+
+### Bagian 66.2: Perintah yang gagal tidak menghentikan eksekusi skrip
+
+Di sebagian besar bahasa skrip, jika pemanggilan fungsi gagal, itu mungkin akan melempar pengecualian (*exception*) dan menghentikan eksekusi program. Perintah Bash tidak memiliki pengecualian, tetapi mereka memiliki kode keluar (*exit codes*). Kode keluar non-nol menandakan kegagalan, namun, kode keluar non-nol tidak akan menghentikan eksekusi program.
+
+Ini dapat menyebabkan situasi berbahaya (meskipun diakui dibuat-buat) seperti ini:
+
+```bash
+#!/bin/bash
+cd ~/non/existent/directory
+rm -rf *
+```
+
+Jika `cd` ke direktori ini gagal, Bash akan mengabaikan kegagalan tersebut dan melanjutkan ke perintah berikutnya, menghapus bersih direktori tempat Anda menjalankan skrip.
+
+Cara terbaik untuk mengatasi masalah ini adalah dengan menggunakan perintah `set`:
+
+```bash
+#!/bin/bash
+set -e
+cd ~/non/existent/directory
+rm -rf *
+```
+
+`set -e` memberitahu Bash untuk segera keluar dari skrip jika ada perintah yang mengembalikan status non-nol.
+
+### Bagian 66.3: Kehilangan Baris Terakhir dalam File
+
+Standar C mengatakan bahwa file harus diakhiri dengan baris baru, jadi jika `EOF` datang di akhir baris, baris itu mungkin tidak terbaca oleh beberapa perintah. Sebagai contoh:
+
+```bash
+$ echo 'one\ntwo\nthree\c' > file.txt
+$ cat file.txt
+one
+two
+three
+$ while read line ; do echo "line $line" ; done < file.txt
+one
+two
+```
+
+Untuk memastikan ini berfungsi dengan benar dalam contoh di atas, tambahkan tes sehingga akan melanjutkan *loop* jika baris terakhir tidak kosong.
+
+```bash
+$ while read line || [ -n "$line" ] ; do echo "line $line" ; done < file.txt
+one
+two
+three
+```
