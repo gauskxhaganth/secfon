@@ -388,4 +388,280 @@ Beberapa program seperti `awk` menggunakan teknik ini untuk menjalankan skrip ya
 
 ---
 
+# Bab 3
+## Menavigasi direktori
+
+### Bagian 3.1: Direktori absolut vs relatif
+
+Untuk berpindah ke direktori yang ditentukan secara absolut, gunakan nama lengkapnya, dimulai dengan garis miring `/`, seperti ini:
+
+```bash
+cd /home/username/project/abc
+```
+
+Jika Anda ingin berpindah ke direktori yang dekat dengan direktori Anda saat ini, Anda dapat menentukan lokasi relatif. Sebagai contoh, jika Anda sudah berada di `/home/username/project`, Anda dapat masuk ke subdirektori `abc` seperti ini:
+
+```bash
+cd abc
+```
+
+Jika Anda ingin pergi ke direktori di atas direktori saat ini, Anda dapat menggunakan alias `..`. Sebagai contoh, jika Anda berada di `/home/username/project/abc` dan ingin pergi ke `/home/username/project`, maka Anda akan melakukan hal berikut:
+
+```bash
+cd ..
+```
+
+Ini juga bisa disebut "naik" satu direktori.
+
+### Bagian 3.2: Berpindah ke direktori terakhir
+
+Untuk shell saat ini, perintah ini akan membawa Anda ke direktori sebelumnya tempat Anda berada, di mana pun itu.
+
+```bash
+cd -
+```
+
+Melakukannya beberapa kali secara efektif akan "beralih" antara direktori saat ini dan direktori sebelumnya.
+
+### Bagian 3.3: Berpindah ke direktori home
+
+Direktori default adalah direktori home (`$HOME`, biasanya `/home/username`), jadi `cd` tanpa direktori apa pun akan membawa Anda ke sana.
+
+```bash
+cd
+```
+
+Atau Anda bisa lebih eksplisit:
+
+```bash
+cd $HOME
+```
+
+Pintasan untuk direktori home adalah `~`, jadi itu juga bisa digunakan.
+
+```bash
+cd ~
+```
+
+### Bagian 3.4: Berpindah ke Direktori Skrip
+
+Secara umum, ada dua jenis skrip Bash:
+
+1.  Alat sistem yang beroperasi dari direktori kerja saat ini.
+2.  Alat proyek yang memodifikasi file relatif terhadap lokasi mereka sendiri di sistem file.
+
+Untuk jenis skrip kedua, akan sangat berguna untuk berpindah ke direktori tempat skrip disimpan. Ini dapat dilakukan dengan perintah berikut:
+
+```bash
+cd "$(dirname "$(readlink -f "$0")")"
+```
+
+Perintah ini menjalankan 3 perintah:
+
+1.  `readlink -f "$0"` menentukan path ke skrip saat ini (`$0`).
+2.  `dirname` mengubah path ke skrip menjadi path ke direktorinya.
+3.  `cd` mengubah direktori kerja saat ini ke direktori yang diterimanya dari `dirname`.
+
+---
+
+# Bab 4
+## Mendaftar File
+
+| Opsi | Deskripsi |
+| :--- | :--- |
+| `-a`, `--all` | Mendaftar semua entri termasuk yang dimulai dengan titik |
+| `-A`, `--almost-all`| Mendaftar semua entri kecuali `.` dan `..` |
+| `-c` | Urutkan file berdasarkan waktu perubahan |
+| `-d`, `--directory` | Mendaftar entri direktori |
+| `-h`, `--human-readable` | Tampilkan ukuran dalam format yang mudah dibaca manusia (yaitu K, M) |
+| `-H` | Sama seperti di atas hanya dengan pangkat 1000 bukan 1024 |
+| `-l` | Tampilkan konten dalam format daftar panjang |
+| `-o` | Format daftar panjang tanpa info grup |
+| `-r`, `--reverse` | Tampilkan konten dalam urutan terbalik |
+| `-s`, `--size` | Cetak ukuran setiap file dalam blok |
+| `-S` | Urutkan berdasarkan ukuran file |
+| `--sort=WORD` | Urutkan konten berdasarkan kata. (yaitu size, version, status) |
+| `-t` | Urutkan berdasarkan waktu modifikasi |
+| `-u` | Urutkan berdasarkan waktu akses terakhir |
+| `-v` | Urutkan berdasarkan versi |
+| `-1` | Daftar satu file per baris |
+
+### Bagian 4.1: Mendaftar File dalam Format Daftar Panjang
+
+Opsi `-l` pada perintah `ls` mencetak konten direktori yang ditentukan dalam format daftar panjang. Jika tidak ada direktori yang ditentukan, maka secara default, konten dari direktori saat ini akan didaftar.
+
+```bash
+ls -l /etc
+```
+
+Contoh Output:
+
+```
+total 1204
+drwxr-xr-x   3 root root  4096 Apr 21 03:44 acpi
+-rw-r--r--   1 root root  3028 Apr 21 03:38 adduser.conf
+drwxr-xr-x   2 root root  4096 Jun 11 20:42 alternatives
+...
+```
+
+Output pertama menampilkan `total`, yang menunjukkan ukuran total dalam blok dari semua file di direktori yang didaftar. Kemudian menampilkan delapan kolom informasi untuk setiap file di direktori yang didaftar. Di bawah ini adalah rincian untuk setiap kolom dalam output:
+
+| No. Kolom | Contoh | Deskripsi |
+| :--- | :--- | :--- |
+| 1.1 | `d` | Tipe file (lihat tabel di bawah) |
+| 1.2 | `rwxr-xr-x` | String izin akses |
+| 2 | `3` | Jumlah hard link |
+| 3 | `root` | Nama pemilik |
+| 4 | `root` | Grup pemilik |
+| 5 | `4096` | Ukuran file dalam byte |
+| 6 | `Apr 21 03:44` | Waktu modifikasi |
+| 7 | `acpi` | Nama file |
+
+**Tipe File**
+
+Tipe file bisa berupa salah satu dari karakter berikut.
+
+| Karakter | Tipe File |
+| :--- | :--- |
+| `-` | File biasa |
+| `b` | File spesial blok |
+| `c` | File spesial karakter |
+| `C` | File performa tinggi ("contiguous data") |
+| `d` | Direktori |
+| `D` | Door (file IPC khusus di Solaris 2.5+ saja) |
+| `l` | Symbolic link |
+| `M` | File off-line ("migrated") (Cray DMF) |
+| `n` | File spesial jaringan (HP-UX) |
+| `p` | FIFO (pipe bernama) |
+| `P` | Port (file sistem khusus di Solaris 10+ saja) |
+| `s` | Socket |
+| `?` | Tipe file lainnya |
+
+### Bagian 4.2: Mendaftar Sepuluh File yang Terakhir Dimodifikasi
+
+Perintah berikut akan mendaftar hingga sepuluh file yang paling baru dimodifikasi di direktori saat ini, menggunakan format daftar panjang (`-l`) dan diurutkan berdasarkan waktu (`-t`).
+
+```bash
+ls -lt | head
+```
+
+### Bagian 4.3: Mendaftar Semua File Termasuk Dotfile
+
+*Dotfile* adalah file yang namanya dimulai dengan `.`. File-file ini biasanya disembunyikan oleh `ls` dan tidak akan didaftar kecuali diminta.
+
+Sebagai contoh, output `ls` berikut:
+
+```bash
+$ ls
+bin pki
+```
+
+Opsi `-a` atau `--all` akan mendaftar semua file, termasuk *dotfile*.
+
+```bash
+$ ls -a
+.               .bash_logout     .lesshst
+..              .bash_profile    pki
+.ansible        .bashrc          .puppetlabs
+.bash_history   bin              .ssh
+                                 .viminfo
+```
+
+Opsi `-A` atau `--almost-all` akan mendaftar semua file, termasuk *dotfile*, tetapi tidak mendaftar `.` dan `..` yang tersirat. Perhatikan bahwa `.` adalah direktori saat ini dan `..` adalah direktori induk.
+
+```bash
+$ ls -A
+.ansible        .bashrc          pki
+.bash_history   bin              .puppetlabs
+.bash_logout    .lesshst         .ssh
+.bash_profile                    .viminfo
+```
+
+### Bagian 4.4: Mendaftar File Tanpa Menggunakan `ls`
+
+Gunakan kemampuan ekspansi nama file dan ekspansi kurung kurawal dari shell Bash untuk mendapatkan nama file:
+
+```bash
+# menampilkan file dan direktori yang ada di direktori saat ini
+printf "%s\n" *
+
+# menampilkan hanya direktori di direktori saat ini
+printf "%s\n" */
+
+# menampilkan hanya (beberapa) file gambar
+printf "%s\n" *.{gif,jpg,png}
+```
+
+Untuk menangkap daftar file ke dalam sebuah variabel untuk diproses, biasanya merupakan praktik yang baik untuk menggunakan array bash:
+
+```bash
+files=( * )
+
+# melakukan iterasi pada mereka
+for file in "${files[@]}"; do
+  echo "$file"
+done
+```
+
+### Bagian 4.5: Mendaftar File
+
+Perintah `ls` mendaftar konten dari direktori yang ditentukan, tidak termasuk *dotfile*. Jika tidak ada direktori yang ditentukan, maka secara default, konten dari direktori saat ini akan didaftar.
+
+File yang didaftar diurutkan secara abjad, secara default, dan disejajarkan dalam kolom jika tidak muat dalam satu baris.
+
+```bash
+$ ls
+apt          Documents    Fonts    Pictures       Public      Videos
+configs      eclipse      git      Programming    Templates   workspace
+bin          Desktop      Music
+```
+
+### Bagian 4.6: Mendaftar File dalam Format seperti Pohon
+
+Perintah `tree` mendaftar konten dari direktori yang ditentukan dalam format seperti pohon. Jika tidak ada direktori yang ditentukan, maka secara default, konten dari direktori saat ini akan didaftar.
+
+Contoh Output:
+
+```bash
+$ tree /tmp
+/tmp
+├── 5037
+├── adb.log
+└── evince-20965
+    └── image.FPWTJY.png
+```
+
+Gunakan opsi `-L` dari perintah `tree` untuk membatasi kedalaman tampilan dan opsi `-d` untuk hanya mendaftar direktori.
+
+Contoh Output:
+
+```bash
+$ tree -L 1 -d /tmp
+/tmp
+└── evince-20965
+```
+
+### Bagian 4.7: Mendaftar File Diurutkan Berdasarkan Ukuran
+
+Opsi `-S` pada perintah `ls` mengurutkan file dalam urutan menurun berdasarkan ukuran file.
+
+```bash
+$ ls -l -S ./Fruits
+total 444
+-rw-rw-rw- 1 root root 295303 Jul 28 19:19 apples.jpg
+-rw-rw-rw- 1 root root 102283 Jul 28 19:19 kiwis.jpg
+-rw-rw-rw- 1 root root  50197 Jul 28 19:19 bananas.jpg
+```
+
+Ketika digunakan dengan opsi `-r`, urutan pengurutan dibalik.
+
+```bash
+$ ls -l -S -r /Fruits
+total 444
+-rw-rw-rw- 1 root root  50197 Jul 28 19:19 bananas.jpg
+-rw-rw-rw- 1 root root 102283 Jul 28 19:19 kiwis.jpg
+-rw-rw-rw- 1 root root 295303 Jul 28 19:19 apples.jpg
+```
+
+---
 
