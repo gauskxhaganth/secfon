@@ -7419,6 +7419,7 @@ Di Unix, file dan direktori yang diawali dengan titik biasanya berisi pengaturan
 Contoh file *dot* adalah `.bash_history`, yang berisi perintah-perintah terbaru yang dieksekusi, dengan asumsi pengguna menggunakan Bash.
 
 Ada berbagai file yang di-*source* saat Anda masuk ke *shell* Bash. Gambar di bawah ini, diambil dari [situs ini](https://www.google.com/search?q=http://www.linuxfromscratch.org/blfs/view/svn/postlfs/profile.html), menunjukkan proses pengambilan keputusan di balik pemilihan file mana yang akan di-*source* saat *startup*.
+```
 
 <p align="center">
   <img src="images/book-02/figure-49.3.png" alt="gambar" width="580"/>
