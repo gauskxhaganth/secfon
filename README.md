@@ -12,3 +12,5 @@ Repo ini berisi materi belajar seputar dunia keamanan siber, berdasarkan pemaham
 
 ## Web2
 #### From-Books:
+[01. linux notes professional](web2-sources/from-books/professional_notes/books-01-linux_notes_professional.md)<br>
+[02. bash notes professional](web2-sources/from-books/professional_notes/books-02-bash_notes_professional.md)<br>
