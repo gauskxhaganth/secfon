@@ -661,7 +661,8 @@ total 444
 
 ---
 
-## Bab 5: Menggunakan cat
+# Bab 5
+## Menggunakan cat
 
 | Opsi | Detail |
 | :--- | :--- |
@@ -2055,7 +2056,7 @@ fi
 
 ---
 
-## Bab 12: Array
+# Bab 12: Array
 
 ### Bagian 12.1: Penugasan Array
 
@@ -5025,8 +5026,6 @@ $ mv filename.{jar,zip}
 
 Ini akan diekspansi menjadi `mv filename.jar filename.zip`.
 
----
-
 ### Bagian 31.2: Membuat direktori untuk mengelompokkan file berdasarkan bulan dan tahun
 
 ```bash
@@ -5129,7 +5128,7 @@ dan seterusnya. Saya merasa ini sangat berguna untuk membuat beberapa folder dan
 ---
 
 # Bab 32
-getopts: *parsing* parameter-posisional yang cerdas
+## getopts: *parsing* parameter-posisional yang cerdas
 
 | Parameter | Detail                                      |
 | :-------- | :------------------------------------------ |
@@ -5236,6 +5235,7 @@ Invalid option ?
 Usage :
 pingmap -[n|t[i|p]|v]
 ```
+
 ---
 
 # Bab 33
@@ -6286,3 +6286,1143 @@ Variabel hanya-baca yang menyimpan nomor ID pengguna:
 ~> $ echo $UID
 12345
 ```
+
+---
+
+# Bab 37
+## Kontrol Pekerjaan (*Job Control*)
+
+### Bagian 37.1: Menampilkan daftar proses latar belakang (*background*)
+
+```bash
+$ jobs
+[1]   Running                 sleep 500 & (wd: ~)
+[2]-  Running                 sleep 600 & (wd: ~)
+[3]+  Running                 ./Fritzing &
+```
+
+*Field* pertama menunjukkan ID pekerjaan. Tanda `+` dan `-` yang mengikuti ID pekerjaan untuk dua pekerjaan masing-masing menunjukkan pekerjaan *default* dan kandidat pekerjaan *default* berikutnya ketika pekerjaan *default* saat ini berakhir. Pekerjaan *default* digunakan ketika perintah `fg` atau `bg` digunakan tanpa argumen apa pun.
+*Field* kedua memberikan status pekerjaan. *Field* ketiga adalah perintah yang digunakan untuk memulai proses.
+*Field* terakhir (`wd: ~`) mengatakan bahwa perintah `sleep` dimulai dari direktori kerja `~` (Home).
+
+### Bagian 37.2: Membawa proses latar belakang ke latar depan (*foreground*)
+
+```bash
+$ fg %2
+sleep 600
+```
+
+`%2` menentukan pekerjaan no. 2. Jika `fg` digunakan tanpa argumen apa pun, ia akan membawa proses terakhir yang diletakkan di latar belakang ke latar depan.
+
+```bash
+$ fg %?sle
+sleep 500
+```
+
+`?sle` merujuk pada perintah proses latar belakang yang mengandung "sle". Jika beberapa perintah latar belakang mengandung *string* tersebut, ini akan menghasilkan kesalahan.
+
+### Bagian 37.3: Memulai ulang proses latar belakang yang dihentikan
+
+```bash
+$ bg
+[8]+ sleep 600 &
+```
+
+### Bagian 37.4: Menjalankan perintah di latar belakang
+
+```bash
+$ sleep 500 &
+[1] 7582
+```
+
+Menempatkan perintah `sleep` di latar belakang. `7582` adalah ID proses dari proses latar belakang.
+
+### Bagian 37.5: Menghentikan proses latar depan
+
+Tekan **Ctrl + Z** untuk menghentikan proses latar depan dan menempatkannya di latar belakang.
+
+```bash
+$ sleep 600
+^Z
+[8]+  Stopped                 sleep 600
+```
+
+---
+
+# Bab 38
+## Pernyataan `case`
+
+### Bagian 38.1: Pernyataan `case` sederhana
+
+Dalam bentuknya yang paling sederhana yang didukung oleh semua versi bash, pernyataan `case` mengeksekusi *case* yang cocok dengan polanya. Operator `;;` berhenti setelah kecocokan pertama, jika ada.
+
+```bash
+#!/bin/bash
+var=1
+case $var in
+1)
+  echo "Antartica"
+  ;;
+2)
+  echo "Brazil"
+  ;;
+3)
+  echo "Cat"
+  ;;
+esac
+```
+
+**Keluaran:**
+
+```
+Antartica
+```
+
+### Bagian 38.2: Pernyataan `case` dengan *fall through*
+
+**Versi ≥ 4.0**
+
+Sejak bash 4.0, operator baru `;&` diperkenalkan yang menyediakan mekanisme *fall through* (lanjut ke *case* berikutnya).
+
+```bash
+#!/bin/bash
+var=1
+case $var in
+1)
+  echo "Antartica"
+  ;&
+2)
+  echo "Brazil"
+  ;&
+3)
+  echo "Cat"
+  ;&
+esac
+```
+
+**Keluaran:**
+
+```
+Antartica
+Brazil
+Cat
+```
+
+### Bagian 38.3: *Fall through* hanya jika pola berikutnya cocok
+
+**Versi ≥ 4.0**
+
+Sejak Bash 4.0, operator lain `;;` diperkenalkan yang juga menyediakan *fall through* tetapi hanya jika pola dalam pernyataan *case* berikutnya, jika ada, cocok.
+
+```bash
+#!/bin-bash
+var=abc
+case $var in
+a*)
+  echo "Antartica"
+  ;;&
+xyz)
+  echo "Brazil"
+  ;;&
+*b*)
+  echo "Cat"
+  ;;&
+esac
+```
+
+**Keluaran:**
+
+```
+Antartica
+Cat
+```
+
+Dalam contoh di bawah ini, `abc` cocok dengan *case* pertama dan ketiga tetapi tidak dengan *case* kedua. Jadi, *case* kedua tidak dieksekusi.
+
+---
+
+# Bab 39
+## Membaca file (aliran data, variabel) baris per baris (dan/atau field per field)
+
+| Parameter | Detail |
+| :--- | :--- |
+| **`IFS`** | Pemisah *field* internal. |
+| **`file`** | Nama/path file. |
+| **`-r`** | Mencegah interpretasi *backslash* saat digunakan dengan `read`. |
+| **`-t`** | Menghapus baris baru (*newline*) di akhir dari setiap baris yang dibaca oleh `readarray`. |
+| **`-d DELIM`** | Lanjutkan hingga karakter pertama dari `DELIM` dibaca (dengan `read`), bukan baris baru. |
+
+### Bagian 39.1: Melakukan perulangan pada file baris per baris
+
+```bash
+while IFS= read -r line; do
+  echo "$line"
+done <file
+```
+
+Jika `file` mungkin tidak menyertakan baris baru di akhir, maka:
+
+```bash
+while IFS= read -r line || [ -n "$line" ]; do
+  echo "$line"
+done <file
+```
+
+### Bagian 39.2: Melakukan perulangan pada keluaran perintah *field* per *field*
+
+Anggap pemisah *field* adalah `:`.
+
+```bash
+while IFS= read -d : -r field || [ -n "$field" ];do
+  echo "**$field**"
+done < <(ping google.com)
+```
+
+Atau dengan sebuah *pipe*:
+
+```bash
+ping google.com | while IFS= read -d : -r field || [ -n "$field" ];do
+  echo "**$field**"
+done
+```
+
+### Bagian 39.3: Membaca baris-baris file ke dalam sebuah *array*
+
+```bash
+readarray -t arr <file
+```
+
+Atau dengan sebuah *loop*:
+
+```bash
+arr=()
+while IFS= read -r line; do
+  arr+=("$line")
+done <file
+```
+
+### Bagian 39.4: Membaca baris-baris *string* ke dalam sebuah *array*
+
+```bash
+var='line 1
+line 2
+line3'
+readarray -t arr <<< "$var"
+```
+
+atau dengan sebuah *loop*:
+
+```bash
+arr=()
+while IFS= read -r line; do
+  arr+=("$line")
+done <<< "$var"
+```
+
+### Bagian 39.5: Melakukan perulangan pada *string* baris per baris
+
+```bash
+var='line 1
+line 2
+line3'
+while IFS= read -r line; do
+  echo "-$line-"
+done <<< "$var"
+```
+
+atau
+
+```bash
+readarray -t arr <<< "$var"
+for i in "${arr[@]}";do
+  echo "-$i-"
+done
+```
+
+### Bagian 39.6: Melakukan perulangan pada keluaran perintah baris per baris
+
+```bash
+while IFS= read -r line;do
+  echo "**$line**"
+done < <(ping google.com)
+```
+
+atau dengan sebuah *pipe*:
+
+```bash
+ping google.com |
+while IFS= read -r line;do
+  echo "**$line**"
+done
+```
+
+### Bagian 39.7: Membaca file *field* per *field*
+
+Anggap pemisah *field* adalah `:` (titik dua) di dalam `file`.
+
+```bash
+while IFS= read -d : -r field || [ -n "$field" ]; do
+  echo "$field"
+done <file
+```
+
+Untuk konten:
+
+```
+first : se
+con
+d:
+Thi rd:
+Fourth
+```
+
+Keluarannya adalah:
+
+```
+**first **
+** se
+con
+d**
+**
+Thi rd**
+**
+Fourth
+**
+```
+
+### Bagian 39.8: Membaca *string* *field* per *field*
+
+Anggap pemisah *field* adalah `:`.
+
+```bash
+var='line: 1
+line: 2
+line3'
+while IFS= read -d : -r field || [ -n "$field" ]; do
+  echo "-$field-"
+done <<< "$var"
+```
+
+**Keluaran:**
+
+```
+-line-
+- 1
+line-
+- 2
+line3
+-
+```
+
+### Bagian 39.9: Membaca *field-field* file ke dalam sebuah *array*
+
+Anggap pemisah *field* adalah `:`.
+
+```bash
+arr=()
+while IFS= read -d : -r field || [ -n "$field" ]; do
+  arr+=("$field")
+done <file
+```
+
+### Bagian 39.10: Membaca *field-field* *string* ke dalam sebuah *array*
+
+Anggap pemisah *field* adalah `:`.
+
+```bash
+var='1:2:3:4:
+newline'
+arr=()
+while IFS= read -d : -r field || [ -n "$field" ]; do
+  arr+=("$field")
+done <<< "$var"
+echo "${arr[4]}"
+```
+
+**Keluaran:**
+
+```
+newline
+```
+
+### Bagian 39.11: Membaca file (`/etc/passwd`) baris per baris dan *field* per *field*
+
+```bash
+#!/bin/bash
+FILENAME="/etc/passwd"
+
+while IFS=: read -r username password userid groupid comment homedir cmdshell
+do
+  echo "$username, $userid, $comment $homedir"
+done < $FILENAME
+```
+
+Dalam file *password unix*, informasi pengguna disimpan baris per baris, setiap baris terdiri dari informasi untuk seorang pengguna yang dipisahkan oleh karakter titik dua (`:`). Dalam contoh ini, saat membaca file baris per baris, baris tersebut juga dipecah menjadi *field-field* menggunakan karakter titik dua sebagai pembatas yang ditunjukkan oleh nilai yang diberikan untuk `IFS`.
+
+**Contoh Masukan:**
+
+```
+mysql:x:27:27:MySQL Server:/var/lib/mysql:/bin/bash
+pulse:x:497:495:PulseAudio System Daemon:/var/run/pulse:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+tomcat:x:91:91:Apache Tomcat:/usr/share/tomcat6:/sbin/nologin
+webalizer:x:67:67:Webalizer:/var/www/usage:/sbin/nologin
+```
+
+**Contoh Keluaran:**
+
+```
+mysql, 27, MySQL Server /var/lib/mysql
+pulse, 497, PulseAudio System Daemon /var/run/pulse
+sshd, 74, Privilege-separated SSH /var/empty/sshd
+tomcat, 91, Apache Tomcat /usr/share/tomcat6
+webalizer, 67, Webalizer /var/www/usage
+```
+
+Untuk membaca baris per baris dan menetapkan seluruh baris ke variabel, berikut adalah versi modifikasi dari contoh tersebut. Perhatikan bahwa kita hanya memiliki satu variabel bernama `line` yang disebutkan di sini.
+
+```bash
+#!/bin/bash
+FILENAME="/etc/passwd"
+
+while IFS= read -r line
+do
+  echo "$line"
+done < $FILENAME
+```
+
+**Contoh Masukan:**
+
+```
+mysql:x:27:27:MySQL Server:/var/lib/mysql:/bin/bash
+pulse:x:497:495:PulseAudio System Daemon:/var/run/pulse:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+tomcat:x:91:91:Apache Tomcat:/usr/share/tomcat6:/sbin/nologin
+webalizer:x:67:67:Webalizer:/var/www/usage:/sbin/nologin
+```
+
+**Contoh Keluaran:**
+
+```
+mysql:x:27:27:MySQL Server:/var/lib/mysql:/bin/bash
+pulse:x:497:495:PulseAudio System Daemon:/var/run/pulse:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+tomcat:x:91:91:Apache Tomcat:/usr/share/tomcat6:/sbin/nologin
+webalizer:x:67:67:Webalizer:/var/www/usage:/sbin/nologin
+```
+
+---
+
+# Bab 40
+## Urutan Eksekusi File
+
+`.bash_profile`, `.bash_login`, `.bashrc`, dan `.profile` semuanya melakukan hal yang hampir sama: mengatur dan mendefinisikan fungsi, variabel, dan sejenisnya.
+
+Perbedaan utamanya adalah `.bashrc` dipanggil saat membuka jendela non-login tetapi interaktif, dan `.bash_profile` serta yang lainnya dipanggil untuk *login shell*. Banyak orang mengatur agar `.bash_profile` atau file sejenisnya tetap memanggil `.bashrc`.
+
+### Bagian 40.1: `.profile` vs `.bash_profile` (dan `.bash_login`)
+
+`.profile` dibaca oleh sebagian besar *shell* saat *startup*, termasuk bash. Namun, `.bash_profile` digunakan untuk konfigurasi yang spesifik untuk bash. Untuk kode inisialisasi umum, letakkan di `.profile`. Jika spesifik untuk bash, gunakan `.bash_profile`.
+
+`.profile` sebenarnya tidak dirancang khusus untuk bash, tetapi `.bash_profile` iya. (`.profile` adalah untuk Bourne dan *shell* serupa lainnya, yang menjadi dasar bash) Bash akan kembali ke `.profile` jika `.bash_profile` tidak ditemukan.
+
+`.bash_login` adalah cadangan untuk `.bash_profile`, jika tidak ditemukan. Umumnya lebih baik menggunakan `.bash_profile` atau `.profile`.
+
+---
+
+# Bab 41
+## Memecah File
+
+Terkadang berguna untuk memecah sebuah file menjadi beberapa file terpisah. Jika Anda memiliki file besar, mungkin ide yang baik untuk memecahnya menjadi potongan-potongan yang lebih kecil.
+
+### Bagian 41.1: Memecah sebuah file
+
+Menjalankan perintah `split` tanpa opsi apa pun akan memecah file menjadi 1 atau lebih file terpisah yang masing-masing berisi hingga 1000 baris.
+
+```bash
+split file
+```
+
+Ini akan membuat file bernama `xaa`, `xab`, `xac`, dll, masing-masing berisi hingga 1000 baris. Seperti yang Anda lihat, semuanya diawali dengan huruf `x` secara *default*. Jika file awal kurang dari 1000 baris, hanya satu file seperti itu yang akan dibuat.
+
+Untuk mengubah awalan, tambahkan awalan yang Anda inginkan di akhir baris perintah.
+
+```bash
+split file customprefix
+```
+
+Sekarang file bernama `customprefixaa`, `customprefixab`, `customprefixac`, dll akan dibuat.
+
+Untuk menentukan jumlah baris yang akan dikeluarkan per file, gunakan opsi `-l`. Berikut ini akan memecah file menjadi maksimal 5000 baris.
+
+```bash
+split -l5000 file
+```
+
+ATAU
+
+```bash
+split --lines=5000 file
+```
+
+Sebagai alternatif, Anda dapat menentukan jumlah maksimum *byte* alih-alih baris. Ini dilakukan dengan menggunakan opsi `-b` atau `--bytes`. Misalnya, untuk memungkinkan maksimum 1MB.
+
+```bash
+split --bytes=1MB file
+```
+
+---
+
+# Bab 42
+## Transfer File menggunakan `scp`
+
+### Bagian 42.1: `scp` mentransfer file
+
+Untuk mentransfer file secara aman ke mesin lain - ketik:
+
+```bash
+scp file1.txt tom@server2:$HOME
+```
+
+Contoh ini menyajikan transfer `file1.txt` dari *host* kita ke direktori *home* pengguna `tom` di `server2`.
+
+### Bagian 42.2: `scp` mentransfer banyak file
+
+`scp` juga dapat digunakan untuk mentransfer beberapa file dari satu server ke server lain. Di bawah ini adalah contoh transfer semua file dari direktori `my_folder` dengan ekstensi `.txt` ke `server2`. Dalam contoh di bawah, semua file akan ditransfer ke direktori *home* pengguna `tom`.
+
+```bash
+scp /my_folder/*.txt tom@server2:$HOME
+```
+
+### Bagian 42.3: Mengunduh file menggunakan `scp`
+
+Untuk mengunduh file dari server jarak jauh ke mesin lokal - ketik:
+
+```bash
+scp tom@server2:$HOME/file.txt /local/machine/path/
+```
+
+Contoh ini menunjukkan cara mengunduh file bernama `file.txt` dari direktori *home* pengguna `tom` ke direktori saat ini di mesin lokal kita.
+
+---
+
+# Bab 43
+## Pipelines
+
+### Bagian 43.1: Menggunakan `|&`
+
+`|&` menghubungkan *standard output* dan *standard error* dari perintah pertama ke perintah kedua, sedangkan `|` hanya menghubungkan *standard output* dari perintah pertama ke perintah kedua.
+
+Dalam contoh ini, halaman diunduh melalui `curl`. Dengan opsi `-v`, `curl` menulis beberapa info di `stderr`, halaman yang diunduh ditulis di `stdout`. Judul halaman dapat ditemukan di antara `<title>` dan `</title>`.
+
+```bash
+curl -vs 'http://www.google.com/' |& awk '/Host:/{print}
+/<title>/{match($0,/<title>(.*)<\/title>/,a);print a[1]}'
+```
+
+**Keluaran adalah:**
+
+```
+> Host: www.google.com
+Google
+```
+
+Tetapi dengan `|` lebih banyak informasi akan dicetak, yaitu yang dikirim ke `stderr` karena hanya `stdout` yang di-*pipe* ke perintah berikutnya. Dalam contoh ini semua baris kecuali baris terakhir (Google) dikirim ke `stderr` oleh `curl`:
+
+```
+* Hostname was NOT found in DNS cache
+*
+Trying 172.217.20.228...
+* Connected to www.google.com (172.217.20.228) port 80 (#0)
+> GET / HTTP/1.1
+> User-Agent: curl/7.35.0
+> Host: www.google.com
+> Accept: */*
+>
+* HTTP 1.0, assume close after body
+< HTTP/1.0 200 OK
+< Date: Sun, 24 Jul 2016 19:04:59 GMT
+< Expires: -1
+< Cache-Control: private, max-age=0
+< Content-Type: text/html; charset=ISO-8859-1
+< P3P: CP="This is not a P3P policy! See
+https://www.google.com/support/accounts/answer/151657?hl=en for more info."
+< Server: gws
+< X-XSS-Protection: 1; mode=block
+< X-Frame-Options: SAMEORIGIN
+< Set-Cookie: NID=82=jX0yZLPPUE7u13kKNevUCDg8yG9Ze_C03o0IM-
+EopOSKL0mMITEagIE816G55L2wrTlQwgXkhq4ApFvvYEoaWF-
+oEoq2T0sBTuQVdsIFULj9b2O8X35O0sAgUnc3a3JnTRBqelMcuS9QkQA; expires=Mon, 23-Jan-2017 19:04:59 GMT;
+path=/; domain=.google.com; HttpOnly
+< Accept-Ranges: none
+< Vary: Accept-Encoding
+< X-Cache: MISS from jetsib_appliance
+< X-Loop-Control: 5.202.190.157 81E4F9836653D5812995BA53992F8065
+< Connection: close
+<
+{ [data not shown]
+* Closing connection 0
+Google
+```
+
+### Bagian 43.2: Menampilkan semua proses dengan paginasi
+
+```bash
+ps -e | less
+```
+
+`ps -e` menunjukkan semua proses, keluarannya dihubungkan ke masukan `less` melalui `|`, `less` membuat paginasi hasilnya.
+
+### Bagian 43.3: Memodifikasi keluaran berkelanjutan dari sebuah perintah
+
+```bash
+~$ ping -c 1 google.com # keluaran yang tidak dimodifikasi
+PING google.com (16.58.209.174) 56(84) bytes of data.
+64 bytes from wk-in-f100.1e100.net (16.58.209.174): icmp_seq=1 ttl=53 time=47.4 ms
+
+~$ ping google.com | grep -o '^[0-9]\+[^()]\+' # keluaran yang dimodifikasi
+64 bytes from wk-in-f100.1e100.net
+64 bytes from wk-in-f100.1e100.net
+...
+```
+
+*Pipe* (`|`) menghubungkan `stdout` dari `ping` ke `stdin` dari `grep`, yang memprosesnya segera. Beberapa perintah lain seperti `sed` secara *default* melakukan *buffering* pada `stdin` mereka, yang berarti ia harus menerima cukup data sebelum mencetak apa pun, yang berpotensi menyebabkan keterlambatan dalam pemrosesan lebih lanjut.
+
+---
+
+# Bab 44
+## Mengelola Variabel Lingkungan `PATH`
+
+| Parameter | Detail |
+| :--- | :--- |
+| **`PATH`** | Variabel lingkungan Path |
+
+### Bagian 44.1: Menambahkan *path* ke variabel lingkungan `PATH`
+
+Variabel lingkungan `PATH` umumnya didefinisikan di `~/.bashrc` atau `~/.bash_profile` atau `/etc/profile` atau `~/.profile` atau `/etc/bash.bashrc` (file konfigurasi Bash spesifik distro).
+
+```bash
+$ echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/jvm/jdk1.8.0_92/bin:/usr/lib/jvm/jdk1.8.0_92/db/bin:/usr/lib/jvm/jdk1.8.0_92/jre/bin
+```
+
+Sekarang, jika kita ingin menambahkan *path* (misalnya `~/bin`) ke variabel `PATH`:
+
+```bash
+PATH=~/bin:$PATH
+# atau
+PATH=$PATH:~/bin
+```
+
+Tetapi ini hanya akan memodifikasi `PATH` di *shell* saat ini (dan *subshell*-nya). Setelah Anda keluar dari *shell*, modifikasi ini akan hilang.
+
+Untuk membuatnya permanen, kita perlu menambahkan potongan kode itu ke file `~/.bashrc` (atau apa pun) dan memuat ulang file tersebut.
+Jika Anda menjalankan kode berikut (di terminal), itu akan menambahkan `~/bin` ke `PATH` secara permanen:
+
+```bash
+echo 'PATH=~/bin:$PATH' >> ~/.bashrc && source ~/.bashrc
+```
+
+**Penjelasan:**
+
+  * `echo 'PATH=~/bin:$PATH' >> ~/.bashrc` menambahkan baris `PATH=~/bin:$PATH` di akhir file `~/.bashrc` (Anda bisa melakukannya dengan editor teks).
+  * `source ~/.bashrc` memuat ulang file `~/.bashrc`.
+
+Ini adalah sedikit kode (dijalankan di terminal) yang akan memeriksa apakah *path* sudah disertakan dan menambahkan *path* hanya jika belum:
+
+```bash
+path=~/bin
+# path yang akan dimasukkan
+bashrc=~/.bashrc
+# file bash yang akan ditulis dan dimuat ulang
+# jalankan kode berikut tanpa modifikasi
+echo $PATH | grep -q "\(^\|:\)$path\(:\|/\{0,1\}$\)" || echo "PATH=\$PATH:$path" >> "$bashrc";
+source "$bashrc"
+```
+
+### Bagian 44.2: Menghapus *path* dari variabel lingkungan `PATH`
+
+Untuk menghapus sebuah `PATH` dari variabel lingkungan `PATH`, Anda perlu mengedit file `~/.bashrc` atau `~/.bash_profile` atau `/etc/profile` atau `~/.profile` atau `/etc/bash.bashrc` (spesifik distro) dan menghapus penugasan untuk *path* tersebut.
+
+Daripada menemukan penugasan yang tepat, Anda bisa saja melakukan penggantian di `$PATH` pada tahap akhirnya. Berikut ini akan menghapus `$path` dari `$PATH` dengan aman:
+
+```bash
+path=~/bin
+PATH="$(echo "$PATH" |sed -e "s#\(^\|:\)$(echo "$path" |sed -e 's/[^^]/[&]/g' -e
+'s/\^/\\^/g')\(:\|/\{0,1\}$\)#\1\2#" -e 's#:\+#:#g' -e 's#^:\|:$##g')"
+```
+
+Untuk membuatnya permanen, Anda perlu menambahkannya di akhir file konfigurasi bash Anda.
+
+Anda dapat melakukannya dengan cara fungsional:
+
+```bash
+rpath(){
+  for path in "$@";do
+    PATH="$(echo "$PATH" |sed -e "s#\(^\|:\)$(echo "$path" |sed -e 's/[^^]/[&]/g' -e
+'s/\^/\\^/g')\(:\|/\{0,1\}$\)#\1\2#" -e 's#:\+#:#g' -e 's#^:\|:$##g')"
+  done
+  echo "$PATH"
+}
+PATH="$(rpath ~/bin /usr/local/sbin /usr/local/bin)"
+PATH="$(rpath /usr/games)"
+# etc ...
+```
+
+Ini akan mempermudah penanganan beberapa *path*.
+
+**Catatan:**
+
+  * Anda perlu menambahkan kode-kode ini di file Konfigurasi Bash (`~/.bashrc` atau apa pun).
+  * Jalankan `source ~/.bashrc` untuk memuat ulang file Konfigurasi Bash (`~/.bashrc`).
+
+# Bab 45
+## Pemecahan Kata (*Word Splitting*)
+
+| Parameter | Detail |
+| :--- | :--- |
+| **`IFS`** | Pemisah *field* internal. |
+| **`-x`** | Cetak perintah dan argumennya saat dieksekusi (*Shell option*). |
+
+### Bagian 45.1: Apa, Kapan, dan Mengapa?
+
+Ketika *shell* melakukan ekspansi parameter, substitusi perintah, ekspansi variabel atau aritmatika, ia memindai batas kata dalam hasilnya. Jika ada batas kata yang ditemukan, maka hasilnya dipecah menjadi beberapa kata pada posisi itu. Batas kata didefinisikan oleh variabel *shell* `IFS` (Internal Field Separator). Nilai *default* untuk `IFS` adalah spasi, tab, dan baris baru, yaitu pemecahan kata akan terjadi pada tiga karakter spasi putih ini jika tidak dicegah secara eksplisit.
+
+```bash
+set -x
+var='I am
+a
+multiline string'
+fun() {
+  echo "-$1-"
+  echo "*$2*"
+  echo ".$3."
+}
+fun $var
+```
+
+Dalam contoh di atas, beginilah cara fungsi `fun` dieksekusi: `fun I am a multiline string`. `$var` dipecah menjadi 5 argumen, hanya `I`, `am` dan `a` yang akan dicetak.
+
+### Bagian 45.2: Efek buruk dari pemecahan kata
+
+```bash
+$ a='I am a string with spaces'
+$ [ $a = $a ] || echo "didn't match"
+bash: [: too many arguments
+didn't match
+```
+
+`[ $a = $a ]` diinterpretasikan sebagai `[ I am a string with spaces = I am a string with spaces ]`. `[` adalah perintah `test` di mana `I am a string with spaces` bukanlah satu argumen, melainkan 6 argumen\!\!
+
+```bash
+$ [ $a = something ] || echo "didn't match"
+bash: [: too many arguments
+didn't match
+```
+
+`[ $a = something ]` diinterpretasikan sebagai `[ I am a string with spaces = something ]`.
+
+```bash
+$ [ $(grep . file) = 'something' ]
+bash: [: too many arguments
+```
+
+Perintah `grep` mengembalikan *string* multi-baris dengan spasi, jadi Anda bisa bayangkan berapa banyak argumen yang ada... :D
+
+Lihat "Apa, Kapan, dan Mengapa?" untuk dasarnya.
+
+### Bagian 45.3: Kegunaan dari pemecahan kata
+
+Ada beberapa kasus di mana pemecahan kata bisa berguna:
+
+**Mengisi *array*:**
+
+```bash
+arr=($(grep -o '[0-9]\+' file))
+```
+
+Ini akan mengisi `arr` dengan semua nilai numerik yang ditemukan di `file`.
+
+**Melakukan *loop* melalui kata-kata yang dipisahkan spasi:**
+
+```bash
+words='foo bar baz'
+for w in $words;do
+  echo "W: $w"
+done
+```
+
+**Keluaran:**
+
+```
+W: foo
+W: bar
+W: baz
+```
+
+**Melewatkan parameter yang dipisahkan spasi yang tidak mengandung spasi putih:**
+
+```bash
+packs='apache2 php php-mbstring php-mysql'
+sudo apt-get install $packs
+```
+
+atau
+
+```bash
+packs='
+apache2
+php
+php-mbstring
+php-mysql
+'
+sudo apt-get install $packs
+```
+
+Ini akan menginstal paket-paket tersebut. Jika Anda memberi tanda kutip ganda pada `$packs`, itu akan menimbulkan kesalahan. `$packs` yang tidak dikutip mengirim semua nama paket yang dipisahkan spasi sebagai argumen ke `apt-get`, sementara mengutipnya akan mengirim *string* `$packs` sebagai satu argumen tunggal dan kemudian `apt-get` akan mencoba menginstal paket bernama `apache2 php php-mbstring php-mysql` (untuk yang pertama) yang jelas tidak ada.
+
+Lihat "Apa, Kapan, dan Mengapa?" untuk dasarnya.
+
+### Bagian 45.4: Memecah dengan perubahan pemisah
+
+Kita bisa melakukan penggantian sederhana pemisah dari spasi menjadi baris baru, seperti contoh berikut.
+
+```bash
+echo $sentence | tr " " "\n"
+```
+
+Ini akan memecah nilai variabel `sentence` dan menampilkannya baris per baris secara berurutan.
+
+### Bagian 45.5: Memecah dengan IFS
+
+Untuk lebih jelasnya, mari buat skrip bernama `showarg`:
+
+```bash
+#!/usr/bin/env bash
+printf "%d args:" $#
+printf " <%s>" "$@"
+echo
+```
+
+Sekarang mari kita lihat perbedaannya:
+
+```bash
+$ var="This is an example"
+$ showarg $var
+4 args: <This> <is> <an> <example>
+```
+
+`$var` dipecah menjadi 4 argumen. `IFS` adalah karakter spasi putih dan oleh karena itu pemecahan kata terjadi pada spasi.
+
+```bash
+$ var="This/is/an/example"
+$ showarg $var
+1 args: <This/is/an/example>
+```
+
+Di atas, pemecahan kata tidak terjadi karena karakter `IFS` tidak ditemukan.
+
+Sekarang mari kita atur `IFS=/`
+
+```bash
+$ IFS=/
+$ var="This/is/an/example"
+$ showarg $var
+4 args: <This> <is> <an> <example>
+```
+
+`$var` dipecah menjadi 4 argumen, bukan satu argumen tunggal.
+
+### Bagian 45.6: IFS & pemecahan kata
+
+Lihat "Apa, Kapan, dan Mengapa?" jika Anda tidak tahu tentang afiliasi `IFS` dengan pemecahan kata.
+
+Mari kita atur `IFS` hanya menjadi karakter spasi:
+
+```bash
+set -x
+var='I am
+a
+multiline string'
+IFS=' '
+fun() {
+  echo "-$1-"
+  echo "*$2*"
+  echo ".$3."
+}
+fun $var
+```
+
+Kali ini pemecahan kata hanya akan bekerja pada spasi. Fungsi `fun` akan dieksekusi seperti ini: `fun I 'am\na\nmultiline' string`. `$var` dipecah menjadi 3 argumen. `I`, `am\na\nmultiline` dan `string` akan dicetak.
+
+Mari kita atur `IFS` hanya menjadi baris baru:
+
+```bash
+IFS=$'\n'
+...
+```
+
+Sekarang `fun` akan dieksekusi seperti: `fun 'I am' a 'multiline string'`. `$var` dipecah menjadi 3 argumen. `I am`, `a`, `multiline string` akan dicetak.
+
+Mari kita lihat apa yang terjadi jika kita mengatur `IFS` menjadi *string* kosong:
+
+```bash
+IFS=
+...
+```
+
+Kali ini `fun` akan dieksekusi seperti ini: `fun 'I am\na\nmultiline string'`. `$var` tidak dipecah, yaitu tetap menjadi satu argumen tunggal.
+
+Anda dapat mencegah pemecahan kata dengan mengatur `IFS` menjadi *string* kosong.
+
+Cara umum untuk mencegah pemecahan kata adalah dengan menggunakan tanda kutip ganda: `fun "$var"` akan mencegah pemecahan kata dalam semua kasus yang dibahas di atas, yaitu fungsi `fun` akan dieksekusi dengan hanya satu argumen.
+
+---
+
+# Bab 46
+## Menghindari `date` menggunakan `printf`
+
+Di Bash 4.2, konversi waktu bawaan *shell* untuk `printf` diperkenalkan: spesifikasi format `%(datefmt)T` membuat `printf` mengeluarkan *string* tanggal-waktu yang sesuai dengan format *string* `datefmt` seperti yang dipahami oleh `strftime`.
+
+### Bagian 46.1: Mendapatkan tanggal saat ini
+
+```bash
+$ printf '%(%F)T\n'
+2016-08-17
+```
+
+### Bagian 46.2: Mengatur variabel ke waktu saat ini
+
+```bash
+$ printf -v now '%(%T)T'
+$ echo "$now"
+12:42:47
+```
+
+---
+
+# Bab 47
+## Menggunakan "trap" untuk Bereaksi terhadap Sinyal dan Peristiwa Sistem
+
+| Parameter | Arti |
+| :--- | :--- |
+| **`-p`** | Menampilkan daftar *trap* yang sedang terpasang. |
+| **`-l`** | Menampilkan daftar nama sinyal dan nomor yang sesuai. |
+
+### Bagian 47.1: Pengantar: membersihkan file sementara
+
+Anda dapat menggunakan perintah `trap` untuk "menjebak" sinyal; ini adalah padanan *shell* dari panggilan `signal()` atau `sigaction()` di C dan sebagian besar bahasa pemrograman lain untuk menangkap sinyal.
+
+Salah satu penggunaan `trap` yang paling umum adalah membersihkan file sementara baik saat keluar yang diharapkan maupun yang tidak diharapkan. Sayangnya tidak cukup banyak skrip *shell* yang melakukan ini :-(
+
+```bash
+#!/bin/sh
+# Buat fungsi pembersihan
+cleanup() {
+  rm --force -- "${tmp}"
+}
+
+# Jebak grup khusus "EXIT", yang selalu dijalankan saat shell keluar.
+trap cleanup EXIT
+
+# Buat file sementara
+tmp="$(mktemp -p /tmp tmpfileXXXXXXX)"
+echo "Hello, world!" >> "${tmp}"
+
+# Tidak perlu rm -f "$tmp". Keuntungan menggunakan EXIT adalah ia tetap bekerja
+# bahkan jika ada kesalahan atau jika Anda menggunakan exit.
+```
+
+### Bagian 47.2: Menangkap SIGINT atau Ctrl+C
+
+*Trap* direset untuk *subshell*, jadi `sleep` akan tetap bereaksi pada sinyal `SIGINT` yang dikirim oleh `^C` (biasanya dengan keluar), tetapi proses induk (yaitu skrip *shell*) tidak akan.
+
+```bash
+#!/bin/sh
+# Jalankan perintah pada sinyal 2 (SIGINT, yang dikirim oleh ^C)
+sigint() {
+  echo "Subshell dimatikan!"
+}
+trap sigint INT
+
+# Atau gunakan perintah no-op untuk tanpa keluaran
+#trap : INT
+
+# Ini akan dimatikan pada ^C pertama
+echo "Sleeping..."
+sleep 500
+echo "Sleeping..."
+sleep 500
+```
+
+Dan varian yang masih memungkinkan Anda untuk keluar dari program utama dengan menekan `^C` dua kali dalam satu detik:
+
+```bash
+last=0
+allow_quit() {
+  [ $(date +%s) -lt $(( $last + 1 )) ] && exit
+  echo "Tekan ^C dua kali berturut-turut untuk keluar"
+  last=$(date +%s)
+}
+trap allow_quit INT
+```
+
+### Bagian 47.3: Mengumpulkan daftar pekerjaan *trap* untuk dijalankan saat keluar
+
+Pernahkah Anda lupa menambahkan *trap* untuk membersihkan file sementara atau melakukan pekerjaan lain saat keluar? Pernahkah Anda mengatur satu *trap* yang membatalkan yang lain?
+
+Kode ini memudahkan untuk menambahkan hal-hal yang harus dilakukan saat keluar satu per satu, daripada memiliki satu pernyataan `trap` besar di suatu tempat dalam kode Anda, yang mungkin mudah dilupakan.
+
+```bash
+# on_exit dan add_on_exit
+# Penggunaan:
+#
+add_on_exit rm -f /tmp/foo
+#
+add_on_exit echo "Saya sedang keluar"
+#
+tempfile=$(mktemp)
+#
+add_on_exit rm -f "$tempfile"
+
+# Berdasarkan http://www.linuxjournal.com/content/use-bash-trap-statement-cleanup-temporary-files
+function on_exit()
+{
+  for i in "${on_exit_items[@]}"
+  do
+    eval $i
+  done
+}
+
+function add_on_exit()
+{
+  local n=${#on_exit_items[*]}
+  on_exit_items[$n]="$*"
+  if [[ $n -eq 0 ]]; then
+    trap on_exit EXIT
+  fi
+}
+```
+
+### Bagian 47.4: Mematikan Proses Anak saat Keluar
+
+Ekspresi *trap* tidak harus berupa fungsi atau program individual, mereka bisa menjadi ekspresi yang lebih kompleks juga. Dengan menggabungkan `jobs -p` dan `kill`, kita dapat mematikan semua proses anak yang dibuat oleh *shell* saat keluar:
+
+```bash
+trap 'jobs -p | xargs kill' EXIT
+```
+
+### Bagian 47.5: Bereaksi terhadap perubahan ukuran jendela terminal
+
+Ada sinyal `WINCH` (*WINdowCHange*), yang ditembakkan ketika seseorang mengubah ukuran jendela terminal.
+
+```bash
+declare -x rows cols
+update_size(){
+  rows=$(tput lines) # dapatkan baris aktual dari term
+  cols=$(tput cols)  # dapatkan kolom aktual dari term
+  echo DEBUG jendela terminal memiliki $rows baris dan lebarnya $cols karakter
+}
+trap update_size WINCH
+```
+
+---
+
+# Bab 48
+## Rangkaian Perintah dan Operasi
+
+Ada beberapa cara untuk merangkai perintah. Yang sederhana seperti hanya `;` atau yang lebih kompleks seperti rantai logis yang berjalan tergantung pada beberapa kondisi. Yang ketiga adalah menyalurkan (*piping*) perintah, yang secara efektif menyerahkan data keluaran ke perintah berikutnya dalam rantai.
+
+### Bagian 48.1: Menghitung kemunculan pola teks
+
+Menggunakan *pipe* membuat keluaran dari sebuah perintah menjadi masukan dari yang berikutnya.
+
+```bash
+ls -1 | grep -c ".conf"
+```
+
+Dalam kasus ini, keluaran dari perintah `ls` digunakan sebagai masukan dari perintah `grep`. Hasilnya akan menjadi jumlah file yang menyertakan ".conf" dalam namanya.
+Ini dapat digunakan untuk membangun rantai perintah berikutnya selama diperlukan:
+
+```bash
+ls -1 | grep ".conf" | grep -c .
+```
+
+### Bagian 48.2: Mentransfer keluaran perintah *root* ke file pengguna
+
+Seringkali seseorang ingin menunjukkan hasil perintah yang dieksekusi oleh *root* kepada pengguna lain. Perintah `tee` memungkinkan dengan mudah untuk menulis file dengan izin pengguna dari perintah yang berjalan sebagai *root*:
+
+```bash
+su -c ifconfig | tee ~/results-of-ifconfig.txt
+```
+
+Hanya `ifconfig` yang berjalan sebagai *root*.
+
+### Bagian 48.3: Perangkaian logis perintah dengan `&&` dan `||`
+
+`&&` merangkai dua perintah. Yang kedua berjalan hanya jika yang pertama keluar dengan sukses. `||` merangkai dua perintah. Tetapi yang kedua berjalan hanya jika yang pertama keluar dengan kegagalan.
+
+```bash
+[ a = b ] && echo "yes" || echo "no"
+
+# jika Anda ingin menjalankan lebih banyak perintah dalam rantai logis, gunakan kurung kurawal
+# yang menunjuk blok perintah
+# Mereka membutuhkan ; sebelum kurung tutup sehingga bash dapat membedakan dari penggunaan lain
+# dari kurung kurawal
+[ a = b ] && { echo "let me see."; echo "hmmm, yes, i think it is true" ; } \
+|| { echo "as i am in the negation i think "; echo "this is false. a is a not b." ; }
+
+# perhatikan penggunaan tanda kelanjutan baris \
+# hanya diperlukan untuk merangkai blok yes dengan || ....
+```
+
+### Bagian 48.4: Perangkaian serial perintah dengan titik koma
+
+Sebuah titik koma hanya memisahkan dua perintah.
+
+```bash
+echo "i am first" ; echo "i am second" ; echo " i am third"
+```
+
+### Bagian 48.5: Merangkai perintah dengan `|`
+
+`|` mengambil keluaran dari perintah kiri dan menyalurkannya sebagai masukan ke perintah kanan. Perhatikan, bahwa ini dilakukan di *subshell*. Oleh karena itu Anda tidak dapat mengatur nilai variabel dari proses pemanggil di dalam sebuah *pipe*.
+
+```bash
+find . -type f -a -iname '*.mp3' | \
+while read filename; do
+  mute --noise "$filename"
+done
+```
+
+---
+
+# Bab 49
+## Jenis-jenis Shell
+
+### Bagian 49.1: Memulai *shell* interaktif
+
+```bash
+bash
+```
+
+### Bagian 49.2: Mendeteksi jenis *shell*
+
+```bash
+shopt -q login_shell && echo 'login' || echo 'not-login'
+```
+
+### Bagian 49.3: Pengantar file *dot* (*dot files*)
+
+Di Unix, file dan direktori yang diawali dengan titik biasanya berisi pengaturan untuk program tertentu/serangkaian program. File *dot* biasanya tersembunyi dari pengguna, jadi Anda perlu menjalankan `ls -a` untuk melihatnya.
+
+Contoh file *dot* adalah `.bash_history`, yang berisi perintah-perintah terbaru yang dieksekusi, dengan asumsi pengguna menggunakan Bash.
+
+Ada berbagai file yang di-*source* saat Anda masuk ke *shell* Bash. Gambar di bawah ini, diambil dari [situs ini](https://www.google.com/search?q=http://www.linuxfromscratch.org/blfs/view/svn/postlfs/profile.html), menunjukkan proses pengambilan keputusan di balik pemilihan file mana yang akan di-*source* saat *startup*.
+
+<p align="center">
+  <img src="images/book-02/figure-30.6.png" alt="gambar" width="580"/>
+</p>
+
+---
+
