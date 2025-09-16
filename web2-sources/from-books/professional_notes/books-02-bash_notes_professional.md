@@ -1605,3 +1605,1905 @@ Dalam kasus ini, jika ada STDERR, itu akan dialihkan ke `/dev/null` (file khusus
 
 ---
 
+# Bab 10
+## Struktur Kontrol
+
+**Parameter untuk `[` atau `test`**
+
+**Operator File**
+
+| Detail | Detail |
+| :--- | :--- |
+| `-e "$file"` | Mengembalikan *true* jika file ada. |
+| `-d "$file"` | Mengembalikan *true* jika file ada dan merupakan sebuah direktori. |
+| `-f "$file"` | Mengembalikan *true* jika file ada dan merupakan file reguler. |
+| `-h "$file"` | Mengembalikan *true* jika file ada dan merupakan *symbolic link*. |
+
+**Pembanding String**
+
+| Detail | Detail |
+| :--- | :--- |
+| `-z "$str"` | *True* jika panjang string adalah nol. |
+| `-n "$str"` | *True* jika panjang string bukan nol. |
+| `"$str" = "$str2"` | *True* jika string `$str` sama dengan string `$str2`. Bukan yang terbaik untuk integer. Mungkin berfungsi tetapi akan tidak konsisten. |
+| `"$str" != "$str2"` | *True* jika string tidak sama. |
+
+**Pembanding Integer**
+
+| Detail | Detail |
+| :--- | :--- |
+| `"$int1" -eq "$int2"` | *True* jika integer sama. |
+| `"$int1" -ne "$int2"` | *True* jika integer tidak sama. |
+| `"$int1" -gt "$int2"` | *True* jika `int1` lebih besar dari `int2`. |
+| `"$int1" -ge "$int2"` | *True* jika `int1` lebih besar atau sama dengan `int2`. |
+| `"$int1" -lt "$int2"` | *True* jika `int1` lebih kecil dari `int2`. |
+| `"$int1" -le "$int2"` | *True* jika `int1` lebih kecil atau sama dengan `int2`. |
+
+### Bagian 10.1: Eksekusi kondisional daftar perintah
+
+**Cara menggunakan eksekusi kondisional daftar perintah**
+
+Setiap perintah *builtin*, ekspresi, atau fungsi, serta perintah atau skrip eksternal apa pun dapat dieksekusi secara kondisional menggunakan operator `&&` (dan) dan `||` (atau).
+
+Sebagai contoh, ini hanya akan mencetak direktori saat ini jika perintah `cd` berhasil.
+
+```bash
+cd my_directory && pwd
+```
+
+Demikian pula, ini akan keluar jika perintah `cd` gagal, mencegah bencana:
+
+```bash
+cd my_directory || exit
+rm -rf *
+```
+
+Saat menggabungkan beberapa pernyataan dengan cara ini, penting untuk diingat bahwa (tidak seperti banyak bahasa bergaya C) operator ini tidak memiliki preseden dan bersifat asosiatif kiri.
+
+Jadi, pernyataan ini akan berfungsi seperti yang diharapkan...
+
+```bash
+cd my_directory && pwd || echo "No such directory"
+```
+
+Jika `cd` berhasil, `&& pwd` dieksekusi dan nama direktori kerja saat ini dicetak. Kecuali jika `pwd` gagal (jarang terjadi), `|| echo ...` tidak akan dieksekusi.
+Jika `cd` gagal, `&& pwd` akan dilewati dan `|| echo ...` akan dijalankan.
+
+Tetapi ini tidak akan (jika Anda berpikir if...then...else)...
+
+```bash
+cd my_directory && ls || echo "No such directory"
+```
+
+Jika `cd` gagal, `&& ls` dilewati dan `|| echo ...` dieksekusi.
+Jika `cd` berhasil, `&& ls` dieksekusi.
+Jika `ls` berhasil, `|| echo ...` diabaikan. (sejauh ini bagus)
+TAPI... jika `ls` gagal, `|| echo ...` juga akan dieksekusi.
+Ini adalah `ls`, bukan `cd`, yang merupakan perintah sebelumnya.
+
+**Mengapa menggunakan eksekusi kondisional daftar perintah**
+
+Eksekusi kondisional sedikit lebih cepat daripada `if...then` tetapi keuntungan utamanya adalah memungkinkan fungsi dan skrip untuk keluar lebih awal, atau "hubungan pendek" (*short circuit*).
+
+Tidak seperti banyak bahasa seperti C di mana memori secara eksplisit dialokasikan untuk *struct* dan variabel dan sejenisnya (dan dengan demikian harus dibatalkan alokasinya), bash menangani ini di balik layar. Dalam kebanyakan kasus, kita tidak perlu membersihkan apa pun sebelum meninggalkan fungsi. Pernyataan `return` akan membatalkan alokasi semua yang bersifat lokal untuk fungsi dan melanjutkan eksekusi di alamat kembali pada *stack*.
+
+Kembali dari fungsi atau keluar dari skrip sesegera mungkin dengan demikian dapat secara signifikan meningkatkan kinerja dan mengurangi beban sistem dengan menghindari eksekusi kode yang tidak perlu. Sebagai contoh...
+
+```bash
+my_function () {
+    ### SELALU PERIKSA KODE KEMBALIAN
+    # satu argumen diperlukan. "" dievaluasi sebagai false(1)
+    [[ "$1" ]] \
+        || return 1
+    # bekerja dengan argumen. keluar jika gagal
+    do_something_with "$1" || return 1
+    do_something_else \
+        || return 1
+    # Sukses! tidak ada kegagalan yang terdeteksi, atau kita tidak akan berada di sini
+    return 0
+}
+```
+
+### Bagian 10.2: Pernyataan If
+
+```bash
+if [[ $1 -eq 1 ]]; then
+    echo "1 dilewatkan pada parameter pertama"
+elif [[ $1 -gt 2 ]]; then
+    echo "2 tidak dilewatkan pada parameter pertama"
+else
+    echo "Parameter pertama bukan 1 dan tidak lebih dari 2."
+fi
+```
+
+Penutup `fi` diperlukan, tetapi klausa `elif` dan/atau `else` dapat dihilangkan.
+
+Titik koma sebelum `then` adalah sintaks standar untuk menggabungkan dua perintah pada satu baris; titik koma dapat dihilangkan hanya jika `then` dipindahkan ke baris berikutnya.
+
+Penting untuk dipahami bahwa kurung siku `[[` bukan bagian dari sintaks, tetapi diperlakukan sebagai perintah; adalah kode keluar dari perintah ini yang sedang diuji. Oleh karena itu, Anda harus selalu menyertakan spasi di sekitar kurung siku.
+
+Ini juga berarti bahwa hasil dari perintah apa pun dapat diuji. Jika kode keluar dari perintah adalah nol, pernyataan dianggap benar.
+
+```bash
+if grep "foo" bar.txt; then
+    echo "foo ditemukan"
+else
+    echo "foo tidak ditemukan"
+fi
+```
+
+Ekspresi matematika, ketika ditempatkan di dalam kurung ganda, juga mengembalikan `0` atau `1` dengan cara yang sama, dan juga dapat diuji:
+
+```bash
+if (( $1 + 5 > 91 )); then
+    echo "$1 lebih besar dari 86"
+fi
+```
+
+Anda mungkin juga menemukan pernyataan `if` dengan kurung siku tunggal. Ini didefinisikan dalam standar POSIX dan dijamin berfungsi di semua shell yang sesuai dengan POSIX termasuk Bash. Sintaksnya sangat mirip dengan yang ada di Bash:
+
+```bash
+if [ "$1" -eq 1 ]; then
+    echo "1 dilewatkan pada parameter pertama"
+elif [ "$1" -gt 2 ]; then
+    echo "2 tidak dilewatkan pada parameter pertama"
+else
+    echo "Parameter pertama bukan 1 dan tidak lebih dari 2."
+fi
+```
+
+### Bagian 10.3: Melakukan Looping pada Array
+
+**for loop:**
+
+```bash
+arr=(a b c d e f)
+for i in "${arr[@]}";do
+    echo "$i"
+done
+```
+
+Atau
+
+```bash
+for ((i=0;i<${#arr[@]};i++));do
+    echo "${arr[$i]}"
+done
+```
+
+**while loop:**
+
+```bash
+i=0
+while [ $i -lt ${#arr[@]} ];do
+    echo "${arr[$i]}"
+    i=$(expr $i + 1)
+done
+```
+
+Atau
+
+```bash
+i=0
+while (( $i < ${#arr[@]} ));do
+    echo "${arr[$i]}"
+    ((i++))
+done
+```
+
+### Bagian 10.4: Menggunakan For Loop untuk Iterasi Angka
+
+```bash
+#! /bin/bash
+for i in {1..10}; do # {1..10} diekspansi menjadi "1 2 3 4 5 6 7 8 9 10"
+    echo $i
+done
+```
+
+Ini menghasilkan output berikut:
+
+```
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+```
+
+### Bagian 10.5: continue dan break
+
+**Contoh untuk `continue`**
+
+```bash
+for i in [series]
+do
+    perintah 1
+    perintah 2
+    if (kondisi) # Kondisi untuk melompati perintah 3
+        continue # lanjut ke nilai berikutnya dalam "series"
+    fi
+    perintah 3
+done
+```
+
+**Contoh untuk `break`**
+
+```bash
+for i in [series]
+do
+    perintah 4
+    if (kondisi) # Kondisi untuk menghentikan loop
+    then
+        perintah 5 # Perintah jika loop perlu dihentikan
+        break
+    fi
+    perintah 6 # Perintah untuk dijalankan jika "kondisi" tidak pernah benar
+done
+```
+
+### Bagian 10.6: Menghentikan Loop (break)
+
+**Menghentikan beberapa loop:**
+
+```bash
+arr=(a b c d e f)
+for i in "${arr[@]}";do
+    echo "$i"
+    for j in "${arr[@]}";do
+        echo "$j"
+        break 2
+    done
+done
+```
+
+Output:
+
+```
+a
+a
+```
+
+**Menghentikan satu loop:**
+
+```bash
+arr=(a b c d e f)
+for i in "${arr[@]}";do
+    echo "$i"
+    for j in "${arr[@]}";do
+        echo "$j"
+        break
+    done
+done
+```
+
+Output:
+
+```
+a
+a
+b
+a
+c
+a
+d
+a
+e
+a
+f
+a
+```
+
+### Bagian 10.7: While Loop
+
+```bash
+#! /bin/bash
+i=0
+while [ $i -lt 5 ] # Selama i lebih kecil dari 5
+do
+    echo "i saat ini adalah $i"
+    i=$[$i+1] # Perhatikan tidak adanya spasi di sekitar kurung siku. Ini membuatnya bukan ekspresi tes
+done # mengakhiri loop
+```
+
+Perhatikan bahwa ada spasi di sekitar kurung siku selama tes (setelah pernyataan `while`). Spasi ini diperlukan.
+
+Loop ini menghasilkan output:
+
+```
+i saat ini adalah 0
+i saat ini adalah 1
+i saat ini adalah 2
+i saat ini adalah 3
+i saat ini adalah 4
+```
+
+### Bagian 10.8: For Loop dengan sintaks gaya-C
+
+Format dasar dari *for loop* gaya-C adalah:
+`for (( penugasan variabel; kondisi; proses iterasi ))`
+
+Catatan:
+
+  * Penugasan variabel di dalam *for loop* gaya-C dapat berisi spasi tidak seperti penugasan biasa.
+  * Variabel di dalam *for loop* gaya-C tidak diawali dengan `$`.
+
+Contoh:
+
+```bash
+for (( i = 0; i < 10; i++ ))
+do
+    echo "Nomor iterasi adalah $i"
+done
+```
+
+Kita juga dapat memproses beberapa variabel di dalam *for loop* gaya-C:
+
+```bash
+for (( i = 0, j = 0; i < 10; i++, j = i * i ))
+do
+    echo "Kuadrat dari $i sama dengan $j"
+done
+```
+
+### Bagian 10.9: Until Loop
+
+*Until loop* dieksekusi sampai kondisi menjadi benar.
+
+```bash
+i=5
+until [[ i -eq 10 ]]; do # Memeriksa apakah i=10
+    echo "i=$i" # Cetak nilai i
+    i=$((i+1))   # Tambah i dengan 1
+done
+```
+
+Output:
+
+```
+i=5
+i=6
+i=7
+i=8
+i=9
+```
+
+Ketika `i` mencapai 10, kondisi di *until loop* menjadi benar dan loop berakhir.
+
+### Bagian 10.10: Pernyataan Switch dengan case
+
+Dengan pernyataan `case`, Anda dapat mencocokkan nilai terhadap satu variabel. Argumen yang dilewatkan ke `case` diperluas dan dicoba untuk dicocokkan dengan setiap pola. Jika kecocokan ditemukan, perintah hingga `;;` dieksekusi.
+
+```bash
+case "$BASH_VERSION" in
+    [34]*)
+        echo {1..4}
+        ;;
+    *)
+        seq -s" " 1 4
+esac
+```
+
+Pola bukanlah ekspresi reguler tetapi pencocokan pola shell (alias *globs*).
+
+### Bagian 10.11: For Loop tanpa parameter daftar-kata
+
+```bash
+for arg; do
+    echo arg=$arg
+done
+```
+
+Sebuah *for loop* tanpa parameter daftar kata akan melakukan iterasi pada parameter posisional. Dengan kata lain, contoh di atas setara dengan kode ini:
+
+```bash
+for arg in "$@"; do
+    echo arg=$arg
+done
+```
+
+Dengan kata lain, jika Anda mendapati diri Anda menulis `for i in "$@"; do ...; done`, cukup hilangkan bagian `in`, dan tulis saja `for i; do ...; done`.
+
+---
+
+# Bab 11
+## Perintah true, false, dan :
+
+### Bagian 11.1: Loop Tak Terbatas (Infinite Loop)
+
+```bash
+while true; do
+    echo ok
+done
+```
+
+atau
+
+```bash
+while :; do
+    echo ok
+done
+```
+
+atau
+
+```bash
+until false; do
+    echo ok
+done
+```
+
+### Bagian 11.2: Pengembalian Fungsi (Function Return)
+
+```bash
+function positive() {
+    return 0
+}
+
+function negative() {
+    return 1
+}
+```
+
+### Bagian 11.3: Kode yang akan selalu/tidak pernah dieksekusi
+
+```bash
+if true; then
+    echo Selalu dieksekusi
+fi
+
+if false; then
+    echo Tidak akan pernah dieksekusi
+fi
+```
+
+-----
+
+## Bab 12: Array
+
+### Bagian 12.1: Penugasan Array
+
+**Penugasan Daftar**
+
+Jika Anda terbiasa dengan Perl, C, atau Java, Anda mungkin berpikir bahwa Bash akan menggunakan koma untuk memisahkan elemen array, namun ini tidak terjadi; sebaliknya, Bash menggunakan spasi:
+
+```perl
+# Array di Perl
+my @array = (1, 2, 3, 4);
+```
+
+```bash
+# Array di Bash
+array=(1 2 3 4)
+```
+
+Buat array dengan elemen baru:
+`array=('elemen pertama' 'elemen kedua' 'elemen ketiga')`
+
+**Penugasan Subskrip**
+
+Buat array dengan indeks elemen eksplisit:
+`array=([3]='elemen keempat' [4]='elemen kelima')`
+
+**Penugasan berdasarkan indeks**
+
+```bash
+array[0]='elemen pertama'
+array[1]='elemen kedua'
+```
+
+**Penugasan berdasarkan nama (array asosiatif)**
+
+**Versi ≥ 4.0**
+
+```bash
+declare -A array
+array[first]='Elemen pertama'
+array[second]='Elemen kedua'
+```
+
+**Penugasan Dinamis**
+
+Buat array dari output perintah lain, misalnya gunakan `seq` untuk mendapatkan rentang dari 1 hingga 10:
+`array=($(seq 1 10))`
+
+Penugasan dari argumen input skrip:
+`array=("$@")`
+
+Penugasan di dalam loop:
+
+```bash
+while read -r; do
+    #array+=("$REPLY")      # Tambahkan ke array
+    array[$i]="$REPLY"     # Penugasan berdasarkan indeks
+    let i++                # Naikkan indeks
+done < <(seq 1 10)         # substitusi perintah
+
+echo ${array[@]}
+# output: 1 2 3 4 5 6 7 8 9 10
+```
+
+di mana `$REPLY` selalu merupakan input saat ini.
+
+### Bagian 12.2: Mengakses Elemen Array
+
+Cetak elemen di indeks 0
+`echo "${array[0]}"`
+
+**Versi \< 4.3**
+Cetak elemen terakhir menggunakan sintaks ekspansi substring
+`echo "${arr[@]: -1 }"`
+
+**Versi ≥ 4.3**
+Cetak elemen terakhir menggunakan sintaks subskrip
+`echo "${array[-1]}"`
+
+Cetak semua elemen, masing-masing dikutip secara terpisah
+`echo "${array[@]}"`
+
+Cetak semua elemen sebagai satu string yang dikutip
+`echo "${array[*]}"`
+
+Cetak semua elemen dari indeks 1, masing-masing dikutip secara terpisah
+`echo "${array[@]:1}"`
+
+Cetak 3 elemen dari indeks 1, masing-masing dikutip secara terpisah
+`echo "${array[@]:1:3}"`
+
+**Operasi String**
+
+Jika merujuk pada satu elemen, operasi string diizinkan:
+
+```bash
+array=(zero one two)
+echo "${array[0]:0:3}" # menghasilkan zer (karakter pada posisi 0, 1 dan 2 dalam string zero)
+echo "${array[0]:1:3}" # menghasilkan ero (karakter pada posisi 1, 2 dan 3 dalam string zero)
+```
+
+jadi `${array[$i]:N:M}` menghasilkan string dari posisi ke-N (dimulai dari 0) dalam string `${array[$i]}` dengan M karakter berikutnya.
+
+### Bagian 12.3: Modifikasi Array
+
+**Ubah Indeks**
+
+Inisialisasi atau perbarui elemen tertentu dalam array
+`array[10]="elemen kesebelas"` \# karena dimulai dari 0
+
+**Versi ≥ 3.1**
+**Tambahkan (Append)**
+
+Modifikasi array, menambahkan elemen ke akhir jika tidak ada subskrip yang ditentukan.
+`array+=('elemen keempat' 'elemen kelima')`
+
+Ganti seluruh array dengan daftar parameter baru.
+`array=("${array[@]}" "elemen keempat" "elemen kelima")`
+
+Tambahkan elemen di awal:
+`array=("elemen baru" "${array[@]}")`
+
+**Sisipkan (Insert)**
+
+Sisipkan elemen pada indeks tertentu:
+
+```bash
+arr=(a b c d)
+# sisipkan elemen pada indeks 2
+i=2
+arr=("${arr[@]:0:$i}" 'new' "${arr[@]:$i}")
+
+echo "${arr[2]}" #output: new
+```
+
+**Hapus (Delete)**
+
+Hapus indeks array menggunakan *builtin* `unset`:
+
+```bash
+arr=(a b c)
+echo "${arr[@]}"    # menghasilkan: a b c
+echo "${!arr[@]}"   # menghasilkan: 0 1 2
+unset -v 'arr[1]'
+echo "${arr[@]}"    # menghasilkan: a c
+echo "${!arr[@]}"   # menghasilkan: 0 2
+```
+
+**Gabungkan (Merge)**
+
+`array3=("${array1[@]}" "${array2[@]}")`
+Ini juga berfungsi untuk *sparse array*.
+
+**Pengindeksan ulang array**
+
+Ini bisa berguna jika elemen telah dihapus dari array, atau jika Anda tidak yakin apakah ada celah dalam array. Untuk membuat ulang indeks tanpa celah:
+`array=("${array[@]}")`
+
+### Bagian 12.4: Iterasi Array
+
+Iterasi array datang dalam dua jenis, *foreach* dan *for-loop* klasik:
+
+```bash
+a=(1 2 3 4)
+
+# foreach loop
+for y in "${a[@]}"; do
+    # tindakan pada $y
+    echo "$y"
+done
+
+# for-loop klasik
+for ((idx=0; idx < ${#a[@]}; ++idx)); do
+    # tindakan pada ${a[$idx]}
+    echo "${a[$idx]}"
+done
+```
+
+Anda juga dapat melakukan iterasi pada output sebuah perintah:
+
+```bash
+a=($(tr ',' ' ' <<<"a,b,c,d")) # tr dapat mengubah satu karakter menjadi karakter lain
+for y in "${a[@]}"; do
+    echo "$y"
+done
+```
+
+### Bagian 12.5: Panjang Array
+
+`${#array[@]}` memberikan panjang array `${array[@]}`:
+
+```bash
+array=('elemen pertama' 'elemen kedua' 'elemen ketiga')
+echo "${#array[@]}" # memberikan panjang 3
+```
+
+Ini juga berfungsi dengan String dalam elemen tunggal:
+
+```bash
+echo "${#array[0]}"
+# memberikan panjang string pada elemen 0: 14
+```
+
+### Bagian 12.6: Array Asosiatif
+
+**Versi ≥ 4.0**
+
+**Deklarasikan array asosiatif**
+`declare -A aa`
+Mendeklarasikan array asosiatif sebelum inisialisasi atau penggunaan adalah wajib.
+
+**Inisialisasi elemen**
+Anda dapat menginisialisasi elemen satu per satu sebagai berikut:
+
+```bash
+aa[hello]=world
+aa[ab]=cd
+aa["key with space"]="hello world"
+```
+
+Anda juga dapat menginisialisasi seluruh array asosiatif dalam satu pernyataan:
+`aa=([hello]=world [ab]=cd ["key with space"]="hello world")`
+
+**Akses elemen array asosiatif**
+`echo ${aa[hello]}`
+`# Out: world`
+
+**Mendaftar kunci array asosiatif**
+`echo "${!aa[@]}"`
+`#Out: hello ab key with space`
+
+**Mendaftar nilai array asosiatif**
+`echo "${aa[@]}"`
+`#Out: world cd hello world`
+
+**Iterasi melalui kunci dan nilai array asosiatif**
+
+```bash
+for key in "${!aa[@]}"; do
+    echo "Kunci: ${key}"
+    echo "Nilai: ${aa[$key]}"
+done
+# Out:
+# Kunci: hello
+# Nilai: world
+# Kunci: ab
+# Nilai: cd
+# Kunci: key with space
+# Nilai: hello world
+```
+
+**Hitung elemen array asosiatif**
+`echo "${#aa[@]}"`
+`# Out: 3`
+
+### Bagian 12.7: Melakukan Looping pada Array
+
+Array contoh kita:
+`arr=(a b c d e f)`
+
+Menggunakan `for..in loop`:
+
+```bash
+for i in "${arr[@]}"; do
+    echo "$i"
+done
+```
+
+**Versi ≥ 2.04**
+Menggunakan `for loop` gaya-C:
+
+```bash
+for ((i=0;i<${#arr[@]};i++)); do
+    echo "${arr[$i]}"
+done
+```
+
+Menggunakan `while loop`:
+
+```bash
+i=0
+while [ $i -lt ${#arr[@]} ]; do
+    echo "${arr[$i]}"
+    i=$((i + 1))
+done
+```
+
+**Versi ≥ 2.04**
+Menggunakan `while loop` dengan kondisional numerik:
+
+```bash
+i=0
+while (( $i < ${#arr[@]} )); do
+    echo "${arr[$i]}"
+    ((i++))
+done
+```
+
+Menggunakan `until loop`:
+
+```bash
+i=0
+until [ $i -ge ${#arr[@]} ]; do
+    echo "${arr[$i]}"
+    i=$((i + 1))
+done
+```
+
+**Versi ≥ 2.04**
+Menggunakan `until loop` dengan kondisional numerik:
+
+```bash
+i=0
+until (( $i >= ${#arr[@]} )); do
+    echo "${arr[$i]}"
+    ((i++))
+done
+```
+
+### Bagian 12.8: Hancurkan, Hapus, atau Batalkan Array
+
+Untuk menghancurkan, menghapus, atau membatalkan array:
+`unset array`
+
+Untuk menghancurkan, menghapus, atau membatalkan satu elemen array:
+`unset array[10]`
+
+### Bagian 12.9: Array dari string
+
+```bash
+stringVar="Apple Orange Banana Mango"
+arrayVar=(${stringVar// / })
+```
+
+Setiap spasi dalam string menunjukkan item baru dalam array yang dihasilkan.
+
+```bash
+echo ${arrayVar[0]} # akan mencetak Apple
+echo ${arrayVar[3]} # akan mencetak Mango
+```
+
+Demikian pula, karakter lain dapat digunakan sebagai pembatas.
+
+```bash
+stringVar="Apple+Orange+Banana+Mango"
+arrayVar=(${stringVar//+/ })
+echo ${arrayVar[0]} # akan mencetak Apple
+echo ${arrayVar[2]} # akan mencetak Banana
+```
+
+### Bagian 12.10: Daftar indeks yang diinisialisasi
+
+Dapatkan daftar indeks yang diinisialisasi dalam array
+
+```bash
+$ arr[2]='second'
+$ arr[10]='tenth'
+$ arr[25]='twenty five'
+$ echo ${!arr[@]}
+2 10 25
+```
+
+### Bagian 12.11: Membaca seluruh file ke dalam array
+
+Membaca dalam satu langkah:
+`IFS=$'\n' read -r -a arr < file`
+
+Membaca dalam sebuah loop:
+
+```bash
+arr=()
+while IFS= read -r line; do
+    arr+=("$line")
+done
+```
+
+**Versi ≥ 4.0**
+Menggunakan `mapfile` atau `readarray` (yang merupakan sinonim):
+
+```bash
+mapfile -t arr < file
+readarray -t arr < file
+```
+
+### Bagian 12.12: Fungsi sisip Array (insert)
+
+Fungsi ini akan menyisipkan elemen ke dalam array pada indeks tertentu:
+
+```bash
+insert(){
+    h='
+################## insert ########################
+# Penggunaan:
+#
+    insert nama_arr indeks elemen
+#
+#
+# Parameter:
+#
+    nama_arr    : Nama variabel array
+#
+    indeks      : Indeks untuk menyisipkan
+#
+    elemen      : Elemen untuk disisipkan
+##################################################
+'
+    [[ $1 = -h ]] && { echo "$h" >/dev/stderr; return 1; }
+    declare -n __arr__=$1
+    # referensi ke variabel array
+    i=$2
+    # indeks untuk menyisipkan
+    el="$3"
+    # elemen untuk disisipkan
+
+    # menangani error
+    [[ ! "$i" =~ ^[0-9]+$ ]] && { echo "E: insert: indeks harus integer yang valid" >/dev/stderr;
+return 1; }
+    (( $i < 0 )) && { echo "E: insert: indeks tidak boleh negatif" >/dev/stderr; return 1; }
+
+    # Sekarang sisipkan $el di $i
+    __arr__=("${__arr__[@]:0:$i}" "$el" "${__arr__[@]:$i}")
+}
+```
+
+**Penggunaan:**
+
+`insert nama_variabel_array indeks elemen`
+
+**Contoh:**
+
+```bash
+arr=(a b c d)
+echo "${arr[2]}" # output: c
+
+# Sekarang panggil fungsi insert dan berikan nama variabel array,
+# indeks untuk menyisipkan
+# dan elemen yang akan disisipkan
+insert arr 2 'Elemen Baru'
+
+# 'Elemen Baru' disisipkan pada indeks 2 di arr, sekarang cetak mereka
+echo "${arr[2]}" # output: Elemen Baru
+echo "${arr[3]}" # output: c
+```
+
+---
+
+# Bab 13
+## Array asosiatif
+
+### Bagian 13.1: Memeriksa array asosiatif
+
+Semua penggunaan yang diperlukan ditunjukkan dengan cuplikan ini:
+
+```bash
+#!/usr/bin/env bash
+
+declare -A assoc_array=([key_string]=value \
+[one]="something" \
+[two]="another thing" \
+[ three ]='perhatikan spasinya!' \
+[ " four" ]='hitung spasi dari kunci ini nanti!' \
+[IMPORTANT]='SPASI ITU BERPENGARUH!!!' \
+[1]='tidak ada integer!' \
+[info]="untuk menghindari ekspansi histori " \
+[info2]="beri tanda kutip pada tanda seru dengan kutip tunggal" \
+)
+
+echo # hanya baris kosong
+echo sekarang ini adalah nilai dari assoc_array:
+echo ${assoc_array[@]}
+echo tidak begitu berguna,
+echo # hanya baris kosong
+echo ini lebih baik:
+declare -p assoc_array
+# -p == print
+echo perhatikan baik-baik spasi di atas\!\!\!
+echo # hanya baris kosong
+echo mengakses kunci
+echo kunci di assoc_array adalah ${!assoc_array[*]}
+echo perhatikan penggunaan operator indireksi \!
+echo # hanya baris kosong
+echo sekarang kita melakukan loop pada assoc_array baris per baris
+echo perhatikan operator indireksi \! yang bekerja secara berbeda,
+echo jika digunakan dengan assoc_array.
+echo # hanya baris kosong
+for key in "${!assoc_array[@]}"; do # mengakses kunci menggunakan indireksi ! !!!!
+    printf "kunci: \"%s\"\nnilai: \"%s\"\n\n" "$key" "${assoc_array[$key]}"
+done
+echo perhatikan baik-baik spasi dalam entri dengan kunci two, three dan four di atas\!\!\!
+echo # hanya baris kosong
+echo # hanya baris kosong lagi
+echo ada perbedaan menggunakan integer sebagai kunci\!\!\!
+i=1
+echo mendeklarasikan var integer i=1
+echo # hanya baris kosong
+echo Di dalam sebuah integer_array, bash mengenali konteks aritmatika.
+echo Di dalam sebuah assoc_array, bash TIDAK mengenali konteks aritmatika.
+echo # hanya baris kosong
+echo ini berfungsi: \${assoc_array[\$i]}: ${assoc_array[$i]}
+echo ini TIDAK!!: \${assoc_array[i]}: ${assoc_array[i]}
+echo # hanya baris kosong
+echo # hanya baris kosong lagi
+echo sebuah \${assoc_array[i]} memiliki konteks string di dalam kurung kurawal berbeda dengan integer_array
+declare -i integer_array=( one two three )
+echo "melakukan: declare -i integer_array=( one two three )"
+echo # hanya baris kosong
+echo kedua bentuk berfungsi: \${integer_array[i]} : ${integer_array[i]}
+echo dan ini juga: \${integer_array[\$i]} : ${integer_array[$i]}
+```
+---
+
+# Bab 14
+## Fungsi
+
+### Bagian 14.1: Fungsi dengan argumen
+
+Dalam `helloJohn.sh`:
+
+```bash
+#!/bin/bash
+greet() {
+    local name="$1"
+    echo "Hello, $name"
+}
+
+greet "John Doe"
+```
+
+```bash
+# menjalankan skrip di atas
+$ bash helloJohn.sh
+Hello, John Doe
+```
+
+1.  Jika Anda tidak memodifikasi argumen dengan cara apa pun, tidak perlu menyalinnya ke variabel lokal - cukup `echo "Hello, $1"`.
+2.  Anda dapat menggunakan `$1`, `$2`, `$3`, dan seterusnya untuk mengakses argumen di dalam fungsi.
+    **Catatan**: untuk argumen lebih dari 9, `$10` tidak akan berfungsi (bash akan membacanya sebagai `$1` dan `0`), Anda perlu melakukan `${10}`, `${11}` dan seterusnya.
+3.  `$@` merujuk ke semua argumen dari sebuah fungsi:
+    ```bash
+    #!/bin/bash
+    foo() {
+        echo "$@"
+    }
+    foo 1 2 3 # output => 1 2 3
+    ```
+    **Catatan**: Anda sebaiknya hampir selalu menggunakan tanda kutip ganda di sekitar `"$@"`, seperti di sini. Menghilangkan tanda kutip akan menyebabkan shell memperluas wildcard (bahkan ketika pengguna secara khusus mengutipnya untuk menghindari itu) dan umumnya menimbulkan perilaku yang tidak diinginkan dan bahkan berpotensi masalah keamanan.
+    ```bash
+    foo "string with spaces;" '$HOME' "*"
+    # output => string with spaces; $HOME *
+    ```
+4.  Untuk argumen default gunakan `${1:-default_val}`. Contoh:
+    ```bash
+    #!/bin/bash
+    foo() {
+        local val=${1:-25}
+        echo "$val"
+    }
+    foo      # output => 25
+    foo 30   # output => 30
+    ```
+5.  Untuk mewajibkan argumen gunakan `${var:?pesan error}`
+    ```bash
+    foo() {
+        local val=${1:?Harus menyediakan sebuah argumen}
+        echo "$val"
+    }
+    ```
+
+### Bagian 14.2: Fungsi Sederhana
+
+Dalam `helloWorld.sh`
+
+```bash
+#!/bin/bash
+# Mendefinisikan sebuah fungsi greet
+greet ()
+{
+    echo "Hello World!"
+}
+
+# Memanggil fungsi greet
+greet
+```
+
+Dalam menjalankan skrip, kita melihat pesan kita
+
+```bash
+$ bash helloWorld.sh
+Hello World!
+```
+
+Perhatikan bahwa melakukan `source` pada file dengan fungsi akan membuat fungsi tersebut tersedia di sesi bash Anda saat ini.
+
+```bash
+$ source helloWorld.sh
+$ greet
+Hello World!
+# atau, yang lebih portabel, ". helloWorld.sh"
+```
+
+Anda dapat mengekspor fungsi di beberapa shell, sehingga terekspos ke proses anak.
+
+```bash
+bash -c 'greet'       # gagal
+export -f greet       # ekspor fungsi; perhatikan -f
+bash -c 'greet'       # sukses
+```
+
+### Bagian 14.3: Menangani flag dan parameter opsional
+
+*Builtin* `getopts` dapat digunakan di dalam fungsi untuk menulis fungsi yang mengakomodasi *flag* dan parameter opsional. Ini tidak menimbulkan kesulitan khusus tetapi seseorang harus menangani nilai yang disentuh oleh `getopts` dengan tepat.
+
+Sebagai contoh, kita mendefinisikan fungsi `failwith` yang menulis pesan di `stderr` dan keluar dengan kode 1 atau kode arbitrer yang diberikan sebagai parameter ke opsi `-x`:
+
+```bash
+# failwith [-x STATUS] PRINTF-LIKE-ARGV
+# Gagal dengan pesan diagnostik yang diberikan
+#
+# Flag -x dapat digunakan untuk menyampaikan status keluar kustom,
+# alih-alih nilai 1. Baris baru secara otomatis ditambahkan ke output.
+failwith()
+{
+    local OPTIND OPTION OPTARG status
+    status=1
+    OPTIND=1
+    while getopts 'x:' OPTION; do
+        case ${OPTION} in
+            x)
+                status="${OPTARG}";;
+            *)
+                1>&2 printf 'failwith: %s: Opsi tidak didukung.\n' "${OPTION}";;
+        esac
+    done
+    shift $(( OPTIND - 1 ))
+    {
+        printf 'Kegagalan: '
+        printf "$@"
+        printf '\n'
+    } 1>&2
+    exit "${status}"
+}
+```
+
+Fungsi ini dapat digunakan sebagai berikut:
+
+```bash
+failwith '%s: File tidak ditemukan.' "${filename}"
+failwith -x 70 'Kesalahan internal umum.'
+```
+
+dan seterusnya.
+
+Perhatikan bahwa seperti pada `printf`, variabel tidak boleh digunakan sebagai argumen pertama. Jika pesan yang akan dicetak terdiri dari konten variabel, seseorang harus menggunakan penentu `%s` untuk mencetaknya, seperti dalam
+`failwith '%s' "${message}"`
+
+### Bagian 14.4: Mencetak definisi fungsi
+
+```bash
+getfunc() {
+    declare -f "$@"
+}
+
+function func(){
+    echo "Saya adalah fungsi contoh"
+}
+
+funcd="$(getfunc func)"
+getfunc func # atau echo "$funcd"
+```
+
+Output:
+
+```
+func ()
+{
+    echo "Saya adalah fungsi contoh"
+}
+```
+
+### Bagian 14.5: Fungsi yang menerima parameter bernama
+
+```bash
+foo() {
+    while [[ "$#" -gt 0 ]]
+    do
+        case $1 in
+            -f|--follow)
+            local FOLLOW="following"
+            ;;
+            -t|--tail)
+            local TAIL="tail=$2"
+            ;;
+        esac
+        shift
+    done
+    echo "FOLLOW: $FOLLOW"
+    echo "TAIL: $TAIL"
+}
+```
+
+Contoh penggunaan:
+
+```bash
+foo -f
+foo -t 10
+foo -f --tail 10
+foo --follow --tail 10
+```
+
+### Bagian 14.6: Nilai kembali dari sebuah fungsi
+
+Pernyataan `return` di Bash tidak mengembalikan nilai seperti fungsi C, sebaliknya ia keluar dari fungsi dengan status kembali. Anda dapat menganggapnya sebagai status keluar dari fungsi tersebut.
+
+Jika Anda ingin mengembalikan nilai dari fungsi, maka kirimkan nilai tersebut ke `stdout` seperti ini:
+
+```bash
+fun() {
+    local var="Nilai contoh yang akan dikembalikan"
+    echo "$var"
+    #printf "%s\n" "$var"
+}
+```
+
+Sekarang, jika Anda melakukan:
+`var="$(fun)"`
+output dari `fun` akan disimpan di `$var`.
+
+### Bagian 14.7: Kode keluar fungsi adalah kode keluar dari perintah terakhirnya
+
+Perhatikan contoh fungsi ini untuk memeriksa apakah host aktif:
+
+```bash
+is_alive() {
+    ping -c1 "$1" &> /dev/null
+}
+```
+
+Fungsi ini mengirimkan satu `ping` ke host yang ditentukan oleh parameter fungsi pertama. Output dan output error dari `ping` keduanya dialihkan ke `/dev/null`, jadi fungsi tidak akan pernah mengeluarkan apa pun. Tetapi perintah `ping` akan memiliki kode keluar `0` jika berhasil, dan bukan nol jika gagal. Karena ini adalah perintah terakhir (dan dalam contoh ini, satu-satunya) dari fungsi, kode keluar dari `ping` akan digunakan kembali untuk kode keluar fungsi itu sendiri.
+
+Fakta ini sangat berguna dalam pernyataan kondisional.
+Sebagai contoh, jika host `graucho` aktif, maka hubungkan ke sana dengan `ssh`:
+
+```bash
+if is_alive graucho; then
+    ssh graucho
+fi
+```
+
+Contoh lain: periksa berulang kali sampai host `graucho` aktif, lalu hubungkan dengan `ssh`:
+
+```bash
+while ! is_alive graucho; do
+    sleep 5
+done
+ssh graucho
+```
+
+---
+
+# Bab 15
+## Ekspansi Parameter Bash
+
+Karakter `$` memperkenalkan ekspansi parameter, substitusi perintah, atau ekspansi aritmatika. Nama parameter atau simbol yang akan diekspansi dapat diapit dalam kurung kurawal, yang bersifat opsional tetapi berfungsi untuk melindungi variabel yang akan diekspansi dari karakter yang langsung mengikutinya yang dapat ditafsirkan sebagai bagian dari nama.
+
+Baca lebih lanjut di [Bash User Manual](https://www.google.com/search?q=https://www.gnu.org/software/bash/manual/bash.html%23Shell-Parameter-Expansion).
+
+### Bagian 15.1: Memodifikasi kapitalisasi karakter alfabet
+
+**Versi ≥ 4.0**
+**Ke huruf besar**
+
+```bash
+$ v="hello"
+# Hanya karakter pertama
+$ printf '%s\n' "${v^}"
+Hello
+# Semua karakter
+$ printf '%s\n' "${v^^}"
+HELLO
+# Alternatif
+$ v="hello world"
+$ declare -u string="$v"
+$ echo "$string"
+HELLO WORLD
+```
+
+**Ke huruf kecil**
+
+```bash
+$ v="BYE"
+# Hanya karakter pertama
+$ printf '%s\n' "${v,}"
+bYE
+# Semua karakter
+$ printf '%s\n' "${v,,}"
+bye
+# Alternatif
+$ v="HELLO WORLD"
+$ declare -l string="$v"
+$ echo "$string"
+hello world
+```
+
+**Bolak-balik Kapitalisasi**
+
+```bash
+$ v="Hello World"
+# Semua karakter
+$ echo "${v~~}"
+hELLO wORLD
+$ echo "${v~}"
+# Hanya karakter pertama
+hello World
+```
+
+### Bagian 15.2: Panjang parameter
+
+```bash
+# Panjang sebuah string
+$ var='12345'
+$ echo "${#var}"
+```
+
+Perhatikan bahwa ini adalah panjang dalam jumlah karakter yang tidak selalu sama dengan jumlah byte (seperti dalam UTF-8 di mana sebagian besar karakter dikodekan dalam lebih dari satu byte), atau jumlah *glyph/grapheme* (beberapa di antaranya adalah kombinasi karakter), juga tidak selalu sama dengan lebar tampilan.
+
+```bash
+# Jumlah elemen array
+$ myarr=(1 2 3)
+$ echo "${#myarr[@]}"
+3
+# Bekerja untuk parameter posisional juga
+$ set -- 1 2 3 4
+$ echo "${#@}"
+4
+# Tetapi lebih umum (dan portabel ke shell lain), orang akan menggunakan
+$ echo "$#"
+4
+```
+
+### Bagian 15.3: Ganti pola dalam string
+
+**Kecocokan pertama:**
+
+```bash
+$ a='I am a string'
+$ echo "${a/a/A}"
+I Am a string
+```
+
+**Semua kecocokan:**
+
+```bash
+$ echo "${a//a/A}"
+I Am A string
+```
+
+**Kecocokan di awal:**
+
+```bash
+$ echo "${a/#I/y}"
+y am a string
+```
+
+**Kecocokan di akhir:**
+
+```bash
+$ echo "${a/%g/N}"
+I am a strinN
+```
+
+**Ganti pola dengan ketiadaan:**
+
+```bash
+$ echo "${a/g/}"
+I am a strin
+```
+
+**Tambahkan awalan ke item array:**
+
+```bash
+$ A=(hello world)
+$ echo "${A[@]/#/R}"
+Rhello Rworld
+```
+
+### Bagian 15.4: Substring dan subarray
+
+```bash
+var='0123456789abcdef'
+# Tentukan offset berbasis nol
+$ printf '%s\n' "${var:3}"
+3456789abcdef
+# Offset dan panjang substring
+$ printf '%s\n' "${var:3:4}"
+3456
+```
+
+**Versi ≥ 4.2**
+
+```bash
+# Panjang negatif dihitung dari akhir string
+$ printf '%s\n' "${var:3:-5}"
+3456789a
+# Offset negatif dihitung dari akhir
+# Membutuhkan spasi untuk menghindari kebingungan dengan ${var:-6}
+$ printf '%s\n' "${var: -6}"
+abcdef
+# Alternatif: tanda kurung
+$ printf '%s\n' "${var:(-6)}"
+abcdef
+# Offset negatif dan panjang negatif
+$ printf '%s\n' "${var: -6:-5}"
+a
+```
+
+Ekspansi yang sama berlaku jika parameter adalah parameter posisional atau elemen dari array bersubskrip:
+
+```bash
+# Atur parameter posisional $1
+set -- 0123456789abcdef
+# Tentukan offset
+$ printf '%s\n' "${1:5}"
+56789abcdef
+# Tetapkan ke elemen array
+myarr[0]='0123456789abcdef'
+# Tentukan offset dan panjang
+$ printf '%s\n' "${myarr[0]:7:3}"
+789
+```
+
+Ekspansi analog berlaku untuk parameter posisional, di mana offset berbasis satu:
+
+```bash
+# Atur parameter posisional $1, $2, ...
+$ set -- 1 2 3 4 5 6 7 8 9 0 a b c d e f
+# Tentukan offset (waspadai $0 (bukan parameter posisional)
+# sedang dipertimbangkan di sini juga)
+$ printf '%s\n' "${@:10}"
+0
+a
+b
+c
+d
+e
+f
+# Tentukan offset dan panjang
+$ printf '%s\n' "${@:10:3}"
+0
+a
+b
+# Tidak ada panjang negatif yang diizinkan untuk parameter posisional
+$ printf '%s\n' "${@:10:-2}"
+bash: -2: substring expression < 0
+# Offset negatif dihitung dari akhir
+# Membutuhkan spasi untuk menghindari kebingungan dengan ${@:-10:2}
+$ printf '%s\n' "${@: -10:2}"
+7
+8
+# ${@:0} adalah $0 yang bukan parameter posisional atau bagian
+# dari $@
+$ printf '%s\n' "${@:0:2}"
+/usr/bin/bash
+1
+```
+
+Ekspansi substring dapat digunakan dengan array terindeks:
+
+```bash
+# Buat array (indeks berbasis nol)
+$ myarr=(0 1 2 3 4 5 6 7 8 9 a b c d e f)
+# Elemen dengan indeks 5 dan lebih tinggi
+$ printf '%s\n' "${myarr[@]:12}"
+c
+d
+e
+f
+# 3 elemen, dimulai dengan indeks 5
+$ printf '%s\n' "${myarr[@]:5:3}"
+5
+6
+7
+# Elemen terakhir dari array
+$ printf '%s\n' "${myarr[@]: -1}"
+f
+```
+
+### Bagian 15.5: Hapus pola dari awal string
+
+**Kecocokan terpendek:**
+
+```bash
+$ a='I am a string'
+$ echo "${a#*a}"
+m a string
+```
+
+**Kecocokan terpanjang:**
+
+```bash
+$ echo "${a##*a}"
+string
+```
+
+### Bagian 15.6: Indireksi parameter
+
+Indireksi Bash memungkinkan untuk mendapatkan nilai dari variabel yang namanya terkandung dalam variabel lain.
+Contoh variabel:
+
+```bash
+$ red="warna merah"
+$ green="warna hijau"
+$ color=red
+$ echo "${!color}"
+warna merah
+$ color=green
+$ echo "${!color}"
+warna hijau
+```
+
+Beberapa contoh lagi yang menunjukkan penggunaan ekspansi tidak langsung:
+
+```bash
+$ foo=10
+$ x=foo
+$ echo ${x}         #Cetak variabel klasik
+foo
+$ foo=10
+$ x=foo
+$ echo ${!x}        #Ekspansi tidak langsung
+10
+```
+
+Satu contoh lagi:
+
+```bash
+$ argtester () { for (( i=1; i<="$#"; i++ )); do echo "${i}";done; }; argtester -ab -cd -ef
+1            #i diekspansi menjadi 1
+2            #i diekspansi menjadi 2
+3            #i diekspansi menjadi 3
+$ argtester () { for (( i=1; i<="$#"; i++ )); do echo "${!i}";done; }; argtester -ab -cd -ef
+-ab          # i=1 --> diekspansi menjadi $1 ---> diekspansi menjadi argumen pertama yang dikirim ke fungsi
+-cd          # i=2 --> diekspansi menjadi $2 ---> diekspansi menjadi argumen kedua yang dikirim ke fungsi
+-ef          # i=3 --> diekspansi menjadi $3 ---> diekspansi menjadi argumen ketiga yang dikirim ke fungsi
+```
+
+### Bagian 15.7: Ekspansi parameter dan nama file
+
+Anda dapat menggunakan Ekspansi Parameter Bash untuk meniru operasi pemrosesan nama file umum seperti `basename` dan `dirname`.
+Kita akan menggunakan ini sebagai path contoh kita:
+`FILENAME="/tmp/example/myfile.txt"`
+
+Untuk meniru `dirname` dan mengembalikan nama direktori dari path file:
+`echo "${FILENAME%/*}"`
+`#Out: /tmp/example`
+
+Untuk meniru `basename $FILENAME` dan mengembalikan nama file dari path file:
+`echo "${FILENAME##*/}"`
+`#Out: myfile.txt`
+
+Untuk meniru `basename $FILENAME .txt` dan mengembalikan nama file tanpa ekstensi `.txt`:
+
+```bash
+BASENAME="${FILENAME##*/}"
+echo "${BASENAME%%.txt}"
+#Out: myfile
+```
+
+### Bagian 15.8: Substitusi nilai default
+
+**`${parameter:-word}`**
+Jika parameter tidak disetel atau null, ekspansi dari `word` disubstitusikan. Jika tidak, nilai `parameter` disubstitusikan.
+
+```bash
+$ unset var
+$ echo "${var:-XX}"    # Parameter tidak disetel -> ekspansi XX terjadi
+XX
+$ var=""
+$ echo "${var:-XX}"    # Parameter null -> ekspansi XX terjadi
+XX
+$ var=23
+$ echo "${var:-XX}"    # Parameter tidak null -> ekspansi asli terjadi
+23
+```
+
+**`${parameter:=word}`**
+Jika parameter tidak disetel atau null, ekspansi `word` ditugaskan ke `parameter`. Nilai `parameter` kemudian disubstitusikan. Parameter posisional dan parameter khusus tidak dapat ditugaskan dengan cara ini.
+
+```bash
+$ unset var
+$ echo "${var:=XX}"    # Parameter tidak disetel -> word ditugaskan ke XX
+XX
+$ echo "$var"
+XX
+$ var=""
+$ echo "${var:=XX}"    # Parameter null -> word ditugaskan ke XX
+XX
+$ echo "$var"
+XX
+$ var=23
+$ echo "${var:=XX}"    # Parameter tidak null -> tidak ada penugasan yang terjadi
+23
+$ echo "$var"
+23
+```
+
+### Bagian 15.9: Hapus pola dari akhir string
+
+**Kecocokan terpendek:**
+
+```bash
+$ a='I am a string'
+$ echo "${a%a*}"
+I am
+```
+
+**Kecocokan terpanjang:**
+
+```bash
+$ echo "${a%%a*}"
+I
+```
+
+### Bagian 15.10: Munging saat ekspansi
+
+Variabel tidak harus selalu diekspansi ke nilainya - substring dapat diekstraksi selama ekspansi, yang dapat berguna untuk mengekstraksi ekstensi file atau bagian dari path. Karakter globbing mempertahankan makna biasanya, jadi `.*` merujuk pada titik harfiah, diikuti oleh urutan karakter apa pun; itu bukan ekspresi reguler.
+
+```bash
+$ v=foo-bar-baz
+$ echo ${v%%-*}
+foo
+$ echo ${v%-*}
+foo-bar
+$ echo ${v##*-}
+baz
+$ echo ${v#*-}
+bar-baz
+```
+
+Juga memungkinkan untuk mengekspansi variabel menggunakan nilai default - katakanlah saya ingin memanggil editor pengguna, tetapi jika mereka belum mengaturnya, saya ingin memberi mereka `vim`.
+
+```bash
+$ EDITOR=nano
+$ ${EDITOR:-vim} /tmp/some_file
+# membuka nano
+$ unset EDITOR
+$ ${EDITOR:-vim} /tmp/some_file
+# membuka vim
+```
+
+Ada dua cara berbeda untuk melakukan ekspansi ini, yang berbeda dalam apakah variabel yang relevan kosong atau tidak disetel. Menggunakan `:-` akan menggunakan default jika variabelnya tidak disetel atau kosong, sedangkan `-` hanya menggunakan default jika variabelnya tidak disetel, tetapi akan menggunakan variabel jika disetel ke string kosong:
+
+```bash
+$ a="set"
+$ b=""
+$ unset c
+$ echo ${a:-default_a} ${b:-default_b} ${c:-default_c}
+set default_b default_c
+$ echo ${a-default_a} ${b-default_b} ${c-default_c}
+set default_c
+```
+
+Mirip dengan default, alternatif dapat diberikan; di mana default digunakan jika variabel tertentu tidak tersedia, alternatif digunakan jika variabel tersedia.
+
+```bash
+$ a="set"
+$ b=""
+$ echo ${a:+alternative_a} ${b:+alternative_b}
+alternative_a
+```
+
+Memperhatikan bahwa ekspansi ini dapat bersarang, menggunakan alternatif menjadi sangat berguna saat memberikan argumen ke flag baris perintah;
+
+```bash
+$ output_file=/tmp/foo
+$ wget ${output_file:+"-o ${output_file}"} www.stackexchange.com
+# diekspansi menjadi wget -o /tmp/foo www.stackexchange.com
+$ unset output_file
+$ wget ${output_file:+"-o ${output_file}"} www.stackexchange.com
+# diekspansi menjadi wget www.stackexchange.com
+```
+
+### Bagian 15.11: Error jika variabel kosong atau tidak disetel
+
+Semantiknya mirip dengan substitusi nilai default, tetapi alih-alih mengganti nilai default, ia menghasilkan error dengan pesan kesalahan yang disediakan. Bentuknya adalah `${VARNAME?ERRMSG}` dan `${VARNAME:?ERRMSG}`. Bentuk dengan `:` akan menghasilkan error jika variabelnya tidak disetel atau kosong, sedangkan bentuk tanpa `:` hanya akan menghasilkan error jika variabelnya tidak disetel. Jika error dilemparkan, `ERRMSG` ditampilkan dan kode keluar diatur ke 1.
+
+```bash
+#!/bin/bash
+FOO=
+# ./script.sh: baris 4: FOO: EMPTY
+echo "FOO adalah ${FOO:?EMPTY}"
+# FOO adalah
+echo "FOO adalah ${FOO?UNSET}"
+# ./script.sh: baris 8: BAR: EMPTY
+echo "BAR adalah ${BAR:?EMPTY}"
+# ./script.sh: baris 10: BAR: UNSET
+echo "BAR adalah ${BAR?UNSET}"
+```
+
+Untuk menjalankan contoh lengkap di atas, setiap pernyataan `echo` yang menghasilkan error perlu dikomentari untuk melanjutkan.
+
+---
+
+# Bab 16
+## Menyalin (cp)
+
+| Opsi | Deskripsi |
+| :--- | :--- |
+| `-a`, `-archive` | Menggabungkan opsi `d`, `p` dan `r` |
+| `-b`, `-backup` | Sebelum menghapus, membuat cadangan |
+| `-d`, `--no-deference` | Mempertahankan link |
+| `-f`, `--force` | Hapus tujuan yang ada tanpa meminta pengguna |
+| `-i`, `--interactive` | Tampilkan prompt sebelum menimpa |
+| `-l`, `--link` | Alih-alih menyalin, buat link file |
+| `-p`, `--preserve` | Pertahankan atribut file jika memungkinkan |
+| `-R`, `--recursive` | Salin direktori secara rekursif |
+
+### Bagian 16.1: Menyalin satu file
+
+Salin `foo.txt` dari `/path/to/source/` ke `/path/to/target/folder/`
+`cp /path/to/source/foo.txt /path/to/target/folder/`
+
+Salin `foo.txt` dari `/path/to/source/` ke `/path/to/target/folder/` ke dalam file bernama `bar.txt`
+`cp /path/to/source/foo.txt /path/to/target/folder/bar.txt`
+
+### Bagian 16.2: Menyalin folder
+
+salin folder `foo` ke dalam folder `bar`
+`cp -r /path/to/foo /path/to/bar`
+
+jika folder `bar` ada sebelum mengeluarkan perintah, maka `foo` dan kontennya akan disalin ke dalam folder `bar`. Namun, jika `bar` tidak ada sebelum mengeluarkan perintah, maka folder `bar` akan dibuat dan konten `foo` akan ditempatkan di dalam `bar`.
+
+---
+
+# Bab 17
+## Find
+
+`find` adalah perintah untuk secara rekursif mencari direktori untuk file (atau direktori) yang cocok dengan kriteria, dan kemudian melakukan beberapa tindakan pada file yang dipilih.
+`find search_path selection_criteria action`
+
+### Bagian 17.1: Mencari file berdasarkan nama atau ekstensi
+
+Untuk menemukan file/direktori dengan nama tertentu, relatif terhadap `pwd`:
+
+```bash
+$ find . -name "myFile.txt"
+./myFile.txt
+```
+
+Untuk menemukan file/direktori dengan ekstensi tertentu, gunakan wildcard:
+
+```bash
+$ find . -name "*.txt"
+./myFile.txt
+./myFile2.txt
+```
+
+Untuk menemukan file/direktori yang cocok dengan salah satu dari banyak ekstensi, gunakan flag `or`:
+`$ find . -name "*.txt" -o -name "*.sh"`
+
+Untuk menemukan file/direktori yang namanya dimulai dengan `abc` dan diakhiri dengan satu karakter alfa diikuti oleh satu digit:
+`$ find . -name "abc[a-z][0-9]"`
+
+Untuk menemukan semua file/direktori yang terletak di direktori tertentu:
+`$ find /opt`
+
+Untuk mencari file saja (bukan direktori), gunakan `-type f`:
+`find /opt -type f`
+
+Untuk mencari direktori saja (bukan file biasa), gunakan `-type d`:
+`find /opt -type d`
+
+### Bagian 17.2: Menjalankan perintah pada file yang ditemukan
+
+Terkadang kita perlu menjalankan perintah pada banyak file. Ini dapat dilakukan menggunakan `xargs`.
+`find . -type d -print | xargs -r chmod 770`
+
+Perintah di atas akan secara rekursif menemukan semua direktori (`-type d`) relatif terhadap `.` (yang merupakan direktori kerja Anda saat ini), dan menjalankan `chmod 770` pada mereka. Opsi `-r` menentukan kepada `xargs` untuk tidak menjalankan `chmod` jika `find` tidak menemukan file apa pun.
+
+Jika nama file atau direktori Anda memiliki karakter spasi di dalamnya, perintah ini mungkin macet; solusinya adalah menggunakan yang berikut:
+`find . -type d -print0 | xargs -r -0 chmod 770`
+
+Dalam contoh di atas, flag `-print0` dan `-0` menentukan bahwa nama file akan dipisahkan menggunakan byte null, dan memungkinkan penggunaan karakter khusus, seperti spasi, dalam nama file. Ini adalah ekstensi GNU, dan mungkin tidak berfungsi di versi `find` dan `xargs` lainnya.
+
+Cara yang lebih disukai untuk melakukan ini adalah dengan melewati perintah `xargs` dan membiarkan `find` memanggil subproses itu sendiri:
+`find . -type d -exec chmod 770 {} \;`
+Di sini, `{}` adalah placeholder yang menunjukkan bahwa Anda ingin menggunakan nama file pada titik itu. `find` akan menjalankan `chmod` pada setiap file secara individual.
+
+Anda juga dapat meneruskan semua nama file ke satu panggilan `chmod`, dengan menggunakan:
+`find . -type d -exec chmod 770 {} +`
+Ini juga merupakan perilaku cuplikan `xargs` di atas. (Untuk memanggil setiap file secara individual, Anda dapat menggunakan `xargs -n1`).
+
+Opsi ketiga adalah membiarkan `bash` melakukan loop pada daftar nama file yang dihasilkan `find`:
+`find . -type d | while read -r d; do chmod 770 "$d"; done`
+
+Ini secara sintaksis yang paling canggung, tetapi nyaman ketika Anda ingin menjalankan beberapa perintah pada setiap file yang ditemukan. Namun, ini tidak aman jika ada nama file dengan nama aneh.
+`find . -type f | while read -r d; do mv "$d" "${d// /_}"; done`
+yang akan mengganti semua spasi di nama file dengan garis bawah. (Contoh ini juga tidak akan berfungsi jika ada spasi di nama direktori terkemuka.)
+
+Masalah dengan yang di atas adalah `while read -r` mengharapkan satu entri per baris, tetapi nama file dapat berisi baris baru (dan juga, `read -r` akan kehilangan spasi di akhir). Anda dapat memperbaikinya dengan membalik keadaan:
+`find . -type d -exec bash -c 'for f; do mv "$f" "${f// /_}"; done' _ {} +`
+
+Dengan cara ini, `-exec` menerima nama file dalam bentuk yang sepenuhnya benar dan portabel; `bash -c` menerimanya sebagai sejumlah argumen, yang akan ditemukan di `$@`, dikutip dengan benar, dll. (Skrip perlu menangani nama-nama ini dengan benar, tentu saja; setiap variabel yang berisi nama file perlu dalam tanda kutip ganda.)
+
+`_` yang misterius diperlukan karena argumen pertama untuk `bash -c 'script'` digunakan untuk mengisi `$0`.
+
+### Bagian 17.3: Menemukan file berdasarkan waktu akses / modifikasi
+
+Pada sistem file `ext`, setiap file memiliki waktu Akses, Modifikasi, dan Perubahan (Status) yang tersimpan - untuk melihat informasi ini Anda dapat menggunakan `stat myFile.txt`; menggunakan flag di dalam `find`, kita dapat mencari file yang dimodifikasi dalam rentang waktu tertentu.
+
+Untuk menemukan file yang telah dimodifikasi dalam 2 jam terakhir:
+`$ find . -mmin -120`
+
+Untuk menemukan file yang belum dimodifikasi dalam 2 jam terakhir:
+`$ find . -mmin +120`
+
+Contoh di atas hanya mencari pada waktu modifikasi - untuk mencari pada waktu akses, atau waktu perubahan, gunakan `a`, atau `c` secara berurutan.
+
+```bash
+$ find . -amin -120
+$ find . -cmin +120
+```
+
+**Format umum:**
+
+  * `-mmin n` : File dimodifikasi n menit yang lalu
+  * `-mmin -n` : File dimodifikasi kurang dari n menit yang lalu
+  * `-mmin +n` : File dimodifikasi lebih dari n menit yang lalu
+
+Temukan file yang telah dimodifikasi dalam 2 hari terakhir:
+`find . -mtime -2`
+
+Temukan file yang belum dimodifikasi dalam 2 hari terakhir:
+`find . -mtime +2`
+
+Gunakan `-atime` dan `-ctime` untuk waktu akses dan waktu perubahan status.
+
+**Format umum:**
+
+  * `-mtime n` : File dimodifikasi n x 24 jam yang lalu
+  * `-mtime -n` : File dimodifikasi kurang dari n x 24 jam yang lalu
+  * `-mtime +n` : File dimodifikasi lebih dari n x 24 jam yang lalu
+
+Temukan file yang dimodifikasi dalam rentang tanggal, dari 2007-06-07 hingga 2007-06-08:
+`find . -type f -newermt 2007-06-07 ! -newermt 2007-06-08`
+
+Temukan file yang diakses dalam rentang stempel waktu (menggunakan file sebagai stempel waktu), dari 1 jam yang lalu hingga 10 menit yang lalu:
+
+```bash
+touch -t $(date -d '1 HOUR AGO' +%Y%m%d%H%M.%S) start_date
+touch -t $(date -d '10 MINUTE AGO' +%Y%m%d%H%M.%S) end_date
+timeout 10 find "$LOCAL_FOLDER" -newerat "start_date" ! -newerat "end_date" -print
+```
+
+**Format umum:**
+`-newerXY referensi` : Membandingkan stempel waktu file saat ini dengan `referensi`. `XY` dapat memiliki salah satu nilai berikut: `at` (waktu akses), `mt` (waktu modifikasi), `ct` (waktu perubahan) dan lainnya. `referensi` adalah nama file yang ingin kita bandingkan stempel waktu yang ditentukan (akses, modifikasi, perubahan) atau string yang menggambarkan waktu absolut.
+
+### Bagian 17.4: Menemukan file berdasarkan ukuran
+
+Temukan file yang lebih besar dari 15MB:
+`find -type f -size +15M`
+
+Temukan file yang kurang dari 12KB:
+`find -type f -size -12k`
+
+Temukan file yang ukurannya tepat 12KB:
+
+```bash
+find -type f -size 12k
+```
+
+Atau
+
+```bash
+find -type f -size 12288c
+```
+
+Atau
+
+```bash
+find -type f -size 24b
+```
+
+Atau
+
+```bash
+find -type f -size 24
+```
+
+**Format umum:**
+`find [opsi] -size n[cwbkMG]`
+Temukan file berukuran n-blok, di mana `+n` berarti lebih dari n-blok, `-n` berarti kurang dari n-blok dan `n` (tanpa tanda apa pun) berarti tepat n-blok.
+
+**Ukuran blok:**
+
+1.  `c`: byte
+2.  `w`: 2 byte
+3.  `b`: 512 byte (default)
+4.  `k`: 1 KB
+5.  `M`: 1 MB
+6.  `G`: 1 GB
+
+### Bagian 17.5: Filter path
+
+Parameter `-path` memungkinkan untuk menentukan pola yang cocok dengan path hasil. Pola tersebut juga dapat cocok dengan nama itu sendiri.
+
+Untuk menemukan hanya file yang mengandung `log` di mana saja di pathnya (folder atau nama):
+`find . -type f -path '*log*'`
+
+Untuk menemukan hanya file di dalam folder bernama `log` (di tingkat mana pun):
+`find . -type f -path '*/log/*'`
+
+Untuk menemukan hanya file di dalam folder bernama `log` atau `data`:
+`find . -type f -path '*/log/*' -o -path '*/data/*'`
+
+Untuk menemukan semua file kecuali yang terkandung dalam folder bernama `bin`:
+`find . -type f -not -path '*/bin/*'`
+
+Untuk menemukan semua file kecuali yang terkandung dalam folder bernama `bin` atau file `log`:
+`find . -type f -not -path '*log' -not -path '*/bin/*'`
+
+### Bagian 17.6: Menemukan file berdasarkan tipe
+
+Untuk menemukan file, gunakan flag `-type f`
+`$ find . -type f`
+
+Untuk menemukan direktori, gunakan flag `-type d`
+`$ find . -type d`
+
+Untuk menemukan perangkat blok, gunakan flag `-type b`
+`$ find /dev -type b`
+
+Untuk menemukan symlink, gunakan flag `-type l`
+`$ find . -type l`
+
+### Bagian 17.7: Menemukan file berdasarkan ekstensi spesifik
+
+Untuk menemukan semua file dengan ekstensi tertentu di dalam path saat ini, Anda dapat menggunakan sintaks `find` berikut. Ini bekerja dengan memanfaatkan konstruk `glob` bawaan bash untuk mencocokkan semua nama yang memiliki `.ekstensi`.
+`find /direktori/untuk/dicari -maxdepth 1 -type f -name "*.ekstensi"`
+
+Untuk menemukan semua file tipe `.txt` dari direktori saat ini saja, lakukan:
+`find . -maxdepth 1 -type f -name "*.txt"`
+
+---
+
