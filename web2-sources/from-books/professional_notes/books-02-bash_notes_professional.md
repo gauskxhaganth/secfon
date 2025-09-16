@@ -7426,3 +7426,865 @@ Ada berbagai file yang di-*source* saat Anda masuk ke *shell* Bash. Gambar di ba
 
 ---
 
+# Bab 50
+## Mewarnai Keluaran Skrip (Lintas Platform)
+
+### Bagian 50.1: color-output.sh
+
+Di bagian pembuka skrip bash, dimungkinkan untuk mendefinisikan beberapa variabel yang berfungsi sebagai pembantu untuk mewarnai atau memformat keluaran terminal selama skrip berjalan.
+
+Platform yang berbeda menggunakan urutan karakter yang berbeda untuk mengekspresikan warna. Namun, ada utilitas bernama `tput` yang berfungsi di semua sistem \*nix dan mengembalikan *string* pewarnaan terminal yang spesifik untuk platform melalui API lintas platform yang konsisten.
+
+Misalnya, untuk menyimpan urutan karakter yang mengubah teks terminal menjadi merah atau hijau:
+
+```bash
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+```
+
+Atau, untuk menyimpan urutan karakter yang mengatur ulang teks ke tampilan *default*:
+
+```bash
+reset=$(tput sgr0)
+```
+
+Kemudian, jika skrip BASH perlu menampilkan keluaran berwarna yang berbeda, ini dapat dicapai dengan:
+
+```bash
+echo "${green}Sukses!${reset}"
+echo "${red}Gagal.${reset}"
+```
+
+---
+
+# Bab 51
+## Ko-proses (*co-processes*)
+
+### Bagian 51.1: Hello World
+
+```bash
+# buat ko-proses
+coproc bash
+
+# kirim perintah ke sana (echo a)
+echo 'echo Hello World' >&"${COPROC[1]}"
+
+# baca satu baris dari keluarannya
+read line <&"${COPROC[0]}"
+
+# tampilkan baris tersebut
+echo "$line"
+```
+
+Keluarannya adalah "Hello World".
+
+# Bab 52
+## Menentukan Tipe Variabel
+
+### Bagian 52.1: Mendeklarasikan variabel dengan tipe lemah (*weakly typed*)
+
+`declare` adalah perintah internal bash. (perintah internal menggunakan `help` untuk menampilkan "halaman manual"). Ini digunakan untuk menampilkan dan mendefinisikan variabel atau menampilkan isi fungsi.
+
+**Sintaks:** `declare [options] [name[=value]]...`
+
+```bash
+# opsi digunakan untuk mendefinisikan
+# sebuah integer
+declare -i myInteger
+declare -i anotherInt=10
+
+# sebuah array dengan nilai
+declare -a anArray=( one two three)
+
+# sebuah Array asosiatif
+declare -A assocArray=( [element1]="something" [second]=anotherthing )
+# perhatikan bahwa bash mengenali konteks string di dalam []
+
+# beberapa pengubah ada
+# konten huruf besar
+declare -u big='ini akan menjadi huruf besar'
+# sama untuk huruf kecil
+declare -l small='INI AKAN MENJADI HURUF KECIL'
+
+# array hanya-baca (readonly)
+declare -ra constarray=( eternal true and unchangeable )
+
+# ekspor integer ke lingkungan
+declare -xi importantInt=42
+```
+
+Anda juga dapat menggunakan `+` yang menghilangkan atribut yang diberikan. Sebagian besar tidak berguna, hanya untuk kelengkapan.
+
+Untuk menampilkan variabel dan/atau fungsi, ada beberapa opsi juga.
+
+```bash
+# mencetak variabel dan fungsi yang didefinisikan
+declare -f
+# membatasi keluaran hanya untuk fungsi
+declare -F # jika sedang debugging, juga mencetak nomor baris dan nama file tempat didefinisikan
+```
+
+---
+
+# Bab 53
+## Pekerjaan pada Waktu Tertentu
+
+### Bagian 53.1: Menjalankan pekerjaan sekali pada waktu tertentu
+
+**Catatan:** `at` tidak diinstal secara *default* pada sebagian besar distribusi modern.
+
+Untuk menjalankan pekerjaan sekali pada waktu selain sekarang, dalam contoh ini jam 5 sore, Anda dapat menggunakan:
+
+```bash
+echo "somecommand &" | at 5pm
+```
+
+Jika Anda ingin menangkap keluarannya, Anda dapat melakukannya dengan cara biasa:
+
+```bash
+echo "somecommand > out.txt 2>err.txt &" | at 5pm
+```
+
+`at` memahami banyak format waktu, jadi Anda juga bisa mengatakan:
+
+```bash
+echo "somecommand &" | at now + 2 minutes
+echo "somecommand &" | at 17:00
+echo "somecommand &" | at 17:00 Jul 7
+echo "somecommand &" | at 4pm 12.03.17
+```
+
+Jika tidak ada tahun atau tanggal yang diberikan, ia mengasumsikan waktu berikutnya saat waktu yang Anda tentukan terjadi. Jadi jika Anda memberikan jam yang sudah lewat hari ini, ia akan mengasumsikan besok, dan jika Anda memberikan bulan yang sudah lewat tahun ini, ia akan mengasumsikan tahun depan.
+
+Ini juga bekerja bersama dengan `nohup` seperti yang Anda harapkan.
+
+```bash
+echo "nohup somecommand > out.txt 2>err.txt &" | at 5pm
+```
+
+Ada beberapa perintah lagi untuk mengontrol pekerjaan berwaktu:
+
+  * `atq` menampilkan semua pekerjaan berwaktu (*atqueue*)
+  * `atrm` menghapus pekerjaan berwaktu (*atremove*)
+  * `batch` pada dasarnya melakukan hal yang sama seperti `at`, tetapi hanya menjalankan pekerjaan ketika beban sistem lebih rendah dari 0.8
+
+Semua perintah berlaku untuk pekerjaan dari pengguna yang sedang *login*. Jika *login* sebagai *root*, tentu saja pekerjaan di seluruh sistem yang ditangani.
+
+### Bagian 53.2: Melakukan pekerjaan pada waktu tertentu berulang kali menggunakan `systemd.timer`
+
+`systemd` menyediakan implementasi modern dari `cron`. Untuk menjalankan skrip secara berkala, diperlukan sebuah *service* dan file *timer*. File *service* dan *timer* harus ditempatkan di `/etc/systemd/{system,user}`.
+
+File *service*:
+
+```ini
+[Unit]
+Description=skrip atau program saya melakukan yang terbaik dan ini adalah deskripsinya
+
+[Service]
+# tipe itu penting!
+Type=simple
+# program|skrip untuk dipanggil. Selalu gunakan path absolut
+# dan arahkan ulang STDIN dan STDERR karena tidak ada terminal saat dieksekusi
+ExecStart=/absolute/path/to/someCommand >>/path/to/output 2>/path/to/STDERRoutput
+
+#TIDAK ADA bagian install!!!! Ditangani oleh fasilitas timer itu sendiri.
+#[Install]
+#WantedBy=multi-user.target
+```
+
+Berikutnya file *timer*:
+
+```ini
+[Unit]
+Description=timer systemd pertama saya
+
+[Timer]
+# Sintaks untuk spesifikasi tanggal/waktu adalah Y-m-d H:M:S
+# * berarti "setiap", dan daftar item yang dipisahkan koma juga dapat diberikan
+# *-*-* *,15,30,45:00 berarti setiap tahun, setiap bulan, setiap hari, setiap jam,
+# pada menit 15,30,45 dan detik nol
+OnCalendar=*-*-* *:01:00
+# yang ini berjalan setiap jam pada menit satu detik nol, mis. 13:01:00
+```
+
+---
+
+# Bab 54
+## Menangani Prompt Sistem
+
+| *Escape* | Detail |
+| :--- | :--- |
+| `\a` | Karakter bel. |
+| `\d` | Tanggal, dalam format "Weekday Month Date" (mis., "Tue May 26"). |
+| `\D{FORMAT}` | `FORMAT` dilewatkan ke `strftime`(3) dan hasilnya dimasukkan ke dalam *string prompt*; `FORMAT` yang kosong menghasilkan representasi waktu spesifik-lokal. Kurung kurawal diperlukan. |
+| `\e` | Karakter *escape*. `\033` tentu saja juga berfungsi. |
+| `\h` | Nama *host*, hingga `.` pertama (yaitu tanpa bagian domain). |
+| `\H` | Nama *host* lengkap dengan bagian domain. |
+| `\j` | Jumlah pekerjaan yang saat ini dikelola oleh *shell*. |
+| `\l` | *Basename* dari nama perangkat terminal *shell*. |
+| `\n` | Baris baru. |
+| `\r` | *Carriage return*. |
+| `\s` | Nama *shell*, *basename* dari `$0` (bagian setelah garis miring terakhir). |
+| `\t` | Waktu, dalam format 24 jam HH:MM:SS. |
+| `\T` | Waktu, dalam format 12 jam HH:MM:SS. |
+| `@` | Waktu, dalam format 12 jam am/pm. |
+| `\A` | Waktu, dalam format 24 jam HH:MM. |
+| `\u` | Nama pengguna dari pengguna saat ini. |
+| `\v` | Versi Bash (mis., 2.00). |
+| `\V` | Rilis Bash, versi + *patchlevel* (mis., 2.00.0). |
+| `\w` | Direktori kerja saat ini, dengan `$HOME` disingkat dengan tilde (menggunakan variabel `$PROMPT_DIRTRIM`). |
+| `\W` | *Basename* dari `$PWD`, dengan `$HOME` disingkat dengan tilde. |
+| `!` | Nomor riwayat dari perintah ini. |
+| `#` | Nomor perintah dari perintah ini. |
+| `$` | Jika UID efektif adalah 0, `#`, jika tidak `_`. |
+| `\NNN` | Karakter yang kode ASCII-nya adalah nilai oktal NNN. |
+| `\\` | Sebuah *backslash*. |
+| `\[` | Mulai urutan karakter non-cetak. Ini bisa digunakan untuk menyematkan urutan kontrol terminal ke dalam *prompt*. |
+| `\]` | Akhiri urutan karakter non-cetak. |
+
+### Bagian 54.1: Menggunakan variabel lingkungan `PROMPT_COMMAND`
+
+Ketika perintah terakhir dalam instance bash interaktif selesai, variabel `PS1` yang dievaluasi ditampilkan. Sebelum benar-benar menampilkan `PS1`, bash memeriksa apakah `PROMPT_COMMAND` diatur. Nilai dari variabel ini harus berupa program atau skrip yang dapat dipanggil. Jika variabel ini diatur, program/skrip ini dipanggil SEBELUM *prompt* `PS1` ditampilkan.
+
+```bash
+# hanya fungsi bodoh, kita akan gunakan untuk demonstrasi
+# kita periksa tanggal jika Jam adalah 12 dan Menit lebih rendah dari 59
+lunchbreak(){
+  if (( $(date +%H) == 12 && $(date +%M) < 59 )); then
+    # dan cetak berwarna \033[ memulai urutan escape
+    # 5; adalah atribut berkedip
+    # 1; berarti tebal (di beberapa terminal, 2; adalah redup)
+    # 31 mengatakan merah
+    printf "\033[5;1;31mmind the lunch break\033[0m\n";
+  else
+    printf "\033[33mstill working...\033[0m\n";
+  fi;
+}
+# mengaktifkannya
+export PROMPT_COMMAND=lunchbreak
+```
+
+### Bagian 54.2: Menggunakan PS2
+
+`PS2` ditampilkan ketika sebuah perintah meluas ke lebih dari satu baris dan bash menunggu lebih banyak ketikan. Ini juga ditampilkan ketika perintah majemuk seperti `while...do..done` dan sejenisnya dimasukkan.
+
+```bash
+export PS2="mohon lengkapi perintah ini?\n"
+# sekarang masukkan perintah yang meluas setidaknya ke dua baris untuk melihat PS2
+```
+
+### Bagian 54.3: Menggunakan PS3
+
+Ketika pernyataan `select` dieksekusi, ia menampilkan item yang diberikan dengan awalan nomor dan kemudian menampilkan *prompt* `PS3`:
+
+```bash
+export PS3=" Untuk memilih bahasa Anda, ketik nomor sebelumnya : "
+select lang in EN CA FR DE; do
+  # periksa masukan di sini sampai valid.
+  break
+done
+```
+
+### Bagian 54.4: Menggunakan PS4
+
+`PS4` ditampilkan ketika bash dalam mode *debugging*.
+
+```bash
+#!/usr/bin/env bash
+# nyalakan debugging
+set -x
+# definisikan stupid_func
+stupid_func(){
+  echo Saya adalah baris 1 dari stupid_func
+  echo Saya adalah baris 2 dari stupid_func
+}
+
+# mengatur prompt "DEBUG" PS4
+export PS4='\nDEBUG level:$SHLVL subshell-level: $BASH_SUBSHELL \nsource-file:${BASH_SOURCE} line#:${LINENO} function:${FUNCNAME[0]:+${FUNCNAME[0]}(): }\nstatement: '
+
+# sebuah pernyataan normal
+echo something
+# pemanggilan fungsi
+stupid_func
+# sebuah pipeline perintah yang berjalan di subshell
+( ls -l | grep 'x' )
+```
+
+### Bagian 54.5: Menggunakan PS1
+
+`PS1` adalah *prompt* sistem normal yang menunjukkan bahwa bash menunggu perintah untuk diketik. Ia memahami beberapa urutan *escape* dan dapat mengeksekusi fungsi atau program. Karena bash harus memposisikan kursor setelah *prompt* yang ditampilkan, ia perlu tahu cara menghitung panjang efektif dari *string prompt*. Untuk menunjukkan urutan karakter non-cetak di dalam variabel `PS1`, kurung kurawal yang di-*escape* digunakan: `\[ sebuah urutan karakter non-cetak \]`. Semua yang dikatakan berlaku untuk semua variabel `PS*`.
+
+(Tanda sisipan hitam menunjukkan kursor)
+
+```bash
+#segala sesuatu yang bukan urutan escape akan dicetak secara harfiah
+export PS1="urutan harfiah " # Prompt sekarang:
+urutan harfiah ▉
+
+# \u == pengguna \h == host \w == direktori kerja aktual
+# perhatikan tanda kutip tunggal untuk menghindari interpretasi oleh shell
+export PS1='\u@\h:\w > ' # \u == pengguna, \h == host, \w direktori kerja aktual
+looser@host:/some/path > ▉
+
+# mengeksekusi beberapa perintah di dalam PS1
+# baris berikut akan mengatur warna latar depan menjadi merah, jika pengguna==root,
+# jika tidak, ia akan mengatur ulang atribut ke default
+# $( (($EUID == 0)) && tput setaf 1)
+# nanti kita akan mengatur ulang atribut ke default dengan
+# $( tput sgr0 )
+# dengan asumsi sebagai root:
+PS1="\[$( (($EUID == 0)) && tput setaf 1)\]\u\[$(tput sgr0)\]@\h:\w \$ "
+looser@host:/some/path > ▉ # jika bukan root, jika root maka <merah>root<default>@host....
+```
+
+---
+
+# Bab 55
+## Perintah `cut`
+
+| Parameter | Detail |
+| :--- | :--- |
+| **`-f, --fields`** | Seleksi berbasis *field*. |
+| **`-d, --delimiter`** | Pembatas untuk seleksi berbasis *field*. |
+| **`-c, --characters`** | Seleksi berbasis karakter, pembatas diabaikan atau error. |
+| **`-s, --only-delimited`**| Abaikan baris tanpa karakter pembatas (dicetak apa adanya jika tidak). |
+| **`--complement`** | Seleksi terbalik (ekstrak semua kecuali *field*/karakter yang ditentukan). |
+| **`--output-delimiter`** | Tentukan jika harus berbeda dari pembatas masukan. |
+
+Perintah `cut` adalah cara cepat untuk mengekstrak bagian dari baris file teks. Ini termasuk perintah Unix tertua. Implementasinya yang paling populer adalah versi GNU yang ditemukan di Linux dan versi FreeBSD yang ditemukan di MacOS, tetapi setiap varian Unix memiliki versinya sendiri. Lihat di bawah untuk perbedaannya. Baris masukan dibaca baik dari `stdin` atau dari file yang terdaftar sebagai argumen di baris perintah.
+
+### Bagian 55.1: Hanya satu karakter pembatas
+
+Anda tidak dapat memiliki lebih dari satu pembatas: jika Anda menentukan sesuatu seperti `-d ",;:"`, beberapa implementasi hanya akan menggunakan karakter pertama sebagai pembatas (dalam hal ini, koma.) Implementasi lain (misalnya GNU cut) akan memberi Anda pesan kesalahan.
+
+```bash
+$ cut -d ",;:" -f2 <<<"J.Smith,1 Main Road,cell:1234567890;land:4081234567"
+cut: the delimiter must be a single character
+Try `cut --help' for more information.
+```
+
+### Bagian 55.2: Pembatas berulang diinterpretasikan sebagai *field* kosong
+
+```bash
+$ cut -d, -f1,3 <<<"a,,b,c,d,e"
+a,b
+```
+
+cukup jelas, tetapi dengan *string* yang dipisahkan spasi mungkin kurang jelas bagi sebagian orang.
+
+```bash
+$ cut -d ' ' -f1,3 <<<"a  b   c    d e"
+a b
+```
+
+`cut` tidak dapat digunakan untuk mem-parsing argumen seperti yang dilakukan *shell* dan program lain.
+
+### Bagian 55.3: Tanpa tanda kutip
+
+Tidak ada cara untuk melindungi pembatas. *Spreadsheet* dan perangkat lunak penanganan CSV serupa biasanya dapat mengenali karakter kutipan teks yang memungkinkan untuk mendefinisikan *string* yang berisi pembatas. Dengan `cut` Anda tidak bisa.
+
+```bash
+$ cut -d, -f3 <<<'John,Smith,"1, Main Street"'
+"1
+```
+
+### Bagian 55.4: Mengekstrak, bukan memanipulasi
+
+Anda hanya dapat mengekstrak bagian dari baris, tidak menyusun ulang atau mengulang *field*.
+
+```bash
+$ cut -d, -f2,1 <<<'John,Smith,USA' ## Sama seperti -f1,2
+John,Smith
+
+$ cut -d, -f2,2 <<<'John,Smith,USA' ## Sama seperti -f2
+Smith
+```
+
+---
+
+# Bab 56
+## Bash di Windows 10
+
+### Bagian 56.1: Readme
+
+Cara yang lebih sederhana untuk menggunakan Bash di Windows adalah dengan menginstal Git for Windows. Ini disertakan dengan Git Bash yang merupakan Bash sejati. Anda dapat mengaksesnya dengan pintasan di:
+`Start > All Programs > Git > Git Bash`
+
+Perintah seperti `grep`, `ls`, `find`, `sed`, `vi`, dll berfungsi.
+
+<p align="center">
+  <img src="images/book-02/figure-56.1.png" alt="gambar" width="580"/>
+</p>
+
+---
+
+# Bab 57
+## Perintah Cut
+
+| Opsi | Deskripsi |
+| :--- | :--- |
+| **`-b LIST, --bytes=LIST`** | Cetak *byte* yang tercantum dalam parameter `LIST`. |
+| **`-c LIST, --characters=LIST`** | Cetak karakter pada posisi yang ditentukan dalam parameter `LIST`. |
+| **`-f LIST, --fields=LIST`** | Cetak *field* atau kolom. |
+| **`-d DELIMITER`** | Digunakan untuk memisahkan kolom atau *field*. |
+
+Di Bash, perintah `cut` berguna untuk membagi file menjadi beberapa bagian yang lebih kecil.
+
+### Bagian 57.1: Menampilkan kolom pertama dari sebuah file
+
+Misalkan Anda memiliki file yang terlihat seperti ini:
+
+```
+John Smith 31
+Robert Jones 27
+...
+```
+
+File ini memiliki 3 kolom yang dipisahkan oleh spasi. Untuk memilih hanya kolom pertama, lakukan hal berikut.
+
+```bash
+cut -d ' ' -f1 filename
+```
+
+Di sini *flag* `-d` menentukan pembatas, atau apa yang memisahkan catatan. *Flag* `-f` menentukan *field* atau nomor kolom. Ini akan menampilkan keluaran berikut:
+
+```
+John
+Robert
+...
+```
+
+### Bagian 57.2: Menampilkan kolom x hingga y dari sebuah file
+
+Terkadang, berguna untuk menampilkan rentang kolom dalam sebuah file. Misalkan Anda memiliki file ini:
+
+```
+Apple California 2017 1.00 47
+Mango Oregon 2015 2.30 33
+```
+
+Untuk memilih 3 kolom pertama, lakukan:
+
+```bash
+cut -d ' ' -f1-3 filename
+```
+
+Ini akan menampilkan keluaran berikut:
+
+```
+Apple California 2017
+Mango Oregon 2015
+```
+
+---
+
+# Bab 58
+## Variabel Global dan Lokal
+
+Secara *default*, setiap variabel di bash bersifat global untuk setiap fungsi, skrip, dan bahkan *shell* luar jika Anda mendeklarasikan variabel di dalam skrip.
+
+Jika Anda ingin variabel Anda bersifat lokal untuk sebuah fungsi, Anda dapat menggunakan `local` agar variabel tersebut menjadi variabel baru yang independen dari lingkup global dan nilainya hanya akan dapat diakses di dalam fungsi itu.
+
+### Bagian 58.1: Variabel global
+
+```bash
+var="hello"
+function foo(){
+  echo $var
+}
+foo
+```
+
+Jelas akan menghasilkan "hello", tetapi ini juga berfungsi sebaliknya:
+
+```bash
+function foo() {
+  var="hello"
+}
+foo
+echo $var
+```
+
+Juga akan menghasilkan "hello".
+
+### Bagian 58.2: Variabel lokal
+
+```bash
+function foo() {
+  local var
+  var="hello"
+}
+foo
+echo $var
+```
+
+Tidak akan menghasilkan apa-apa, karena `var` adalah variabel lokal untuk fungsi `foo`, dan nilainya tidak terlihat dari luarnya.
+
+### Bagian 58.3: Mencampur keduanya
+
+```bash
+var="hello"
+function foo(){
+  local var="sup?"
+  echo "di dalam fungsi, var=$var"
+}
+foo
+echo "di luar fungsi, var=$var"
+```
+
+Akan menghasilkan:
+
+```
+di dalam fungsi, var=sup?
+di luar fungsi, var=hello
+```
+
+---
+
+# Bab 59
+## Skrip CGI
+
+### Bagian 59.1: Metode Permintaan: GET
+
+Cukup mudah untuk memanggil Skrip-CGI melalui GET.
+
+Pertama, Anda akan memerlukan URL yang di-encode dari skrip tersebut.
+Kemudian Anda menambahkan tanda tanya `?` diikuti oleh variabel.
+Setiap variabel harus memiliki dua bagian yang dipisahkan oleh `=`.
+Bagian pertama harus selalu nama unik untuk setiap variabel,
+sedangkan bagian kedua hanya berisi nilai.
+Variabel dipisahkan oleh `&`.
+Total panjang *string* tidak boleh melebihi 255 karakter.
+Nama dan nilai perlu di-*encode* dalam format HTML (ganti: `< , / ? : @ & = + $`).
+
+**Petunjuk:**
+
+  * Saat menggunakan formulir HTML, metode permintaan dapat dibuat sendiri.
+  * Dengan Ajax Anda dapat meng-*encode* semua melalui `encodeURI` dan `encodeURIComponent`.
+
+**Contoh:**
+`http://www.example.com/cgi-bin/script.sh?var1=Hello%20World!&var2=This%20is%20a%20Test.&`
+
+Server harus berkomunikasi hanya melalui Cross-Origin Resource Sharing (CORS), untuk membuat permintaan lebih aman. Dalam contoh ini kita menggunakan CORS untuk menentukan Tipe-Data yang ingin kita gunakan.
+
+Ada banyak Tipe-Data yang bisa kita pilih, yang paling umum adalah...
+
+  * `text/html`
+  * `text/plain`
+  * `application/json`
+
+Saat mengirim permintaan, server juga akan membuat banyak variabel lingkungan. Untuk saat ini variabel lingkungan yang paling penting adalah `$REQUEST_METHOD` dan `$QUERY_STRING`.
+
+Metode Permintaan harus `GET`, tidak ada yang lain\!
+*String* Kueri menyertakan semua data yang di-*encode* dalam format HTML.
+
+**Skrip:**
+
+```bash
+#!/bin/bash
+# CORS adalah cara berkomunikasi, jadi mari kita respons ke server terlebih dahulu
+echo "Content-type: text/html"
+# atur tipe-data yang ingin kita gunakan
+echo ""
+# kita tidak memerlukan aturan lagi, baris kosong ini memulainya.
+# CORS sudah final dan setiap komunikasi dari sekarang akan seperti membaca dokumen html.
+# Oleh karena itu kita perlu membuat stdout apa pun dalam format html!
+# buat struktur html dan kirim ke stdout
+echo "<!DOCTYPE html>"
+echo "<html><head>"
+# Konten akan dibuat tergantung pada Metode Permintaan
+if [ "$REQUEST_METHOD" = "GET" ]; then
+  # Perhatikan bahwa variabel lingkungan $REQUEST_METHOD dan $QUERY_STRING dapat diproses oleh shell secara langsung.
+  # Seseorang harus menyaring masukan untuk menghindari cross site scripting.
+  Var1=$(echo "$QUERY_STRING" | sed -n 's/^.*var1=\([^&]*\).*$/\1/p')
+  # baca nilai "var1"
+  Var1_Dec=$(echo -e $(echo "$Var1" | sed 's/+/ /g;s/%\(..\)/\\x\1/g;'))
+  # decode html
+  Var2=$(echo "$QUERY_STRING" | sed -n 's/^.*var2=\([^&]*\).*$/\1/p')
+  Var2_Dec=$(echo -e $(echo "$Var2" | sed 's/+/ /g;s/%\(..\)/\\x\1/g;'))
+  # buat konten untuk stdout
+  echo "<title>Bash-CGI Example 1</title>"
+  echo "</head><body>"
+  echo "<h1>Bash-CGI Example 1</h1>"
+  echo "<p>QUERY_STRING: ${QUERY_STRING}<br>var1=${Var1_Dec}<br>var2=${Var2_Dec}</p>"
+  # cetak nilai ke stdout
+else
+  echo "<title>456 Wrong Request Method</title>"
+  echo "</head><body>"
+  echo "<h1>456</h1>"
+  echo "<p>Permintaan data gagal.<br>Metode Permintaan harus \"GET\" saja!</p>"
+fi
+echo "<hr>"
+echo "$SERVER_SIGNATURE"
+# variabel lingkungan lain
+echo "</body></html>"
+# tutup html
+exit 0
+```
+
+Dokumen html akan terlihat seperti ini ...
+
+```html
+<html><head>
+<title>Bash-CGI Example 1</title>
+</head><body>
+<h1>Bash-CGI Example 1</h1>
+<p>QUERY_STRING: var1=Hello%20World!&amp;var2=This%20is%20a%20Test.&amp;<br>var1=Hello
+World!<br>var2=This is a Test.</p>
+<hr>
+<address>Apache/2.4.10 (Debian) Server at example.com Port 80</address>
+</body></html>
+```
+
+Keluaran dari variabel akan terlihat seperti ini ...
+
+```
+var1=Hello%20World!&var2=This%20is%20a%20Test.&
+Hello World!
+This is a Test.
+Apache/2.4.10 (Debian) Server at example.com Port 80
+```
+
+**Efek samping negatif...**
+
+  * Semua *encoding* dan *decoding* tidak terlihat bagus, tetapi diperlukan.
+  * Permintaan akan dapat dibaca publik dan meninggalkan jejak.
+  * Ukuran permintaan terbatas.
+  * Membutuhkan perlindungan terhadap *Cross-Side-Scripting* (XSS).
+
+### Bagian 59.2: Metode Permintaan: POST dengan JSON
+
+Menggunakan Metode Permintaan POST dalam kombinasi dengan SSL membuat transfer data lebih aman.
+
+**Sebagai tambahan...**
+
+  * Sebagian besar *encoding* dan *decoding* tidak diperlukan lagi.
+  * URL akan terlihat oleh siapa saja dan perlu di-*encode* URL.
+  * Data akan dikirim secara terpisah dan oleh karena itu harus diamankan melalui SSL.
+  * Ukuran data hampir tidak terbatas.
+  * Masih membutuhkan perlindungan terhadap *Cross-Side-Scripting* (XSS).
+
+Untuk menjaga contoh ini tetap sederhana, kita ingin menerima Data JSON dan komunikasi harus melalui Cross-Origin Resource Sharing (CORS). Skrip berikut juga akan mendemonstrasikan dua Tipe-Konten yang berbeda.
+
+```bash
+#!/bin/bash
+exec 2>/dev/null
+# Kita tidak ingin pesan kesalahan dicetak ke stdout
+trap "response_with_html && exit 0" ERR
+# respons dengan pesan html saat terjadi kesalahan dan tutup skrip
+
+function response_with_html(){
+  echo "Content-type: text/html"
+  echo ""
+  echo "<!DOCTYPE html>"
+  echo "<html><head>"
+  echo "<title>456</title>"
+  echo "</head><body>"
+  echo "<h1>456</h1>"
+  echo "<p>Upaya untuk berkomunikasi dengan server gagal.</p>"
+  echo "<hr>"
+  echo "$SERVER_SIGNATURE"
+  echo "</body></html>"
+}
+
+function response_with_json(){
+  echo "Content-type: application/json"
+  echo ""
+  echo "{\"message\": \"Hello World!\"}"
+}
+
+if [ "$REQUEST_METHOD" = "POST" ]; then
+  # Variabel lingkungan $CONTENT_TYPE menjelaskan tipe-data yang diterima
+  case "$CONTENT_TYPE" in
+  application/json)
+    # Variabel lingkungan $CONTENT_LENGTH menjelaskan ukuran data
+    read -n "$CONTENT_LENGTH" QUERY_STRING_POST # baca aliran data
+    # Baris berikut akan mencegah XSS dan memeriksa data JSON yang valid.
+    # Tetapi Simbol-simbol ini perlu di-encode entah bagaimana sebelum dikirim ke skrip ini
+    QUERY_STRING_POST=$(echo "$QUERY_STRING_POST" | sed "s/'//g" | sed 's/\$//g;s/`//g;s/\*//g;s/\\//g' )
+    # menghapus beberapa simbol (seperti \ * ` $ ') untuk mencegah XSS dengan Bash dan SQL.
+    QUERY_STRING_POST=$(echo "$QUERY_STRING_POST" | sed -e :a -e 's/<[^>]*>//g;/</N;//ba')
+    # menghapus sebagian besar deklarasi html untuk mencegah XSS di dalam dokumen
+    JSON=$(echo "$QUERY_STRING_POST" | jq .)
+    # encode json - Ini adalah cara yang cukup aman untuk memeriksa kode json yang valid
+    ;;
+  *)
+    response_with_html
+    exit 0
+    ;;
+  esac
+  #
+else
+  response_with_html
+  exit 0
+fi
+# Beberapa Perintah ...
+response_with_json
+exit 0
+```
+
+Anda akan mendapatkan `{"message":"Hello World!"}` sebagai jawaban saat mengirim Data-JSON melalui POST ke Skrip ini. Segalanya yang lain akan menerima dokumen html.
+
+Penting juga variabel `$JSON`. Variabel ini bebas dari XSS, tetapi masih bisa memiliki nilai yang salah di dalamnya dan perlu diverifikasi terlebih dahulu. Harap diingat itu.
+
+Kode ini bekerja serupa tanpa JSON. Anda bisa mendapatkan data apa pun dengan cara ini. Anda hanya perlu mengubah Tipe-Konten sesuai kebutuhan Anda.
+
+**Contoh:**
+
+```bash
+if [ "$REQUEST_METHOD" = "POST" ]; then
+  case "$CONTENT_TYPE" in
+  application/x-www-form-urlencoded)
+    read -n "$CONTENT_LENGTH" QUERY_STRING_POST
+    ;;
+  text/plain)
+    read -n "$CONTENT_LENGTH" QUERY_STRING_POST
+    ;;
+  esac
+fi
+```
+
+Terakhir, jangan lupa untuk merespons semua permintaan, jika tidak, program pihak ketiga tidak akan tahu apakah mereka berhasil.
+
+---
+
+# Bab 60
+## Kata Kunci `select`
+
+Kata kunci `select` dapat digunakan untuk mendapatkan argumen masukan dalam format menu.
+
+### Bagian 60.1: Kata kunci `select` dapat digunakan untuk mendapatkan argumen masukan dalam format menu
+
+Misalkan Anda ingin pengguna MEMILIH kata kunci dari menu, kita bisa membuat skrip yang mirip dengan:
+
+```bash
+#!/usr/bin/env bash
+select os in "linux" "windows" "mac"
+do
+  echo "${os}"
+  break
+done
+```
+
+**Penjelasan:** Di sini kata kunci `SELECT` digunakan untuk melakukan *loop* melalui daftar item yang akan disajikan di *prompt* perintah untuk dipilih oleh pengguna. Perhatikan kata kunci `break` untuk keluar dari *loop* setelah pengguna membuat pilihan. Jika tidak, *loop* akan tak berujung\!
+
+**Hasil:** Setelah menjalankan skrip ini, menu item-item ini akan ditampilkan dan pengguna akan diminta untuk memilih. Setelah memilih, nilainya akan ditampilkan, kembali ke *prompt* perintah.
+
+```
+>bash select_menu.sh
+1) linux
+2) windows
+3) mac
+#? 3
+mac
+>
+```
+
+---
+
+# Bab 61
+## Kapan Menggunakan `eval`
+
+Pertama dan terutama: ketahuilah apa yang Anda lakukan\! Kedua, meskipun Anda harus menghindari penggunaan `eval`, jika penggunaannya membuat kode lebih bersih, silakan saja.
+
+### Bagian 61.1: Menggunakan `eval`
+
+Sebagai contoh, pertimbangkan berikut ini yang mengatur isi `$@` ke isi variabel yang diberikan:
+
+```bash
+a=(1 2 3)
+eval set -- "${a[@]}"
+```
+
+Kode ini sering disertai dengan `getopt` atau `getopts` untuk mengatur `$@` ke keluaran dari parser opsi yang disebutkan di atas, namun, Anda juga dapat menggunakannya untuk membuat fungsi `pop` sederhana yang dapat beroperasi pada variabel secara diam-diam dan langsung tanpa harus menyimpan hasilnya ke variabel asli:
+
+```bash
+isnum()
+{
+  # apakah argumennya integer?
+  local re='^[0-9]+$'
+  if [[ -n $1 ]]; then
+    [[ $1 =~ $re ]] && return 0
+    return 1
+  else
+    return 2
+  fi
+}
+
+isvar()
+{
+  if isnum "$1"; then
+    return 1
+  fi
+  local arr="$(eval eval -- echo -n "\$$1")"
+  if [[ -n ${arr[@]} ]]; then
+    return 0
+  fi
+  return 1
+}
+
+pop()
+{
+  if [[ -z $@ ]]; then
+    return 1
+  fi
+  local var=
+  local isvar=0
+  local arr=()
+  if isvar "$1"; then # mari kita periksa apakah ini variabel atau hanya array biasa
+    var="$1"
+    isvar=1
+    arr=($(eval eval -- echo -n "\${$1[@]}")) # jika ini adalah var, dapatkan isinya
+  else
+    arr=($@)
+  fi
+
+  # kita perlu membalik isi $@ sehingga kita bisa shift
+  # elemen terakhir ke dalam kehampaan
+  arr=($(awk <<<"${arr[@]}" '{ for (i=NF; i>1; --i) printf("%s ",$i); print $1; }'))
+  # atur $@ ke ${arr[@]} sehingga kita bisa menjalankan shift terhadapnya.
+  eval set -- "${arr[@]}"
+  shift # hapus elemen terakhir
+  # kembalikan array ke urutan aslinya
+  arr=($(awk <<<"$@" '{ for (i=NF; i>1; --i) printf("%s ",$i); print $1; }'))
+  # cetak isinya untuk kepentingan pengguna dan untuk array biasa
+  echo "${arr[@]}"
+  if ((isvar)); then
+    # atur isi var asli ke array baru yang dimodifikasi
+    eval -- "$var=(${arr[@]})"
+  fi
+}
+```
+
+### Bagian 61.2: Menggunakan `eval` dengan `getopt`
+
+Meskipun `eval` mungkin tidak diperlukan untuk fungsi seperti `pop`, namun diperlukan setiap kali Anda menggunakan `getopt`:
+
+Pertimbangkan fungsi berikut yang menerima `-h` sebagai opsi:
+
+```bash
+f()
+{
+  local __me__="${FUNCNAME[0]}"
+  local argv="$(getopt -o 'h' -n $__me__ -- "$@")"
+  eval set -- "$argv"
+  while :; do
+    case "$1" in
+      -h)
+        echo "LOLOLOLOL"
+        return 0
+      ;;
+      --)
+        shift
+        break
+      ;;
+    esac
+  done
+  echo "$@"
+}
+```
+
+Tanpa `eval set -- "$argv"` menghasilkan `-h --` alih-alih yang diinginkan (`-h --`) dan selanjutnya memasuki *loop* tak terbatas karena `-h --` tidak cocok dengan `--` atau `-h`.
+
+---
+
