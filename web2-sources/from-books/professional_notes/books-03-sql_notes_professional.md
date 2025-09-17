@@ -4117,3 +4117,1075 @@ WHERE NOT EXISTS ( SELECT 1
 
 ---
 
+# Bab 30
+## TRUNCATE
+
+Pernyataan `TRUNCATE` menghapus **semua data** dari sebuah tabel. Ini mirip dengan `DELETE` tanpa filter, tetapi, tergantung pada perangkat lunak basis data, memiliki batasan dan optimasi tertentu.
+
+
+### Bagian 30.1: Menghapus semua baris dari tabel Employee
+
+```sql
+TRUNCATE TABLE Employee;
+```
+
+Menggunakan `TRUNCATE TABLE` seringkali lebih baik daripada menggunakan `DELETE` karena `TRUNCATE` **mengabaikan semua indeks dan trigger** dan hanya menghapus semuanya.
+
+`DELETE` adalah operasi berbasis baris, yang berarti setiap baris dihapus satu per satu. `TRUNCATE` adalah operasi berbasis halaman data (*data page*); seluruh halaman data dialokasikan ulang. Jika Anda memiliki tabel dengan jutaan baris, akan jauh lebih cepat untuk men-*truncate* tabel daripada menggunakan pernyataan `DELETE`.
+
+Meskipun kita bisa menghapus baris tertentu dengan `DELETE`, kita **tidak bisa men-`TRUNCATE` baris tertentu**; kita hanya bisa men-`TRUNCATE` semua *record* sekaligus.
+
+Menghapus semua baris dengan `DELETE` lalu menyisipkan *record* baru akan melanjutkan nilai kunci primer *Auto Increment* dari nilai yang dimasukkan sebelumnya. Sedangkan pada `TRUNCATE`, nilai kunci primer *Auto Increment* juga akan **direset dan dimulai kembali dari 1**.
+
+Perhatikan bahwa saat men-*truncate* tabel, **tidak boleh ada *foreign key*** yang merujuk ke tabel tersebut, jika tidak Anda akan mendapatkan error.
+
+--
+
+# Bab 31
+## DROP Table
+
+### Bagian 31.1: Memeriksa keberadaan sebelum menghapus
+
+**MySQL (Versi ≥ 3.19), PostgreSQL (Versi ≥ 8.x), SQLite (Versi ≥ 3.0)**
+
+```sql
+DROP TABLE IF EXISTS MyTable;
+```
+
+**SQL Server (Versi ≥ 2005)**
+
+```sql
+IF EXISTS (SELECT * FROM Information_Schema.Tables
+           WHERE Table_Schema = 'dbo'
+           AND Table_Name = 'MyTable')
+DROP TABLE dbo.MyTable
+```
+
+### Bagian 31.2: Drop sederhana
+
+```sql
+DROP TABLE MyTable;
+```
+
+---
+
+# Bab 32
+## DROP atau DELETE Database
+
+### Bagian 32.1: DROP Database
+
+Menghapus basis data adalah pernyataan satu baris yang sederhana. `DROP DATABASE` akan **menghapus basis data secara permanen**, oleh karena itu selalu pastikan untuk memiliki cadangan (*backup*) jika diperlukan.
+
+Di bawah ini adalah perintah untuk menghapus Database `Employees`:
+
+```sql
+DROP DATABASE [dbo].[Employees]
+```
+
+---
+
+# Bab 33
+## Cascading Delete
+
+### Bagian 33.1: ON DELETE CASCADE
+
+Bayangkan Anda memiliki aplikasi yang mengelola ruangan. Setiap ruangan dimiliki oleh seorang klien. Anda memiliki tabel `T_Client` dan `T_Room`, di mana `T_Room` memiliki *foreign key* yang merujuk ke `T_Client`.
+
+Jika Anda mencoba menghapus seorang klien:
+
+```sql
+DELETE FROM T_Client WHERE CLI_ID = x
+```
+
+Anda akan mendapatkan error pelanggaran *foreign key*, karena Anda tidak bisa menghapus klien yang masih memiliki ruangan.
+
+Solusi yang buruk adalah menulis kode di aplikasi Anda untuk menghapus semua ruangan klien terlebih dahulu, baru kemudian menghapus kliennya. Ini akan menjadi rumit jika ada banyak tabel lain yang bergantung pada klien.
+
+Solusi yang lebih baik adalah menambahkan `ON DELETE CASCADE` ke *foreign key* Anda.
+
+```sql
+ALTER TABLE dbo.T_Room
+ADD CONSTRAINT FK_T_Room_T_Client FOREIGN KEY(RM_CLI_ID)
+REFERENCES dbo.T_Client (CLI_ID)
+ON DELETE CASCADE
+```
+
+Sekarang, jika Anda menjalankan:
+
+```sql
+DELETE FROM T_Client WHERE CLI_ID = x
+```
+
+Semua ruangan yang terkait dengan klien tersebut akan **dihapus secara otomatis**. Masalah terpecahkan tanpa perubahan kode di aplikasi.
+
+**Sebuah kata peringatan:** Di **Microsoft SQL Server**, ini tidak akan berfungsi jika Anda memiliki tabel yang mereferensikan dirinya sendiri (misalnya, struktur pohon rekursif). **PostgreSQL**, di sisi lain, dapat melakukan ini, asalkan pohon tersebut tidak siklik (tidak membentuk lingkaran).
+
+---
+
+# Bab 34
+## GRANT dan REVOKE
+
+### Bagian 34.1: Memberikan/mencabut hak akses
+
+Memberikan izin `SELECT` dan `UPDATE` pada tabel `Employees` kepada `User1` dan `User2`.
+
+```sql
+GRANT SELECT, UPDATE
+ON Employees
+TO User1, User2;
+```
+
+Mencabut izin `SELECT` dan `UPDATE` pada tabel `Employees` dari `User1` dan `User2`.
+
+```sql
+REVOKE SELECT, UPDATE
+ON Employees
+FROM User1, User2;
+```
+
+---
+
+# Bab 35
+## XML
+
+### Bagian 35.1: Kueri dari Tipe Data XML
+
+(Contoh untuk SQL Server)
+
+```sql
+DECLARE @xmlIN XML = '<TableData>
+<aaa Main="First"><row name="a" value="1" /><row name="b" value="2" /></aaa>
+<aaa Main="Second"><row name="a" value="3" /><row name="b" value="4" /></aaa>
+<aaa Main="Third"><row name="a" value="10" /><row name="b" value="20" /></aaa>
+</TableData>'
+
+SELECT
+    t.col.value('../@Main', 'varchar(10)') [Header],
+    t.col.value('@name', 'VARCHAR(25)') [name],
+    t.col.value('@value', 'VARCHAR(25)') [Value]
+FROM
+    @xmlIn.nodes('//TableData/aaa/row') AS t (col)
+```
+
+**Hasil**
+| Header | name | Value |
+| :--- | :--- | :--- |
+| First | a | 1 |
+| First | b | 2 |
+| Second| a | 3 |
+| Second| b | 4 |
+| Third | a | 10 |
+| Third | b | 20 |
+
+---
+
+# Bab 36
+## Primary Keys
+
+### Bagian 36.1: Membuat Primary Key
+
+```sql
+CREATE TABLE Employees (
+    Id int NOT NULL,
+    PRIMARY KEY (Id),
+    ...
+);
+```
+
+Ini akan membuat tabel `Employees` dengan 'Id' sebagai *primary key*-nya. *Primary key* dapat digunakan untuk mengidentifikasi baris secara unik. Hanya satu *primary key* yang diizinkan per tabel.
+
+Sebuah kunci juga bisa terdiri dari satu atau lebih *field*, yang disebut *composite key*:
+
+```sql
+CREATE TABLE EMPLOYEE (
+    e1_id INT,
+    e2_id INT,
+    PRIMARY KEY (e1_id, e2_id)
+)
+```
+
+### Bagian 36.2: Menggunakan Auto Increment
+
+Banyak basis data memungkinkan nilai *primary key* untuk bertambah secara otomatis saat kunci baru ditambahkan.
+
+**MySQL**
+
+```sql
+CREATE TABLE Employees ( Id int NOT NULL AUTO_INCREMENT, PRIMARY KEY (Id) );
+```
+
+**PostgreSQL**
+
+```sql
+CREATE TABLE Employees ( Id SERIAL PRIMARY KEY );
+```
+
+**SQL Server**
+
+```sql
+CREATE TABLE Employees ( Id int NOT NULL IDENTITY, PRIMARY KEY (Id) );
+```
+
+**SQLite**
+
+```sql
+CREATE TABLE Employees ( Id INTEGER PRIMARY KEY );
+```
+
+---
+
+# Bab 37
+## Indexes
+
+**Indeks** adalah struktur data yang berisi penunjuk (*pointer*) ke konten sebuah tabel yang diatur dalam urutan tertentu, untuk membantu basis data mengoptimalkan kueri. Ini mirip dengan indeks buku.
+
+### Bagian 37.1: Sorted Index (Indeks Terurut)
+
+Jika Anda menggunakan indeks yang diurutkan sesuai dengan cara Anda mengambil data, pernyataan `SELECT` tidak perlu melakukan pengurutan tambahan.
+
+```sql
+CREATE INDEX ix_scoreboard_score ON scoreboard (score DESC);
+```
+
+Saat Anda menjalankan kueri `SELECT * FROM scoreboard ORDER BY score DESC;`, sistem basis data tidak perlu mengurutkan lagi.
+
+### Bagian 37.2: Partial or Filtered Index (Indeks Parsial)
+
+SQL Server dan SQLite memungkinkan pembuatan indeks yang tidak hanya berisi sebagian kolom, tetapi juga **sebagian baris**.
+
+```sql
+CREATE INDEX Started_Orders
+ON orders(product_id)
+WHERE order_state_id = 1;
+```
+
+Indeks ini hanya akan mencakup pesanan yang belum selesai (`order_state_id = 1`), membuatnya lebih kecil dan lebih cepat untuk diperbarui.
+
+### Bagian 37.3: Membuat Indeks
+
+```sql
+CREATE INDEX ix_cars_employee_id ON Cars (EmployeeId);
+```
+
+Ini akan membuat indeks untuk kolom `EmployeeId` di tabel `Cars`, yang akan mempercepat kueri seperti `WHERE EmployeeId = 1`.
+
+Indeks dapat berisi lebih dari 1 kolom. Urutan kolom dalam indeks sangat penting.
+
+```sql
+CREATE INDEX ix_cars_e_c_o_ids ON Cars (EmployeeId, CarId, OwnerId);
+```
+
+Indeks ini akan sangat berguna untuk kueri seperti: `WHERE EmployeeId = 1 ORDER BY CarId DESC`.
+Namun, kurang berguna untuk kueri seperti: `WHERE OwnerId = 17`, karena `OwnerId` bukan kolom pertama dalam definisi indeks.
+
+### Bagian 37.4: Menghapus, Menonaktifkan, dan Membangun Ulang Indeks
+
+Untuk menghapus indeks sepenuhnya:
+
+```sql
+DROP INDEX ix_cars_employee_id ON Cars;
+```
+
+Sebagai alternatif, indeks dapat dinonaktifkan (ini mempertahankan struktur dan metadata):
+
+```sql
+ALTER INDEX ix_cars_employee_id ON Cars DISABLE;
+```
+
+Dan kemudian dibangun ulang jika diperlukan:
+
+```sql
+ALTER INDEX ix_cars_employee_id ON Cars REBUILD;
+```
+
+### Bagian 37.5: Clustered, Unique, dan Sorted Indexes
+
+  * **Clustered Index**: Menentukan urutan fisik penyimpanan data di tabel. Hanya bisa ada **satu** *clustered index* per tabel.
+    ```sql
+    CREATE CLUSTERED INDEX ix_clust_employee_id ON Employees(EmployeeId, Email);
+    ```
+  * **Unique Index**: Memastikan bahwa setiap nilai dalam kolom yang diindeks adalah unik.
+    ```sql
+    CREATE UNIQUE INDEX uq_customers_email ON Customers(Email);
+    ```
+  * **Sorted Index**: Menentukan urutan pengurutan (ASC atau DESC).
+    ```sql
+    CREATE INDEX ix_eid_desc ON Customers(EmployeeID DESC);
+    ```
+
+### Bagian 37.6: Rebuild index (Membangun Ulang Indeks)
+
+Seiring waktu, indeks dapat terfragmentasi karena operasi `UPDATE/DELETE/INSERT`. Membangun ulang indeks mirip dengan menghapus dan membuatnya kembali, tetapi bisa lebih efisien.
+
+```sql
+ALTER INDEX index_name REBUILD;
+```
+
+Beberapa vendor DB menawarkan alternatif seperti `REORGANIZE` (SQL Server) atau `SHRINK SPACE` (Oracle).
+
+### Bagian 37.7: Menyisipkan dengan Unique Index
+
+`UPDATE Customers SET Email = "richard0123@example.com" WHERE id = 1;`
+Pernyataan di atas akan **gagal** jika sudah ada *unique index* pada kolom `Email` dan nilai tersebut sudah ada. Namun, beberapa DBMS (seperti MySQL) menyediakan sintaks untuk menangani kasus ini:
+
+```sql
+-- Ini adalah sintaks spesifik MySQL, bukan SQL standar
+UPDATE Customers SET Email = "richard0123@example.com" WHERE id = 1 ON DUPLICATE KEY;
+```
+
+---
+
+# Bab 38
+## Row number (Nomor Baris)
+
+### Bagian 38.1: Hapus Semua Kecuali Record Terakhir (Tabel 1-ke-Banyak)
+
+```sql
+WITH cte AS (
+    SELECT 
+        ProjectID,
+        ROW_NUMBER() OVER (PARTITION BY ProjectID ORDER BY InsertDate DESC) AS rn
+    FROM ProjectNotes
+)
+DELETE FROM cte WHERE rn > 1;
+```
+
+### Bagian 38.2: Nomor baris tanpa partisi
+
+Menyertakan nomor baris sesuai dengan urutan yang ditentukan.
+
+```sql
+SELECT
+    ROW_NUMBER() OVER(ORDER BY Fname ASC) AS RowNumber,
+    Fname,
+    LName
+FROM Employees
+```
+
+### Bagian 38.3: Nomor baris dengan partisi
+
+Menggunakan kriteria partisi untuk mengelompokkan penomoran baris sesuai dengannya.
+
+```sql
+SELECT
+    ROW_NUMBER() OVER(PARTITION BY DepartmentId ORDER BY DepartmentId ASC) AS RowNumber,
+    DepartmentId, 
+    Fname, 
+    LName
+FROM Employees
+```
+
+---
+
+# Bab 39
+## SQL Group By vs Distinct
+
+### Bagian 39.1: Perbedaan antara GROUP BY dan DISTINCT
+
+`GROUP BY` digunakan dalam kombinasi dengan fungsi agregasi. Perhatikan tabel berikut:
+
+| orderId | userId | storeName | orderValue | orderDate |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | 43 | Store A | 25 | 2016-03-20 |
+| 2 | 57 | Store B | 50 | 2016-03-22 |
+| 3 | 43 | Store A | 30 | 2016-03-25 |
+| 4 | 82 | Store C | 10 | 2016-03-26 |
+| 5 | 21 | Store A | 45 | 2016-03-29 |
+
+Kueri di bawah ini menggunakan `GROUP BY` untuk melakukan perhitungan agregat.
+
+```sql
+SELECT
+    storeName,
+    COUNT(*) AS total_nr_orders,
+    COUNT(DISTINCT userId) AS nr_unique_customers,
+    AVG(orderValue) AS average_order_value,
+    MIN(orderDate) AS first_order,
+    MAX(orderDate) AS lastOrder
+FROM
+    orders
+GROUP BY
+    storeName;
+```
+
+dan akan mengembalikan informasi berikut:
+
+| storeName | total\_nr\_orders | nr\_unique\_customers | average\_order\_value | first\_order | lastOrder |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Store A | 3 | 2 | 33.3 | 2016-03-20 | 2016-03-29 |
+| Store B | 1 | 1 | 50 | 2016-03-22 | 2016-03-22 |
+| Store C | 1 | 1 | 10 | 2016-03-26 | 2016-03-26 |
+
+Sedangkan `DISTINCT` digunakan untuk mendaftar kombinasi unik dari nilai-nilai untuk kolom yang ditentukan.
+
+```sql
+SELECT DISTINCT
+    storeName,
+    userId
+FROM
+    orders;
+```
+
+| storeName | userId |
+| :--- | :--- |
+| Store A | 43 |
+| Store B | 57 |
+| Store C | 82 |
+| Store A | 21 |
+
+---
+
+# Bab 40
+## Menemukan Duplikat pada Sebagian Kolom dengan Detail
+
+### Bagian 40.1: Siswa dengan nama dan tanggal lahir yang sama
+
+```sql
+WITH CTE (StudentId, Fname, LName, DOB, RowCnt)
+AS (
+    SELECT 
+        StudentId, 
+        FirstName, 
+        LastName, 
+        DateOfBirth as DOB, 
+        SUM(1) OVER (PARTITION BY FirstName, LastName, DateOfBirth) as RowCnt
+    FROM tblStudent
+)
+SELECT * FROM CTE WHERE RowCnt > 1
+ORDER BY DOB, LName
+```
+
+Contoh ini menggunakan *Common Table Expression (CTE)* dan *Window Function* untuk menampilkan semua baris duplikat (pada sebagian kolom) secara berdampingan.
+
+---
+
+# Bab 41
+## Fungsi String
+
+Fungsi string melakukan operasi pada nilai string dan mengembalikan nilai numerik atau string.
+Menggunakan fungsi string, Anda dapat, misalnya, menggabungkan data, mengekstrak substring, membandingkan string, atau mengubah string menjadi semua karakter huruf besar atau kecil.
+
+### Bagian 41.1: Concatenate (Menggabungkan)
+
+Dalam SQL (standar ANSI/ISO), operator untuk penggabungan string adalah `||`. Sintaks ini didukung oleh semua basis data utama **kecuali SQL Server**:
+
+```sql
+SELECT 'Hello' || 'World' || '!'; --menghasilkan HelloWorld!
+```
+
+Banyak basis data mendukung fungsi `CONCAT` untuk menggabungkan string:
+
+```sql
+SELECT CONCAT('Hello', 'World'); --menghasilkan 'HelloWorld'
+```
+
+Beberapa basis data mendukung penggunaan `CONCAT` untuk menggabungkan lebih dari dua string (Oracle tidak):
+
+```sql
+SELECT CONCAT('Hello', 'World', '!'); --menghasilkan 'HelloWorld!'
+```
+
+Di beberapa basis data, tipe non-string harus di-*cast* atau dikonversi:
+
+```sql
+SELECT CONCAT('Foo', CAST(42 AS VARCHAR(5)), 'Bar'); --menghasilkan 'Foo42Bar'
+```
+
+Beberapa basis data (misalnya, Oracle) melakukan konversi *lossless* implisit. Misalnya, `CONCAT` pada `CLOB` dan `NCLOB` menghasilkan `NCLOB`. `CONCAT` pada angka dan `varchar2` menghasilkan `varchar2`, dll.:
+
+```sql
+SELECT CONCAT(CONCAT('Foo', 42), 'Bar') FROM dual; --menghasilkan Foo42Bar
+```
+
+Beberapa basis data dapat menggunakan operator `+` non-standar (tetapi di sebagian besar, `+` hanya berfungsi untuk angka):
+
+```sql
+SELECT 'Foo' + CAST(42 AS VARCHAR(5)) + 'Bar';
+```
+
+Di SQL Server \< 2012, di mana `CONCAT` tidak didukung, `+` adalah satu-satunya cara untuk menggabungkan string.
+
+### Bagian 41.2: Length (Panjang)
+
+**SQL Server**
+
+`LEN` tidak menghitung spasi di akhir.
+
+```sql
+SELECT LEN('Hello') -- menghasilkan 5
+SELECT LEN('Hello '); -- menghasilkan 5
+```
+
+`DATALENGTH` menghitung spasi di akhir.
+
+```sql
+SELECT DATALENGTH('Hello') -- menghasilkan 5
+SELECT DATALENGTH('Hello '); -- menghasilkan 6
+```
+
+Perlu dicatat, `DATALENGTH` mengembalikan panjang representasi byte yang mendasari string, yang bergantung, antara lain, pada *charset* yang digunakan untuk menyimpan string.
+
+```sql
+DECLARE @str varchar(100) = 'Hello ' --varchar biasanya string ASCII, menempati 1 byte per karakter
+SELECT DATALENGTH(@str) -- menghasilkan 6
+
+DECLARE @nstr nvarchar(100) = 'Hello ' --nvarchar adalah string unicode, menempati 2 byte per karakter
+SELECT DATALENGTH(@nstr) -- menghasilkan 12
+```
+
+**Oracle**
+
+**Sintaks**: `Length ( char )`
+
+**Contoh**:
+
+```sql
+SELECT Length('Bible') FROM dual; --Menghasilkan 5
+SELECT Length('righteousness') FROM dual; --Menghasilkan 13
+SELECT Length(NULL) FROM dual; --Menghasilkan NULL
+```
+
+**Lihat Juga**: `LengthB`, `LengthC`, `Length2`, `Length4`
+
+### Bagian 41.3: Trim (Memangkas spasi kosong)
+
+`Trim` digunakan untuk menghapus spasi di awal atau akhir pilihan.
+
+Di **MSSQL** tidak ada `TRIM()` tunggal:
+
+```sql
+SELECT LTRIM(' Hello ') --menghasilkan 'Hello '
+SELECT RTRIM(' Hello ') --menghasilkan ' Hello'
+SELECT LTRIM(RTRIM(' Hello ')) --menghasilkan 'Hello'
+```
+
+**MySql dan Oracle**
+
+```sql
+SELECT TRIM(' Hello ') --menghasilkan 'Hello'
+```
+
+### Bagian 41.4: Upper & lower case (Huruf Besar & Kecil)
+
+```sql
+SELECT UPPER('HelloWorld') --menghasilkan 'HELLOWORLD'
+SELECT LOWER('HelloWorld') --menghasilkan 'helloworld'
+```
+
+### Bagian 41.5: Split (Memisahkan)
+
+Memisahkan ekspresi string menggunakan pemisah karakter. Perhatikan bahwa `STRING_SPLIT()` adalah *table-valued function*.
+
+```sql
+SELECT value FROM STRING_SPLIT('Lorem ipsum dolor sit amet.', ' ');
+```
+
+**Hasil:**
+| value |
+| :--- |
+| Lorem |
+| ipsum |
+| dolor |
+| sit |
+| amet. |
+
+### Bagian 41.6: Replace (Mengganti)
+
+**Sintaks:**
+`REPLACE( String_yang_dicari_di_dalamnya, String_yang_dicari_dan_diganti, String_untuk_ditempatkan_ke_string_asli )`
+
+**Contoh:**
+
+```sql
+SELECT REPLACE( 'Peter Steve Tom', 'Steve', 'Billy' ) --Nilai Kembali: Peter Billy Tom
+```
+
+### Bagian 41.7: REGEXP
+
+**MySQL Versi ≥ 3.19**
+
+Memeriksa apakah sebuah string cocok dengan *regular expression* (yang ditentukan oleh string lain).
+
+```sql
+SELECT 'bedded' REGEXP '[a-f]' -- menghasilkan True
+SELECT 'beam' REGEXP '[a-f]' -- menghasilkan False
+```
+
+### Bagian 41.8: Substring
+
+Sintaksnya adalah: `SUBSTRING ( ekspresi_string, mulai, panjang )`. Perhatikan bahwa string SQL diindeks mulai dari 1.
+
+```sql
+SELECT SUBSTRING('Hello', 1, 2) --menghasilkan 'He'
+SELECT SUBSTRING('Hello', 3, 3) --menghasilkan 'llo'
+```
+
+Ini sering digunakan bersama dengan fungsi `LEN()` untuk mendapatkan n karakter terakhir dari string yang panjangnya tidak diketahui.
+
+```sql
+DECLARE @str1 VARCHAR(10) = 'Hello', @str2 VARCHAR(10) = 'FooBarBaz';
+
+SELECT SUBSTRING(@str1, LEN(@str1) - 2, 3) --menghasilkan 'llo'
+SELECT SUBSTRING(@str2, LEN(@str2) - 2, 3) --menghasilkan 'Baz'
+```
+
+### Bagian 41.9: Stuff
+
+Menyisipkan sebuah string ke dalam string lain, menggantikan 0 atau lebih karakter pada posisi tertentu.
+Catatan: posisi `start` diindeks mulai dari 1 (Anda mulai mengindeks dari 1, bukan 0).
+
+**Sintaks:**
+`STUFF ( ekspresi_karakter, mulai, panjang, ekspresi_pengganti )`
+
+**Contoh:**
+
+```sql
+SELECT STUFF('FooBarBaz', 4, 3, 'Hello') --menghasilkan 'FooHelloBaz'
+```
+
+### Bagian 41.10: LEFT - RIGHT
+
+**Sintaksnya adalah:**
+
+```
+LEFT ( ekspresi-string, integer )
+RIGHT ( ekspresi-string, integer )
+```
+
+```sql
+SELECT LEFT('Hello',2) --menghasilkan He
+SELECT RIGHT('Hello',2) --menghasilkan lo
+```
+
+Oracle SQL tidak memiliki fungsi `LEFT` dan `RIGHT`. Mereka dapat ditiru dengan `SUBSTR` dan `LENGTH`.
+
+```
+SUBSTR ( ekspresi-string, 1, integer )
+SUBSTR ( ekspresi-string, length(ekspresi-string)-integer+1, integer)
+```
+
+```sql
+SELECT SUBSTR('Hello',1,2) --menghasilkan He
+SELECT SUBSTR('Hello',LENGTH('Hello')-2+1,2) --menghasilkan lo
+```
+
+### Bagian 41.11: REVERSE
+
+**Sintaksnya adalah**: `REVERSE ( ekspresi-string )`
+
+```sql
+SELECT REVERSE('Hello') --menghasilkan olleH
+```
+
+### Bagian 41.12: REPLICATE
+
+Fungsi `REPLICATE` menggabungkan sebuah string dengan dirinya sendiri sebanyak jumlah yang ditentukan.
+**Sintaksnya adalah**: `REPLICATE ( ekspresi-string, integer )`
+
+```sql
+SELECT REPLICATE ('Hello',4) --menghasilkan 'HelloHelloHelloHello'
+```
+
+### Bagian 41.13: Fungsi Replace dalam kueri Select dan Update
+
+Fungsi `Replace` di SQL digunakan untuk memperbarui konten sebuah string. Panggilan fungsinya adalah `REPLACE()` untuk MySQL, Oracle, dan SQL Server.
+
+**Sintaks dari fungsi `Replace` adalah:**
+`REPLACE (str, find, repl)`
+
+Contoh berikut menggantikan kemunculan `South` dengan `Southern` di tabel `Employees`:
+
+| FirstName | Address |
+| :--- | :--- |
+| James | South New York |
+| John | South Boston |
+| Michael | South San Diego |
+
+**Pernyataan Select:**
+Jika kita menerapkan fungsi `Replace` berikut:
+
+```sql
+SELECT
+    FirstName,
+    REPLACE (Address, 'South', 'Southern') Address
+FROM Employees
+ORDER BY FirstName
+```
+
+**Hasil:**
+| FirstName | Address |
+| :--- | :--- |
+| James | Southern New York |
+| John | Southern Boston |
+| Michael | Southern San Diego |
+
+**Pernyataan Update:**
+Kita dapat menggunakan fungsi `replace` untuk membuat perubahan permanen di tabel kita melalui pendekatan berikut.
+
+```sql
+UPDATE Employees
+SET city = REPLACE(Address, 'South', 'Southern');
+```
+
+Pendekatan yang lebih umum adalah menggunakan ini bersama dengan klausa `WHERE` seperti ini:
+
+```sql
+UPDATE Employees
+SET Address = REPLACE(Address, 'South', 'Southern')
+WHERE Address LIKE 'South%';
+```
+
+### Bagian 41.14: INSTR
+
+Mengembalikan indeks kemunculan pertama dari sebuah substring (nol jika tidak ditemukan).
+**Sintaks**: `INSTR ( string, substring )`
+
+```sql
+SELECT INSTR('FooBarBar', 'Bar') -- menghasilkan 4
+SELECT INSTR('FooBarBar', 'Xar') -- menghasilkan 0
+```
+
+### Bagian 41.15: PARSENAME
+
+**Basis Data**: SQL Server
+
+Fungsi `PARSENAME` mengembalikan bagian spesifik dari string yang diberikan (nama objek). Nama objek dapat berisi string seperti nama objek, nama pemilik, nama basis data, dan nama server.
+
+Detail lebih lanjut [MSDN:PARSENAME](https://learn.microsoft.com/en-us/sql/t-sql/functions/parsename-transact-sql)
+
+**Sintaks**
+`PARSENAME('NamaStringUntukDianalisis', IndeksBagian)`
+
+**Contoh**
+
+Untuk mendapatkan **nama objek**, gunakan indeks bagian 1:
+
+```sql
+SELECT PARSENAME('ServerName.DatabaseName.SchemaName.ObjectName', 1) -- menghasilkan `ObjectName`
+SELECT PARSENAME('[1012-1111].SchoolDatabase.school.Student', 1)      -- menghasilkan `Student`
+```
+
+Untuk mendapatkan **nama skema**, gunakan indeks bagian 2:
+
+```sql
+SELECT PARSENAME('ServerName.DatabaseName.SchemaName.ObjectName', 2) -- menghasilkan `SchemaName`
+SELECT PARSENAME('[1012-1111].SchoolDatabase.school.Student', 2)      -- menghasilkan `school`
+```
+
+Untuk mendapatkan **nama basis data**, gunakan indeks bagian 3:
+
+```sql
+SELECT PARSENAME('ServerName.DatabaseName.SchemaName.ObjectName', 3) -- menghasilkan `DatabaseName`
+SELECT PARSENAME('[1012-1111].SchoolDatabase.school.Student', 3)      -- menghasilkan `SchoolDatabase`
+```
+
+Untuk mendapatkan **nama server**, gunakan indeks bagian 4:
+
+```sql
+SELECT PARSENAME('ServerName.DatabaseName.SchemaName.ObjectName', 4) -- menghasilkan `ServerName`
+SELECT PARSENAME('[1012-1111].SchoolDatabase.school.Student', 4)      -- menghasilkan `[1012-1111]`
+```
+
+`PARSENAME` akan mengembalikan `null` jika bagian yang ditentukan tidak ada dalam string nama objek yang diberikan.
+
+---
+
+# Bab 42
+## Fungsi (Agregat)
+
+### Bagian 42.1: Agregasi bersyarat
+
+**Tabel Payments**
+| Customer | Payment\_type | Amount |
+| :--- | :--- | :--- |
+| Peter | Credit | 100 |
+| Peter | Credit | 300 |
+| John | Credit | 1000 |
+| John | Debit | 500 |
+
+```sql
+select 
+    customer,
+    sum(case when payment_type = 'credit' then amount else 0 end) as credit,
+    sum(case when payment_type = 'debit' then amount else 0 end) as debit
+from payments
+group by customer
+```
+
+**Hasil:**
+| Customer | Credit | Debit |
+| :--- | :--- | :--- |
+| Peter | 400 | 0 |
+| John | 1000 | 500 |
+
+```sql
+select 
+    customer,
+    sum(case when payment_type = 'credit' then 1 else 0 end) as credit_transaction_count,
+    sum(case when payment_type = 'debit' then 1 else 0 end) as debit_transaction_count
+from payments
+group by customer
+```
+
+**Hasil:**
+| Customer | credit\_transaction\_count | debit\_transaction\_count |
+| :--- | :--- | :--- |
+| Peter | 2 | 0 |
+| John | 1 | 1 |
+
+### Bagian 42.2: List Concatenation (Penggabungan Daftar)
+
+Sebagian kredit untuk [jawaban SO ini](https://www.google.com/search?q=https://stackoverflow.com/a/194887/1037996).
+
+*List Concatenation* mengagregasi sebuah kolom atau ekspresi dengan menggabungkan nilai-nilainya menjadi satu string tunggal untuk setiap grup. Sebuah string untuk membatasi setiap nilai (baik kosong atau koma jika dihilangkan) dan urutan nilai dalam hasil dapat ditentukan. Meskipun ini bukan bagian dari standar SQL, setiap vendor basis data relasional utama mendukungnya dengan cara mereka sendiri.
+
+**MySQL**
+
+```sql
+SELECT 
+    ColumnA, 
+    GROUP_CONCAT(ColumnB ORDER BY ColumnB SEPARATOR ',') AS ColumnBs
+FROM TableName
+GROUP BY ColumnA
+ORDER BY ColumnA;
+```
+
+**Oracle & DB2**
+
+```sql
+SELECT 
+    ColumnA, 
+    LISTAGG(ColumnB, ',') WITHIN GROUP (ORDER BY ColumnB) AS ColumnBs
+FROM TableName
+GROUP BY ColumnA
+ORDER BY ColumnA;
+```
+
+**PostgreSQL**
+
+```sql
+SELECT 
+    ColumnA, 
+    STRING_AGG(ColumnB, ',' ORDER BY ColumnB) AS ColumnBs
+FROM TableName
+GROUP BY ColumnA
+ORDER BY ColumnA;
+```
+
+**SQL Server**
+
+*SQL Server 2016 dan sebelumnya*
+(CTE disertakan untuk mendorong prinsip DRY)
+
+```sql
+WITH CTE_TableName AS (
+    SELECT ColumnA, ColumnB
+    FROM TableName
+)
+SELECT 
+    t0.ColumnA, 
+    STUFF((
+        SELECT ',' + t1.ColumnB
+        FROM CTE_TableName t1
+        WHERE t1.ColumnA = t0.ColumnA
+        ORDER BY t1.ColumnB
+        FOR XML PATH('')), 1, 1, '') AS ColumnBs
+FROM CTE_TableName t0
+GROUP BY t0.ColumnA
+ORDER BY ColumnA;
+```
+
+*SQL Server 2017 dan SQL Azure*
+
+```sql
+SELECT 
+    ColumnA, 
+    STRING_AGG(ColumnB, ',') WITHIN GROUP (ORDER BY ColumnB) AS ColumnBs
+FROM TableName
+GROUP BY ColumnA
+ORDER BY ColumnA;
+```
+
+**SQLite**
+
+*tanpa pengurutan:*
+
+```sql
+SELECT 
+    ColumnA, 
+    GROUP_CONCAT(ColumnB, ',') AS ColumnBs
+FROM TableName
+GROUP BY ColumnA
+ORDER BY ColumnA;
+```
+
+*pengurutan memerlukan subquery atau CTE:*
+
+```sql
+WITH CTE_TableName AS (
+    SELECT ColumnA, ColumnB
+    FROM TableName
+    ORDER BY ColumnA, ColumnB
+)
+SELECT 
+    ColumnA, 
+    GROUP_CONCAT(ColumnB, ',') AS ColumnBs
+FROM CTE_TableName
+GROUP BY ColumnA
+ORDER BY ColumnA;
+```
+
+### Bagian 42.3: SUM
+
+Fungsi `Sum` menjumlahkan nilai dari semua baris dalam grup. Jika klausa `group by` dihilangkan maka akan menjumlahkan semua baris.
+
+```sql
+select sum(salary) TotalSalary
+from employees;
+```
+
+| TotalSalary |
+| :--- |
+| 2500 |
+
+```sql
+select DepartmentId, sum(salary) TotalSalary
+from employees
+group by DepartmentId;
+```
+
+| DepartmentId | TotalSalary |
+| :--- | :--- |
+| 1 | 2000 |
+| 2 | 500 |
+
+### Bagian 42.4: AVG()
+
+Fungsi agregat `AVG()` mengembalikan rata-rata dari ekspresi yang diberikan, biasanya nilai numerik dalam sebuah kolom.
+
+Asumsikan kita memiliki tabel yang berisi perhitungan populasi tahunan di kota-kota di seluruh dunia. *Record* untuk New York City terlihat mirip dengan yang di bawah ini:
+
+**TABEL CONTOH**
+| city\_name | population | year |
+| :--- | :--- | :--- |
+| New York City | 8,550,405 | 2015 |
+| New York City | ...... | |
+| New York City | 8,000,906 | 2005 |
+
+Untuk memilih populasi rata-rata New York City, USA dari sebuah tabel yang berisi nama kota, pengukuran populasi, dan tahun pengukuran selama sepuluh tahun terakhir:
+
+**KUERI**
+
+```sql
+select city_name, AVG(population) avg_population
+from city_population
+where city_name = 'NEW YORK CITY';
+```
+
+Perhatikan bagaimana tahun pengukuran tidak ada dalam kueri karena populasi dirata-ratakan dari waktu ke waktu.
+
+**HASIL**
+| city\_name | avg\_population |
+| :--- | :--- |
+| New York City | 8,250,754 |
+
+**Catatan**: Fungsi `AVG()` akan mengubah nilai menjadi tipe numerik. Ini sangat penting untuk diingat saat bekerja dengan tanggal.
+
+### Bagian 42.5: Count
+
+Anda dapat menghitung jumlah baris:
+
+```sql
+SELECT count(*) TotalRows
+FROM employees;
+```
+
+| TotalRows |
+| :--- |
+| 4 |
+
+Atau hitung karyawan per departemen:
+
+```sql
+SELECT DepartmentId, count(*) NumEmployees
+FROM employees
+GROUP BY DepartmentId;
+```
+
+| DepartmentId | NumEmployees |
+| :--- | :--- |
+| 1 | 3 |
+| 2 | 1 |
+
+Anda dapat menghitung pada sebuah kolom/ekspresi dengan efek tidak akan menghitung nilai `NULL`:
+
+```sql
+SELECT count(ManagerId) mgr
+FROM EMPLOYEES;
+```
+
+| mgr |
+| :--- |
+| 3 |
+
+(Ada satu nilai null di kolom managerID)
+
+Anda juga dapat menggunakan `DISTINCT` di dalam fungsi lain seperti `COUNT` untuk hanya menemukan anggota `DISTINCT` dari himpunan untuk melakukan operasi.
+
+Sebagai contoh:
+
+```sql
+SELECT 
+    COUNT(ContinentCode) AllCount, 
+    COUNT(DISTINCT ContinentCode) SingleCount
+FROM Countries;
+```
+
+Akan mengembalikan nilai yang berbeda. `SingleCount` hanya akan Menghitung benua individu sekali, sementara `AllCount` akan menyertakan duplikat.
+
+| ContinentCode |
+| :--- |
+| OC |
+| EU |
+| AS |
+| NA |
+| NA |
+| AF |
+| AF |
+
+`AllCount`: 7 `SingleCount`: 5
+
+### Bagian 42.6: Min
+
+Menemukan nilai terkecil dari kolom:
+
+```sql
+select min(age) from employee;
+```
+
+Contoh di atas akan mengembalikan nilai terkecil untuk kolom `age` dari tabel `employee`.
+
+**Sintaks:**
+
+```sql
+SELECT MIN(column_name) FROM table_name;
+```
+
+### Bagian 42.7: Max
+
+Menemukan nilai maksimum dari kolom:
+
+```sql
+select max(age) from employee;
+```
+
+Contoh di atas akan mengembalikan nilai terbesar untuk kolom `age` dari tabel `employee`.
+
+**Sintaks:**
+
+```sql
+SELECT MAX(column_name) FROM table_name;
+```
+
+---
+
