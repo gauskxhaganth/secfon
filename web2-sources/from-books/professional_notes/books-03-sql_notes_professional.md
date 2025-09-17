@@ -6164,3 +6164,655 @@ Kolom `HeroId` adalah *foreign key* ke tabel `SuperHeros`.
 
 ---
 
+# Bab 51
+## Sequence
+
+### **Bagian 51.1: Membuat Sequence**
+
+```sql
+CREATE SEQUENCE orders_seq
+START WITH 1000
+INCREMENT BY 1;
+```
+
+Perintah ini membuat sebuah *sequence* dengan nilai awal 1000 yang akan bertambah sebesar 1 setiap kali digunakan.
+
+### **Bagian 51.2: Menggunakan Sequence**
+
+Referensi ke `seq_name.NEXTVAL` digunakan untuk mendapatkan nilai berikutnya dalam sebuah *sequence*. Satu pernyataan hanya dapat menghasilkan satu nilai *sequence*. Jika ada beberapa referensi ke `NEXTVAL` dalam satu pernyataan, semuanya akan menggunakan nomor yang sama yang telah dihasilkan.
+
+`NEXTVAL` dapat digunakan untuk `INSERT`:
+
+```sql
+INSERT INTO Orders (Order_UID, Customer)
+VALUES (orders_seq.NEXTVAL, 1032);
+```
+
+Dapat digunakan untuk `UPDATE`:
+
+```sql
+UPDATE Orders
+SET Order_UID = orders_seq.NEXTVAL
+WHERE Customer = 581;
+```
+
+Dapat juga digunakan untuk `SELECT`:
+
+```sql
+SELECT orders_seq.NEXTVAL FROM dual;
+```
+
+---
+
+# Bab 52
+## Subkueri (Subqueries)
+
+### **Bagian 52.1: Subkueri dalam klausa FROM**
+
+Subkueri dalam klausa `FROM` bertindak serupa dengan tabel sementara yang dihasilkan selama eksekusi kueri dan akan hilang setelahnya.
+
+```sql
+SELECT Managers.Id, Employees.Salary
+FROM (
+    SELECT Id
+    FROM Employees
+    WHERE ManagerId IS NULL
+) AS Managers
+JOIN Employees ON Managers.Id = Employees.Id
+```
+
+### **Bagian 52.2: Subkueri dalam klausa SELECT**
+
+```sql
+SELECT
+    Id,
+    FName,
+    LName,
+    (SELECT COUNT(*) FROM Cars WHERE Cars.CustomerId = Customers.Id) AS NumberOfCars
+FROM Customers
+```
+
+### **Bagian 52.3: Subkueri dalam klausa WHERE**
+
+Gunakan subkueri untuk menyaring (*filter*) set hasil. Sebagai contoh, kueri ini akan mengembalikan semua karyawan dengan gaji yang sama dengan karyawan dengan bayaran tertinggi.
+
+```sql
+SELECT *
+FROM Employees
+WHERE Salary = (SELECT MAX(Salary) FROM Employees)
+```
+
+### **Bagian 52.4: Subkueri Terkorelasi (Correlated Subqueries)**
+
+Subkueri Terkorelasi (juga dikenal sebagai Tersinkronisasi atau Terkoordinasi) adalah kueri bersarang yang membuat referensi ke baris saat ini dari kueri luarnya:
+
+```sql
+SELECT EmployeeId
+FROM Employee AS eOuter
+WHERE Salary > (
+    SELECT AVG(Salary)
+    FROM Employee eInner
+    WHERE eInner.DepartmentId = eOuter.DepartmentId
+)
+```
+
+Subkueri `SELECT AVG(Salary) ...` adalah subkueri terkorelasi karena ia merujuk ke baris `Employee eOuter` dari kueri luarnya.
+
+### **Bagian 52.5: Menyaring hasil kueri menggunakan kueri pada tabel yang berbeda**
+
+Kueri ini memilih semua karyawan yang tidak ada di tabel `Supervisors`.
+
+```sql
+SELECT *
+FROM Employees
+WHERE EmployeeID NOT IN (SELECT EmployeeID FROM Supervisors)
+```
+
+Hasil yang sama dapat dicapai dengan menggunakan `LEFT JOIN`.
+
+```sql
+SELECT *
+FROM Employees AS e
+LEFT JOIN Supervisors AS s ON s.EmployeeID = e.EmployeeID
+WHERE s.EmployeeID IS NULL
+```
+
+### **Bagian 52.6: Subkueri dalam klausa FROM**
+
+Anda dapat menggunakan subkueri untuk mendefinisikan tabel sementara dan menggunakannya dalam klausa `FROM` dari kueri "luar".
+
+```sql
+SELECT * FROM (SELECT city, temp_hi - temp_lo AS temp_var FROM weather) AS w
+WHERE temp_var > 20;
+```
+
+Kueri di atas menemukan kota-kota dari tabel `weather` yang variasi suhu hariannya lebih besar dari 20. Hasilnya adalah:
+
+| city | temp\_var |
+| :--- | :--- |
+| ST LOUIS | 21 |
+| LOS ANGELES | 31 |
+| LOS ANGELES | 23 |
+| LOS ANGELES | 31 |
+| LOS ANGELES | 27 |
+| LOS ANGELES | 28 |
+| LOS ANGELES | 28 |
+| LOS ANGELES | 32 |
+| ... | ... |
+
+### **Bagian 52.7: Subkueri dalam klausa WHERE**
+
+Contoh berikut menemukan kota (dari contoh `cities`) yang populasinya di bawah suhu rata-rata (diperoleh melalui subkueri):
+
+```sql
+SELECT name, pop2000 FROM cities
+WHERE pop2000 < (SELECT avg(pop2000) FROM cities);
+```
+
+Di sini: subkueri `(SELECT avg(pop2000) FROM cities)` digunakan untuk menentukan kondisi dalam klausa `WHERE`. Hasilnya adalah:
+
+| name | pop2000 |
+| :--- | :--- |
+| San Francisco | 776733 |
+| ST LOUIS | 348189 |
+| Kansas City | 146866 |
+
+---
+
+# Bab 53
+## Blok Eksekusi
+
+### **Bagian 53.1: Menggunakan BEGIN ... END**
+
+```sql
+BEGIN
+    UPDATE Employees SET PhoneNumber = '5551234567' WHERE Id = 1;
+    UPDATE Employees SET Salary = 650 WHERE Id = 3;
+END
+```
+
+---
+
+# Bab 54
+## Stored Procedure
+
+### **Bagian 54.1: Membuat dan memanggil stored procedure**
+
+*Stored procedure* dapat dibuat melalui GUI manajemen basis data (contoh SQL Server), atau melalui pernyataan SQL sebagai berikut:
+
+```sql
+-- Definisikan nama dan parameter
+CREATE PROCEDURE Northwind.getEmployee
+    @LastName nvarchar(50),
+    @FirstName nvarchar(50)
+AS
+-- Definisikan kueri yang akan dijalankan
+SELECT FirstName, LastName, Department
+FROM Northwind.vEmployeeDepartment
+WHERE FirstName = @FirstName AND LastName = @LastName
+AND EndDate IS NULL;
+```
+
+Memanggil *procedure*:
+
+```sql
+EXECUTE Northwind.getEmployee N'Ackerman', N'Pilar';
+-- Atau
+EXEC Northwind.getEmployee @LastName = N'Ackerman', @FirstName = N'Pilar';
+GO
+-- Atau
+EXECUTE Northwind.getEmployee @FirstName = N'Pilar', @LastName = N'Ackerman';
+GO
+```
+
+---
+
+# Bab 55
+## Trigger
+
+### **Bagian 55.1: CREATE TRIGGER**
+
+Contoh ini membuat sebuah *trigger* yang menyisipkan catatan ke tabel kedua (`MyAudit`) setelah sebuah catatan disisipkan ke dalam tabel di mana *trigger* tersebut didefinisikan (`MyTable`). Di sini, tabel "inserted" adalah tabel khusus yang digunakan oleh Microsoft SQL Server untuk menyimpan baris yang terpengaruh selama pernyataan `INSERT` dan `UPDATE`; ada juga tabel khusus "deleted" yang melakukan fungsi yang sama untuk pernyataan `DELETE`.
+
+```sql
+CREATE TRIGGER MyTrigger
+ON MyTable
+AFTER INSERT
+AS
+BEGIN
+    -- sisipkan catatan audit ke tabel MyAudit
+    INSERT INTO MyAudit(MyTableId, User)
+    (SELECT MyTableId, CURRENT_USER FROM inserted)
+END
+```
+
+### **Bagian 55.2: Menggunakan Trigger untuk mengelola "Keranjang Sampah" untuk item yang dihapus**
+
+```sql
+CREATE TRIGGER BooksDeleteTrigger
+ON MyBooksDB.Books
+AFTER DELETE
+AS
+INSERT INTO BooksRecycleBin
+SELECT *
+FROM deleted;
+GO
+```
+
+---
+
+# Bab 56
+## Transaksi
+
+### **Bagian 56.1: Transaksi Sederhana**
+
+```sql
+BEGIN TRANSACTION
+    INSERT INTO DeletedEmployees(EmployeeID, DateDeleted, User)
+    (SELECT 123, GetDate(), CURRENT_USER);
+
+    DELETE FROM Employees WHERE EmployeeID = 123;
+COMMIT TRANSACTION
+```
+
+### **Bagian 56.2: Rollback Transaksi**
+
+Ketika sesuatu gagal dalam kode transaksi Anda dan Anda ingin membatalkannya, Anda dapat melakukan *rollback* pada transaksi Anda:
+
+```sql
+BEGIN TRY
+    BEGIN TRANSACTION
+        INSERT INTO Users(ID, Name, Age)
+        VALUES(1, 'Bob', 24)
+
+        DELETE FROM Users WHERE Name = 'Todd'
+    COMMIT TRANSACTION
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION
+END CATCH
+```
+
+---
+
+# Bab 57
+## Desain Tabel
+
+### **Bagian 57.1: Properti dari tabel yang didesain dengan baik**
+
+Sebuah basis data relasional sejati harus lebih dari sekadar memasukkan data ke dalam beberapa tabel dan menulis beberapa pernyataan SQL untuk menarik data tersebut keluar.
+
+Struktur tabel yang dirancang dengan buruk, dalam kasus terbaiknya, akan memperlambat eksekusi kueri dan bisa membuat basis data tidak mungkin berfungsi sebagaimana mestinya.
+
+Sebuah tabel basis data tidak boleh dianggap hanya sebagai tabel biasa; ia harus mengikuti serangkaian aturan untuk dianggap benar-benar relasional. Secara akademis, ini disebut sebagai 'relasi' untuk membuat perbedaan.
+
+Lima aturan dari sebuah tabel relasional adalah:
+
+1.  Setiap nilai bersifat **atomik**; nilai di setiap *field* pada setiap baris harus merupakan nilai tunggal.
+2.  Setiap *field* berisi nilai-nilai dengan **tipe data yang sama**.
+3.  Setiap *heading* *field* memiliki **nama yang unik**.
+4.  Setiap baris dalam tabel harus memiliki setidaknya satu nilai yang membuatnya **unik** di antara catatan lain dalam tabel.
+5.  **Urutan baris dan kolom tidak memiliki signifikansi**.
+
+Sebuah tabel yang sesuai dengan kelima aturan:
+
+| Id | Name | DOB | Manager |
+| :-- | :--- | :--- | :--- |
+| 1 | Fred | 11/02/1971 | 3 |
+| 2 | Fred | 11/02/1971 | 3 |
+| 3 | Sue | 08/07/1975 | 2 |
+
+  * **Aturan 1**: Setiap nilai bersifat atomik. `Id`, `Name`, `DOB`, dan `Manager` hanya berisi satu nilai tunggal.
+  * **Aturan 2**: `Id` hanya berisi integer, `Name` berisi teks (kita bisa menambahkan bahwa itu adalah teks dengan empat karakter atau kurang), `DOB` berisi tanggal dengan tipe yang valid, dan `Manager` berisi integer (kita bisa menambahkan bahwa itu sesuai dengan *field Primary Key* di tabel manajer).
+  * **Aturan 3**: `Id`, `Name`, `DOB`, dan `Manager` adalah nama *heading* yang unik di dalam tabel.
+  * **Aturan 4**: Penyertaan *field* `Id` memastikan bahwa setiap catatan berbeda dari catatan lain di dalam tabel.
+
+Sebuah tabel yang didesain dengan buruk:
+
+| Id | Name | DOB | Name |
+| :-- | :--- | :--- | :--- |
+| 1 | Fred | 11/02/1971 | 3 |
+| 1 | Fred | 11/02/1971 | 3 |
+| 3 | Sue | Friday the 18th July 1975 | 2, 1 |
+
+  * **Aturan 1**: *Field* `Name` kedua berisi dua nilai - 2 dan 1.
+  * **Aturan 2**: *Field* `DOB` berisi tanggal dan teks.
+  * **Aturan 3**: Ada dua *field* yang disebut 'Name'.
+  * **Aturan 4**: Catatan pertama dan kedua persis sama.
+  * **Aturan 5**: Aturan ini tidak dilanggar.
+
+---
+
+# Bab 58
+## Sinonim
+
+### **Bagian 58.1: Membuat Sinonim**
+
+```sql
+CREATE SYNONYM EmployeeData
+FOR MyDatabase.dbo.Employees
+```
+
+---
+
+# Bab 59
+## Skema Informasi (Information Schema)
+
+### **Bagian 59.1: Pencarian Dasar Skema Informasi**
+
+Salah satu kueri yang paling berguna bagi pengguna akhir dari RDBMS besar adalah pencarian pada skema informasi.
+
+Kueri semacam itu memungkinkan pengguna untuk dengan cepat menemukan tabel basis data yang berisi kolom yang menarik, seperti ketika mencoba menghubungkan data dari 2 tabel secara tidak langsung melalui tabel ketiga, tanpa pengetahuan sebelumnya tentang tabel mana yang mungkin berisi kunci atau kolom berguna lainnya yang sama dengan tabel target.
+
+Menggunakan T-SQL untuk contoh ini, skema informasi sebuah basis data dapat dicari sebagai berikut:
+
+```sql
+SELECT *
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE COLUMN_NAME LIKE '%Institution%'
+```
+
+Hasilnya berisi daftar kolom yang cocok, nama tabel mereka, dan informasi berguna lainnya.
+
+---
+
+# Bab 60
+## Urutan Eksekusi
+
+### Bagian 60.1: Urutan Logis Pemrosesan Kueri dalam SQL
+
+```sql
+/*(8)*/ SELECT /*9*/ DISTINCT /*11*/ TOP
+/*(1)*/ FROM
+/*(3)*/
+JOIN
+/*(2)*/
+ON
+/*(4)*/ WHERE
+/*(5)*/ GROUP BY
+/*(6)*/ WITH {CUBE | ROLLUP}
+/*(7)*/ HAVING
+/*(10)*/ ORDER BY
+/*(11)*/ LIMIT
+```
+
+Urutan pemrosesan sebuah kueri dan deskripsi dari setiap bagian.
+
+**VT** adalah singkatan dari 'Virtual Table' (Tabel Virtual) dan menunjukkan bagaimana berbagai data dihasilkan saat kueri diproses.
+
+1.  **FROM**: Produk Kartesius (*Cartesian product* atau *cross join*) dilakukan antara dua tabel pertama dalam klausa `FROM`, dan sebagai hasilnya, tabel virtual **VT1** dihasilkan.
+2.  **ON**: Filter `ON` diterapkan pada VT1. Hanya baris yang kondisinya bernilai **TRUE** yang akan dimasukkan ke **VT2**.
+3.  **OUTER (join)**: Jika `OUTER JOIN` ditentukan (berbeda dengan `CROSS JOIN` atau `INNER JOIN`), baris-baris dari tabel yang dipertahankan (*preserved table*) yang tidak ditemukan pasangannya akan ditambahkan ke baris-baris dari VT2 sebagai *outer rows*, menghasilkan **VT3**. Jika ada lebih dari dua tabel dalam klausa `FROM`, langkah 1 hingga 3 akan diterapkan berulang kali antara hasil *join* terakhir dan tabel berikutnya dalam klausa `FROM` hingga semua tabel diproses.
+4.  **WHERE**: Filter `WHERE` diterapkan pada VT3. Hanya baris yang kondisinya bernilai **TRUE** yang akan dimasukkan ke **VT4**.
+5.  **GROUP BY**: Baris-baris dari VT4 diatur ke dalam grup berdasarkan daftar kolom yang ditentukan dalam klausa `GROUP BY`. **VT5** dihasilkan.
+6.  **CUBE | ROLLUP**: *Supergroup* (grup dari grup) ditambahkan ke baris-baris dari VT5, menghasilkan **VT6**.
+7.  **HAVING**: Filter `HAVING` diterapkan pada VT6. Hanya grup yang kondisinya bernilai **TRUE** yang akan dimasukkan ke **VT7**.
+8.  **SELECT**: Daftar `SELECT` diproses, menghasilkan **VT8**.
+9.  **DISTINCT**: Baris-baris duplikat dihapus dari VT8. **VT9** dihasilkan.
+10. **ORDER BY**: Baris-baris dari VT9 diurutkan sesuai dengan daftar kolom yang ditentukan dalam klausa `ORDER BY`. Sebuah kursor dihasilkan (**VC10**).
+11. **TOP**: Sejumlah atau persentase baris yang ditentukan dipilih dari awal VC10. Tabel **VT11** dihasilkan dan dikembalikan ke pemanggil. `LIMIT` memiliki fungsionalitas yang sama dengan `TOP` di beberapa dialek SQL seperti Postgres dan Netezza.
+
+---
+
+# Bab 61
+## Kode SQL yang Bersih (*Clean Code*)
+
+Cara menulis kueri SQL yang baik dan mudah dibaca, serta contoh praktik terbaik.
+
+### Bagian 61.1: Pemformatan dan Ejaan Kata Kunci dan Nama
+
+#### **Nama Tabel/Kolom**
+
+Dua cara umum untuk memformat nama tabel/kolom adalah **CamelCase** dan **snake\_case**:
+
+```sql
+SELECT FirstName, LastName
+FROM Employees
+WHERE Salary > 500;
+```
+
+```sql
+SELECT first_name, last_name
+FROM employees
+WHERE salary > 500;
+```
+
+Nama harus mendeskripsikan apa yang disimpan dalam objeknya. Ini menyiratkan bahwa nama kolom biasanya harus dalam bentuk tunggal. Apakah nama tabel harus menggunakan bentuk tunggal atau jamak adalah pertanyaan yang banyak diperdebatkan, tetapi dalam praktiknya, lebih umum menggunakan nama tabel dalam bentuk jamak.
+
+Menambahkan awalan atau akhiran seperti `tbl` atau `col` mengurangi keterbacaan, jadi hindarilah. Namun, terkadang awalan/akhiran ini digunakan untuk menghindari konflik dengan kata kunci SQL, dan sering digunakan pada *trigger* dan *index* (yang namanya biasanya tidak disebutkan dalam kueri).
+
+#### **Kata Kunci (*Keywords*)**
+
+Kata kunci SQL tidak peka terhadap huruf besar/kecil (*case sensitive*). Namun, merupakan praktik umum untuk menuliskannya dalam huruf kapital.
+
+### Bagian 61.2: Indentasi
+
+Tidak ada standar yang diterima secara luas. Yang disetujui semua orang adalah bahwa menjejalkan semuanya dalam satu baris adalah praktik yang buruk:
+
+```sql
+SELECT d.Name, COUNT(*) AS Employees FROM Departments AS d JOIN Employees AS e ON d.ID = e.DepartmentID WHERE d.Name != 'HR' HAVING COUNT(*) > 10 ORDER BY COUNT(*) DESC;
+```
+
+Setidaknya, letakkan setiap klausa di baris baru, dan pisahkan baris jika menjadi terlalu panjang:
+
+```sql
+SELECT d.Name,
+    COUNT(*) AS Employees
+FROM Departments AS d
+JOIN Employees AS e ON d.ID = e.DepartmentID
+WHERE d.Name != 'HR'
+HAVING COUNT(*) > 10
+ORDER BY COUNT(*) DESC;
+```
+
+Terkadang, semua yang mengikuti kata kunci SQL yang mengawali sebuah klausa di-indentasi ke kolom yang sama:
+
+```sql
+SELECT
+    d.Name,
+    COUNT(*) AS Employees
+FROM
+    Departments AS d
+JOIN
+    Employees AS e ON d.ID = e.DepartmentID
+WHERE
+    d.Name != 'HR'
+HAVING
+    COUNT(*) > 10
+ORDER BY
+    COUNT(*) DESC;
+```
+
+(Ini juga dapat dilakukan dengan meratakan kata kunci SQL ke kanan.)
+
+Gaya umum lainnya adalah meletakkan kata kunci penting di barisnya sendiri:
+
+```sql
+SELECT
+    d.Name,
+    COUNT(*) AS Employees
+FROM
+    Departments AS d
+JOIN
+    Employees AS e
+    ON d.ID = e.DepartmentID
+WHERE
+    d.Name != 'HR'
+HAVING
+    COUNT(*) > 10
+ORDER BY
+    COUNT(*) DESC;
+```
+
+Menyelaraskan beberapa ekspresi serupa secara vertikal meningkatkan keterbacaan:
+
+```sql
+SELECT Model,
+       EmployeeID
+FROM Cars
+WHERE CustomerID = 42
+  AND Status     = 'READY';
+```
+
+Menggunakan beberapa baris membuatnya lebih sulit untuk menyematkan perintah SQL ke dalam bahasa pemrograman lain. Namun, banyak bahasa memiliki mekanisme untuk string multi-baris, misalnya, `@"..."` di C\#, `"""..."""` di Python, atau `R"(...)"` di C++.
+
+### Bagian 61.3: `SELECT *`
+
+`SELECT *` mengembalikan semua kolom dalam urutan yang sama seperti yang didefinisikan dalam tabel.
+
+Saat menggunakan `SELECT *`, data yang dikembalikan oleh kueri dapat berubah setiap kali definisi tabel berubah. Hal ini meningkatkan risiko bahwa versi berbeda dari aplikasi atau basis data Anda menjadi tidak kompatibel satu sama lain. Lebih jauh lagi, membaca lebih banyak kolom dari yang diperlukan dapat meningkatkan jumlah I/O disk dan jaringan.
+
+Jadi, Anda harus selalu secara eksplisit menentukan kolom yang sebenarnya ingin Anda ambil:
+
+```sql
+-- Jangan lakukan ini
+--SELECT *
+-- Lakukan ini
+SELECT ID, FName, LName, PhoneNumber
+FROM Emplopees;
+```
+
+(Saat melakukan kueri interaktif, pertimbangan ini tidak berlaku.)
+
+Namun, `SELECT *` tidak menjadi masalah dalam *subquery* dari operator `EXISTS`, karena `EXISTS` mengabaikan data aktual (ia hanya memeriksa apakah setidaknya satu baris telah ditemukan). Untuk alasan yang sama, tidak ada gunanya mendaftar kolom spesifik untuk `EXISTS`, jadi `SELECT *` sebenarnya lebih masuk akal:
+
+```sql
+-- menampilkan departemen di mana tidak ada orang yang direkrut baru-baru ini
+SELECT ID,
+       Name
+FROM Departments
+WHERE NOT EXISTS (SELECT *
+                  FROM Employees
+                  WHERE DepartmentID = Departments.ID
+                    AND HireDate >= '2015-01-01');
+```
+
+### Bagian 61.4: *Join*
+
+*Join* eksplisit harus selalu digunakan; *join* implisit memiliki beberapa masalah:
+
+  * Kondisi *join* berada di suatu tempat dalam klausa `WHERE`, tercampur dengan kondisi filter lainnya. Hal ini mempersulit untuk melihat tabel mana yang di-*join* dan bagaimana caranya.
+  * Karena hal di atas, ada risiko kesalahan yang lebih tinggi, dan kemungkinan besar kesalahan tersebut ditemukan lebih lambat.
+  * Dalam SQL standar, *join* eksplisit adalah satu-satunya cara untuk menggunakan *outer join*:
+
+<!-- end list -->
+
+```sql
+SELECT d.Name,
+       e.Fname || e.LName AS EmpName
+FROM
+    Departments AS d
+LEFT JOIN Employees AS e 
+    ON d.ID = e.DepartmentID;
+```
+
+*Join* eksplisit memungkinkan penggunaan klausa `USING`:
+
+```sql
+SELECT RecipeID,
+       Recipes.Name,
+       COUNT(*) AS NumberOfIngredients
+FROM
+    Recipes
+LEFT JOIN Ingredients USING (RecipeID);
+```
+
+(Ini mengharuskan kedua tabel menggunakan nama kolom yang sama. `USING` secara otomatis menghapus kolom duplikat dari hasil, misalnya, *join* dalam kueri ini mengembalikan satu kolom `RecipeID`.)
+
+---
+
+# Bab 62
+## SQL Injection
+
+**SQL injection** adalah upaya untuk mengakses tabel basis data sebuah situs web dengan menyuntikkan SQL ke dalam kolom formulir. Jika server web tidak melindungi dari serangan SQL injection, seorang peretas dapat menipu basis data untuk menjalankan kode SQL tambahan. Dengan mengeksekusi kode SQL mereka sendiri, peretas dapat meningkatkan akses akun mereka, melihat informasi pribadi orang lain, atau melakukan modifikasi lain pada basis data.
+
+### Bagian 62.1: Contoh SQL Injection
+
+Asumsikan panggilan ke *handler* login aplikasi web Anda terlihat seperti ini:
+
+`https://somepage.com/ajax/login.ashx?username=admin&password=123`
+
+Sekarang di `login.ashx`, Anda membaca nilai-nilai ini:
+
+```
+strUserName = getHttpsRequestParameterString("username");
+strPassword = getHttpsRequestParameterString("password");
+```
+
+dan membuat kueri ke basis data Anda untuk menentukan apakah pengguna dengan kata sandi tersebut ada.
+
+Jadi, Anda membuat string kueri SQL:
+
+```
+txtSQL = "SELECT * FROM Users WHERE username = '" + strUserName + "' AND password = '"+ strPassword +"'";
+```
+
+Ini akan berfungsi jika nama pengguna dan kata sandi tidak mengandung tanda kutip.
+
+Namun, jika salah satu parameter mengandung tanda kutip, SQL yang dikirim ke basis data akan terlihat seperti ini:
+
+```
+-- strUserName = "d'Alambert";
+txtSQL = "SELECT * FROM Users WHERE username = 'd'Alambert' AND password = '123'";
+```
+
+Ini akan menghasilkan kesalahan sintaks, karena tanda kutip setelah `d` di `d'Alambert` mengakhiri string SQL.
+
+Anda dapat memperbaikinya dengan melakukan *escaping* pada tanda kutip di nama pengguna dan kata sandi, misalnya:
+
+```
+strUserName = strUserName.Replace("'", "''");
+strPassword = strPassword.Replace("'", "''");
+```
+
+Namun, lebih tepat menggunakan parameter:
+
+```
+cmd.CommandText = "SELECT * FROM Users WHERE username = @username AND password = @password";
+cmd.Parameters.Add("@username", strUserName);
+cmd.Parameters.Add("@password", strPassword);
+```
+
+Jika Anda tidak menggunakan parameter, dan lupa mengganti tanda kutip bahkan di salah satu nilai, maka pengguna jahat (alias peretas) dapat menggunakan ini untuk mengeksekusi perintah SQL di basis data Anda.
+
+Sebagai contoh, jika penyerang jahat, dia akan mengatur kata sandi menjadi:
+
+`lol'; DROP DATABASE master; --`
+
+dan kemudian SQL akan terlihat seperti ini:
+
+`"SELECT * FROM Users WHERE username = 'somebody' AND password = 'lol'; DROP DATABASE master; --'"`
+
+Sayangnya bagi Anda, ini adalah SQL yang valid, dan DB akan mengeksekusinya\!
+
+Jenis eksploitasi ini disebut **SQL injection**.
+
+Ada banyak hal lain yang dapat dilakukan oleh pengguna jahat, seperti mencuri alamat email setiap pengguna, mencuri kata sandi semua orang, mencuri nomor kartu kredit, mencuri sejumlah data apa pun di basis data Anda, dll.
+
+Inilah mengapa Anda harus selalu melakukan *escaping* pada string Anda.
+
+Dan fakta bahwa Anda pasti akan lupa melakukannya cepat atau lambat adalah alasan mengapa Anda harus menggunakan parameter. Karena jika Anda menggunakan parameter, maka kerangka kerja bahasa pemrograman Anda akan melakukan *escaping* yang diperlukan untuk Anda.
+
+### Bagian 62.2: Contoh *Injection* Sederhana
+
+Jika pernyataan SQL dibuat seperti ini:
+
+```sql
+SQL = "SELECT * FROM Users WHERE username = '" + user + "' AND password ='" + pw + "'";
+db.execute(SQL);
+```
+
+Maka seorang peretas dapat mengambil data Anda dengan memberikan kata sandi seperti `pw' or '1'='1`. Pernyataan SQL yang dihasilkan akan menjadi:
+
+```sql
+SELECT * FROM Users WHERE username = 'somebody' AND password ='pw' or '1'='1'
+```
+
+Ini akan melewati pemeriksaan kata sandi untuk semua baris di tabel `Users` karena `'1'='1'` selalu bernilai benar.
+
+Untuk mencegah ini, gunakan parameter SQL:
+
+```sql
+SQL = "SELECT * FROM Users WHERE username = ? AND password = ?";
+db.execute(SQL, [user, pw]);
+```
