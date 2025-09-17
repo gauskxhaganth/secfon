@@ -1071,6 +1071,10 @@ Kita sekarang melihat transaksi baru dengan alamat kontrak sebagai tujuan dan ni
 
 Di manakah penarikan keluar itu? Sebuah tab baru telah muncul di halaman riwayat alamat kontrak, bernama **Internal Transactions**. Karena transfer 0,1 ether berasal dari kode kontrak, itu adalah sebuah **transaksi internal** (juga disebut *message* atau pesan). Klik tab tersebut untuk melihatnya (lihat Gambar 2-24).
 
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.24.png" alt="gambar" width="580"/>
+</p>
+
 "Transaksi internal" ini dikirim oleh kontrak pada baris kode ini (dari fungsi `withdraw` di `Faucet.sol`):
 
 ```solidity
