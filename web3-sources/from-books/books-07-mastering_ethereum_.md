@@ -796,3 +796,295 @@ Kontrak memiliki alamat, sama seperti EOA. Kontrak juga dapat mengirim dan mener
 Perhatikan bahwa karena akun kontrak tidak memiliki kunci privat, ia tidak dapat **memulai** sebuah transaksi. Hanya EOA yang dapat memulai transaksi, tetapi kontrak dapat bereaksi terhadap transaksi dengan memanggil kontrak lain, membangun alur eksekusi yang kompleks. Salah satu penggunaan umum dari ini adalah EOA yang mengirimkan transaksi permintaan ke dompet *smart contract* multisignature untuk mengirim sejumlah ETH ke alamat lain. Pola pemrograman DApp yang umum adalah memiliki Kontrak A memanggil Kontrak B untuk menjaga keadaan bersama di antara para pengguna Kontrak A.
 
 Dalam beberapa bagian berikutnya, kita akan menulis kontrak pertama kita. Anda kemudian akan belajar cara membuat, mendanai, dan menggunakan kontrak tersebut dengan dompet MetaMask dan ether uji coba di jaringan uji Ropsten.
+### **Kontrak Sederhana: Sebuah Faucet Ether Uji Coba**
+
+Ethereum memiliki banyak bahasa tingkat tinggi yang berbeda, yang semuanya dapat digunakan untuk menulis kontrak dan menghasilkan *bytecode* EVM. Anda dapat membaca tentang banyak bahasa yang paling terkemuka dan menarik di "Pengantar Bahasa Tingkat Tinggi Ethereum" di halaman 129. Salah satu bahasa tingkat tinggi sejauh ini merupakan pilihan dominan untuk pemrograman *smart contract*: **Solidity**. Solidity diciptakan oleh Dr. Gavin Wood, salah satu penulis buku ini, dan telah menjadi bahasa yang paling banyak digunakan di Ethereum (dan di luarnya). Kita akan menggunakan Solidity untuk menulis kontrak pertama kita.
+
+Untuk contoh pertama kita (Contoh 2-1), kita akan menulis kontrak yang mengontrol sebuah *faucet*. Anda sudah menggunakan *faucet* untuk mendapatkan ether uji coba di jaringan uji Ropsten. *Faucet* adalah hal yang relatif sederhana: ia memberikan ether ke alamat mana pun yang meminta, dan dapat diisi ulang secara berkala. Anda dapat mengimplementasikan *faucet* sebagai dompet yang dikendalikan oleh manusia atau server web.
+
+**Contoh 2-1. Faucet.sol: Sebuah kontrak Solidity yang mengimplementasikan sebuah faucet**
+
+```solidity
+1 // Kontrak pertama kita adalah sebuah faucet!
+2 contract Faucet {
+3
+4   // Berikan ether kepada siapa pun yang meminta
+5   function withdraw(uint withdraw_amount) public {
+6
+7       // Batasi jumlah penarikan
+8       require(withdraw_amount <= 100000000000000000);
+9
+10      // Kirim jumlah tersebut ke alamat yang memintanya
+11      msg.sender.transfer(withdraw_amount);
+12  }
+13
+14  // Terima jumlah masuk berapa pun
+15  function () public payable {}
+16
+17 }
+```
+
+> Anda akan menemukan semua contoh kode untuk buku ini di subdirektori `code` dari repositori GitHub buku ini. Secara spesifik, kontrak `Faucet.sol` kita berada di:
+> `code/Solidity/Faucet.sol`
+
+Ini adalah kontrak yang sangat sederhana, sesederhana yang bisa kita buat. Ini juga merupakan kontrak yang **cacat**, menunjukkan sejumlah praktik buruk dan kerentanan keamanan. Kita akan belajar dengan memeriksa semua kekurangannya di bagian selanjutnya. Tapi untuk saat ini, mari kita lihat apa yang dilakukan kontrak ini dan cara kerjanya, baris per baris. Anda akan segera menyadari bahwa banyak elemen soliditas mirip dengan bahasa pemrograman yang ada, seperti JavaScript, Java, atau C ++.
+
+Baris pertama adalah sebuah komentar:
+
+```solidity
+// Kontrak pertama kita adalah sebuah faucet!
+```
+
+Komentar ditujukan untuk dibaca oleh manusia dan tidak disertakan dalam *bytecode* EVM yang dapat dieksekusi. Biasanya kita meletakkannya di baris sebelum kode yang ingin kita jelaskan, atau terkadang di baris yang sama. Komentar dimulai dengan dua garis miring: `//`. Segala sesuatu dari garis miring pertama hingga akhir baris tersebut diperlakukan sama seperti baris kosong dan diabaikan.
+
+Baris berikutnya adalah tempat di mana kontrak kita sebenarnya dimulai:
+
+```solidity
+contract Faucet {
+```
+
+Baris ini mendeklarasikan sebuah objek `contract`, mirip dengan deklarasi `class` di bahasa berorientasi objek lainnya. Definisi kontrak mencakup semua baris di antara kurung kurawal (`{}`), yang mendefinisikan sebuah lingkup (*scope*), sama seperti bagaimana kurung kurawal digunakan di banyak bahasa pemrograman lain.
+
+Selanjutnya, kita mendeklarasikan fungsi pertama dari kontrak `Faucet`:
+
+```solidity
+function withdraw(uint withdraw_amount) public {
+```
+
+Fungsi ini bernama `withdraw`, dan menerima satu argumen integer tak bertanda (`uint`) bernama `withdraw_amount`. Fungsi ini dideklarasikan sebagai fungsi `public`, yang berarti dapat dipanggil oleh kontrak lain. Definisi fungsi mengikuti, di antara kurung kurawal. Bagian pertama dari fungsi `withdraw` menetapkan batas penarikan:
+
+```solidity
+require(withdraw_amount <= 100000000000000000);
+```
+
+Fungsi ini menggunakan fungsi bawaan Solidity, `require`, untuk menguji sebuah prasyarat, yaitu `withdraw_amount` harus kurang dari atau sama dengan 100.000.000.000.000.000 wei, yang merupakan unit dasar ether (lihat Tabel 2-1) dan setara dengan 0,1 ether. Jika fungsi `withdraw` dipanggil dengan `withdraw_amount` yang lebih besar dari jumlah itu, fungsi `require` di sini akan menyebabkan eksekusi kontrak berhenti dan gagal dengan sebuah pengecualian (*exception*). Perhatikan bahwa pernyataan di Solidity harus diakhiri dengan titik koma.
+
+Bagian dari kontrak ini adalah logika utama dari *faucet* kita. Bagian ini mengontrol aliran dana keluar dari kontrak dengan menempatkan batasan pada penarikan. Ini adalah kontrol yang sangat sederhana tetapi dapat memberi Anda gambaran sekilas tentang kekuatan *blockchain* yang dapat diprogram: perangkat lunak terdesentralisasi yang mengendalikan uang.
+
+Berikutnya adalah penarikan yang sebenarnya:
+
+```solidity
+msg.sender.transfer(withdraw_amount);
+```
+
+Beberapa hal menarik terjadi di sini. Objek `msg` adalah salah satu input yang dapat diakses oleh semua kontrak. Objek ini mewakili transaksi yang memicu eksekusi kontrak ini. Atribut `sender` adalah alamat pengirim dari transaksi tersebut. Fungsi `transfer` adalah fungsi bawaan yang mentransfer ether dari kontrak saat ini ke alamat pengirim. Jika dibaca dari belakang, ini berarti **transfer ke pengirim `msg` yang memicu eksekusi kontrak ini**. Fungsi `transfer` menerima jumlah sebagai satu-satunya argumen. Kita meneruskan nilai `withdraw_amount` yang merupakan parameter untuk fungsi `withdraw` yang dideklarasikan beberapa baris sebelumnya.
+
+Baris berikutnya adalah kurung kurawal penutup, yang menandakan akhir dari definisi fungsi `withdraw` kita.
+
+Selanjutnya, kita mendeklarasikan satu fungsi lagi:
+
+```solidity
+function () public payable {}
+```
+
+Fungsi ini adalah apa yang disebut fungsi *fallback* atau **default**, yang dipanggil jika transaksi yang memicu kontrak tidak menyebutkan nama fungsi apa pun yang dideklarasikan dalam kontrak, atau tidak ada fungsi sama sekali, atau tidak berisi data. Kontrak dapat memiliki satu fungsi default seperti ini (tanpa nama) dan biasanya inilah yang menerima ether. Itulah mengapa fungsi ini didefinisikan sebagai fungsi `public` dan `payable`, yang berarti dapat menerima ether ke dalam kontrak. Fungsi ini tidak melakukan apa-apa, selain menerima ether, seperti yang ditunjukkan oleh definisi kosong dalam kurung kurawal (`{}`). Jika kita membuat transaksi yang mengirim ether ke alamat kontrak, seolah-olah itu adalah dompet, fungsi ini akan menanganinya.
+
+Tepat di bawah fungsi default kita adalah kurung kurawal penutup terakhir, yang menutup definisi dari kontrak `Faucet`. Selesai\!
+
+### **Mengkompilasi Kontrak Faucet**
+
+Sekarang kita memiliki kontrak contoh pertama kita, kita perlu menggunakan *compiler* Solidity untuk mengubah kode Solidity menjadi *bytecode* EVM sehingga dapat dieksekusi oleh EVM di *blockchain* itu sendiri.
+
+*Compiler* Solidity tersedia sebagai *executable* mandiri, sebagai bagian dari berbagai kerangka kerja, dan dibundel dalam Lingkungan Pengembangan Terpadu (IDE). Agar tetap sederhana, kita akan menggunakan salah satu IDE yang lebih populer, bernama **Remix**.
+
+Gunakan browser Chrome Anda (dengan dompet MetaMask yang telah Anda instal sebelumnya) untuk menavigasi ke Remix IDE di [https://remix.ethereum.org](https://remix.ethereum.org).
+
+Saat Anda pertama kali memuat Remix, ia akan dimulai dengan contoh kontrak bernama `ballot.sol`. Kita tidak memerlukannya, jadi tutup dengan mengklik `x` di sudut tab, seperti yang terlihat pada Gambar 2-10.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.10.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-10: Menutup file default di Remix IDE]
+
+Sekarang, tambahkan tab baru dengan mengklik tanda tambah melingkar di bilah alat kiri atas, seperti yang terlihat pada Gambar 2-11. Beri nama file baru `Faucet.sol`.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.11.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-11: Menambahkan file baru di Remix IDE]
+
+Setelah Anda membuka tab baru, salin dan tempel kode dari contoh `Faucet.sol` kita, seperti yang terlihat pada Gambar 2-12.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.12.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-12: Menempelkan kode Faucet.sol ke Remix IDE]
+
+Setelah Anda memuat kontrak `Faucet.sol` ke dalam Remix IDE, IDE akan secara otomatis mengkompilasi kode tersebut. Jika semua berjalan lancar, Anda akan melihat kotak hijau dengan tulisan "Faucet" di dalamnya muncul di sebelah kanan, di bawah tab **Compile**, yang mengonfirmasi kompilasi berhasil (lihat Gambar 2-13).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.13.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-13: Konfirmasi kompilasi berhasil di Remix IDE]
+
+> Jika terjadi kesalahan, masalah yang paling mungkin adalah Remix IDE menggunakan versi *compiler* Solidity yang berbeda dari 0.4.19. Dalam hal ini, arahan `pragma` kita akan mencegah `Faucet.sol` untuk dikompilasi. Untuk mengubah versi *compiler*, buka tab **Settings**, atur versi ke 0.4.19, dan coba lagi.
+
+*Compiler* Solidity sekarang telah mengkompilasi `Faucet.sol` kita menjadi *bytecode* EVM. Jika Anda penasaran, *bytecode*-nya terlihat seperti ini:
+
+```
+PUSH1 0x60 PUSH1 0x40 MSTORE CALLVALUE ISZERO PUSH2 0xF JUMPI PUSH1 0x0 DUP1
+REVERT JUMPDEST PUSH1 0xE5 DUP1 PUSH2 0x1D PUSH1 0x0 CODECOPY PUSH1 0x0 RETURN
+STOP PUSH1 0x60 PUSH1 0x40 MSTORE PUSH1 0x4 CALLDATASIZE LT PUSH1 0x3F JUMPI
+PUSH1 0x0 CALLDATALOAD PUSH29
+0x100000000000000000000000000000000000000000000000000000000
+SWAP1 DIV PUSH4 0xFFFFFFFF AND DUP1 PUSH4 0x2E1A7D4D EQ PUSH1 0x41 JUMPI
+JUMPDEST STOP JUMPDEST CALLVALUE ISZERO PUSH1 0x4B JUMPI PUSH1 0x0 DUP1 REVERT
+JUMPDEST PUSH1 0x5F PUSH1 0x4 DUP1 DUP1 CALLDATALOAD SWAP1 PUSH1 0x20 ADD SWAP1
+SWAP2 SWAP1 POP POP PUSH1 0x61 JUMP JUMPDEST STOP JUMPDEST PUSH8
+0x16345785D8A0000 DUP2 GT ISZERO ISZERO ISZERO PUSH1 0x77 JUMPI PUSH1 0x0 DUP1
+REVERT JUMPDEST CALLER PUSH20 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF AND
+PUSH2 0x8FC DUP3 SWAP1 DUP2 ISZERO MUL SWAP1 PUSH1 0x40 MLOAD PUSH1 0x0 PUSH1
+0x40 MLOAD DUP1 DUP4 SUB DUP2 DUP6 DUP9 DUP9 CALL SWAP4 POP POP POP POP ISZERO
+ISZERO PUSH1 0xB6 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP JUMP STOP LOG1 PUSH6
+0x627A7A723058 KECCAK256 PUSH9 0x13D1EA839A4438EF75 GASLIMIT CALLVALUE LOG4 0x5f
+PUSH24 0x7541F409787592C988A079407FB28B4AD000290000000000
+```
+
+Senang kan Anda menggunakan bahasa tingkat tinggi seperti Solidity alih-alih memprogram langsung dalam *bytecode* EVM? Saya juga\!
+
+### **Membuat Kontrak di Blockchain**
+
+Jadi, kita punya sebuah kontrak. Kita sudah mengkompilasinya menjadi *bytecode*. Sekarang, kita perlu "mendaftarkan" kontrak tersebut di *blockchain* Ethereum. Kita akan menggunakan *testnet* Ropsten untuk menguji kontrak kita, jadi itulah *blockchain* tempat kita ingin mengirimkannya.
+
+Mendaftarkan kontrak di *blockchain* melibatkan pembuatan transaksi khusus yang tujuannya adalah alamat `0x0000000000000000000000000000000000000000`, yang juga dikenal sebagai **alamat nol**. Alamat nol adalah alamat khusus yang memberitahu *blockchain* Ethereum bahwa Anda ingin mendaftarkan sebuah kontrak. Untungnya, Remix IDE akan menangani semua itu untuk Anda dan mengirimkan transaksi ke MetaMask.
+
+Pertama, beralih ke tab **Run** dan pilih **Injected Web3** di kotak pilihan *drop-down* **Environment**. Ini menghubungkan Remix IDE ke dompet MetaMask, dan melalui MetaMask ke jaringan uji Ropsten. Setelah Anda melakukannya, Anda dapat melihat **Ropsten** di bawah Environment. Juga, di kotak pilihan **Account** akan ditampilkan alamat dompet Anda (lihat Gambar 2-14).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.14.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-14: Mengkonfigurasi lingkungan 'Run' di Remix untuk men-deploy kontrak]
+
+Tepat di bawah pengaturan Run yang baru saja Anda konfirmasi adalah kontrak `Faucet`, siap untuk dibuat. Klik tombol **Deploy** yang ditunjukkan pada Gambar 2-14.
+
+Remix akan membuat transaksi "pembuatan" khusus dan MetaMask akan meminta Anda untuk menyetujuinya, seperti yang ditunjukkan pada Gambar 2-15. Anda akan melihat transaksi pembuatan kontrak tidak berisi ether, tetapi memiliki 258 byte data (kontrak yang dikompilasi) dan akan mengonsumsi 10 gwei gas. Klik **Submit** untuk menyetujuinya
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.15.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-15: Jendela konfirmasi MetaMask untuk transaksi pembuatan kontrak]
+
+Sekarang Anda harus menunggu. Butuh waktu sekitar 15 hingga 30 detik agar kontrak ditambang di Ropsten. Remix mungkin tidak akan terlihat melakukan banyak hal, tetapi bersabarlah.
+
+Setelah kontrak dibuat, ia akan muncul di bagian bawah tab **Run** (lihat Gambar 2-16).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.16.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-16: Kontrak yang telah di-*deploy* ditampilkan di tab Run Remix]
+
+Perhatikan bahwa kontrak `Faucet` sekarang memiliki alamatnya sendiri: Remix menampilkannya sebagai "**Faucet at 0x72e…c7829**" (meskipun alamat Anda, yang berupa huruf dan angka acak, akan berbeda). Simbol papan klip (*clipboard*) kecil di sebelah kanan memungkinkan Anda untuk menyalin alamat kontrak ke papan klip Anda. Kita akan menggunakannya di bagian selanjutnya.
+
+### **Berinteraksi dengan Kontrak**
+
+Mari kita rekap apa yang telah kita pelajari sejauh ini: Kontrak Ethereum adalah program yang mengendalikan uang, yang berjalan di dalam mesin virtual yang disebut EVM. Kontrak ini dibuat oleh transaksi khusus yang mengirimkan *bytecode* mereka untuk dicatat di *blockchain*. Setelah dibuat di *blockchain*, mereka memiliki alamat Ethereum, sama seperti dompet. Setiap kali seseorang mengirim transaksi ke alamat kontrak, hal itu akan menyebabkan kontrak berjalan di EVM, dengan transaksi tersebut sebagai inputnya. Transaksi yang dikirim ke alamat kontrak dapat berisi ether atau data, atau keduanya. Jika mengandung ether, ether tersebut akan "disetorkan" ke saldo kontrak. Jika mengandung data, data tersebut dapat menentukan fungsi bernama di dalam kontrak dan memanggilnya, serta meneruskan argumen ke fungsi tersebut.
+
+#### **Melihat Alamat Kontrak di Penjelajah Blok**
+
+Sekarang kita memiliki kontrak yang tercatat di *blockchain*, dan kita dapat melihat ia memiliki alamat Ethereum. Mari kita periksa di penjelajah blok `ropsten.etherscan.io` dan lihat seperti apa bentuk sebuah kontrak. Di Remix IDE, salin alamat kontrak dengan mengklik ikon papan klip di sebelah namanya (lihat Gambar 2-17).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.17.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-17: Menyalin alamat kontrak Faucet dari Remix IDE]
+
+Biarkan Remix tetap terbuka; kita akan kembali lagi nanti. Sekarang, arahkan browser Anda ke `ropsten.etherscan.io` dan tempelkan alamat tersebut ke dalam kotak pencarian. Anda akan melihat riwayat alamat Ethereum kontrak tersebut, seperti yang ditunjukkan pada Gambar 2-18.\
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.18.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-18: Riwayat alamat kontrak Faucet di Etherscan]
+
+### **Mendanai Kontrak**
+
+Untuk saat ini, kontrak tersebut hanya memiliki satu transaksi dalam riwayatnya: transaksi pembuatan kontrak. Seperti yang Anda lihat, kontrak tersebut juga tidak memiliki ether (saldo nol). Itu karena kita tidak mengirim ether apa pun ke kontrak dalam transaksi pembuatan, meskipun kita bisa saja melakukannya.
+
+*Faucet* kita butuh dana\! Proyek pertama kita adalah menggunakan MetaMask untuk mengirim ether ke kontrak. Alamat kontrak seharusnya masih ada di papan klip Anda (jika tidak, salin lagi dari Remix). Buka MetaMask, dan kirim 1 ether ke alamat tersebut, persis seperti yang Anda lakukan ke alamat Ethereum lainnya (lihat Gambar 2-19).
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.19.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-19: Mengirim ether ke alamat kontrak Faucet menggunakan MetaMask]
+
+Dalam satu menit, jika Anda memuat ulang penjelajah blok Etherscan, ia akan menunjukkan transaksi lain ke alamat kontrak dan saldo yang diperbarui menjadi 1 ether.
+
+Ingat fungsi `public payable` default tanpa nama dalam kode `Faucet.sol` kita? Kodenya terlihat seperti ini:
+
+```solidity
+function () public payable {}
+```
+
+Ketika Anda mengirim transaksi ke alamat kontrak, tanpa data yang menentukan fungsi mana yang harus dipanggil, transaksi itu memanggil fungsi default ini. Karena kita mendeklarasikannya sebagai `payable`, fungsi ini menerima dan menyetorkan 1 ether ke dalam saldo akun kontrak. Transaksi Anda menyebabkan kontrak berjalan di EVM, memperbarui saldonya. Anda telah mendanai *faucet* Anda\!
+
+### **Menarik Dana dari Kontrak Kita**
+
+Selanjutnya, mari kita tarik sejumlah dana dari *faucet*. Untuk menarik dana, kita harus membuat transaksi yang memanggil fungsi `withdraw` dan meneruskan argumen `withdraw_amount` ke dalamnya. Agar tetap sederhana untuk saat ini, Remix akan membuat transaksi itu untuk kita dan MetaMask akan menampilkannya untuk persetujuan kita.
+
+Kembali ke tab Remix dan lihat kontrak di tab **Run**. Anda akan melihat sebuah kotak merah berlabel `withdraw` dengan kolom masukan berlabel `uint256 withdraw_amount` (lihat Gambar 2-20).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.20.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-20: Antarmuka fungsi `withdraw` di Remix]
+
+Ini adalah antarmuka Remix ke kontrak. Ini memungkinkan kita untuk membuat transaksi yang memanggil fungsi yang didefinisikan dalam kontrak. Kita akan memasukkan `withdraw_amount` dan mengklik tombol `withdraw` untuk menghasilkan transaksi.
+
+Pertama, mari kita tentukan `withdraw_amount`. Kita ingin mencoba menarik 0,1 ether, yang merupakan jumlah maksimum yang diizinkan oleh kontrak kita. Ingat bahwa semua nilai mata uang di Ethereum secara internal didenominasikan dalam **wei**, dan fungsi `withdraw` kita juga mengharapkan `withdraw_amount` didenominasikan dalam wei. Jumlah yang kita inginkan adalah 0,1 ether, yaitu `100.000.000.000.000.000` wei (angka 1 diikuti oleh 17 angka nol).
+
+> Karena keterbatasan pada JavaScript, angka sebesar `$10^{17}$` tidak dapat diproses oleh Remix. Sebagai gantinya, kita harus membungkusnya dengan tanda kutip ganda, agar Remix dapat menerimanya sebagai *string* dan memanipulasinya sebagai `BigNumber`. Jika kita tidak membungkusnya dengan tanda kutip, Remix IDE akan gagal memprosesnya dan menampilkan "Error encoding arguments: Error: Assertion failed."
+
+Ketik `“100000000000000000”` (dengan tanda kutip) ke dalam kotak `withdraw_amount` dan klik tombol **withdraw** (lihat Gambar 2-21).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.21.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-21: Memasukkan jumlah penarikan di Remix]
+
+MetaMask akan memunculkan jendela transaksi untuk Anda setujui. Klik **Submit** untuk mengirim panggilan penarikan Anda ke kontrak (lihat Gambar 2-22).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.22.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-22: Menyetujui transaksi pemanggilan fungsi di MetaMask]
+
+Tunggu sebentar lalu muat ulang penjelajah blok Etherscan untuk melihat transaksi tersebut tercermin dalam riwayat alamat kontrak Faucet (lihat Gambar 2-23).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.23.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-23: Riwayat alamat kontrak Faucet setelah transaksi penarikan]
+
+Kita sekarang melihat transaksi baru dengan alamat kontrak sebagai tujuan dan nilai 0 ether. Saldo kontrak telah berubah dan sekarang menjadi 0,9 ether karena telah mengirimkan 0,1 ether kepada kita seperti yang diminta. Tetapi kita tidak melihat transaksi "KELUAR" (*OUT*) dalam riwayat alamat kontrak.
+
+Di manakah penarikan keluar itu? Sebuah tab baru telah muncul di halaman riwayat alamat kontrak, bernama **Internal Transactions**. Karena transfer 0,1 ether berasal dari kode kontrak, itu adalah sebuah **transaksi internal** (juga disebut *message* atau pesan). Klik tab tersebut untuk melihatnya (lihat Gambar 2-24).
+
+"Transaksi internal" ini dikirim oleh kontrak pada baris kode ini (dari fungsi `withdraw` di `Faucet.sol`):
+
+```solidity
+msg.sender.transfer(withdraw_amount);
+```
+
+Sebagai rekap: Anda mengirim sebuah transaksi dari dompet MetaMask Anda yang berisi instruksi data untuk memanggil fungsi `withdraw` dengan argumen `withdraw_amount` sebesar 0,1 ether. Transaksi itu menyebabkan kontrak berjalan di dalam EVM. Saat EVM menjalankan fungsi `withdraw` dari kontrak `Faucet`, pertama ia memanggil fungsi `require` dan memvalidasi bahwa jumlah yang diminta kurang dari atau sama dengan penarikan maksimum yang diizinkan sebesar 0,1 ether. Kemudian ia memanggil fungsi `transfer` untuk mengirimkan ether kepada Anda. Menjalankan fungsi `transfer` menghasilkan sebuah transaksi internal yang menyetorkan 0,1 ether ke alamat dompet Anda, dari saldo kontrak. Itulah yang ditampilkan di tab **Internal Transactions** di Etherscan.
+
+### **Kesimpulan**
+
+Dalam bab ini, Anda telah menyiapkan dompet menggunakan MetaMask dan mendanainya menggunakan *faucet* di jaringan uji Ropsten. Anda menerima ether ke alamat Ethereum dompet Anda, kemudian Anda mengirim ether ke alamat Ethereum *faucet*.
+
+Selanjutnya, Anda menulis kontrak *faucet* di Solidity. Anda menggunakan Remix IDE untuk mengkompilasi kontrak menjadi *bytecode* EVM, kemudian menggunakan Remix untuk membentuk transaksi dan membuat kontrak `Faucet` di *blockchain* Ropsten. Setelah dibuat, kontrak `Faucet` memiliki alamat Ethereum, dan Anda mengiriminya sejumlah ether. Terakhir, Anda membuat transaksi untuk memanggil fungsi `withdraw` dan berhasil meminta 0,1 ether. Kontrak memeriksa permintaan tersebut dan mengirimi Anda 0,1 ether dengan sebuah transaksi internal.
+
+Mungkin tidak tampak seperti hal besar, tetapi Anda baru saja berhasil berinteraksi dengan perangkat lunak yang mengendalikan uang di atas sebuah komputer dunia yang terdesentralisasi.
+
+Kita akan melakukan lebih banyak lagi pemrograman *smart contract* di Bab 7 dan belajar tentang praktik terbaik serta pertimbangan keamanan di Bab 9.
