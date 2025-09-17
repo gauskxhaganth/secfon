@@ -2206,3 +2206,6 @@ WHERE id IN (
 ```
 
 Kueri di atas akan memberikan Anda semua pelanggan yang memiliki pesanan dalam sistem.
+
+---
+
