@@ -2209,3 +2209,720 @@ Kueri di atas akan memberikan Anda semua pelanggan yang memiliki pesanan dalam s
 
 ---
 
+# Bab 13
+## Menyaring hasil menggunakan WHERE dan HAVING
+
+### Bagian 13.1: Menggunakan BETWEEN untuk Menyaring Hasil
+
+Contoh-contoh berikut menggunakan basis data sampel [Penjualan Barang](https://www.google.com/search?q=%23bagian-101-menggunakan-case-untuk-menghitung-jumlah-baris-dalam-kolom-yang-cocok-dengan-kondisi) dan [Pelanggan](https://www.google.com/search?q=%23bagian-51-basis-data-bengkel-mobil).
+
+**Catatan**: Operator `BETWEEN` bersifat inklusif (batas awal dan akhir termasuk dalam rentang).
+
+**Menggunakan operator `BETWEEN` dengan Angka:**
+
+```sql
+SELECT * From ItemSales
+WHERE Quantity BETWEEN 10 AND 17
+```
+
+Kueri ini akan mengembalikan semua *record* `ItemSales` yang memiliki kuantitas lebih besar dari atau sama dengan 10 dan lebih kecil dari atau sama dengan 17. Hasilnya akan terlihat seperti:
+
+| Id | SaleDate | ItemId | Quantity | Price |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | 2013-07-01 | 100 | 10 | 34.5 |
+| 4 | 2013-07-23 | 100 | 15 | 34.5 |
+| 5 | 2013-07-24 | 145 | 10 | 34.5 |
+
+**Menggunakan operator `BETWEEN` dengan Nilai Tanggal:**
+
+```sql
+SELECT * From ItemSales
+WHERE SaleDate BETWEEN '2013-07-11' AND '2013-07-24'
+```
+
+Kueri ini akan mengembalikan semua *record* `ItemSales` dengan `SaleDate` yang lebih besar dari atau sama dengan 11 Juli 2013 dan lebih kecil dari atau sama dengan 24 Juli 2013.
+
+| Id | SaleDate | ItemId | Quantity | Price |
+| :--- | :--- | :--- | :--- | :--- |
+| 3 | 2013-07-11 | 100 | 20 | 34.5 |
+| 4 | 2013-07-23 | 100 | 15 | 34.5 |
+| 5 | 2013-07-24 | 145 | 10 | 34.5 |
+
+**Catatan**: Saat membandingkan nilai `datetime` alih-alih `date`, Anda mungkin perlu mengonversi nilai `datetime` menjadi nilai `date`, atau menambah/mengurangi 24 jam untuk mendapatkan hasil yang benar.
+
+**Menggunakan operator `BETWEEN` dengan Nilai Teks:**
+
+```sql
+SELECT Id, FName, LName FROM Customers
+WHERE LName BETWEEN 'D' AND 'L';
+```
+
+Contoh langsung: [SQL fiddle](https://www.google.com/search?q=http://sqlfiddle.com/%23!9/1620c/34)
+
+Kueri ini akan mengembalikan semua pelanggan yang namanya secara alfabetis berada di antara huruf 'D' dan 'L'. Dalam hal ini, Pelanggan \#1 dan \#3 akan dikembalikan. Pelanggan \#2, yang namanya dimulai dengan 'M', tidak akan disertakan.
+
+| Id | FName | LName |
+| :--- | :--- | :--- |
+| 1 | William | Jones |
+| 3 | Richard | Davis |
+
+### Bagian 13.2: Menggunakan HAVING dengan Fungsi Agregat
+
+Tidak seperti klausa `WHERE`, `HAVING` dapat digunakan dengan fungsi agregat.
+
+> **Fungsi agregat** adalah fungsi di mana nilai dari beberapa baris dikelompokkan bersama sebagai input berdasarkan kriteria tertentu untuk membentuk satu nilai tunggal yang memiliki makna atau pengukuran yang lebih signifikan ([Wikipedia](https://en.wikipedia.org/wiki/Aggregate_function)).
+
+Fungsi agregat yang umum termasuk `COUNT()`, `SUM()`, `MIN()`, dan `MAX()`.
+
+Contoh ini menggunakan [Tabel Mobil](https://www.google.com/search?q=%23bagian-51-basis-data-bengkel-mobil) dari Basis Data Contoh.
+
+```sql
+SELECT CustomerId, COUNT(Id) AS [Number of Cars]
+FROM Cars
+GROUP BY CustomerId
+HAVING COUNT(Id) > 1
+```
+
+Kueri ini akan mengembalikan `CustomerId` dan jumlah `Number of Cars` dari setiap pelanggan yang memiliki lebih dari satu mobil. Dalam kasus ini, satu-satunya pelanggan yang memiliki lebih dari satu mobil adalah Pelanggan \#1.
+
+Hasilnya akan terlihat seperti:
+| CustomerId | Number of Cars |
+| :--- | :--- |
+| 1 | 2 |
+
+### Bagian 13.3: Klausa WHERE dengan nilai NULL/NOT NULL
+
+```sql
+SELECT *
+FROM Employees
+WHERE ManagerId IS NULL
+```
+
+Pernyataan ini akan mengembalikan semua *record* `Employee` di mana nilai kolom `ManagerId` adalah `NULL`.
+
+Hasilnya adalah:
+| Id | FName | LName | PhoneNumber | ManagerId | DepartmentId |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | James | Smith | 1234567890 | NULL | 1 |
+
+```sql
+SELECT *
+FROM Employees
+WHERE ManagerId IS NOT NULL
+```
+
+Pernyataan ini akan mengembalikan semua *record* `Employee` di mana nilai `ManagerId` bukan `NULL`.
+
+Hasilnya adalah:
+| Id | FName | LName | PhoneNumber | ManagerId | DepartmentId |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | John | Johnson | 2468101214 | 1 | 1 |
+| 3 | Michael | Williams | 1357911131 | 1 | 2 |
+| 4 | Johnathon | Smith | 1212121212 | 2 | 1 |
+
+**Catatan**: Kueri yang sama tidak akan mengembalikan hasil jika Anda mengubah klausa `WHERE` menjadi `WHERE ManagerId = NULL` atau `WHERE ManagerId <> NULL`.
+
+### Bagian 13.4: Kesetaraan (Equality)
+
+```sql
+SELECT * FROM Employees
+```
+
+Pernyataan ini akan mengembalikan semua baris dari tabel `Employees`.
+*(Tabel `Employees` dengan data lengkap ditampilkan di sini dalam teks asli, formatnya akan dirapikan)*
+
+Menggunakan `WHERE` di akhir pernyataan `SELECT` Anda memungkinkan Anda untuk membatasi baris yang dikembalikan ke suatu kondisi. Dalam kasus ini, di mana ada kecocokan persis menggunakan tanda `=`:
+
+```sql
+SELECT * FROM Employees WHERE DepartmentId = 1
+```
+
+Hanya akan mengembalikan baris di mana `DepartmentId` sama dengan 1:
+*(Tabel hasil yang difilter ditampilkan di sini dalam teks asli)*
+
+### Bagian 13.5: Klausa WHERE hanya mengembalikan baris yang cocok dengan kriterianya
+
+Steam memiliki bagian "game di bawah $10" di halaman tokonya. Di suatu tempat jauh di dalam sistem mereka, mungkin ada kueri yang terlihat seperti ini:
+
+```sql
+SELECT *
+FROM Items
+WHERE Price < 10
+```
+
+### Bagian 13.6: AND dan OR
+
+Anda juga dapat menggabungkan beberapa operator untuk membuat kondisi `WHERE` yang lebih kompleks. Contoh berikut menggunakan tabel `Employees`:
+*(Tabel `Employees` dengan data lengkap ditampilkan di sini dalam teks asli)*
+
+**AND**
+
+```sql
+SELECT * FROM Employees WHERE DepartmentId = 1 AND ManagerId = 1
+```
+
+Akan mengembalikan:
+| Id | FName | LName | PhoneNumber | ManagerId | DepartmentId | Salary | Hire\_date |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | John | Johnson | 2468101214 | 1 | 1 | 400 | 23-03-2005 |
+
+**OR**
+
+```sql
+SELECT * FROM Employees WHERE DepartmentId = 2 OR ManagerId = 2
+```
+
+Akan mengembalikan:
+| Id | FName | LName | PhoneNumber | ManagerId | DepartmentId | Salary | Hire\_date |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 3 | Michael | Williams | 1357911131 | 1 | 2 | 600 | 12-05-2009 |
+| 4 | Johnathon | Smith | 1212121212 | 2 | 1 | 500 | 24-07-2016 |
+
+### Bagian 13.7: Menggunakan IN untuk mengembalikan baris dengan nilai yang terkandung dalam daftar
+
+Contoh ini menggunakan [Tabel Mobil](https://www.google.com/search?q=%23bagian-51-basis-data-bengkel-mobil) dari Basis Data Contoh.
+
+```sql
+SELECT *
+FROM Cars
+WHERE TotalCost IN (100, 200, 300)
+```
+
+Kueri ini akan mengembalikan Mobil \#2 yang berharga 200 dan Mobil \#3 yang berharga 100. Perhatikan bahwa ini setara dengan menggunakan beberapa klausa dengan `OR`, misalnya:
+
+```sql
+SELECT *
+FROM Cars
+WHERE TotalCost = 100 OR TotalCost = 200 OR TotalCost = 300
+```
+
+### Bagian 13.8: Menggunakan LIKE untuk menemukan string dan substring yang cocok
+
+Lihat dokumentasi lengkap tentang [operator LIKE](https://www.google.com/search?q=%23bab-11-operator-like).
+
+Contoh ini menggunakan [Tabel Karyawan](https://www.google.com/search?q=%23bagian-51-basis-data-bengkel-mobil) dari Basis Data Contoh.
+
+```sql
+SELECT *
+FROM Employees
+WHERE FName LIKE 'John'
+```
+
+Kueri ini hanya akan mengembalikan Karyawan \#1 yang nama depannya persis 'John'.
+
+```sql
+SELECT *
+FROM Employees
+WHERE FName like 'John%'
+```
+
+Menambahkan `%` memungkinkan Anda mencari substring:
+
+  * `John%` - akan mengembalikan setiap Karyawan yang namanya dimulai dengan 'John', diikuti oleh sejumlah karakter apa pun.
+  * `%John` - akan mengembalikan setiap Karyawan yang namanya diakhiri dengan 'John', didahului oleh sejumlah karakter apa pun.
+  * `%John%` - akan mengembalikan setiap Karyawan yang namanya mengandung 'John' di mana saja di dalam nilainya.
+
+Dalam kasus ini, kueri akan mengembalikan Karyawan \#2 yang namanya 'John' serta Karyawan \#4 yang namanya 'Johnathon'.
+
+### Bagian 13.9: Where EXISTS
+
+Akan memilih *record* di `TableName` yang memiliki *record* yang cocok di `TableName1`.
+
+```sql
+SELECT * FROM TableName t WHERE EXISTS (
+    SELECT 1 FROM TableName1 t1 where t.Id = t1.Id)
+```
+
+### Bagian 13.10: Menggunakan HAVING untuk memeriksa beberapa kondisi dalam sebuah grup
+
+**Tabel Orders**
+| CustomerId | ProductId | Quantity | Price |
+| :--- | :--- | :--- | :--- |
+| 1 | 2 | 5 | 100 |
+| 1 | 3 | 2 | 200 |
+| 1 | 4 | 1 | 500 |
+| 2 | 1 | 4 | 50 |
+| 3 | 5 | 6 | 700 |
+
+Untuk memeriksa pelanggan yang telah memesan **kedua** - ProductID 2 dan 3, `HAVING` dapat digunakan:
+
+```sql
+select customerId
+from orders
+where productID in (2,3)
+group by customerId
+having count(distinct productID) = 2
+```
+
+Nilai yang dikembalikan:
+| customerId |
+| :--- |
+| 1 |
+
+Kueri tersebut hanya memilih *record* dengan ProductID yang dimaksud dan dengan klausa `HAVING` memeriksa grup yang memiliki 2 ProductID dan bukan hanya satu.
+
+Kemungkinan lain adalah:
+
+```sql
+select customerId
+from orders
+group by customerId
+having sum(case when productID = 2 then 1 else 0 end) > 0
+   and sum(case when productID = 3 then 1 else 0 end) > 0
+```
+
+Kueri ini hanya memilih grup yang memiliki setidaknya satu *record* dengan `productID` 2 dan setidaknya satu dengan `productID` 3.
+
+# Bab 14
+## SKIP TAKE (Paginasi)
+
+### Bagian 14.1: Membatasi jumlah hasil
+
+**ISO/ANSI SQL:**
+
+```sql
+SELECT * FROM TableName FETCH FIRST 20 ROWS ONLY;
+```
+
+**MySQL; PostgreSQL; SQLite:**
+
+```sql
+SELECT * FROM TableName LIMIT 20;
+```
+
+**Oracle:**
+
+```sql
+SELECT Id, Col1
+FROM (SELECT Id, Col1, row_number() over (order by Id) RowNumber
+      FROM TableName)
+WHERE RowNumber <= 20
+```
+
+**SQL Server:**
+
+```sql
+SELECT TOP 20 *
+FROM dbo.[Sale]
+```
+
+### Bagian 14.2: Melewati lalu mengambil beberapa hasil (Paginasi)
+
+**ISO/ANSI SQL:**
+
+```sql
+SELECT Id, Col1
+FROM TableName
+ORDER BY Id
+OFFSET 20 ROWS FETCH NEXT 20 ROWS ONLY;
+```
+
+**MySQL:**
+
+```sql
+SELECT * FROM TableName LIMIT 20, 20; -- offset, limit
+```
+
+**Oracle; SQL Server:**
+
+```sql
+SELECT Id, Col1
+FROM (SELECT Id, Col1, row_number() over (order by Id) RowNumber
+      FROM TableName)
+WHERE RowNumber BETWEEN 21 AND 40
+```
+
+**PostgreSQL; SQLite:**
+
+```sql
+SELECT * FROM TableName LIMIT 20 OFFSET 20;
+```
+
+### Bagian 14.3: Melewati beberapa baris dari hasil
+
+**ISO/ANSI SQL:**
+
+```sql
+SELECT Id, Col1
+FROM TableName
+ORDER BY Id
+OFFSET 20 ROWS
+```
+
+**MySQL:**
+
+```sql
+SELECT * FROM TableName LIMIT 20, 42424242424242;
+-- lewati 20, untuk ambil gunakan angka yang sangat besar yang lebih dari jumlah baris di tabel
+```
+
+**Oracle:**
+
+```sql
+SELECT Id, Col1
+FROM (SELECT Id, Col1, row_number() over (order by Id) RowNumber
+      FROM TableName)
+WHERE RowNumber > 20
+```
+
+**PostgreSQL:**
+
+```sql
+SELECT * FROM TableName OFFSET 20;
+```
+
+**SQLite:**
+
+```sql
+SELECT * FROM TableName LIMIT -1 OFFSET 20;
+```
+
+# Bab 15
+## EXCEPT
+
+### Bagian 15.1: Memilih dataset kecuali jika nilainya ada di dataset lain ini
+
+\--skema dataset harus identik
+
+```sql
+SELECT 'Data1' as 'Column' UNION ALL
+SELECT 'Data2' as 'Column' UNION ALL
+SELECT 'Data3' as 'Column' UNION ALL
+SELECT 'Data4' as 'Column' UNION ALL
+SELECT 'Data5' as 'Column'
+EXCEPT
+SELECT 'Data3' as 'Column'
+```
+
+\--Mengembalikan Data1, Data2, Data4, dan Data5
+
+# Bab 16
+## EXPLAIN dan DESCRIBE
+
+### Bagian 16.1: EXPLAIN pada kueri Select
+
+`EXPLAIN` di depan kueri `SELECT` menunjukkan kepada Anda bagaimana kueri akan dieksekusi. Dengan cara ini Anda dapat melihat apakah kueri menggunakan indeks atau apakah Anda dapat mengoptimalkan kueri Anda dengan menambahkan indeks.
+
+**Contoh kueri:**
+
+```sql
+explain select * from user join data on user.test = data.fk_user;
+```
+
+**Contoh hasil:**
+| id | select\_type | table | type | possible\_keys | key | key\_len | ref | rows | Extra |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | SIMPLE | user | index | test | test | 5 | (null) | 1 | Using where; Using |
+| 1 | SIMPLE | data | ref | fk\_user | fk\_user | 5 | user.test | 1 | (null) |
+
+Pada kolom `type` Anda melihat apakah sebuah indeks digunakan. Di kolom `possible_keys` Anda melihat apakah rencana eksekusi dapat memilih dari indeks yang berbeda atau jika tidak ada. `key` memberitahu Anda indeks yang sebenarnya digunakan. `key_len` menunjukkan ukuran dalam byte untuk satu item indeks. Semakin rendah nilai ini, semakin banyak item indeks yang muat dalam ukuran memori yang sama dan dapat diproses lebih cepat. `rows` menunjukkan perkiraan jumlah baris yang perlu dipindai oleh kueri, semakin rendah semakin baik.
+
+### Bagian 16.2: DESCRIBE nama\_tabel;
+
+`DESCRIBE` dan `EXPLAIN` adalah sinonim. `DESCRIBE` pada nama tabel mengembalikan definisi kolom-kolomnya.
+
+```sql
+DESCRIBE tablename;
+```
+
+**Contoh Hasil:**
+| COLUMN\_NAME | COLUMN\_TYPE | IS\_NULLABLE | COLUMN\_KEY | COLUMN\_DEFAULT | EXTRA |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| id | int(11) | NO | PRI | 0 | auto\_increment |
+| test | varchar(255) | YES | | (null) | |
+
+Di sini Anda melihat nama kolom, diikuti oleh tipe kolom. Ini menunjukkan apakah `NULL` diizinkan di kolom dan apakah kolom menggunakan Indeks. Nilai default juga ditampilkan dan jika tabel berisi perilaku khusus seperti `auto_increment`.
+
+# Bab 17
+## KLAUSA EXISTS
+
+### Bagian 17.1: KLAUSA EXISTS
+
+**Tabel Customer**
+| Id | FirstName | LastName |
+| :--- | :--- | :--- |
+| 1 | Ozgur | Ozturk |
+| 2 | Youssef | Medi |
+| 3 | Henry | Tai |
+
+**Tabel Order**
+| Id | CustomerId | Amount |
+| :--- | :--- | :--- |
+| 1 | 2 | 123.50 |
+| 2 | 3 | 14.80 |
+
+**Dapatkan semua pelanggan dengan setidaknya satu pesanan**
+
+```sql
+SELECT * FROM Customer WHERE EXISTS (
+    SELECT * FROM Order WHERE Order.CustomerId=Customer.Id
+)
+```
+
+**Hasil**
+| Id | FirstName | LastName |
+| :--- | :--- | :--- |
+| 2 | Youssef | Medi |
+| 3 | Henry | Tai |
+
+**Dapatkan semua pelanggan tanpa pesanan**
+
+```sql
+SELECT * FROM Customer WHERE NOT EXISTS (
+    SELECT * FROM Order WHERE Order.CustomerId = Customer.Id
+)
+```
+
+**Hasil**
+| Id | FirstName | LastName |
+| :--- | :--- | :--- |
+| 1 | Ozgur | Ozturk |
+
+**Tujuan**
+`EXISTS`, `IN`, dan `JOIN` terkadang dapat digunakan untuk hasil yang sama, namun, mereka tidak sama:
+
+  * **EXISTS** harus digunakan untuk memeriksa apakah sebuah nilai ada di tabel lain.
+  * **IN** harus digunakan untuk daftar statis.
+  * **JOIN** harus digunakan untuk mengambil data dari tabel lain.
+
+# Bab 18
+## JOIN
+
+`JOIN` adalah metode untuk menggabungkan informasi dari dua tabel. Hasilnya adalah satu set kolom gabungan dari kedua tabel, yang ditentukan oleh tipe join (`INNER`/`OUTER`/`CROSS` dan `LEFT`/`RIGHT`/`FULL`, dijelaskan di bawah) dan kriteria join (bagaimana baris dari kedua tabel berhubungan).
+
+Sebuah tabel dapat digabungkan dengan dirinya sendiri atau dengan tabel lain mana pun. Jika informasi dari lebih dari dua tabel perlu diakses, beberapa `JOIN` dapat ditentukan dalam klausa `FROM`.
+
+### Bagian 18.1: Self Join
+
+Sebuah tabel dapat digabungkan dengan dirinya sendiri, dengan baris yang berbeda saling cocok berdasarkan beberapa kondisi. Dalam kasus penggunaan ini, **alias harus digunakan** untuk membedakan dua kemunculan tabel.
+
+Dalam contoh di bawah ini, untuk setiap `Employee` di tabel `Employees` dari basis data contoh, sebuah *record* dikembalikan yang berisi nama depan karyawan bersama dengan nama depan manajer karyawan yang bersangkutan. Karena manajer juga merupakan karyawan, tabel tersebut digabungkan dengan dirinya sendiri:
+
+```sql
+SELECT
+    e.FName AS "Employee",
+    m.FName AS "Manager"
+FROM
+    Employees e
+JOIN
+    Employees m
+    ON e.ManagerId = m.Id
+```
+
+Kueri ini akan mengembalikan data berikut:
+| Employee | Manager |
+| :--- | :--- |
+| John | James |
+| Michael | James |
+| Johnathon | John |
+
+**Jadi bagaimana cara kerjanya?**
+Tabel asli berisi *record* berikut:
+| Id | FName | LName | ManagerId |
+| :--- | :--- | :--- | :--- |
+| 1 | James | Smith | NULL |
+| 2 | John | Johnson | 1 |
+| 3 | Michael | Williams | 1 |
+| 4 | Johnathon | Smith | 2 |
+
+Tindakan pertama adalah membuat **produk Kartesian** dari semua *record* dalam tabel yang digunakan dalam klausa `FROM`. Dalam hal ini, itu adalah tabel `Employees` dua kali, jadi tabel perantara akan terlihat seperti ini (saya telah menghapus *field* yang tidak digunakan dalam contoh ini):
+| e.Id | e.FName | e.ManagerId | m.Id | m.FName | m.ManagerId |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | James | NULL | 1 | James | NULL |
+| 1 | James | NULL | 2 | John | 1 |
+| 1 | James | NULL | 3 | Michael | 1 |
+| 1 | James | NULL | 4 | Johnathon | 2 |
+| 2 | John | 1 | 1 | James | NULL |
+| 2 | John | 1 | 2 | John | 1 |
+| 2 | John | 1 | 3 | Michael | 1 |
+| 2 | John | 1 | 4 | Johnathon | 2 |
+| 3 | Michael | 1 | 1 | James | NULL |
+| 3 | Michael | 1 | 2 | John | 1 |
+| 3 | Michael | 1 | 3 | Michael | 1 |
+| 3 | Michael | 1 | 4 | Johnathon | 2 |
+| 4 | Johnathon | 2 | 1 | James | NULL |
+| 4 | Johnathon | 2 | 2 | John | 1 |
+| 4 | Johnathon | 2 | 3 | Michael | 1 |
+| 4 | Johnathon | 2 | 4 | Johnathon | 2 |
+
+Tindakan selanjutnya adalah hanya menyimpan *record* yang memenuhi kriteria `JOIN`, jadi setiap *record* di mana `ManagerId` dari tabel alias `e` sama dengan `Id` dari tabel alias `m`:
+| e.Id | e.FName | e.ManagerId | m.Id | m.FName | m.ManagerId |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | John | 1 | 1 | James | NULL |
+| 3 | Michael | 1 | 1 | James | NULL |
+| 4 | Johnathon | 2 | 2 | John | 1 |
+
+Kemudian, setiap ekspresi yang digunakan dalam klausa `SELECT` dievaluasi untuk mengembalikan tabel ini:
+| e.FName | m.FName |
+| :--- | :--- |
+| John | James |
+| Michael | James |
+| Johnathon | John |
+
+Terakhir, nama kolom `e.FName` dan `m.FName` digantikan oleh nama kolom alias mereka, yang ditetapkan dengan operator `AS`:
+| Employee | Manager |
+| :--- | :--- |
+| John | James |
+| Michael | James |
+| Johnathon | John |
+
+### Bagian 18.2: Perbedaan antara inner/outer join
+
+SQL memiliki berbagai jenis `JOIN` untuk menentukan apakah baris yang (tidak) cocok disertakan dalam hasil: `INNER JOIN`, `LEFT OUTER JOIN`, `RIGHT OUTER JOIN`, dan `FULL OUTER JOIN` (kata kunci `INNER` dan `OUTER` bersifat opsional). Gambar di bawah ini menggarisbawahi perbedaan antara jenis-jenis join ini: area biru mewakili hasil yang dikembalikan oleh join, dan area putih mewakili hasil yang tidak akan dikembalikan oleh join.
+
+<p align="center">
+  <img src="images/book-03/figure-18.2.png" alt="gambar" width="580"/>
+</p>
+
+Presentasi Cross Join SQL Pictorial [(reference)](http://www.w3resource.com/sql/joins/cross-join.php) :
+
+<p align="center">
+  <img src="images/book-03/figure-18.2a.png" alt="gambar" width="580"/>
+</p>
+
+Berikut adalah contoh-contoh dari jawaban ini.
+Misalnya ada dua tabel seperti di bawah ini:
+
+**Tabel A**
+| a |
+| :-- |
+| 1 |
+| 2 |
+| 3 |
+| 4 |
+
+**Tabel B**
+| b |
+| :-- |
+| 3 |
+| 4 |
+| 5 |
+| 6 |
+
+Perhatikan bahwa (1,2) **unik untuk A**, (3,4) adalah **nilai yang sama** (*common*), dan (5,6) **unik untuk B**.
+
+### Inner Join
+
+**Inner join**, menggunakan salah satu dari kueri yang setara, memberikan **irisan** (*intersection*) dari kedua tabel, yaitu dua baris yang sama-sama mereka miliki:
+
+```sql
+select * from a INNER JOIN b on a.a = b.b;
+select a.*,b.* from a,b where a.a = b.b;
+```
+
+| a | b |
+| :-- | :-- |
+| 3 | 3 |
+| 4 | 4 |
+
+### Left outer join
+
+**Left outer join** akan memberikan **semua baris di A**, ditambah baris-baris yang sama di B:
+
+```sql
+select * from a LEFT OUTER JOIN b on a.a = b.b;
+```
+
+| a | b |
+| :-- | :-- |
+| 1 | null |
+| 2 | null |
+| 3 | 3 |
+| 4 | 4 |
+
+### Right outer join
+
+Demikian pula, **right outer join** akan memberikan **semua baris di B**, ditambah baris-baris yang sama di A:
+
+```sql
+select * from a RIGHT OUTER JOIN b on a.a = b.b;
+```
+
+| a | b |
+| :-- | :-- |
+| 3 | 3 |
+| 4 | 4 |
+| null | 5 |
+| null | 6 |
+
+-----
+
+### Full outer join
+
+**Full outer join** akan memberikan **gabungan** (*union*) dari A dan B, yaitu semua baris di A dan semua baris di B. Jika sesuatu di A tidak memiliki data yang sesuai di B, maka bagian B adalah `null`, dan sebaliknya.
+
+```sql
+select * from a FULL OUTER JOIN b on a.a = b.b;
+```
+
+| a | b |
+| :-- | :-- |
+| 1 | null |
+| 2 | null |
+| 3 | 3 |
+| 4 | 4 |
+| null | 5 |
+| null | 6 |
+
+### Bagian 18.3: Terminologi JOIN: Inner, Outer, Semi, Anti..
+
+Katakanlah kita memiliki dua tabel (A dan B) dan beberapa baris mereka cocok (relatif terhadap kondisi `JOIN` yang diberikan, apa pun kondisinya dalam kasus tertentu):
+
+<p align="center">
+  <img src="images/book-03/figure-18.3.png" alt="gambar" width="580"/>
+</p>
+
+Kita dapat menggunakan berbagai jenis `JOIN` untuk menyertakan atau mengecualikan baris yang cocok atau tidak cocok dari kedua sisi, dan menamai `JOIN` dengan benar dengan memilih istilah yang sesuai dari diagram di atas.
+
+Contoh di bawah ini menggunakan data uji berikut:
+
+```sql
+CREATE TABLE A (
+    X varchar(255) PRIMARY KEY
+);
+
+CREATE TABLE B (
+    Y varchar(255) PRIMARY KEY
+);
+
+INSERT INTO A VALUES
+('Amy'),
+('John'),
+('Lisa'),
+('Marco'),
+('Phil');
+
+INSERT INTO B VALUES
+('Lisa'),
+('Marco'),
+('Phil'),
+('Tim'),
+('Vincent');
+```
+
+## Inner Join
+
+Menggabungkan baris kiri dan kanan yang cocok.
+
+<p align="center">
+  <img src="images/book-03/figure-18.3a.png" alt="gambar" width="580"/>
+</p>
+
+```sql
+SELECT * FROM A JOIN B ON X = Y;
+```
+
+| X | Y |
+| :-- | :-- |
+| Lisa | Lisa |
+| Marco | Marco |
+| Phil | Phil |
+
+## Left Outer Join
+
+Terkadang disingkat menjadi "**left join**". Menggabungkan baris kiri dan kanan yang cocok, dan **menyertakan baris kiri yang tidak cocok**.
+
+<p align="center">
+  <img src="images/book-03/figure-18.3b.png" alt="gambar" width="580"/>
+</p>
+
