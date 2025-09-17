@@ -5388,3 +5388,779 @@ SELECT POWER(50, 3) AS Result
 
 ---
 
+# Bab 44
+## Fungsi (Analitik)
+
+Anda menggunakan fungsi analitik untuk menentukan nilai berdasarkan sekelompok nilai. Misalnya, Anda dapat menggunakan jenis fungsi ini untuk menentukan total berjalan, persentase, atau hasil teratas dalam suatu grup.
+
+### **Bagian 44.1: LAG dan LEAD**
+
+Fungsi **LAG** menyediakan data pada baris **sebelum** baris saat ini dalam set hasil yang sama. Misalnya, dalam pernyataan `SELECT`, Anda dapat membandingkan nilai di baris saat ini dengan nilai di baris sebelumnya.
+
+Anda menggunakan ekspresi skalar untuk menentukan nilai yang harus dibandingkan. Parameter `offset` adalah jumlah baris sebelum baris saat ini yang akan digunakan dalam perbandingan. Jika Anda tidak menentukan jumlah baris, nilai default satu baris akan digunakan.
+
+Parameter `default` menentukan nilai yang harus dikembalikan ketika ekspresi pada `offset` memiliki nilai `NULL`. Jika Anda не menentukan nilai, nilai `NULL` akan dikembalikan.
+
+Fungsi **LEAD** menyediakan data pada baris **setelah** baris saat ini dalam set baris. Misalnya, dalam pernyataan `SELECT`, Anda dapat membandingkan nilai di baris saat ini dengan nilai di baris berikutnya.
+
+Anda menentukan nilai yang harus dibandingkan menggunakan ekspresi skalar. Parameter `offset` adalah jumlah baris setelah baris saat ini yang akan digunakan dalam perbandingan.
+
+Anda menentukan nilai yang harus dikembalikan ketika ekspresi pada `offset` memiliki nilai `NULL` menggunakan parameter `default`. Jika Anda не menentukan parameter ini, default satu baris akan digunakan dan nilai `NULL` akan dikembalikan.
+
+```sql
+SELECT BusinessEntityID, SalesYTD,
+LEAD(SalesYTD, 1, 0) OVER(ORDER BY BusinessEntityID) AS "Lead value",
+LAG(SalesYTD, 1, 0) OVER(ORDER BY BusinessEntityID) AS "Lag value"
+FROM SalesPerson;
+```
+
+Contoh ini menggunakan fungsi `LEAD` dan `LAG` untuk membandingkan nilai penjualan setiap karyawan hingga saat ini dengan karyawan yang terdaftar di atas dan di bawahnya, dengan catatan diurutkan berdasarkan kolom `BusinessEntityID`.
+
+| BusinessEntityID | SalesYTD | Lead value | Lag value |
+| :--- | :--- | :--- | :--- |
+| 274 | 559697.5639 | 3763178.1787 | 0.0000 |
+| 275 | 3763178.1787 | 4251368.5497 | 559697.5639 |
+| 276 | 4251368.5497 | 3189418.3662 | 3763178.1787 |
+| 277 | 3189418.3662 | 1453719.4653 | 4251368.5497 |
+| 278 | 1453719.4653 | 2315185.6110 | 3189418.3662 |
+| 279 | 2315185.6110 | 1352577.1325 | 1453719.4653 |
+
+### **Bagian 44.2: PERCENTILE\_DISC dan PERCENTILE\_CONT**
+
+Fungsi **`PERCENTILE_DISC`** menampilkan nilai dari entri pertama di mana distribusi kumulatif lebih tinggi dari persentil yang Anda berikan menggunakan parameter `numeric_literal`.
+
+Nilai-nilai tersebut dikelompokkan berdasarkan set baris atau partisi, seperti yang ditentukan oleh klausa `WITHIN GROUP`.
+
+Fungsi **`PERCENTILE_CONT`** mirip dengan fungsi `PERCENTILE_DISC`, tetapi mengembalikan rata-rata dari jumlah entri yang cocok pertama dan entri berikutnya.
+
+```sql
+SELECT BusinessEntityID, JobTitle, SickLeaveHours,
+CUME_DIST() OVER(PARTITION BY JobTitle ORDER BY SickLeaveHours ASC)
+AS "Cumulative Distribution",
+PERCENTILE_DISC(0.5) WITHIN GROUP(ORDER BY SickLeaveHours)
+OVER(PARTITION BY JobTitle) AS "Percentile Discreet"
+FROM Employee;
+```
+
+Untuk menemukan nilai pasti dari baris yang cocok atau melebihi persentil 0.5, Anda meneruskan persentil tersebut sebagai literal numerik dalam fungsi `PERCENTILE_DISC`. Kolom "Percentile Discreet" dalam set hasil menampilkan nilai dari baris di mana distribusi kumulatif lebih tinggi dari persentil yang ditentukan.
+
+| BusinessEntityID | JobTitle | SickLeaveHours | Cumulative Distribution | Percentile Discreet |
+| :--- | :--- | :--- | :--- | :--- |
+| 272 | Application Specialist | 55 | 0.25 | 56 |
+| 268 | Application Specialist | 56 | 0.75 | 56 |
+| 269 | Application Specialist | 56 | 0.75 | 56 |
+| 267 | Application Specialist | 57 | 1 | 56 |
+
+Untuk mendasarkan perhitungan pada satu set nilai, Anda menggunakan fungsi `PERCENTILE_CONT`. Kolom "Percentile Continuous" dalam hasil menampilkan nilai rata-rata dari jumlah nilai hasil dan nilai cocok tertinggi berikutnya.
+
+```sql
+SELECT BusinessEntityID, JobTitle, SickLeaveHours,
+CUME_DIST() OVER(PARTITION BY JobTitle ORDER BY SickLeaveHours ASC)
+AS "Cumulative Distribution",
+PERCENTILE_DISC(0.5) WITHIN GROUP(ORDER BY SickLeaveHours)
+OVER(PARTITION BY JobTitle) AS "Percentile Discreet",
+PERCENTILE_CONT(0.5) WITHIN GROUP(ORDER BY SickLeaveHours)
+OVER(PARTITION BY JobTitle) AS "Percentile Continuous"
+FROM Employee;
+```
+
+| BusinessEntityID | JobTitle | SickLeaveHours | Cumulative Distribution | Percentile Discreet | Percentile Continuous |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 272 | Application Specialist | 55 | 0.25 | 56 | 56 |
+| 268 | Application Specialist | 56 | 0.75 | 56 | 56 |
+| 269 | Application Specialist | 56 | 0.75 | 56 | 56 |
+| 267 | Application Specialist | 57 | 1 | 56 | 56 |
+
+### **Bagian 44.3: FIRST\_VALUE**
+
+Anda menggunakan fungsi `FIRST_VALUE` untuk menentukan nilai pertama dalam set hasil yang terurut, yang Anda identifikasi menggunakan ekspresi skalar.
+
+```sql
+SELECT StateProvinceID, Name, TaxRate,
+FIRST_VALUE(StateProvinceID)
+OVER(ORDER BY TaxRate ASC) AS FirstValue
+FROM SalesTaxRate;
+```
+
+Dalam contoh ini, fungsi `FIRST_VALUE` digunakan для mengembalikan ID negara bagian atau provinsi dengan tarif pajak terendah. Klausa `OVER` digunakan untuk mengurutkan tarif pajak guna mendapatkan tarif terendah.
+
+| StateProvinceID | Name | TaxRate | FirstValue |
+| :--- | :--- | :--- | :--- |
+| 74 | Utah State Sales Tax | 5.00 | 74 |
+| 36 | Minnesota State Sales Tax | 6.75 | 74 |
+| 30 | Massachusetts State Sales Tax | 7.00 | 74 |
+| 1 | Canadian GST | 7.00 | 74 |
+| 57 | Canadian GST | 7.00 | 74 |
+| 63 | Canadian GST | 7.00 | 74 |
+
+### **Bagian 44.4: LAST\_VALUE**
+
+Fungsi `LAST_VALUE` memberikan nilai terakhir dalam set hasil yang terurut, yang Anda tentukan menggunakan ekspresi skalar.
+
+```sql
+SELECT TerritoryID, StartDate, BusinessentityID,
+LAST_VALUE(BusinessentityID)
+OVER(ORDER BY TerritoryID) AS LastValue
+FROM SalesTerritoryHistory;
+```
+
+Contoh ini menggunakan fungsi `LAST_VALUE` untuk mengembalikan nilai terakhir untuk setiap set baris dalam nilai yang terurut.
+
+| TerritoryID | StartDate | BusinessentityID | LastValue |
+| :--- | :--- | :--- | :--- |
+| 1 | 2005-07-01 00.00.00.000 | 280 | 283 |
+| 1 | 2006-11-01 00.00.00.000 | 284 | 283 |
+| 1 | 2005-07-01 00.00.00.000 | 283 | 283 |
+| 2 | 2007-01-01 00.00.00.000 | 277 | 275 |
+| 2 | 2005-07-01 00.00.00.000 | 275 | 275 |
+| 3 | 2007-01-01 00.00.00.000 | 275 | 277 |
+
+### **Bagian 44.5: PERCENT\_RANK dan CUME\_DIST**
+
+Fungsi **`PERCENT_RANK`** menghitung peringkat sebuah baris relatif terhadap set baris. Persentasenya didasarkan pada jumlah baris dalam grup yang memiliki nilai lebih rendah dari baris saat ini.
+
+Nilai pertama dalam set hasil selalu memiliki peringkat persentase nol. Nilai untuk peringkat tertinggi – atau terakhir – dalam set selalu satu.
+
+Fungsi **`CUME_DIST`** menghitung posisi relatif dari nilai yang ditentukan dalam sekelompok nilai, dengan menentukan persentase nilai yang lebih kecil dari atau sama dengan nilai tersebut. Ini disebut distribusi kumulatif.
+
+```sql
+SELECT BusinessEntityID, JobTitle, SickLeaveHours,
+PERCENT_RANK() OVER(PARTITION BY JobTitle ORDER BY SickLeaveHours DESC)
+AS "Percent Rank",
+CUME_DIST() OVER(PARTITION BY JobTitle ORDER BY SickLeaveHours DESC)
+AS "Cumulative Distribution"
+FROM Employee;
+```
+
+Dalam contoh ini, Anda menggunakan klausa `ORDER` untuk mempartisi – atau mengelompokkan – baris yang diambil oleh pernyataan `SELECT` berdasarkan jabatan karyawan, dengan hasil di setiap grup diurutkan berdasarkan jumlah jam cuti sakit yang telah digunakan karyawan.
+
+| BusinessEntityID | JobTitle | SickLeaveHours | Percent Rank | Cumulative Distribution |
+| :--- | :--- | :--- | :--- | :--- |
+| 267 | Application Specialist | 57 | 0 | 0.25 |
+| 268 | Application Specialist | 56 | 0.333333333333333 | 0.75 |
+| 269 | Application Specialist | 56 | 0.333333333333333 | 0.75 |
+| 272 | Application Specialist | 55 | 1 | 1 |
+| 262 | Assitant to the Cheif Financial Officer | 48 | 0 | 1 |
+| 239 | Benefits Specialist | 45 | 0 | 1 |
+| 252 | Buyer | 50 | 0 | 0.111111111111111 |
+| 251 | Buyer | 49 | 0.125 | 0.333333333333333 |
+| 256 | Buyer | 49 | 0.125 | 0.333333333333333 |
+| 253 | Buyer | 48 | 0.375 | 0.555555555555555 |
+| 254 | Buyer | 48 | 0.375 | 0.555555555555555 |
+
+Fungsi `PERCENT_RANK` memberi peringkat entri di dalam setiap grup. Untuk setiap entri, fungsi ini mengembalikan persentase entri dalam grup yang sama yang memiliki nilai lebih rendah.
+
+Fungsi `CUME_DIST` serupa, kecuali bahwa fungsi ini mengembalikan persentase nilai yang lebih kecil dari atau sama dengan nilai saat ini.
+
+---
+
+# Bab 45
+## Fungsi Jendela (Window Functions)
+
+### **Bagian 45.1: Mengatur penanda (flag) jika baris lain memiliki properti yang sama**
+
+Katakanlah saya memiliki data ini:
+
+**Tabel `items`**
+| id | name | tag |
+| :--- | :--- | :--- |
+| 1 | example | unique\_tag |
+| 2 | foo | simple |
+| 42 | bar | simple |
+| 3 | baz | hello |
+| 51 | quux | world |
+
+Saya ingin mendapatkan semua baris tersebut dan mengetahui apakah sebuah `tag` digunakan oleh baris lain.
+
+```sql
+SELECT id, name, tag, COUNT(*) OVER (PARTITION BY tag) > 1 AS flag FROM items
+```
+
+Hasilnya akan menjadi:
+
+| id | name | tag | flag |
+| :--- | :--- | :--- | :--- |
+| 1 | example | unique\_tag | false |
+| 2 | foo | simple | true |
+| 42 | bar | simple | true |
+| 3 | baz | hello | false |
+| 51 | quux | world | false |
+
+Jika basis data Anda tidak memiliki `OVER` dan `PARTITION`, Anda dapat menggunakan ini untuk menghasilkan hasil yang sama:
+
+```sql
+SELECT id, name, tag, (SELECT COUNT(tag) FROM items B WHERE tag = A.tag) > 1 AS flag FROM items A
+```
+
+### **Bagian 45.2: Menemukan catatan "di luar urutan" menggunakan fungsi LAG()**
+
+Diberikan data sampel ini:
+
+| ID | STATUS | STATUS\_TIME | STATUS\_BY |
+| :--- | :--- | :--- | :--- |
+| 1 | ONE | 2016-09-28-19.47.52.501398 | USER\_1 |
+| 3 | ONE | 2016-09-28-19.47.52.501511 | USER\_2 |
+| 1 | THREE | 2016-09-28-19.47.52.501517 | USER\_3 |
+| 3 | TWO | 2016-09-28-19.47.52.501521 | USER\_2 |
+| 3 | THREE | 2016-09-28-19.47.52.501524 | USER\_4 |
+
+Item yang diidentifikasi oleh nilai `ID` harus berpindah dari `STATUS` 'ONE' ke 'TWO' ke 'THREE' secara berurutan, tanpa melewatkan status. Masalahnya adalah menemukan nilai pengguna (`STATUS_BY`) yang melanggar aturan dan berpindah dari 'ONE' langsung ke 'THREE'.
+
+Fungsi analitik `LAG()` membantu menyelesaikan masalah ini dengan mengembalikan nilai dari baris sebelumnya untuk setiap baris:
+
+```sql
+SELECT * FROM (
+  SELECT
+    t.*,
+    LAG(status) OVER (PARTITION BY id ORDER BY status_time) AS prev_status
+  FROM test t
+) t1 WHERE status = 'THREE' AND prev_status != 'TWO'
+```
+
+Jika basis data Anda tidak memiliki `LAG()`, Anda dapat menggunakan ini untuk menghasilkan hasil yang sama:
+
+```sql
+SELECT A.id, A.status, B.status as prev_status, A.status_time, B.status_time as prev_status_time
+FROM Data A, Data B
+WHERE A.id = B.id
+AND
+  B.status_time = (SELECT MAX(status_time) FROM Data where status_time < A.status_time and id = A.id)
+AND
+  A.status = 'THREE' AND NOT B.status = 'TWO'
+```
+
+### **Bagian 45.3: Mendapatkan total berjalan (running total)**
+
+Diberikan data ini:
+
+| date | amount |
+| :--- | :--- |
+| 2016-03-12 | 200 |
+| 2016-03-11 | -50 |
+| 2016-03-14 | 100 |
+| 2016-03-15 | 100 |
+| 2016-03-10 | -250 |
+
+```sql
+SELECT date, amount, SUM(amount) OVER (ORDER BY date ASC) AS running
+FROM operations
+ORDER BY date ASC
+```
+
+akan memberi Anda:
+
+| date | amount | running |
+| :--- | :--- | :--- |
+| 2016-03-10 | -250 | -250 |
+| 2016-03-11 | -50 | -300 |
+| 2016-03-12 | 200 | -100 |
+| 2016-03-14 | 100 | 0 |
+| 2016-03-15 | 100 | 100 |
+
+### **Bagian 45.4: Menambahkan total baris yang dipilih ke setiap baris**
+
+```sql
+SELECT your_columns, COUNT(*) OVER() as Ttl_Rows FROM your_data_set
+```
+
+| id | name | Ttl\_Rows |
+| :--- | :--- | :--- |
+| 1 | example | 5 |
+| 2 | foo | 5 |
+| 3 | bar | 5 |
+| 4 | baz | 5 |
+| 5 | quux | 5 |
+
+Daripada menggunakan dua kueri untuk mendapatkan hitungan lalu barisnya, Anda dapat menggunakan agregat sebagai fungsi jendela dan menggunakan set hasil penuh sebagai jendela.
+
+Ini dapat digunakan sebagai dasar untuk perhitungan lebih lanjut tanpa kompleksitas *self join* tambahan.
+
+### **Bagian 45.5: Mendapatkan N baris terbaru dari beberapa pengelompokan**
+
+Diberikan data ini:
+
+| User\_ID | Completion\_Date |
+| :--- | :--- |
+| 1 | 2016-07-20 |
+| 1 | 2016-07-21 |
+| 2 | 2016-07-20 |
+| 2 | 2016-07-21 |
+| 2 | 2016-07-22 |
+
+```sql
+;with CTE as
+(
+  SELECT *,
+    ROW_NUMBER() OVER (PARTITION BY User_ID
+    ORDER BY Completion_Date DESC) Row_Num
+  FROM
+    Data
+)
+SELECT * FROM CTE WHERE Row_Num <= n
+```
+
+Menggunakan `n=1`, Anda akan mendapatkan satu baris terbaru per `user_id`:
+
+| User\_ID | Completion\_Date | Row\_Num |
+| :--- | :--- | :--- |
+| 1 | 2016-07-21 | 1 |
+| 2 | 2016-07-22 | 1 |
+
+---
+
+# Bab 46
+## Common Table Expressions (CTE)
+
+### **Bagian 46.1: Menghasilkan nilai**
+
+Sebagian besar basis data tidak memiliki cara bawaan untuk menghasilkan serangkaian angka untuk penggunaan ad-hoc; namun, *common table expressions* dapat digunakan dengan rekursi untuk meniru jenis fungsi tersebut.
+
+Contoh berikut menghasilkan *common table expression* bernama `Numbers` dengan kolom `i` yang memiliki baris untuk angka 1-5:
+
+```sql
+-- Beri nama tabel `Numbers` dan kolom `i` untuk menampung angka
+WITH Numbers(i) AS (
+  -- Angka/indeks awal
+  SELECT 1
+  -- Operator UNION ALL tingkat atas diperlukan untuk rekursi
+  UNION ALL
+  -- Ekspresi iterasi:
+  SELECT i + 1
+  -- Ekspresi tabel yang pertama kita deklarasikan digunakan sebagai sumber rekursi
+  FROM Numbers
+  -- Klausa untuk mendefinisikan akhir dari rekursi
+  WHERE i < 5
+)
+-- Gunakan ekspresi tabel yang dihasilkan seperti tabel biasa
+SELECT i FROM Numbers;
+```
+
+| i |
+| :-- |
+| 1 |
+| 2 |
+| 3 |
+| 4 |
+| 5 |
+
+Metode ini dapat digunakan dengan interval angka apa pun, serta tipe data lainnya.
+
+### **Bagian 46.2: Menjabarkan subtree secara rekursif**
+
+```sql
+WITH RECURSIVE ManagedByJames(Level, ID, FName, LName) AS (
+  -- mulai dengan baris ini
+  SELECT 1, ID, FName, LName
+  FROM Employees
+  WHERE ID = 1
+  UNION ALL
+  -- dapatkan karyawan yang memiliki salah satu baris yang dipilih sebelumnya sebagai manajer
+  SELECT ManagedByJames.Level + 1,
+    Employees.ID,
+    Employees.FName,
+    Employees.LName
+  FROM Employees
+  JOIN ManagedByJames
+    ON Employees.ManagerID = ManagedByJames.ID
+  ORDER BY 1 DESC -- pencarian depth-first
+)
+SELECT * FROM ManagedByJames;
+```
+
+| Level | ID | FName | LName |
+| :--- | :- | :--- | :--- |
+| 1 | 1 | James | Smith |
+| 2 | 2 | John | Johnson |
+| 3 | 4 | Johnathon | Smith |
+| 2 | 3 | Michael | Williams |
+
+### **Bagian 46.3: Kueri sementara**
+
+Ini berperilaku dengan cara yang sama seperti subkueri bersarang tetapi dengan sintaks yang berbeda.
+
+```sql
+WITH ReadyCars AS (
+  SELECT *
+  FROM Cars
+  WHERE Status = 'READY'
+)
+SELECT ID, Model, TotalCost
+FROM ReadyCars
+ORDER BY TotalCost;
+```
+
+| ID | Model | TotalCost |
+| :--- | :--- | :--- |
+| 1 | Ford F-150 | 200 |
+| 2 | Ford F-150 | 230 |
+
+Sintaks subkueri yang setara:
+
+```sql
+SELECT ID, Model, TotalCost
+FROM (
+  SELECT *
+  FROM Cars
+  WHERE Status = 'READY'
+) AS ReadyCars
+ORDER BY TotalCost
+```
+
+### **Bagian 46.4: Naik secara rekursif dalam sebuah pohon (tree)**
+
+```sql
+WITH RECURSIVE ManagersOfJonathon AS (
+  -- mulai dengan baris ini
+  SELECT *
+  FROM Employees
+  WHERE ID = 4
+  UNION ALL
+  -- dapatkan manajer dari semua baris yang dipilih sebelumnya
+  SELECT Employees.*
+  FROM Employees
+  JOIN ManagersOfJonathon
+    ON Employees.ID = ManagersOfJonathon.ManagerID
+)
+SELECT * FROM ManagersOfJonathon;
+```
+
+| Id | FName | LName | PhoneNumber | ManagerId | DepartmentId |
+| :-- | :--- | :--- | :--- | :--- | :--- |
+| 4 | Johnathon | Smith | 1212121212 | 2 | 1 |
+| 2 | John | Johnson | 2468101214 | 1 | 1 |
+| 1 | James | Smith | 1234567890 | NULL | 1 |
+
+### **Bagian 46.5: Menghasilkan tanggal secara rekursif, diperluas untuk menyertakan contoh jadwal tim (rostering)**
+
+```sql
+DECLARE @DateFrom DATETIME = '2016-06-01 06:00'
+DECLARE @DateTo DATETIME = '2016-07-01 06:00'
+DECLARE @IntervalDays INT = 7
+
+-- Urutan Transisi = Istirahat & Santai ke Shift Siang ke Shift Malam
+-- RR (Rest & Relax) = 1
+-- DS (Day Shift) = 2
+-- NS (Night Shift) = 3
+;WITH roster AS
+(
+  SELECT @DateFrom AS RosterStart, 1 AS TeamA, 2 AS TeamB, 3 AS TeamC
+  UNION ALL
+  SELECT DATEADD(d, @IntervalDays, RosterStart),
+    CASE TeamA WHEN 1 THEN 2 WHEN 2 THEN 3 WHEN 3 THEN 1 END AS TeamA,
+    CASE TeamB WHEN 1 THEN 2 WHEN 2 THEN 3 WHEN 3 THEN 1 END AS TeamB,
+    CASE TeamC WHEN 1 THEN 2 WHEN 2 THEN 3 WHEN 3 THEN 1 END AS TeamC
+  FROM roster WHERE RosterStart < DATEADD(d, -@IntervalDays, @DateTo)
+)
+SELECT RosterStart,
+  ISNULL(LEAD(RosterStart) OVER (ORDER BY RosterStart), RosterStart + @IntervalDays) AS RosterEnd,
+  CASE TeamA WHEN 1 THEN 'RR' WHEN 2 THEN 'DS' WHEN 3 THEN 'NS' END AS TeamA,
+  CASE TeamB WHEN 1 THEN 'RR' WHEN 2 THEN 'DS' WHEN 3 THEN 'NS' END AS TeamB,
+  CASE TeamC WHEN 1 THEN 'RR' WHEN 2 THEN 'DS' WHEN 3 THEN 'NS' END AS TeamC
+FROM roster
+```
+
+**Hasil**
+
+Misalnya, untuk Minggu 1, Tim A sedang R\&R (Istirahat & Santai), Tim B sedang Shift Siang, dan Tim C sedang Shift Malam.
+
+<p align="center">
+  <img src="images/book-03/figure-46.5.png" alt="gambar" width="580"/>
+</p>
+
+### **Bagian 46.6: Fungsionalitas CONNECT BY Oracle dengan CTE rekursif**
+
+Fungsionalitas `CONNECT BY` dari Oracle menyediakan banyak fitur berguna dan non-trivial yang tidak ada secara bawaan saat menggunakan CTE rekursif standar SQL. Contoh ini mereplikasi fitur-fitur tersebut (dengan beberapa tambahan demi kelengkapan), menggunakan sintaks SQL Server. Ini paling berguna bagi pengembang Oracle yang merasa banyak fitur hilang dalam kueri hirarkis mereka di basis data lain, tetapi ini juga berfungsi untuk menunjukkan apa yang bisa dilakukan dengan kueri hirarkis secara umum.
+
+```sql
+WITH tbl AS (
+  SELECT id, name, parent_id
+  FROM mytable
+)
+, tbl_hierarchy AS (
+  /* Jangkar (Anchor) */
+  SELECT 
+    1 AS "LEVEL"
+    --, 1 AS CONNECT_BY_ISROOT
+    --, 0 AS CONNECT_BY_ISBRANCH
+    , CASE WHEN t.id IN (SELECT parent_id FROM tbl) THEN 0 ELSE 1 END AS CONNECT_BY_ISLEAF
+    , 0 AS CONNECT_BY_ISCYCLE
+    , '/' + CAST(t.id AS VARCHAR(MAX)) + '/' AS SYS_CONNECT_BY_PATH_id
+    , '/' + CAST(t.name AS VARCHAR(MAX)) + '/' AS SYS_CONNECT_BY_PATH_name
+    , t.id AS root_id
+    , t.*
+  FROM tbl t
+  WHERE t.parent_id IS NULL
+  -- START WITH parent_id IS NULL
+  UNION ALL
+  /* Rekursif */
+  SELECT 
+    th."LEVEL" + 1 AS "LEVEL"
+    --, 0 AS CONNECT_BY_ISROOT
+    --, CASE WHEN t.id IN (SELECT parent_id FROM tbl) THEN 1 ELSE 0 END AS CONNECT_BY_ISBRANCH
+    , CASE WHEN t.id IN (SELECT parent_id FROM tbl) THEN 0 ELSE 1 END AS CONNECT_BY_ISLEAF
+    , CASE WHEN th.SYS_CONNECT_BY_PATH_id LIKE '%/' + CAST(t.id AS VARCHAR(MAX)) + '/%' THEN 1 ELSE 0 END AS CONNECT_BY_ISCYCLE
+    , th.SYS_CONNECT_BY_PATH_id + CAST(t.id AS VARCHAR(MAX)) + '/' AS SYS_CONNECT_BY_PATH_id
+    , th.SYS_CONNECT_BY_PATH_name + CAST(t.name AS VARCHAR(MAX)) + '/' AS SYS_CONNECT_BY_PATH_name
+    , th.root_id
+    , t.*
+  FROM tbl t
+  JOIN tbl_hierarchy th ON (th.id = t.parent_id) -- CONNECT BY PRIOR id = parent_id
+  WHERE th.CONNECT_BY_ISCYCLE = 0
+)
+-- NOCYCLE
+SELECT 
+  th.*
+  --, REPLICATE('  ', (th."LEVEL" - 1) * 3) + th.name AS tbl_hierarchy
+FROM tbl_hierarchy th
+JOIN tbl CONNECT_BY_ROOT ON (CONNECT_BY_ROOT.id = th.root_id)
+ORDER BY th.SYS_CONNECT_BY_PATH_name;
+-- ORDER SIBLINGS BY name
+```
+
+Fitur-fitur `CONNECT BY` yang ditunjukkan di atas, beserta penjelasannya:
+
+**Klausa (Clauses)**
+
+  * **`CONNECT BY`**: Menentukan hubungan yang mendefinisikan hirarki.
+  * **`START WITH`**: Menentukan *node* akar.
+  * **`ORDER SIBLINGS BY`**: Mengurutkan hasil dengan benar.
+
+**Parameter**
+
+  * **`NOCYCLE`**: Menghentikan pemrosesan sebuah cabang ketika perulangan (loop) terdeteksi. Hirarki yang valid adalah *Directed Acyclic Graphs*, dan referensi sirkular melanggar konstruksi ini.
+
+**Operator**
+
+  * **`PRIOR`**: Mendapatkan data dari induk *node*.
+  * **`CONNECT_BY_ROOT`**: Mendapatkan data dari akar *node*.
+
+**Pseudokolom (Pseudocolumns)**
+
+  * **`LEVEL`**: Menunjukkan jarak *node* dari akarnya.
+  * **`CONNECT_BY_ISLEAF`**: Menunjukkan *node* yang tidak memiliki anak.
+  * **`CONNECT_BY_ISCYCLE`**: Menunjukkan *node* dengan referensi sirkular.
+
+**Fungsi (Functions)**
+
+  * **`SYS_CONNECT_BY_PATH`**: Mengembalikan representasi yang diratakan/digabungkan dari jalur ke *node* dari akarnya.
+
+---
+
+# Bab 47
+## View
+
+### **Bagian 47.1: View sederhana**
+
+Sebuah *view* dapat menyaring beberapa baris dari tabel dasar atau hanya memproyeksikan beberapa kolom darinya:
+
+```sql
+CREATE VIEW new_employees_details AS
+SELECT E.id, Fname, Salary, Hire_date
+FROM Employees E
+WHERE hire_date > date '2015-01-01';
+```
+
+Jika Anda melakukan `SELECT` dari *view* tersebut:
+
+```sql
+select * from new_employees_details
+```
+
+| Id | FName | Salary | Hire\_date |
+| :-- | :--- | :--- | :--- |
+| 4 | Johnathon | 500 | 24-07-2016 |
+
+### **Bagian 47.2: View kompleks**
+
+Sebuah *view* bisa menjadi kueri yang sangat kompleks (agregasi, *join*, subkueri, dll). Pastikan Anda menambahkan nama kolom untuk semua yang Anda pilih:
+
+```sql
+Create VIEW dept_income AS
+SELECT d.Name as DepartmentName, sum(e.salary) as TotalSalary
+FROM Employees e
+JOIN Departments d on e.DepartmentId = d.id
+GROUP BY d.Name;
+```
+
+Sekarang Anda dapat melakukan `SELECT` darinya seperti dari tabel biasa:
+
+```sql
+SELECT *
+FROM dept_income;
+```
+
+| DepartmentName | TotalSalary |
+| :--- | :--- |
+| HR | 1900 |
+| Sales | 600 |
+
+---
+
+# Bab 48
+## Materialized View
+
+Sebuah *materialized view* adalah *view* yang hasilnya disimpan secara fisik dan harus diperbarui secara berkala agar tetap terkini. Oleh karena itu, *view* ini berguna untuk menyimpan hasil kueri yang kompleks dan berjalan lama ketika hasil *real-time* tidak diperlukan. *Materialized view* dapat dibuat di Oracle dan PostgreSQL. Sistem basis data lain menawarkan fungsionalitas serupa, seperti *indexed view* di SQL Server atau *materialized query tables* di DB2.
+
+### **Bagian 48.1: Contoh PostgreSQL**
+
+```sql
+CREATE TABLE mytable (number INT);
+
+INSERT INTO mytable VALUES (1);
+
+CREATE MATERIALIZED VIEW myview AS SELECT * FROM mytable;
+
+SELECT * FROM myview;
+```
+
+**Hasil:**
+
+```
+ number
+--------
+      1
+(1 row)
+```
+
+```sql
+INSERT INTO mytable VALUES(2);
+
+SELECT * FROM myview;
+```
+
+**Hasil:**
+
+```
+ number
+--------
+      1
+(1 row)
+```
+
+```sql
+REFRESH MATERIALIZED VIEW myview;
+
+SELECT * FROM myview;
+```
+
+**Hasil:**
+
+```
+ number
+--------
+      1
+      2
+(2 rows)
+```
+
+---
+
+# Bab 49
+## Komentar
+
+### **Bagian 49.1: Komentar satu baris**
+
+Komentar satu baris diawali dengan `--`, dan berlanjut hingga akhir baris:
+
+```sql
+SELECT *
+FROM Employees -- ini adalah komentar
+WHERE FName = 'John'
+```
+
+### **Bagian 49.2: Komentar multi-baris**
+
+Komentar kode multi-baris diapit dalam `/* ... */`:
+
+```sql
+/* Kueri ini
+mengembalikan semua karyawan */
+SELECT *
+FROM Employees
+```
+
+Juga memungkinkan untuk menyisipkan komentar seperti itu di tengah baris:
+
+```sql
+SELECT /* semua kolom: */ *
+FROM Employees
+```
+
+---
+
+# Bab 50
+## Foreign Key
+
+### **Bagian 50.1: Penjelasan Foreign Key**
+
+Kendala (*constraint*) **Foreign Key** memastikan integritas data, dengan memberlakukan bahwa nilai di satu tabel harus cocok dengan nilai di tabel lain.
+
+Contoh di mana *foreign key* diperlukan adalah: Di sebuah universitas, sebuah mata kuliah harus dimiliki oleh sebuah jurusan. Kode untuk skenario ini adalah:
+
+```sql
+CREATE TABLE Department (
+    Dept_Code CHAR(5) PRIMARY KEY,
+    Dept_Name VARCHAR(20) UNIQUE
+);
+```
+
+Masukkan nilai dengan pernyataan berikut:
+
+```sql
+INSERT INTO Department VALUES ('CS205', 'Computer Science');
+```
+
+Tabel berikut akan berisi informasi mata kuliah yang ditawarkan oleh jurusan Ilmu Komputer:
+
+```sql
+CREATE TABLE Programming_Courses (
+    Dept_Code CHAR(5),
+    Prg_Code CHAR(9) PRIMARY KEY,
+    Prg_Name VARCHAR(50) UNIQUE,
+    FOREIGN KEY (Dept_Code) References Department(Dept_Code)
+);
+```
+
+(Tipe data dari *Foreign Key* harus cocok dengan tipe data dari kunci yang direferensikan.)
+
+Kendala *Foreign Key* pada kolom `Dept_Code` hanya mengizinkan nilai jika nilai tersebut sudah ada di tabel yang direferensikan, `Department`. Ini berarti jika Anda mencoba memasukkan nilai berikut:
+
+```sql
+INSERT INTO Programming_Courses Values ('CS300', 'FDB-DB001', 'Database Systems');
+```
+
+basis data akan memunculkan kesalahan pelanggaran *Foreign Key*, karena `CS300` tidak ada di tabel `Department`. Tetapi ketika Anda mencoba nilai kunci yang ada:
+
+```sql
+INSERT INTO Programming_Courses VALUES ('CS205', 'FDB-DB001', 'Database Systems');
+INSERT INTO Programming_Courses VALUES ('CS205', 'DB2-DB002', 'Database Systems II');
+```
+
+maka basis data mengizinkan nilai-nilai ini.
+
+**Beberapa tips untuk menggunakan Foreign Key**
+
+  * *Foreign Key* harus mereferensikan kunci `UNIQUE` (atau `PRIMARY`) di tabel induk.
+  * Memasukkan nilai `NULL` di kolom *Foreign Key* tidak menimbulkan kesalahan.
+  * Kendala *Foreign Key* dapat mereferensikan tabel dalam basis data yang sama.
+  * Kendala *Foreign Key* dapat merujuk ke kolom lain di tabel yang sama (referensi-diri).
+
+### **Bagian 50.2: Membuat tabel dengan foreign key**
+
+Dalam contoh ini kita memiliki tabel yang sudah ada, `SuperHeros`. Tabel ini berisi *primary key* `ID`.
+
+Kita akan menambahkan tabel baru untuk menyimpan kekuatan dari setiap pahlawan super:
+
+```sql
+CREATE TABLE HeroPowers
+(
+    ID int NOT NULL PRIMARY KEY,
+    Name nvarchar(MAX) NOT NULL,
+    HeroId int REFERENCES SuperHeros(ID)
+)
+```
+
+Kolom `HeroId` adalah *foreign key* ke tabel `SuperHeros`.
+
+---
+
