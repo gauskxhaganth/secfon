@@ -5189,3 +5189,202 @@ SELECT MAX(column_name) FROM table_name;
 
 ---
 
+# Bab 43
+## Fungsi (Scalar/Baris Tunggal)
+
+SQL menyediakan beberapa fungsi skalar bawaan. Setiap fungsi skalar mengambil satu nilai sebagai input dan mengembalikan satu nilai sebagai output untuk setiap baris dalam sebuah set hasil.
+
+Anda menggunakan fungsi skalar di mana pun sebuah ekspresi diizinkan dalam pernyataan T-SQL.
+
+### Bagian 43.1: Tanggal Dan Waktu 🗓️
+
+Di SQL, Anda menggunakan tipe data tanggal dan waktu untuk menyimpan informasi kalender. Tipe data ini termasuk `time`, `date`, `smalldatetime`, `datetime`, `datetime2`, dan `datetimeoffset`. Setiap tipe data memiliki format spesifik.
+
+| Tipe data | Format |
+| :--- | :--- |
+| **time** | `hh:mm:ss[.nnnnnnn]` |
+| **date** | `YYYY-MM-DD` |
+| **smalldatetime** | `YYYY-MM-DD hh:mm:ss` |
+| **datetime** | `YYYY-MM-DD hh:mm:ss[.nnn]` |
+| **datetime2** | `YYYY-MM-DD hh:mm:ss[.nnnnnnn]` |
+| **datetimeoffset** | `YYYY-MM-DD hh:mm:ss[.nnnnnnn] [+/-]hh:mm` |
+
+Fungsi `DATENAME` mengembalikan nama atau nilai dari bagian tanggal tertentu.
+
+```sql
+SELECT DATENAME (weekday,'2017-01-14') as Datename
+```
+
+| Datename |
+| :--- |
+| Saturday |
+
+Anda menggunakan fungsi `GETDATE` untuk menentukan tanggal dan waktu saat ini dari komputer yang menjalankan instance SQL saat ini. Fungsi ini tidak menyertakan perbedaan zona waktu.
+
+```sql
+SELECT GETDATE() as Systemdate
+```
+
+| Systemdate |
+| :--- |
+| 2017-01-14 11:11:47.7230728 |
+
+Fungsi `DATEDIFF` mengembalikan selisih antara dua tanggal.
+
+Dalam sintaksnya, `datepart` adalah parameter yang menentukan bagian mana dari tanggal yang ingin Anda gunakan untuk menghitung selisih. `datepart` bisa berupa `year`, `month`, `week`, `day`, `hour`, `minute`, `second`, atau `millisecond`. Anda kemudian menentukan tanggal mulai di parameter `startdate` dan tanggal akhir di parameter `enddate`.
+
+```sql
+SELECT SalesOrderID, DATEDIFF(day, OrderDate, ShipDate) AS 'Processing time'
+FROM Sales.SalesOrderHeader
+```
+
+| SalesOrderID | Processing time |
+| :--- | :--- |
+| 43659 | 7 |
+| 43660 | 7 |
+| 43661 | 7 |
+| 43662 | 7 |
+
+Fungsi `DATEADD` memungkinkan Anda untuk menambahkan interval ke bagian dari tanggal tertentu.
+
+```sql
+SELECT DATEADD (day, 20, '2017-01-14') AS Added20MoreDays
+```
+
+| Added20MoreDays |
+| :--- |
+| 2017-02-03 00:00:00.000 |
+
+### Bagian 43.2: Modifikasi Karakter
+
+Fungsi modifikasi karakter termasuk mengubah karakter menjadi huruf besar atau kecil, mengubah angka menjadi angka yang diformat, melakukan manipulasi karakter, dll.
+
+Fungsi `lower(char)` mengubah parameter karakter yang diberikan menjadi karakter huruf kecil.
+
+```sql
+SELECT customer_id, lower(customer_last_name) FROM customer;
+```
+
+akan mengembalikan nama belakang pelanggan yang diubah dari "SMITH" menjadi "smith".
+
+### Bagian 43.3: Fungsi Konfigurasi dan Konversi
+
+Contoh fungsi konfigurasi di SQL adalah fungsi `@@SERVERNAME`. Fungsi ini memberikan nama server lokal yang sedang menjalankan SQL.
+
+```sql
+SELECT @@SERVERNAME AS 'Server'
+```
+
+| Server |
+| :--- |
+| SQL064 |
+
+Di SQL, sebagian besar konversi data terjadi secara implisit, tanpa campur tangan pengguna.
+
+Untuk melakukan konversi apa pun yang tidak dapat diselesaikan secara implisit, Anda dapat menggunakan fungsi `CAST` atau `CONVERT`.
+
+Sintaks fungsi `CAST` lebih sederhana daripada sintaks fungsi `CONVERT`, tetapi terbatas dalam apa yang bisa dilakukannya.
+
+Di sini, kita menggunakan kedua fungsi `CAST` dan `CONVERT` untuk mengubah tipe data `datetime` menjadi tipe data `varchar`.
+
+Fungsi `CAST` selalu menggunakan pengaturan gaya default. Misalnya, ia akan merepresentasikan tanggal dan waktu menggunakan format `YYYY-MM-DD`.
+
+Fungsi `CONVERT` menggunakan gaya tanggal dan waktu yang Anda tentukan. Dalam hal ini, `3` menentukan format tanggal `dd/mm/yy`.
+
+```sql
+USE AdventureWorks2012
+GO
+SELECT 
+    FirstName + ' ' + LastName + ' was hired on ' + CAST(HireDate AS varchar(20)) AS 'Cast',
+    FirstName + ' ' + LastName + ' was hired on ' + CONVERT(varchar, HireDate, 3) AS 'Convert'
+FROM Person.Person AS p
+JOIN HumanResources.Employee AS e
+    ON p.BusinessEntityID = e.BusinessEntityID
+GO
+```
+
+| Cast | Convert |
+| :--- | :--- |
+| David Hamiltion was hired on 2003-02-04 | David Hamiltion was hired on 04/02/03 |
+
+Contoh lain dari fungsi konversi adalah fungsi `PARSE`. Fungsi ini mengubah string menjadi tipe data yang ditentukan.
+
+Dalam sintaks fungsi, Anda menentukan string yang harus dikonversi, kata kunci `AS`, dan kemudian tipe data yang diperlukan. Secara opsional, Anda juga dapat menentukan *culture* (budaya) di mana nilai string harus diformat. Jika Anda tidak menentukannya, bahasa untuk sesi tersebut akan digunakan.
+
+Jika nilai string tidak dapat dikonversi ke format numerik, tanggal, atau waktu, itu akan menghasilkan kesalahan. Anda kemudian perlu menggunakan `CAST` atau `CONVERT` untuk konversi tersebut.
+
+```sql
+SELECT PARSE('Monday, 13 August 2012' AS datetime2 USING 'en-US') AS 'Date in English'
+```
+
+| Date in English |
+| :--- |
+| 2012-08-13 00:00:00.0000000 |
+
+### Bagian 43.4: Fungsi Logis dan Matematis
+
+SQL memiliki dua fungsi logis – `CHOOSE` dan `IIF`.
+
+Fungsi `CHOOSE` mengembalikan item dari daftar nilai, berdasarkan posisinya dalam daftar. Posisi ini ditentukan oleh indeks.
+
+Dalam sintaksnya, parameter `index` menentukan item dan merupakan bilangan bulat. Parameter `val_1 … val_n` mengidentifikasi daftar nilai.
+
+```sql
+SELECT CHOOSE(2, 'Human Resources', 'Sales', 'Admin', 'Marketing' ) AS Result;
+```
+
+| Result |
+| :--- |
+| Sales |
+
+Dalam contoh ini, Anda menggunakan fungsi `CHOOSE` untuk mengembalikan entri kedua dalam daftar departemen.
+
+Fungsi `IIF` mengembalikan satu dari dua nilai, berdasarkan kondisi tertentu. Jika kondisinya benar, ia akan mengembalikan nilai *true*. Jika tidak, ia akan mengembalikan nilai *false*.
+
+Dalam sintaksnya, parameter `boolean_expression` menentukan ekspresi Boolean. Parameter `true_value` menentukan nilai yang harus dikembalikan jika `boolean_expression` bernilai *true* dan parameter `false_value` menentukan nilai yang harus dikembalikan jika `boolean_expression` bernilai *false*.
+
+```sql
+SELECT 
+    BusinessEntityID, 
+    SalesYTD,
+    IIF(SalesYTD > 200000, 'Bonus', 'No Bonus') AS 'Bonus?'
+FROM Sales.SalesPerson
+GO
+```
+
+| BusinessEntityID | SalesYTD | Bonus? |
+| :--- | :--- | :--- |
+| 274 | 559697.5639 | Bonus |
+| 275 | 3763178.1787 | Bonus |
+| 285 | 172524.4512 | No Bonus |
+
+Dalam contoh ini, Anda menggunakan fungsi `IIF` untuk mengembalikan salah satu dari dua nilai. Jika penjualan tahunan seorang wiraniaga di atas 200.000, orang ini akan berhak mendapatkan bonus.
+
+SQL menyertakan beberapa fungsi matematika yang dapat Anda gunakan untuk melakukan perhitungan pada nilai input dan mengembalikan hasil numerik.
+
+Salah satu contohnya adalah fungsi `SIGN`, yang mengembalikan nilai yang menunjukkan tanda dari sebuah ekspresi. Nilai `-1` menunjukkan ekspresi negatif, nilai `+1` menunjukkan ekspresi positif, dan `0` menunjukkan nol.
+
+```sql
+SELECT SIGN(-20) AS 'Sign'
+```
+
+| Sign |
+| :--- |
+| -1 |
+
+Dalam contoh, inputnya adalah angka negatif, jadi panel Hasil mencantumkan hasil -1.
+
+Fungsi matematika lainnya adalah fungsi `POWER`. Fungsi ini memberikan nilai dari sebuah ekspresi yang dipangkatkan dengan pangkat tertentu.
+
+Dalam sintaksnya, parameter `float_expression` menentukan ekspresi, dan parameter `y` menentukan pangkat yang Anda inginkan untuk menaikkan ekspresi tersebut.
+
+```sql
+SELECT POWER(50, 3) AS Result
+```
+
+| Result |
+| :--- |
+| 125000 |
+
+---
+
