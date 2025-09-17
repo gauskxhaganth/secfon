@@ -3499,4 +3499,621 @@ CREATE DATABASE myDatabase;
 
 Ini akan membuat basis data kosong bernama `myDatabase` di mana Anda dapat membuat tabel.
 
+---
+
+# Bab 21
+## CREATE TABLE
+
+| Parameter | Detail |
+| :--- | :--- |
+| **tableName** | Nama dari tabel. |
+| **columns** | Berisi 'enumerasi' dari semua kolom yang dimiliki tabel. Lihat [Membuat Tabel Baru](https://www.google.com/search?q=%23bagian-212-membuat-tabel-baru) untuk detail lebih lanjut. |
+
+Pernyataan `CREATE TABLE` digunakan untuk membuat tabel baru di dalam basis data. Definisi sebuah tabel terdiri dari daftar kolom, tipe datanya, dan batasan integritas (*integrity constraints*) apa pun.
+
+### Bagian 21.1: Create Table From Select (CTAS)
+
+Anda mungkin ingin membuat duplikat dari sebuah tabel:
+
+```sql
+CREATE TABLE ClonedEmployees AS SELECT * FROM Employees;
+```
+
+Anda dapat menggunakan fitur lain dari pernyataan `SELECT` untuk memodifikasi data sebelum memasukkannya ke tabel baru. Kolom-kolom dari tabel baru secara otomatis dibuat sesuai dengan baris yang dipilih.
+
+```sql
+CREATE TABLE ModifiedEmployees AS
+SELECT Id, CONCAT(FName," ",LName) AS FullName FROM Employees
+WHERE Id > 10;
+```
+
+### Bagian 21.2: Membuat Tabel Baru
+
+Sebuah tabel dasar `Employees`, yang berisi ID, nama depan dan belakang karyawan, beserta nomor telepon mereka dapat dibuat menggunakan:
+
+```sql
+CREATE TABLE Employees(
+    Id int identity(1,1) primary key not null,
+    FName varchar(20) not null,
+    LName varchar(20) not null,
+    PhoneNumber varchar(10) not null
+);
+```
+
+*(Contoh ini spesifik untuk Transact-SQL/SQL Server)*
+
+`CREATE TABLE` membuat tabel baru di basis data, diikuti dengan nama tabel, yaitu `Employees`.
+
+Ini kemudian diikuti oleh daftar nama kolom dan propertinya, seperti `Id`:
+
+`Id int identity(1,1) primary key not null`
+
+| Nilai | Arti |
+| :--- | :--- |
+| **Id** | Nama kolom. |
+| **int** | Tipe data kolom. |
+| **identity(1,1)** | Menyatakan bahwa kolom akan memiliki nilai yang dibuat secara otomatis, dimulai dari 1 dan bertambah 1 untuk setiap baris baru. |
+| **primary key** | Menyatakan bahwa semua nilai dalam kolom ini akan unik. |
+| **not null** | Menyatakan bahwa kolom ini tidak boleh memiliki nilai null. |
+
+### Bagian 21.3: CREATE TABLE Dengan FOREIGN KEY
+
+Di bawah ini Anda dapat menemukan tabel `Employees` dengan referensi ke tabel `Cities`.
+
+```sql
+CREATE TABLE Cities(
+    CityID INT IDENTITY(1,1) NOT NULL,
+    Name VARCHAR(20) NOT NULL,
+    Zip VARCHAR(10) NOT NULL
+);
+
+CREATE TABLE Employees(
+    EmployeeID INT IDENTITY (1,1) NOT NULL,
+    FirstName VARCHAR(20) NOT NULL,
+    LastName VARCHAR(20) NOT NULL,
+    PhoneNumber VARCHAR(10) NOT NULL,
+    CityID INT FOREIGN KEY REFERENCES Cities(CityID)
+);
+```
+
+Di sini Anda dapat menemukan diagram basis datanya.
+
+<p align="center">
+  <img src="images/book-03/figure-21.3.png" alt="gambar" width="580"/>
+</p>
+
+Tentu, ini adalah kelanjutannya.
+
+Kolom `CityID` dari tabel `Employees` akan mereferensikan kolom `CityID` dari tabel `Cities`. Di bawah ini Anda dapat menemukan sintaks untuk membuatnya.
+
+`CityID INT FOREIGN KEY REFERENCES Cities(CityID)`
+
+| Nilai | Arti |
+| :--- | :--- |
+| **CityID** | Nama kolom. |
+| **INT** | Tipe data kolom. |
+| **FOREIGN KEY** | Menjadikannya *foreign key* (opsional). |
+| **REFERENCES** | Membuat referensi. |
+| **Cities(CityID)** | Merujuk ke tabel `Cities` pada kolom `CityID`. |
+
+**Penting**: Anda tidak dapat membuat referensi ke tabel yang belum ada di basis data. Pastikan untuk membuat tabel `Cities` terlebih dahulu, baru kemudian tabel `Employees`. Jika Anda melakukannya secara terbalik, itu akan menghasilkan kesalahan.
+
+## Bagian 21.4: Menduplikasi sebuah tabel
+
+Untuk menduplikasi sebuah tabel, cukup lakukan hal berikut:
+
+```sql
+CREATE TABLE newtable LIKE oldtable;
+INSERT newtable SELECT * FROM oldtable;
+```
+
+*(Catatan: Sintaks `LIKE` tidak universal; ini bekerja di MySQL. Untuk RDBMS lain, `CREATE TABLE ... AS SELECT ...` adalah pendekatan yang lebih umum.)*
+
+## Bagian 21.5: Membuat Tabel Sementara atau In-Memory
+
+### PostgreSQL dan SQLite
+
+Untuk membuat tabel sementara yang lokal untuk sesi:
+
+```sql
+CREATE TEMP TABLE MyTable(...);
+```
+
+### SQL Server
+
+Untuk membuat tabel sementara yang lokal untuk sesi:
+
+```sql
+CREATE TABLE #TempPhysical(...);
+```
+
+Untuk membuat tabel sementara yang dapat dilihat oleh semua orang:
+
+```sql
+CREATE TABLE ##TempPhysicalVisibleToEveryone(...);
+```
+
+Untuk membuat tabel in-memory (variabel tabel):
+
+```sql
+DECLARE @TempMemory TABLE(...);
+```
+
+# Bab 22
+## CREATE FUNCTION
+
+| Argumen | Deskripsi |
+| :--- | :--- |
+| **function\_name** | Nama fungsi. |
+| **list\_of\_parameters** | Parameter yang diterima fungsi. |
+| **return\_data\_type**| Tipe data yang dikembalikan fungsi. |
+| **function\_body** | Kode dari fungsi. |
+| **scalar\_expression**| Nilai skalar yang dikembalikan oleh fungsi. |
+
+### Bagian 22.1: Membuat Fungsi baru
+
+```sql
+CREATE FUNCTION FirstWord (@input varchar(1000))
+RETURNS varchar(1000)
+AS
+BEGIN
+    DECLARE @output varchar(1000)
+    SET @output = SUBSTRING(@input, 0, CASE CHARINDEX(' ', @input)
+                                            WHEN 0 THEN LEN(@input) + 1
+                                            ELSE CHARINDEX(' ', @input)
+                                        END)
+    RETURN @output
+END
+```
+
+Contoh ini membuat sebuah fungsi bernama `FirstWord`, yang menerima satu parameter `varchar` dan mengembalikan nilai `varchar` lain.
+
+# Bab 23
+## TRY/CATCH
+
+### Bagian 23.1: Transaksi Dalam TRY/CATCH
+
+Contoh ini akan melakukan **rollback** pada kedua `INSERT` karena ada `datetime` yang tidak valid:
+
+```sql
+BEGIN TRANSACTION
+BEGIN TRY
+    INSERT INTO dbo.Sale(Price, SaleDate, Quantity)
+    VALUES (5.2, GETDATE(), 1)
+
+    -- Baris ini akan gagal karena 'not a date' bukan tanggal yang valid
+    INSERT INTO dbo.Sale(Price, SaleDate, Quantity)
+    VALUES (5.2, 'not a date', 1)
+
+    COMMIT TRANSACTION
+END TRY
+BEGIN CATCH
+    -- Menangkap error dan membatalkan transaksi
+    THROW
+    ROLLBACK TRANSACTION
+END CATCH
+```
+
+Contoh ini akan melakukan **commit** pada kedua `INSERT` karena keduanya valid:
+
+```sql
+BEGIN TRANSACTION
+BEGIN TRY
+    INSERT INTO dbo.Sale(Price, SaleDate, Quantity)
+    VALUES (5.2, GETDATE(), 1)
+
+    INSERT INTO dbo.Sale(Price, SaleDate, Quantity)
+    VALUES (5.2, GETDATE(), 1)
+
+    COMMIT TRANSACTION
+END TRY
+BEGIN CATCH
+    -- Blok ini tidak akan dieksekusi jika tidak ada error
+    THROW
+    ROLLBACK TRANSACTION
+END CATCH
+```
+
+---
+
+# Bab 24
+## UNION / UNION ALL
+
+Kata kunci `UNION` di SQL digunakan untuk menggabungkan hasil dari dua pernyataan `SELECT` **tanpa duplikat**. Agar dapat menggunakan `UNION`, kedua pernyataan `SELECT` harus memiliki **jumlah kolom yang sama**, dengan **tipe data yang sama**, dan dalam **urutan yang sama**. Namun, panjang kolom bisa berbeda.
+
+### Bagian 24.1: Kueri dasar UNION ALL
+
+```sql
+CREATE TABLE HR_EMPLOYEES (
+    PersonID int,
+    LastName VARCHAR(30),
+    FirstName VARCHAR(30),
+    Position VARCHAR(30)
+);
+
+CREATE TABLE FINANCE_EMPLOYEES (
+    PersonID INT,
+    LastName VARCHAR(30),
+    FirstName VARCHAR(30),
+    Position VARCHAR(30)
+);
+```
+
+Misalkan kita ingin mendapatkan nama semua manajer dari departemen kita. Kita bisa mendapatkan semua karyawan dari departemen HR dan Keuangan yang memiliki posisi sebagai manajer.
+
+```sql
+SELECT
+    FirstName, LastName
+FROM
+    HR_EMPLOYEES
+WHERE
+    Position = 'manager'
+UNION ALL
+SELECT
+    FirstName, LastName
+FROM
+    FINANCE_EMPLOYEES
+WHERE
+    Position = 'manager'
+```
+
+Pernyataan `UNION` menghapus baris duplikat dari hasil kueri. Karena mungkin ada orang yang memiliki Nama dan posisi yang sama di kedua departemen, kita menggunakan `UNION ALL` agar **tidak menghapus duplikat**.
+
+Jika Anda ingin menggunakan alias untuk setiap kolom output, Anda bisa meletakkannya hanya di pernyataan `SELECT` yang pertama, sebagai berikut:
+
+```sql
+SELECT
+    FirstName as 'First Name', LastName as 'Last Name'
+FROM
+    HR_EMPLOYEES
+WHERE
+    Position = 'manager'
+UNION ALL
+SELECT
+    FirstName, LastName
+FROM
+    FINANCE_EMPLOYEES
+WHERE
+    Position = 'manager'
+```
+
+### Bagian 24.2: Penjelasan dan Contoh Sederhana
+
+Secara sederhana:
+
+  * **`UNION`** menggabungkan 2 set hasil sambil **menghapus duplikat**. 🧐
+  * **`UNION ALL`** menggabungkan 2 set hasil **tanpa mencoba menghapus duplikat**. ✅
+
+Satu kesalahan yang sering dibuat adalah menggunakan `UNION` padahal tidak perlu menghapus duplikat. Biaya performa tambahan pada set hasil yang besar bisa sangat signifikan. 🐢💨
+
+#### Kapan Anda mungkin membutuhkan `UNION`
+
+Misalkan Anda perlu memfilter sebuah tabel terhadap 2 atribut yang berbeda, dan Anda telah membuat indeks *non-clustered* terpisah untuk setiap kolom. `UNION` memungkinkan Anda memanfaatkan kedua indeks sambil tetap mencegah duplikat.
+
+```sql
+SELECT C1, C2, C3 FROM Table1 WHERE C1 = @Param1
+UNION
+SELECT C1, C2, C3 FROM Table1 WHERE C2 = @Param2
+```
+
+Ini menyederhanakan *performance tuning* Anda karena hanya indeks sederhana yang diperlukan untuk menjalankan kueri ini secara optimal.
+
+#### Kapan Anda mungkin membutuhkan `UNION ALL`
+
+Misalkan Anda masih perlu memfilter sebuah tabel terhadap 2 atribut, tetapi Anda tidak perlu memfilter *record* duplikat (baik karena tidak masalah atau data Anda tidak akan menghasilkan duplikat).
+
+```sql
+SELECT C1 FROM Table1
+UNION ALL
+SELECT C1 FROM Table2
+```
+
+Ini sangat berguna saat membuat *View* yang menggabungkan data yang dirancang untuk dipartisi secara fisik di beberapa tabel. Karena data sudah terpisah, meminta mesin basis data untuk menghapus duplikat tidak memberikan nilai tambah dan hanya menambah waktu pemrosesan tambahan pada kueri.
+
+# Bab 25
+## ALTER TABLE
+
+Perintah `ALTER` di SQL digunakan untuk memodifikasi kolom/batasan dalam sebuah tabel. 🛠️
+
+### Bagian 25.1: Menambah Kolom (Add Column)
+
+```sql
+ALTER TABLE Employees
+ADD StartingDate date NOT NULL DEFAULT GetDate(),
+    DateOfBirth date NULL
+```
+
+Pernyataan di atas akan menambahkan kolom bernama `StartingDate` (yang tidak boleh `NULL` dengan nilai default tanggal saat ini) dan `DateOfBirth` (yang bisa `NULL`) ke dalam tabel `Employees`.
+
+### Bagian 25.2: Menghapus Kolom (Drop Column)
+
+```sql
+ALTER TABLE Employees
+DROP COLUMN salary;
+```
+
+Ini tidak hanya akan menghapus informasi dari kolom itu, tetapi akan **menghilangkan kolom** `salary` dari tabel `employees` (kolom tersebut tidak akan ada lagi).
+
+### Bagian 25.3: Menambah Primary Key
+
+```sql
+ALTER TABLE EMPLOYEES ADD pk_EmployeeID PRIMARY KEY (ID)
+```
+
+Ini akan menambahkan *Primary Key* ke tabel `Employees` pada *field* `ID`. Menyertakan lebih dari satu nama kolom di dalam tanda kurung akan membuat *Composite Primary Key*.
+
+```sql
+ALTER TABLE EMPLOYEES ADD pk_EmployeeID PRIMARY KEY (ID, FName)
+```
+
+### Bagian 25.4: Mengubah Kolom (Alter Column)
+
+```sql
+ALTER TABLE Employees
+ALTER COLUMN StartingDate DATETIME NOT NULL DEFAULT (GETDATE())
+```
+
+Kueri ini akan mengubah tipe data kolom `StartingDate` dari `date` sederhana menjadi `datetime` dan mengatur nilai default-nya ke tanggal saat ini.
+
+### Bagian 25.5: Menghapus Constraint (Drop Constraint)
+
+```sql
+ALTER TABLE Employees
+DROP CONSTRAINT DefaultSalary
+```
+
+Ini akan menghapus *constraint* bernama `DefaultSalary` dari definisi tabel `employees`.
+**Catatan**: Pastikan *constraint* dari kolom dihapus sebelum menghapus kolom itu sendiri.
+
+# Bab 26
+## INSERT
+
+### Bagian 26.1: INSERT data dari tabel lain menggunakan SELECT
+
+```sql
+INSERT INTO Customers (FName, LName, PhoneNumber)
+SELECT FName, LName, PhoneNumber FROM Employees
+```
+
+Contoh ini akan menyisipkan semua `Employees` ke dalam tabel `Customers`. Karena kedua tabel memiliki *field* yang berbeda, Anda perlu menentukan *field* mana yang akan diisi dan *field* mana yang akan dipilih. Nama *field* tidak harus sama, tetapi tipe datanya harus sama.
+
+Jika kedua tabel memiliki nama *field* yang sama persis:
+
+```sql
+INSERT INTO Table1
+SELECT * FROM Table2
+```
+
+### Bagian 26.2: Menyisipkan Baris Baru
+
+```sql
+INSERT INTO Customers
+VALUES ('Zack', 'Smith', 'zack@example.com', '7049989942', 'EMAIL');
+```
+
+Pernyataan ini akan menyisipkan baris baru ke tabel `Customers`. Perhatikan bahwa nilai untuk kolom `Id` tidak ditentukan, karena akan ditambahkan secara otomatis (jika diatur sebagai *identity*). Namun, semua nilai kolom lainnya harus ditentukan.
+
+### Bagian 26.3: Menyisipkan Hanya pada Kolom Tertentu
+
+```sql
+INSERT INTO Customers (FName, LName, Email, PreferredContact)
+VALUES ('Zack', 'Smith', 'zack@example.com', 'EMAIL');
+```
+
+Pernyataan ini akan menyisipkan baris baru, namun data hanya akan dimasukkan ke dalam kolom yang ditentukan. Perhatikan bahwa semua kolom yang ditandai sebagai `NOT NULL` harus disertakan.
+
+### Bagian 26.4: Menyisipkan beberapa baris sekaligus
+
+Beberapa baris dapat disisipkan dengan satu perintah `INSERT`:
+
+```sql
+INSERT INTO tbl_name (field1, field2, field3)
+VALUES (1,2,3), (4,5,6), (7,8,9);
+```
+
+Untuk menyisipkan data dalam jumlah besar (*bulk insert*), ada fitur dan rekomendasi spesifik untuk masing-masing DBMS.
+
+  * **MySQL** - [`LOAD DATA INFILE`](https://dev.mysql.com/doc/refman/5.7/en/load-data.html)
+  * **MSSQL** - [`BULK INSERT`](https://msdn.microsoft.com/en-us/library/ms188365.aspx)
+  
+---
+
+# Bab 27
+## MERGE
+
+`MERGE` (sering juga disebut **UPSERT** untuk "update or insert") memungkinkan untuk menyisipkan baris baru atau, jika baris sudah ada, memperbarui baris yang ada. Tujuannya adalah untuk melakukan seluruh rangkaian operasi secara **atomik** (untuk menjamin konsistensi data) dan untuk mencegah *overhead* komunikasi untuk beberapa pernyataan SQL dalam sistem klien/server.
+
+### Bagian 27.1: MERGE untuk membuat Target cocok dengan Source
+
+```sql
+MERGE INTO targetTable t
+USING sourceTable s
+ON t.PKID = s.PKID
+WHEN MATCHED AND NOT EXISTS (
+    SELECT s.ColumnA, s.ColumnB, s.ColumnC
+    INTERSECT
+    SELECT t.ColumnA, t.ColumnB, t.ColumnC
+)
+    THEN UPDATE SET
+        t.ColumnA = s.ColumnA,
+        t.ColumnB = s.ColumnB,
+        t.ColumnC = s.ColumnC
+WHEN NOT MATCHED BY TARGET
+    THEN INSERT (PKID, ColumnA, ColumnB, ColumnC)
+    VALUES (s.PKID, s.ColumnA, s.ColumnB, s.ColumnC)
+WHEN NOT MATCHED BY SOURCE
+    THEN DELETE;
+```
+
+**Catatan**: Bagian `AND NOT EXISTS` mencegah pembaruan *record* yang tidak berubah. Menggunakan konstruksi `INTERSECT` memungkinkan kolom yang dapat bernilai `NULL` untuk dibandingkan tanpa penanganan khusus.
+
+### Bagian 27.2: MySQL: menghitung pengguna berdasarkan nama
+
+Misalkan kita ingin tahu berapa banyak pengguna yang memiliki nama yang sama. Kita buat tabel `users` sebagai berikut:
+
+```sql
+create table users(
+    id int primary key auto_increment,
+    name varchar(8),
+    count int,
+    unique key name(name)
+);
+```
+
+Sekarang, kita baru saja menemukan pengguna baru bernama 'Joe'. MySQL menggunakan sintaks `insert … on duplicate key update …`:
+
+```sql
+insert into users(name, count)
+values ('Joe', 1)
+on duplicate key update count=count+1;
+```
+
+Jika 'Joe' belum ada, baris baru akan dibuat dengan `count = 1`. Jika sudah ada, `count` pada baris tersebut akan ditambah 1.
+
+### Bagian 27.3: PostgreSQL: menghitung pengguna berdasarkan nama
+
+Misalkan kita ingin tahu berapa banyak pengguna yang memiliki nama yang sama. Kita buat tabel `users` sebagai berikut:
+
+```sql
+create table users(
+    id serial,
+    name varchar(8) unique,
+    count int
+);
+```
+
+Sekarang, kita baru saja menemukan pengguna baru bernama 'Joe'. PostgreSQL menggunakan sintaks `insert … on conflict … do update …`:
+
+```sql
+insert into users(name, count)
+values('Joe', 1)
+on conflict (name) do update set count = users.count + 1;
+```
+
+Jika 'Joe' belum ada, baris baru akan dibuat dengan `count = 1`. Jika sudah ada (konflik pada kolom `name`), `count` pada baris yang ada akan ditambah 1.
+
+# Bab 28
+## cross apply, outer apply
+
+`APPLY` akan digunakan ketika ada *table-valued function* (fungsi yang mengembalikan tabel) di ekspresi kanan.
+
+Secara sederhana:
+
+  * `CROSS APPLY` berfungsi seperti `INNER JOIN`.
+  * `OUTER APPLY` berfungsi seperti `LEFT OUTER JOIN`.
+
+Perbedaan utamanya adalah `APPLY` memungkinkan Anda untuk meneruskan nilai dari tabel kiri sebagai **parameter ke fungsi untuk setiap baris**. Ini adalah sesuatu yang tidak bisa dilakukan oleh `JOIN` standar.
+
+### Bagian 28.1: Dasar-dasar CROSS APPLY dan OUTER APPLY
+
+Bayangkan Anda memiliki sebuah fungsi yang menerima `DepartmentID` dan mengembalikan semua karyawan di departemen tersebut:
+
+```sql
+CREATE FUNCTION dbo.fn_GetAllEmployeeOfADepartment (@DeptID AS int)
+RETURNS TABLE
+AS
+RETURN (
+    SELECT * FROM Employee E WHERE E.DepartmentID = @DeptID
+)
+GO
+```
+
+Sekarang, jika Anda ingin mendapatkan semua departemen beserta karyawannya menggunakan fungsi ini, Anda harus menggunakan `APPLY`:
+
+```sql
+-- Mengembalikan departemen yang memiliki karyawan (seperti INNER JOIN)
+SELECT *
+FROM Department D
+CROSS APPLY dbo.fn_GetAllEmployeeOfADepartment(D.DepartmentID)
+GO
+
+-- Mengembalikan semua departemen, bahkan yang tidak memiliki karyawan (seperti LEFT JOIN)
+SELECT *
+FROM Department D
+OUTER APPLY dbo.fn_GetAllEmployeeOfADepartment(D.DepartmentID)
+GO
+```
+
+Jika Anda mencoba mengganti `APPLY` dengan `JOIN`, Anda akan mendapatkan error. Ini karena `JOIN` tidak dapat meneruskan `D.DepartmentID` dari kueri luar ke dalam fungsi untuk setiap barisnya. Oleh karena itu, operator `APPLY` sangat diperlukan untuk skenario seperti ini.
+
+# Bab 29
+## DELETE
+
+Pernyataan `DELETE` digunakan untuk menghapus *record* dari sebuah tabel. 🗑️
+
+### Bagian 29.1: DELETE semua baris
+
+Menghilangkan klausa `WHERE` akan menghapus **semua baris** dari tabel.
+
+```sql
+DELETE FROM Employees
+```
+
+Lihat dokumentasi `TRUNCATE` untuk detail tentang bagaimana performa `TRUNCATE` bisa lebih baik karena tidak mencatat setiap penghapusan baris satu per satu.
+
+### Bagian 29.2: DELETE baris tertentu dengan WHERE
+
+Ini akan menghapus semua baris yang cocok dengan kriteria `WHERE`.
+
+```sql
+DELETE FROM Employees
+WHERE FName = 'John'
+```
+
+### Bagian 29.3: Klausa TRUNCATE
+
+Gunakan ini untuk mereset tabel ke kondisi saat dibuat. `TRUNCATE` menghapus semua baris dan mereset nilai seperti *auto-increment*. Operasi ini biasanya jauh lebih cepat daripada `DELETE`.
+
+```sql
+TRUNCATE TABLE Employees
+```
+
+### Bagian 29.4: DELETE baris tertentu berdasarkan perbandingan dengan tabel lain
+
+Dimungkinkan untuk `DELETE` data dari sebuah tabel jika cocok (atau tidak cocok) dengan data di tabel lain.
+
+Misalkan kita ingin `DELETE` data dari `Source` setelah data tersebut dimuat ke `Target`.
+
+**Menggunakan `EXISTS`:**
+
+```sql
+DELETE FROM Source
+WHERE EXISTS ( SELECT 1
+               FROM Target
+               Where Source.ID = Target.ID )
+```
+
+**Menggunakan `JOIN` (Sintaks berbeda antar RDBMS):**
+
+Beberapa RDBMS yang umum (misalnya MySQL, Oracle, PostgreSQL, Teradata) memungkinkan tabel untuk di-join selama `DELETE`, yang memungkinkan perbandingan yang lebih kompleks.
+
+**Di PostgreSQL, gunakan `USING`:**
+
+```sql
+DELETE FROM Source
+USING TargetSchema.Target, AggregateSchema.Aggregate
+WHERE Source.ID = TargetSchema.Target.ID
+  AND TargetSchema.Target.DataDate = AggregateSchema.Aggregate.AggDate
+```
+
+**Di MySQL, Oracle, dan Teradata, Anda bisa menggunakan sintaks ini:**
+
+```sql
+DELETE Source
+FROM
+    Source, TargetSchema.Target, AggregateSchema.Aggregate
+WHERE Source.ID = TargetSchema.Target.ID
+  AND TargetSchema.Target.DataDate = AggregateSchema.Aggregate.AggDate
+```
+
+Perbandingan juga dapat dirancang untuk memeriksa skenario ketidakcocokan menggunakan `NOT EXISTS`:
+
+```sql
+DELETE FROM Source
+WHERE NOT EXISTS ( SELECT 1
+                   FROM Target
+                   Where Source.ID = Target.ID )
+```
+
+---
 
