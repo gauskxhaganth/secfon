@@ -2926,3 +2926,577 @@ Terkadang disingkat menjadi "**left join**". Menggabungkan baris kiri dan kanan 
   <img src="images/book-03/figure-18.3b.png" alt="gambar" width="580"/>
 </p>
 
+```sql
+SELECT * FROM A LEFT JOIN B ON X = Y;
+```
+
+| X | Y |
+| :-- | :-- |
+| Amy | NULL |
+| John | NULL |
+| Lisa | Lisa |
+| Marco | Marco |
+| Phil | Phil |
+
+## Right Outer Join
+
+Terkadang disingkat menjadi "**right join**". Menggabungkan baris kiri dan kanan yang cocok, dan **menyertakan baris kanan yang tidak cocok**.
+
+<p align="center">
+  <img src="images/book-03/figure-18.3c.png" alt="gambar" width="580"/>
+</p>
+
+```sql
+SELECT * FROM A RIGHT JOIN B ON X = Y;
+```
+
+| X | Y |
+| :-- | :-- |
+| Lisa | Lisa |
+| Marco | Marco |
+| Phil | Phil |
+| NULL | Tim |
+| NULL | Vincent |
+
+## Full Outer Join
+
+Terkadang disingkat menjadi "**full join**". Merupakan gabungan (*union*) dari `left` dan `right outer join`.
+
+<p align="center">
+  <img src="images/book-03/figure-18.3d.png" alt="gambar" width="580"/>
+</p>
+
+```sql
+SELECT * FROM A FULL JOIN B ON X = Y;
+```
+
+| X | Y |
+| :-- | :-- |
+| Amy | NULL |
+| John | NULL |
+| Lisa | Lisa |
+| Marco | Marco |
+| Phil | Phil |
+| NULL | Tim |
+| NULL | Vincent |
+
+## Left Semi Join
+
+Menyertakan **baris kiri yang cocok** dengan baris kanan.
+
+<p align="center">
+  <img src="images/book-03/figure-18.3e.png" alt="gambar" width="580"/>
+</p>
+
+```sql
+SELECT * FROM A WHERE X IN (SELECT Y FROM B);
+```
+
+| X |
+| :-- |
+| Lisa |
+| Marco |
+| Phil |
+
+## Right Semi Join
+
+Menyertakan **baris kanan yang cocok** dengan baris kiri.
+
+<p align="center">
+  <img src="images/book-03/figure-18.3f.png" alt="gambar" width="580"/>
+</p>
+
+Tentu, ini kelanjutannya.
+
+```sql
+SELECT * FROM B WHERE Y IN (SELECT X FROM A);
+```
+
+| Y |
+| :-- |
+| Lisa |
+| Marco |
+| Phil |
+
+Seperti yang bisa Anda lihat, tidak ada sintaks `IN` khusus untuk *left vs. right semi join* - kita mencapai efeknya hanya dengan menukar posisi tabel di dalam teks SQL.
+
+## Left Anti Semi Join
+
+Menyertakan **baris kiri yang tidak cocok** dengan baris kanan.
+
+<p align="center">
+  <img src="images/book-03/figure-18.3g.png" alt="gambar" width="580"/>
+</p>
+
+Tentu, ini kelanjutannya.
+
+```sql
+SELECT * FROM A WHERE X NOT IN (SELECT Y FROM B);
+```
+
+| X |
+| :-- |
+| Amy |
+| John |
+
+**PERINGATAN**: Hati-hati jika Anda menggunakan `NOT IN` pada kolom yang bisa `NULL` (*NULL-able*)\! [Detail lebih lanjut di sini](https://www.google.com/search?q=https://stackoverflow.com/questions/12900246/why-is-not-in-clause-not-working-properly-with-null-values).
+
+## Right Anti Semi Join
+
+Menyertakan **baris kanan yang tidak cocok** dengan baris kiri.
+
+<p align="center">
+  <img src="images/book-03/figure-18.3h.png" alt="gambar" width="580"/>
+</p>
+
+```sql
+SELECT * FROM B WHERE Y NOT IN (SELECT X FROM A);
+```
+
+| Y |
+| :-- |
+| Tim |
+| Vincent |
+
+Seperti yang bisa Anda lihat, tidak ada sintaks `NOT IN` khusus untuk *left vs. right anti semi join* - kita mencapai efeknya hanya dengan menukar posisi tabel di dalam teks SQL.
+
+## Cross Join
+
+Sebuah **produk Kartesian** (*Cartesian product*) dari semua baris kiri dengan semua baris kanan.
+
+```sql
+SELECT * FROM A CROSS JOIN B;
+```
+
+| X | Y |
+| :-- | :-- |
+| Amy | Lisa |
+| John | Lisa |
+| Lisa | Lisa |
+| Marco | Lisa |
+| Phil | Lisa |
+| Amy | Marco |
+| John | Marco |
+| Lisa | Marco |
+| Marco | Marco |
+| Phil | Marco |
+| Amy | Phil |
+| John | Phil |
+| Lisa | Phil |
+| Marco | Phil |
+| Phil | Phil |
+| Amy | Tim |
+| John | Tim |
+| Lisa | Tim |
+| Marco | Tim |
+| Phil | Tim |
+| Amy | Vincent |
+| John | Vincent |
+| Lisa | Vincent |
+| Marco | Vincent |
+| Phil | Vincent |
+
+`Cross join` setara dengan `inner join` dengan kondisi join yang selalu cocok, jadi kueri berikut akan mengembalikan hasil yang sama:
+
+```sql
+SELECT * FROM A JOIN B ON 1 = 1;
+```
+
+### Self-Join
+
+Ini hanya menunjukkan sebuah tabel yang bergabung dengan dirinya sendiri. *Self-join* bisa berupa salah satu dari jenis join yang telah dibahas di atas. Sebagai contoh, ini adalah *inner self-join*:
+
+```sql
+SELECT * FROM A A1 JOIN A A2 ON LEN(A1.X) < LEN(A2.X);
+```
+
+| X (A1) | X (A2) |
+| :-- | :-- |
+| Amy | John |
+| Amy | Lisa |
+| Amy | Marco |
+| John | Marco |
+| Lisa | Marco |
+| Phil | Marco |
+| Amy | Phil |
+
+### Bagian 18.4: Left Outer Join
+
+**Left Outer Join** (juga dikenal sebagai **Left Join** atau **Outer Join**) adalah `Join` yang memastikan **semua baris dari tabel kiri** terwakili; jika tidak ada baris yang cocok dari tabel kanan, field yang sesuai akan bernilai `NULL`.
+
+Contoh berikut akan memilih semua departemen dan nama depan karyawan yang bekerja di departemen tersebut. Departemen yang tidak memiliki karyawan tetap dikembalikan dalam hasil, tetapi akan memiliki `NULL` untuk nama karyawan:
+
+```sql
+SELECT
+    Departments.Name, Employees.FName
+FROM
+    Departments
+LEFT OUTER JOIN Employees
+    ON Departments.Id = Employees.DepartmentId
+```
+
+Ini akan mengembalikan hasil berikut dari basis data contoh:
+
+| Departments.Name | Employees.FName |
+| :-- | :-- |
+| HR | James |
+| HR | John |
+| HR | Johnathon |
+| Sales | Michael |
+| Tech | NULL |
+
+**Jadi bagaimana cara kerjanya?**
+
+Ada dua tabel dalam klausa `FROM`:
+
+**Tabel Employees**
+| Id | FName | LName | PhoneNumber | ManagerId | DepartmentId | Salary | HireDate |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | James | Smith | 1234567890 | NULL | 1 | 1000 | 2002-01-01 |
+| 2 | John | Johnson | 2468101214 | 1 | 1 | 400 | 2005-03-23 |
+| 3 | Michael | Williams | 1357911131 | 1 | 2 | 600 | 2009-05-12 |
+| 4 | Johnathon | Smith | 1212121212 | 2 | 1 | 500 | 2016-07-24 |
+
+dan **Tabel Departments**
+| Id | Name |
+| :--- | :--- |
+| 1 | HR |
+| 2 | Sales |
+| 3 | Tech |
+
+Pertama, produk Kartesian (*Cartesian product*) dibuat dari kedua tabel, menghasilkan sebuah tabel perantara.
+
+Record yang memenuhi kriteria join (`Departments.Id = Employees.DepartmentId`) disorot dengan **tebal**; ini akan diteruskan ke tahap kueri selanjutnya.
+
+Karena ini adalah `LEFT OUTER JOIN`, semua record dikembalikan dari sisi **KIRI** join (tabel `Departments`), sementara record apa pun di sisi **KANAN** diberi penanda `NULL` jika tidak cocok dengan kriteria join. Dalam tabel di bawah ini, ini akan mengembalikan `Tech` dengan `NULL`.
+
+*(Tabel perantara setelah produk Kartesian dan sebelum filter `SELECT`)*
+| Dept.Id | Dept.Name | Emp.Id | Emp.FName | Emp.DepartmentId |
+| :-- | :-- | :-- | :-- | :-- |
+| **1** | **HR** | **1** | **James** | **1** |
+| **1** | **HR** | **2** | **John** | **1** |
+| 1 | HR | 3 | Michael | 2 |
+| **1** | **HR** | **4** | **Johnathon**| **1** |
+| 2 | Sales | 1 | James | 1 |
+| 2 | Sales | 2 | John | 1 |
+| **2** | **Sales** | **3** | **Michael** | **2** |
+| 2 | Sales | 4 | Johnathon | 1 |
+| **3** | **Tech** | - | *NULL* | - |
+
+Terakhir, setiap ekspresi yang digunakan dalam klausa `SELECT` dievaluasi untuk mengembalikan tabel akhir kita:
+
+| Departments.Name | Employees.FName |
+| :-- | :-- |
+| HR | James |
+| HR | John |
+| HR | Johnathon |
+| Sales | Michael |
+| Tech | NULL |
+
+### Bagian 18.5: Implicit Join
+
+Join juga dapat dilakukan dengan memiliki beberapa tabel dalam klausa `FROM`, dipisahkan dengan koma `,`, dan mendefinisikan hubungan di antara mereka dalam klausa `WHERE`. Teknik ini disebut **Implicit Join** (karena tidak secara eksplisit mengandung klausa `JOIN`).
+
+Semua RDBMS mendukungnya, tetapi sintaks ini **biasanya tidak disarankan**. Alasan mengapa ini bukan ide yang baik untuk digunakan adalah:
+
+  * Ada kemungkinan terjadi *cross join* yang tidak disengaja yang kemudian mengembalikan hasil yang salah, terutama jika Anda memiliki banyak join dalam kueri.
+  * Jika Anda memang bermaksud melakukan *cross join*, hal itu tidak jelas dari sintaksnya (lebih baik tulis `CROSS JOIN` secara eksplisit), dan seseorang kemungkinan akan mengubahnya saat pemeliharaan.
+
+Contoh berikut akan memilih nama depan karyawan dan nama departemen tempat mereka bekerja:
+
+```sql
+SELECT e.FName, d.Name
+FROM
+    Employee e, Departments d
+WHERE e.DeptartmentId = d.Id
+```
+
+Ini akan mengembalikan hasil berikut dari basis data contoh:
+| e.FName | d.Name |
+| :-- | :-- |
+| James | HR |
+| John | HR |
+| Michael | Sales |
+| Johnathon | HR |
+
+### Bagian 18.6: CROSS JOIN
+
+`CROSS JOIN` melakukan produk Kartesian dari dua anggota. **Produk Kartesian** berarti setiap baris dari satu tabel digabungkan dengan setiap baris dari tabel kedua dalam join. Sebagai contoh, jika `TABLEA` memiliki 20 baris dan `TABLEB` memiliki 20 baris, hasilnya akan menjadi 20\*20 = 400 baris output.
+
+Menggunakan basis data contoh:
+
+```sql
+SELECT d.Name, e.FName
+FROM
+    Departments d
+CROSS JOIN Employees e;
+```
+
+Yang mengembalikan:
+| d.Name | e.FName |
+| :-- | :-- |
+| HR | James |
+| HR | John |
+| HR | Michael |
+| HR | Johnathon |
+| Sales | James |
+| Sales | John |
+| Sales | Michael |
+| Sales | Johnathon |
+| Tech | James |
+| Tech | John |
+| Tech | Michael |
+| Tech | Johnathon |
+
+Disarankan untuk menulis `CROSS JOIN` secara eksplisit jika Anda ingin melakukan *cartesian join*, untuk menyoroti bahwa inilah yang Anda inginkan.
+
+### Bagian 18.7: CROSS APPLY & LATERAL JOIN
+
+Jenis `JOIN` yang sangat menarik adalah **LATERAL JOIN** (baru di PostgreSQL 9.3+), yang juga dikenal sebagai **CROSS APPLY/OUTER APPLY** di SQL-Server & Oracle.
+
+Ide dasarnya adalah bahwa sebuah *table-valued function* (atau subkueri inline) diterapkan untuk **setiap baris** yang Anda join. Ini memungkinkan untuk, misalnya, hanya men-join entri pertama yang cocok di tabel lain.
+
+Perbedaan antara `JOIN` normal dan `LATERAL JOIN` terletak pada kenyataan bahwa Anda dapat menggunakan kolom yang sebelumnya Anda join dalam subkueri yang Anda "CROSS APPLY".
+
+**Sintaks:**
+
+  * **PostgreSQL 9.3+**: `left | right | inner JOIN LATERAL`
+  * **SQL-Server**: `CROSS | OUTER APPLY`
+
+`INNER JOIN LATERAL` sama dengan `CROSS APPLY`, dan `LEFT JOIN LATERAL` sama dengan `OUTER APPLY`.
+
+**Contoh Penggunaan (SQL-Server):**
+
+```sql
+SELECT * FROM T_Contacts
+-- CROSS APPLY -- = INNER JOIN
+OUTER APPLY     -- = LEFT JOIN
+(
+    SELECT TOP 1
+        MAP_CTCOU_CT_UID
+        ,MAP_CTCOU_COU_UID
+        ,MAP_CTCOU_DateFrom
+        ,MAP_CTCOU_DateTo
+    FROM T_MAP_Contacts_Ref_OrganisationalUnit
+    WHERE MAP_CTCOU_SoftDeleteStatus = 1
+    AND MAP_CTCOU_CT_UID = T_Contacts.CT_UID
+    ORDER BY MAP_CTCOU_DateFrom
+) AS FirstOE
+```
+
+*(Contoh kode lengkap disediakan di teks asli untuk PostgreSQL dan SQL Server)*
+
+### Bagian 18.8: FULL JOIN
+
+Satu jenis `JOIN` yang kurang dikenal adalah **FULL JOIN**.
+(Catatan: `FULL JOIN` tidak didukung oleh MySQL per 2016)
+
+**FULL OUTER JOIN** mengembalikan **semua baris dari tabel kiri, dan semua baris dari tabel kanan**.
+
+Jika ada baris di tabel kiri yang tidak memiliki kecocokan di tabel kanan, atau jika ada baris di tabel kanan yang tidak memiliki kecocokan di tabel kiri, maka baris-baris tersebut juga akan dicantumkan.
+
+**Contoh:**
+
+```sql
+SELECT
+    COALESCE(T_Budget.Year, tYear.Year) AS RPT_BudgetInYear
+    ,COALESCE(T_Budget.Value, 0.0) AS RPT_Value
+FROM T_Budget
+FULL JOIN tfu_RPT_All_CreateYearInterval(@budget_year_from, @budget_year_to) AS tYear
+    ON tYear.Year = T_Budget.Year
+```
+
+Perhatikan bahwa jika Anda menggunakan *soft-delete*, Anda harus memeriksa status *soft-delete* lagi di klausa `WHERE` (karena `FULL JOIN` berperilaku seperti `UNION`).
+
+Juga, jika Anda melakukan `FULL JOIN`, Anda biasanya harus mengizinkan `NULL` di klausa `WHERE`; lupa mengizinkan `NULL` pada suatu nilai akan memiliki efek yang sama seperti `INNER JOIN`, yang merupakan sesuatu yang tidak Anda inginkan jika Anda melakukan `FULL JOIN`.
+
+### Bagian 18.9: Recursive JOINs
+
+*Recursive join* sering digunakan untuk mendapatkan data induk-anak. Dalam SQL, ini diimplementasikan dengan *recursive common table expressions* (CTE), contohnya:
+
+```sql
+WITH RECURSIVE MyDescendants AS (
+    SELECT Name
+    FROM People
+    WHERE Name = 'John Doe'
+    UNION ALL
+    SELECT People.Name
+    FROM People
+    JOIN MyDescendants ON People.Name = MyDescendants.Parent
+)
+SELECT * FROM MyDescendants;
+```
+
+### Bagian 18.10: Basic explicit inner join
+
+Sebuah `JOIN` dasar (juga disebut "**inner join**") mengambil data dari dua tabel, dengan hubungan mereka didefinisikan dalam klausa `JOIN`.
+
+Contoh berikut akan memilih nama depan karyawan (`FName`) dari tabel `Employees` dan nama departemen tempat mereka bekerja (`Name`) dari tabel `Departments`:
+
+```sql
+SELECT Employees.FName, Departments.Name
+FROM
+    Employees
+JOIN
+    Departments
+    ON Employees.DepartmentId = Departments.Id
+```
+
+Ini akan mengembalikan hasil berikut dari basis data contoh:
+| Employees.FName | Departments.Name |
+| :-- | :-- |
+| James | HR |
+| John | HR |
+| Michael | Sales |
+| Johnathon | HR |
+
+### Bagian 18.11: Joining on a Subquery
+
+Men-join sebuah *subquery* sering digunakan ketika Anda ingin mendapatkan data agregat dari tabel anak/detail dan menampilkannya bersama dengan *record* dari tabel induk/header. Sebagai contoh, Anda mungkin ingin mendapatkan hitungan *record* anak, rata-rata dari beberapa kolom numerik di *record* anak, atau baris teratas atau terbawah berdasarkan tanggal atau *field* numerik.
+
+Contoh berikut menggunakan alias, yang bisa dibilang membuat kueri lebih mudah dibaca ketika melibatkan banyak tabel. Di sini kita mengambil semua baris dari tabel induk `PurchaseOrders` dan mengambil hanya baris pertama untuk setiap *record* induk dari tabel anak `PurchaseOrderLineItems`.
+
+```sql
+SELECT po.Id, po.PODate, po.VendorName, po.Status, item.ItemNo,
+       item.Description, item.Cost, item.Price
+FROM PurchaseOrders po
+LEFT JOIN
+(
+    SELECT l.PurchaseOrderId, l.ItemNo, l.Description, l.Cost, l.Price, Min(l.id) as Id
+    FROM PurchaseOrderLineItems l
+    GROUP BY l.PurchaseOrderId, l.ItemNo, l.Description, l.Cost, l.Price
+) AS item ON item.PurchaseOrderId = po.Id
+```
+
+---
+
+# Bab 19
+## UPDATE
+
+### Bagian 19.1: UPDATE dengan data dari tabel lain
+
+Contoh di bawah ini mengisi `PhoneNumber` untuk setiap `Employee` yang juga seorang `Customer` dan saat ini tidak memiliki nomor telepon yang diatur di Tabel `Employees`.
+(Contoh ini menggunakan tabel `Employees` dan `Customers` dari Basis Data Contoh.)
+
+**SQL Standar**
+Update menggunakan *correlated subquery*:
+
+```sql
+UPDATE
+    Employees
+SET PhoneNumber =
+    (SELECT
+        c.PhoneNumber
+    FROM
+        Customers c
+    WHERE
+        c.FName = Employees.FName
+        AND c.LName = Employees.LName)
+WHERE Employees.PhoneNumber IS NULL
+```
+
+**SQL:2003**
+Update menggunakan `MERGE`:
+
+```sql
+MERGE INTO
+    Employees e
+USING
+    Customers c
+ON
+    e.FName = c.Fname
+    AND e.LName = c.LName
+    AND e.PhoneNumber IS NULL
+WHEN MATCHED THEN
+    UPDATE
+    SET PhoneNumber = c.PhoneNumber
+```
+
+**SQL Server**
+Update menggunakan `INNER JOIN`:
+
+```sql
+UPDATE
+    Employees
+SET
+    PhoneNumber = c.PhoneNumber
+FROM
+    Employees e
+INNER JOIN Customers c
+    ON e.FName = c.FName
+    AND e.LName = c.LName
+WHERE
+    e.PhoneNumber IS NULL
+```
+
+### Bagian 19.2: Memodifikasi nilai yang ada
+
+Contoh ini menggunakan [Tabel Mobil](https://www.google.com/search?q=%23bagian-51-basis-data-bengkel-mobil).
+
+```sql
+UPDATE Cars
+SET TotalCost = TotalCost + 100
+WHERE Id = 3 or Id = 4
+```
+
+Operasi `UPDATE` dapat menyertakan nilai saat ini di baris yang diperbarui. Dalam contoh sederhana ini, `TotalCost` dinaikkan sebesar 100 untuk dua baris:
+
+  * `TotalCost` Mobil \#3 meningkat dari 100 menjadi 200
+  * `TotalCost` Mobil \#4 meningkat dari 1254 menjadi 1354
+
+Nilai baru sebuah kolom dapat berasal dari nilai sebelumnya atau dari nilai kolom lain mana pun di tabel yang sama atau tabel yang di-join.
+
+### Bagian 19.3: Memperbarui Baris Tertentu
+
+Contoh ini menggunakan [Tabel Mobil](https://www.google.com/search?q=%23bagian-51-basis-data-bengkel-mobil).
+
+```sql
+UPDATE
+    Cars
+SET
+    Status = 'READY'
+WHERE
+    Id = 4
+```
+
+Pernyataan ini akan mengatur status baris 'Cars' dengan id 4 menjadi "READY". Klausa `WHERE` berisi ekspresi logis yang dievaluasi untuk setiap baris. Jika sebuah baris memenuhi kriteria, nilainya diperbarui. Jika tidak, baris tersebut tetap tidak berubah.
+
+### Bagian 19.4: Memperbarui Semua Baris
+
+Contoh ini menggunakan [Tabel Mobil](https://www.google.com/search?q=%23bagian-51-basis-data-bengkel-mobil).
+
+```sql
+UPDATE Cars
+SET Status = 'READY'
+```
+
+Pernyataan ini akan mengatur kolom 'status' dari **semua baris** tabel 'Cars' menjadi "READY" karena tidak memiliki klausa `WHERE` untuk memfilter set baris.
+
+### Bagian 19.5: Menangkap record yang diperbarui
+
+Terkadang seseorang ingin menangkap *record* yang baru saja diperbarui. (Contoh untuk SQL Server)
+
+```sql
+CREATE TABLE #TempUpdated(ID INT)
+
+UPDATE TableName SET Col1 = 42
+OUTPUT inserted.ID INTO #TempUpdated
+WHERE Id > 50
+```
+
+---
+
+# Bab 20
+## CREATE Database
+
+### Bagian 20.1: CREATE Database
+
+Sebuah basis data dibuat dengan perintah SQL berikut:
+
+```sql
+CREATE DATABASE myDatabase;
+```
+
+Ini akan membuat basis data kosong bernama `myDatabase` di mana Anda dapat membuat tabel.
+
+
