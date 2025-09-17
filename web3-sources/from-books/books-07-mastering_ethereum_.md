@@ -585,3 +585,214 @@ Tabel 2-1 menunjukkan berbagai unit, nama sehari-hari (umum), dan nama SI-nya. S
   <img src="images/books-07-mastering_ethereum/tabel-2.1.png" alt="gambar" width="580"/>
 </p>
 
+### **Memilih Dompet Ethereum**
+
+Istilah "dompet" (*wallet*) telah memiliki banyak arti, meskipun semuanya saling terkait dan dalam penggunaan sehari-hari pada dasarnya merujuk pada hal yang sama. Kami akan menggunakan istilah "dompet" untuk mengartikan **aplikasi perangkat lunak yang membantu Anda mengelola akun Ethereum Anda**. Singkatnya, dompet Ethereum adalah gerbang Anda ke sistem Ethereum. Dompet ini menyimpan kunci Anda dan dapat membuat serta menyiarkan transaksi atas nama Anda. Memilih dompet Ethereum bisa jadi sulit karena ada banyak pilihan berbeda dengan fitur dan desain yang beragam. Beberapa lebih cocok untuk pemula dan beberapa lebih cocok untuk para ahli. Platform Ethereum itu sendiri masih terus disempurnakan, dan dompet "terbaik" sering kali adalah yang dapat beradaptasi dengan perubahan yang datang bersama pembaruan platform.
+
+Tapi jangan khawatir! Jika Anda memilih dompet dan tidak menyukai cara kerjanya—atau jika Anda menyukainya pada awalnya tetapi kemudian ingin mencoba yang lain—Anda dapat mengganti dompet dengan cukup mudah. Yang harus Anda lakukan adalah membuat transaksi yang mengirimkan dana Anda dari dompet lama ke dompet baru, atau mengekspor kunci privat (*private keys*) Anda dan mengimpornya ke dompet yang baru.
+
+Kami telah memilih tiga jenis dompet yang berbeda untuk digunakan sebagai contoh di seluruh buku: **dompet seluler, dompet desktop, dan dompet berbasis web**. Kami memilih ketiga dompet ini karena mereka merepresentasikan berbagai macam kompleksitas dan fitur. Namun, pemilihan dompet-dompet ini **bukanlah sebuah dukungan** terhadap kualitas atau keamanannya. Mereka hanyalah titik awal yang baik untuk demonstrasi dan pengujian.
+
+Ingatlah bahwa agar aplikasi dompet dapat berfungsi, ia harus memiliki akses ke kunci privat Anda, jadi sangat penting bagi Anda untuk hanya mengunduh dan menggunakan aplikasi dompet dari sumber yang Anda percayai. Untungnya, secara umum, semakin populer sebuah aplikasi dompet, semakin besar kemungkinannya untuk dapat dipercaya. Meskipun demikian, merupakan praktik yang baik untuk tidak "menaruh semua telur Anda dalam satu keranjang" dan menyebarkan akun Ethereum Anda di beberapa dompet.
+
+Berikut adalah beberapa dompet yang bagus untuk memulai:
+
+**MetaMask**
+MetaMask adalah dompet ekstensi browser yang berjalan di browser Anda (Chrome, Firefox, Opera, atau Brave Browser). Dompet ini mudah digunakan dan nyaman untuk pengujian, karena dapat terhubung ke berbagai *node* Ethereum dan *blockchain* uji. MetaMask adalah dompet berbasis web.
+
+**Jaxx**
+Jaxx adalah dompet multiplatform dan multikurensi yang berjalan di berbagai sistem operasi, termasuk Android, iOS, Windows, macOS, dan Linux. Ini sering menjadi pilihan yang baik untuk pengguna baru karena dirancang untuk kesederhanaan dan kemudahan penggunaan. Jaxx bisa menjadi dompet seluler atau desktop, tergantung di mana Anda menginstalnya.
+
+**MyEtherWallet (MEW)**
+MyEtherWallet adalah dompet berbasis web yang berjalan di browser apa pun. Dompet ini memiliki banyak fitur canggih yang akan kita jelajahi dalam banyak contoh kita. MyEtherWallet adalah dompet berbasis web.
+
+**Emerald Wallet**
+Emerald Wallet dirancang untuk bekerja dengan *blockchain* Ethereum Classic, tetapi kompatibel dengan *blockchain* berbasis Ethereum lainnya. Ini adalah aplikasi desktop sumber terbuka dan bekerja di bawah Windows, macOS, dan Linux. Emerald Wallet dapat menjalankan *full node* atau terhubung ke *node* publik jarak jauh, bekerja dalam mode "ringan" (*light*). Dompet ini juga memiliki alat pendamping untuk melakukan semua operasi dari baris perintah (*command line*).
+
+Kita akan mulai dengan menginstal MetaMask di desktop—tetapi pertama-tama, kita akan membahas secara singkat tentang mengontrol dan mengelola kunci.
+
+### **Kontrol dan Tanggung Jawab**
+
+*Blockchain* terbuka seperti Ethereum itu penting karena beroperasi sebagai sistem terdesentralisasi. Itu berarti banyak hal, tetapi satu aspek krusial adalah bahwa setiap pengguna Ethereum dapat—dan seharusnya—**mengontrol kunci privat mereka sendiri**, yang merupakan hal yang mengontrol akses ke dana dan *smart contract*. Terkadang kita menyebut kombinasi akses ke dana dan *smart contract* sebagai "akun" atau "dompet". Istilah-istilah ini bisa menjadi cukup kompleks dalam fungsionalitasnya, jadi kita akan membahas ini lebih detail nanti. Namun, sebagai prinsip dasar, sesederhana **satu kunci privat sama dengan satu "akun."**
+
+Beberapa pengguna memilih untuk menyerahkan kontrol atas kunci privat mereka dengan menggunakan kustodian pihak ketiga, seperti bursa daring (*online exchange*). Dalam buku ini, kami akan mengajari Anda cara mengambil kendali dan mengelola kunci privat Anda sendiri.
+
+Dengan kontrol datanglah tanggung jawab besar. **Jika Anda kehilangan kunci privat, Anda kehilangan akses ke dana dan kontrak Anda.** Tidak ada yang bisa membantu Anda mendapatkan kembali akses—dana Anda akan terkunci selamanya. Berikut adalah beberapa tips untuk membantu Anda mengelola tanggung jawab ini:
+
+* **Jangan mengimprovisasi keamanan.** Gunakan pendekatan standar yang sudah teruji.
+* Semakin penting sebuah akun (misalnya, semakin tinggi nilai dana yang dikendalikan, atau semakin signifikan *smart contract* yang dapat diakses), semakin tinggi pula langkah-langkah keamanan yang harus diambil.
+* Keamanan tertinggi diperoleh dari perangkat *air-gapped* (terisolasi dari jaringan), tetapi level ini tidak diperlukan untuk setiap akun.
+* **Jangan pernah menyimpan kunci privat Anda dalam bentuk teks biasa**, terutama secara digital. Untungnya, sebagian besar antarmuka pengguna saat ini bahkan tidak akan membiarkan Anda melihat kunci privat mentahnya.
+* Kunci privat dapat disimpan dalam bentuk terenkripsi, sebagai file "*keystore*" digital. Karena dienkripsi, kunci tersebut memerlukan kata sandi untuk membukanya. Saat Anda diminta untuk memilih kata sandi, **buatlah yang kuat** (yaitu, panjang dan acak), cadangkan, dan jangan bagikan. Jika Anda tidak memiliki pengelola kata sandi, tuliskan dan simpan di tempat yang aman dan rahasia. Untuk mengakses akun Anda, Anda memerlukan file *keystore* dan kata sandinya.
+* **Jangan menyimpan kata sandi apa pun** dalam dokumen digital, foto digital, tangkapan layar, drive daring, PDF terenkripsi, dll. Sekali lagi, jangan mengimprovisasi keamanan. Gunakan pengelola kata sandi atau pena dan kertas.
+* Saat Anda diminta untuk mencadangkan kunci sebagai **urutan kata mnemonik**, gunakan pena dan kertas untuk membuat cadangan fisik. Jangan menunda tugas itu "untuk nanti"; Anda akan lupa. Cadangan ini dapat digunakan untuk membangun kembali kunci privat Anda jika Anda kehilangan semua data yang tersimpan di sistem Anda, atau jika Anda lupa atau kehilangan kata sandi. Namun, mereka juga dapat digunakan oleh penyerang untuk mendapatkan kunci privat Anda, jadi **jangan pernah menyimpannya secara digital**, dan simpan salinan fisiknya dengan aman di laci atau brankas yang terkunci.
+* Sebelum mentransfer jumlah besar (terutama ke alamat baru), **lakukan transaksi uji coba kecil terlebih dahulu** (misalnya, senilai kurang dari $1) dan tunggu konfirmasi penerimaan.
+* Saat Anda membuat akun baru, mulailah dengan hanya mengirim transaksi uji coba kecil ke alamat baru tersebut. Setelah Anda menerima transaksi uji coba, coba kirim kembali dari akun itu. Ada banyak alasan pembuatan akun bisa salah, dan jika salah, lebih baik mengetahuinya dengan kerugian kecil. Jika pengujian berhasil, semuanya baik-baik saja.
+* Penjelajah blok (*block explorer*) publik adalah cara mudah untuk melihat secara independen apakah sebuah transaksi telah diterima oleh jaringan. Namun, kemudahan ini berdampak negatif pada privasi Anda, karena Anda mengungkapkan alamat Anda ke penjelajah blok, yang dapat melacak Anda.
+* **Jangan mengirim uang ke alamat mana pun yang ditampilkan dalam buku ini.** Kunci privatnya tercantum di dalam buku dan seseorang akan segera mengambil uang itu.
+
+Sekarang setelah kita membahas beberapa praktik terbaik dasar untuk manajemen kunci dan keamanan, mari kita mulai menggunakan MetaMask!
+
+### **Memulai dengan MetaMask**
+
+Buka browser Google Chrome dan navigasikan ke [https://chrome.google.com/webstore/category/extensions](https://chrome.google.com/webstore/category/extensions).
+
+Cari "MetaMask" dan klik pada logo rubah. Anda akan melihat sesuatu seperti hasil yang ditunjukkan pada Gambar 2-1.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.1.png" alt="gambar" width="580"/>
+</p>
+
+Penting untuk memverifikasi bahwa Anda mengunduh ekstensi MetaMask yang asli, karena terkadang orang dapat menyelundupkan ekstensi berbahaya melewati filter Google. Yang asli:
+
+* Menunjukkan ID `nkbihfbeogaeaoehlefnkodbefgpgknn` di bilah alamat (*address bar*)
+* Ditawarkan oleh [https://metamask.io](https://metamask.io)
+* Memiliki lebih dari 1.400 ulasan
+* Memiliki lebih dari 1.000.000 pengguna
+
+Setelah Anda memastikan sedang melihat ekstensi yang benar, klik "**Tambahkan ke Chrome**" untuk menginstalnya.
+
+### **Membuat Dompet**
+
+Setelah MetaMask terinstal, Anda akan melihat ikon baru (kepala rubah) di bilah alat (*toolbar*) browser Anda. Klik ikon tersebut untuk memulai. Anda akan diminta untuk menyetujui syarat dan ketentuan, lalu membuat dompet Ethereum baru Anda dengan memasukkan kata sandi (lihat Gambar 2-2).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.2.png" alt="gambar" width="580"/>
+</p>
+
+> Kata sandi ini mengontrol akses ke MetaMask, sehingga tidak dapat digunakan oleh siapa pun yang memiliki akses ke browser Anda.
+
+Setelah Anda mengatur kata sandi, MetaMask akan membuat dompet untuk Anda dan menunjukkan cadangan mnemonik yang terdiri dari 12 kata dalam bahasa Inggris (lihat Gambar 2-3). Kata-kata ini dapat digunakan di dompet kompatibel mana pun untuk memulihkan akses ke dana Anda jika terjadi sesuatu pada MetaMask atau komputer Anda. **Anda tidak memerlukan kata sandi untuk pemulihan ini; 12 kata tersebut sudah cukup.**
+
+> **Peringatan Keamanan** ✍️
+>
+> Cadangkan mnemonik Anda (12 kata) **di atas kertas, sebanyak dua kali**. Simpan kedua cadangan kertas di dua lokasi aman yang terpisah, seperti brankas tahan api, laci terkunci, atau kotak deposit. Perlakukan cadangan kertas ini seperti uang tunai dengan nilai yang setara dengan apa yang Anda simpan di dompet Ethereum Anda. **Siapa pun yang memiliki akses ke kata-kata ini dapat memperoleh akses dan mencuri uang Anda.**
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.3.png" alt="gambar" width="580"/>
+</p>
+
+Setelah Anda mengkonfirmasi bahwa Anda telah menyimpan mnemonic dengan aman, Anda akan dapat
+Untuk melihat detail akun Ethereum Anda, seperti yang ditunjukkan pada Gambar 2-4.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.4.png" alt="gambar" width="580"/>
+</p>
+
+Halaman akun Anda menampilkan nama akun Anda ("Akun 1" secara default), sebuah alamat Ethereum (`0x9E713…` dalam contoh), dan ikon berwarna-warni untuk membantu Anda membedakan akun ini secara visual dari akun lain. Di bagian atas halaman akun, Anda dapat melihat jaringan Ethereum mana yang sedang Anda gunakan ("Jaringan Utama" dalam contoh).
+
+Selamat! Anda telah menyiapkan dompet Ethereum pertama Anda.
+
+### **Beralih Jaringan**
+
+Seperti yang dapat Anda lihat di halaman akun MetaMask, Anda dapat memilih di antara beberapa jaringan Ethereum. Secara default, MetaMask akan mencoba terhubung ke jaringan utama. Pilihan lainnya adalah *testnet* publik, *node* Ethereum apa pun pilihan Anda, atau *node* yang menjalankan *blockchain* privat di komputer Anda sendiri (*localhost*):
+
+**Main Ethereum Network (Jaringan Utama Ethereum)**
+*Blockchain* publik utama Ethereum. ETH asli, nilai nyata, dan konsekuensi nyata.
+
+**Ropsten Test Network (Jaringan Uji Ropsten)**
+*Blockchain* dan jaringan uji publik Ethereum. ETH di jaringan ini tidak memiliki nilai.
+
+**Kovan Test Network (Jaringan Uji Kovan)**
+*Blockchain* dan jaringan uji publik Ethereum yang menggunakan protokol konsensus Aura dengan *proof of authority* (penandatanganan terfederasi). ETH di jaringan ini tidak memiliki nilai. Jaringan uji Kovan hanya didukung oleh Parity. Klien Ethereum lainnya menggunakan protokol konsensus Clique, yang diusulkan kemudian, untuk verifikasi berbasis *proof of authority*.
+
+**Rinkeby Test Network (Jaringan Uji Rinkeby)**
+*Blockchain* dan jaringan uji publik Ethereum, yang menggunakan protokol konsensus Clique dengan *proof of authority* (penandatanganan terfederasi). ETH di jaringan ini tidak memiliki nilai.
+
+**Localhost 8545**
+Terhubung ke *node* yang berjalan di komputer yang sama dengan browser. *Node* tersebut dapat menjadi bagian dari *blockchain* publik mana pun (utama atau *testnet*), atau *testnet* privat.
+
+**Custom RPC (RPC Kustom)**
+Memungkinkan Anda untuk menghubungkan MetaMask ke *node* mana pun dengan antarmuka *Remote Procedure Call* (RPC) yang kompatibel dengan Geth. *Node* tersebut bisa menjadi bagian dari *blockchain* publik atau privat mana pun.
+
+> Dompet MetaMask Anda menggunakan kunci privat dan alamat Ethereum yang sama di semua jaringan yang terhubung dengannya. Namun, saldo alamat Ethereum Anda di setiap jaringan Ethereum akan berbeda. Kunci Anda mungkin mengontrol ether dan kontrak di Ropsten, misalnya, tetapi tidak di jaringan utama.
+
+### **Mendapatkan Ether Uji Coba**
+
+Tugas pertama Anda adalah mendanai dompet Anda. Anda tidak akan melakukannya di jaringan utama karena ether sungguhan membutuhkan uang dan menanganinya memerlukan sedikit lebih banyak pengalaman. Untuk saat ini, Anda akan mengisi dompet Anda dengan ether dari *testnet*.
+
+Alihkan MetaMask ke **Jaringan Uji Ropsten**. Klik **Beli**, lalu klik **Ropsten Test Faucet**. MetaMask akan membuka halaman web baru, seperti yang ditunjukkan pada Gambar 2-5.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.5.png" alt="gambar" width="580"/>
+</p>
+
+Anda mungkin memperhatikan bahwa halaman web tersebut sudah berisi alamat Ethereum dari dompet MetaMask Anda. MetaMask mengintegrasikan halaman web yang mendukung Ethereum dengan dompet MetaMask Anda dan dapat "melihat" alamat Ethereum di halaman web, memungkinkan Anda, misalnya, untuk mengirim pembayaran ke toko daring yang menampilkan alamat Ethereum. MetaMask juga dapat mengisi halaman web dengan alamat dompet Anda sendiri sebagai alamat penerima jika halaman web tersebut memintanya. Di halaman ini, aplikasi *faucet* meminta alamat dompet dari MetaMask untuk mengirimkan ether uji coba.
+
+Klik tombol hijau "**request 1 ether from faucet**". Anda akan melihat ID transaksi muncul di bagian bawah halaman. Aplikasi *faucet* telah membuat sebuah transaksi—pembayaran untuk Anda. ID transaksi terlihat seperti ini:
+
+`0x7c7ad5aaea6474adccf6f5c5d6abed11b70a350fbc6f9590109e099568090c57`
+
+Dalam beberapa detik, transaksi baru akan ditambang oleh para penambang Ropsten dan dompet MetaMask Anda akan menunjukkan saldo sebesar 1 ETH. Klik pada ID transaksi dan browser Anda akan membawa Anda ke penjelajah blok (*block explorer*), yaitu sebuah situs web yang memungkinkan Anda untuk memvisualisasikan dan menjelajahi blok, alamat, dan transaksi. MetaMask menggunakan penjelajah blok **Etherscan**, salah satu penjelajah blok Ethereum yang lebih populer. Transaksi yang berisi pembayaran dari Ropsten Test Faucet ditunjukkan pada Gambar 2-6.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.6.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-6: Tampilan transaksi pembayaran dari faucet di Etherscan]
+
+Transaksi tersebut telah dicatat di *blockchain* Ropsten dan dapat dilihat kapan saja oleh siapa saja, hanya dengan mencari ID transaksi, atau mengunjungi tautan tersebut. Coba kunjungi tautan itu, atau masukkan *hash* transaksi ke situs web `ropsten.etherscan.io`, untuk melihatnya sendiri.
+
+### **Mengirim Ether dari MetaMask**
+
+Setelah Anda menerima ether uji coba pertama Anda dari Ropsten Test Faucet, Anda dapat bereksperimen dengan mengirim ether dengan mencoba mengirim sebagian kembali ke *faucet*. Seperti yang Anda lihat di halaman Ropsten Test Faucet, ada pilihan untuk "menyumbang" 1 ETH ke *faucet*. Opsi ini tersedia agar setelah Anda selesai menguji, Anda dapat mengembalikan sisa ether uji coba Anda, sehingga orang lain dapat menggunakannya selanjutnya. Meskipun ether uji coba tidak memiliki nilai, beberapa orang menimbunnya, sehingga menyulitkan orang lain untuk menggunakan jaringan uji. Menimbun ether uji coba sangat tidak disukai!
+
+Untungnya, kita bukanlah penimbun ether uji coba. Klik tombol oranye "**1 ether**" untuk memberitahu MetaMask agar membuat transaksi pembayaran 1 ether ke *faucet*. MetaMask akan menyiapkan transaksi dan memunculkan jendela konfirmasi, seperti yang ditunjukkan pada Gambar 2-7.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.7.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-7: Jendela konfirmasi transaksi pengiriman di MetaMask]
+
+Ups! Anda mungkin menyadari bahwa Anda tidak dapat menyelesaikan transaksi—MetaMask mengatakan saldo Anda tidak mencukupi. Sekilas ini mungkin tampak membingungkan: Anda memiliki 1 ETH, Anda ingin mengirim 1 ETH, jadi mengapa MetaMask mengatakan dana Anda tidak cukup?
+
+Jawabannya adalah karena **biaya gas**. Setiap transaksi Ethereum memerlukan pembayaran biaya, yang dikumpulkan oleh para penambang untuk memvalidasi transaksi. Biaya di Ethereum dibebankan dalam mata uang virtual yang disebut **gas**. Anda membayar gas dengan ether, sebagai bagian dari transaksi.
+
+> Biaya juga diperlukan di jaringan uji. Tanpa biaya, jaringan uji akan berperilaku berbeda dari jaringan utama, membuatnya menjadi platform pengujian yang tidak memadai. Biaya juga melindungi jaringan uji dari serangan DoS dan kontrak yang dibuat dengan buruk (misalnya, *infinite loops*), sama seperti mereka melindungi jaringan utama.
+
+Saat Anda mengirim transaksi, MetaMask menghitung harga gas rata-rata dari transaksi yang berhasil baru-baru ini sebesar 3 **gwei**, yang merupakan singkatan dari gigawei. Wei adalah subdivisi terkecil dari mata uang ether, seperti yang kita bahas di "Unit Mata Uang Ether" di halaman 13. Batas gas ditetapkan pada biaya pengiriman transaksi dasar, yaitu 21.000 unit gas. Oleh karena itu, jumlah maksimum ETH yang akan Anda keluarkan adalah 3 * 21.000 gwei = 63.000 gwei = 0,000063 ETH. (Perlu diketahui bahwa harga gas rata-rata dapat berfluktuasi, karena sebagian besar ditentukan oleh penambang. Kita akan melihat di bab selanjutnya bagaimana Anda dapat menaikkan/menurunkan batas gas Anda untuk memastikan transaksi Anda diprioritaskan jika diperlukan.)
+
+Semua ini berarti: melakukan transaksi 1 ETH membutuhkan biaya 1,000063 ETH. MetaMask secara membingungkan membulatkannya menjadi 1 ETH saat menampilkan total, tetapi jumlah sebenarnya yang Anda butuhkan adalah 1,000063 ETH dan Anda hanya memiliki 1 ETH. Klik **Tolak** untuk membatalkan transaksi ini.
+
+Mari kita dapatkan lebih banyak ether uji coba! Klik tombol hijau "request 1 ether from the faucet" lagi dan tunggu beberapa detik. Jangan khawatir, *faucet* seharusnya memiliki banyak ether dan akan memberi Anda lebih banyak jika Anda meminta.
+
+Setelah Anda memiliki saldo 2 ETH, Anda bisa mencoba lagi. Kali ini, saat Anda mengklik tombol donasi oranye "1 ether", Anda memiliki saldo yang cukup untuk menyelesaikan transaksi. Klik **Kirim** saat MetaMask memunculkan jendela pembayaran. Setelah semua ini, Anda akan melihat saldo sebesar 0,999937 ETH karena Anda mengirim 1 ETH ke *faucet* dengan biaya gas sebesar 0,000063 ETH.
+
+### **Menjelajahi Riwayat Transaksi Sebuah Alamat**
+
+Sekarang Anda telah menjadi ahli dalam menggunakan MetaMask untuk mengirim dan menerima ether uji coba. Dompet Anda telah menerima setidaknya dua pembayaran dan mengirim setidaknya satu. Anda dapat melihat semua transaksi ini menggunakan penjelajah blok `ropsten.etherscan.io`. Anda bisa menyalin alamat dompet Anda dan menempelkannya ke kotak pencarian penjelajah blok, atau meminta MetaMask membukakan halaman untuk Anda. Di sebelah ikon akun Anda di MetaMask, Anda akan melihat tombol yang menunjukkan tiga titik. Klik tombol itu untuk menampilkan menu opsi terkait akun (lihat Gambar 2-8).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.8.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-8: Menu opsi akun di MetaMask]
+
+Pilih "**Lihat akun di Etherscan**" untuk membuka halaman web di penjelajah blok yang menunjukkan riwayat transaksi akun Anda, seperti yang ditunjukkan pada Gambar 2-9.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-2.9.png" alt="gambar" width="580"/>
+</p>
+
+[Gambar 2-9: Riwayat transaksi sebuah alamat di Etherscan]
+
+Di sini Anda dapat melihat seluruh riwayat transaksi alamat Ethereum Anda. Ini menunjukkan semua transaksi yang tercatat di *blockchain* Ropsten di mana alamat Anda adalah pengirim atau penerima. Klik beberapa transaksi ini untuk melihat detail lebih lanjut.
+
+Anda dapat menjelajahi riwayat transaksi dari alamat mana pun. Coba lihat riwayat transaksi alamat Ropsten Test Faucet (petunjuk: itu adalah alamat "pengirim" yang tercantum dalam pembayaran tertua ke alamat Anda). Anda dapat melihat semua ether uji coba yang dikirim dari *faucet* kepada Anda dan ke alamat lain. Setiap transaksi yang Anda lihat dapat membawa Anda ke lebih banyak alamat dan lebih banyak transaksi. Tak lama kemudian Anda akan tersesat dalam labirin data yang saling terhubung. *Blockchain* publik berisi kekayaan informasi yang sangat besar, yang semuanya dapat dieksplorasi secara terprogram, seperti yang akan kita lihat dalam contoh-contoh di masa depan.
+
+### **Memperkenalkan Komputer Dunia**
+
+Anda sekarang telah membuat dompet serta mengirim dan menerima ether. Sejauh ini, kita telah memperlakukan Ethereum sebagai mata uang kripto. Tetapi Ethereum jauh, jauh lebih dari itu. Faktanya, fungsi mata uang kripto hanyalah pendukung fungsi Ethereum sebagai **komputer dunia yang terdesentralisasi**. Ether dimaksudkan untuk digunakan membayar biaya menjalankan *smart contract*, yang merupakan program komputer yang berjalan di atas komputer emulasi yang disebut **Ethereum Virtual Machine (EVM)**.
+
+EVM adalah sebuah *global singleton*, yang berarti ia beroperasi seolah-olah ia adalah komputer instans tunggal global, yang berjalan di mana-mana. Setiap *node* di jaringan Ethereum menjalankan salinan lokal dari EVM untuk memvalidasi eksekusi kontrak, sementara *blockchain* Ethereum mencatat perubahan keadaan dari komputer dunia ini saat memproses transaksi dan *smart contract*. Kita akan membahas ini secara lebih rinci di Bab 13.
+
+### **Externally Owned Accounts (EOA) dan Kontrak**
+
+Jenis akun yang Anda buat di dompet MetaMask disebut **externally owned account (EOA)** atau akun yang dimiliki secara eksternal. EOA adalah akun yang memiliki kunci privat; memiliki kunci privat berarti memiliki kendali atas akses ke dana atau kontrak. Sekarang, Anda mungkin menebak ada jenis akun lain. Jenis akun lainnya adalah **akun kontrak**. Akun kontrak memiliki kode *smart contract*, yang tidak dimiliki oleh EOA biasa. Selain itu, akun kontrak **tidak memiliki kunci privat**. Sebaliknya, ia dimiliki (dan dikendalikan) oleh logika kode *smart contract*-nya: program perangkat lunak yang dicatat di *blockchain* Ethereum saat pembuatan akun kontrak dan dieksekusi oleh EVM.
+
+Kontrak memiliki alamat, sama seperti EOA. Kontrak juga dapat mengirim dan menerima ether, sama seperti EOA. Namun, ketika tujuan transaksi adalah alamat kontrak, hal itu menyebabkan kontrak tersebut berjalan di EVM, menggunakan transaksi, dan data transaksi, sebagai inputnya. Selain ether, transaksi dapat berisi data yang menunjukkan fungsi spesifik mana dalam kontrak yang harus dijalankan dan parameter apa yang harus diteruskan ke fungsi tersebut. Dengan cara ini, transaksi dapat memanggil fungsi di dalam kontrak.
+
+Perhatikan bahwa karena akun kontrak tidak memiliki kunci privat, ia tidak dapat **memulai** sebuah transaksi. Hanya EOA yang dapat memulai transaksi, tetapi kontrak dapat bereaksi terhadap transaksi dengan memanggil kontrak lain, membangun alur eksekusi yang kompleks. Salah satu penggunaan umum dari ini adalah EOA yang mengirimkan transaksi permintaan ke dompet *smart contract* multisignature untuk mengirim sejumlah ETH ke alamat lain. Pola pemrograman DApp yang umum adalah memiliki Kontrak A memanggil Kontrak B untuk menjaga keadaan bersama di antara para pengguna Kontrak A.
+
+Dalam beberapa bagian berikutnya, kita akan menulis kontrak pertama kita. Anda kemudian akan belajar cara membuat, mendanai, dan menggunakan kontrak tersebut dengan dompet MetaMask dan ether uji coba di jaringan uji Ropsten.
