@@ -1255,7 +1255,7 @@ Untuk menginstal Parity, Anda dapat menggunakan manajer paket Rust `cargo` atau 
 
 Wiki Parity menawarkan instruksi untuk membangun Parity di berbagai lingkungan dan *container*. Kami akan menunjukkan cara membangun Parity dari sumber. Ini mengasumsikan Anda telah menginstal Rust menggunakan `rustup` (lihat “Kebutuhan Perangkat Lunak untuk Membangun dan Menjalankan Klien (Node)” di halaman 47).
 
-Pertama, dapatkan kode sumber dari GitHub:
+	Pertama, dapatkan kode sumber dari GitHub:
 
 `$ git clone https://github.com/paritytech/parity`
 
@@ -5834,16 +5834,1070 @@ Juga dari Zeppelin adalah **ZeppelinOS**, sebuah platform sumber terbuka layanan
 
 Proyek **ethpm** bertujuan untuk mengatur berbagai sumber daya yang berkembang di ekosistem dengan menyediakan sistem manajemen paket. Dengan demikian, registri mereka menyediakan lebih banyak contoh untuk Anda jelajahi:
 
-  * Situs web: [https://www.ethpm.com/](https://www.ethpm.com/)
-  * Tautan registri: [https://www.ethpm.com/registry](https://www.ethpm.com/registry)
-  * Tautan GitHub: [https://github.com/ethpm](https://github.com/ethpm)
-  * Dokumentasi: [https://www.ethpm.com/docs/integration-guide](https://www.ethpm.com/docs/integration-guide)
+  * [Situs web](https://www.ethpm.com/)
+  * [Tautan registri](https://www.ethpm.com/registry)
+  * [Tautan GitHub](https://github.com/ethpm)
+  * [Dokumentasi](https://www.ethpm.com/docs/integration-guide)
 
 ### Kesimpulan
 
 Ada banyak hal yang harus diketahui dan dipahami oleh setiap pengembang yang bekerja di domain kontrak pintar. Dengan mengikuti praktik terbaik dalam desain dan penulisan kode kontrak pintar Anda, Anda akan menghindari banyak jebakan dan perangkap yang parah.
 
 Mungkin prinsip keamanan perangkat lunak yang paling mendasar adalah **memaksimalkan penggunaan kembali kode yang tepercaya**. Dalam kriptografi, ini sangat penting sehingga telah diringkas menjadi sebuah pepatah: “Jangan buat kripto Anda sendiri.” Dalam kasus kontrak pintar, ini berarti mendapatkan sebanyak mungkin dari pustaka yang tersedia secara bebas yang telah diperiksa secara menyeluruh oleh komunitas.
+
+---
+
+# BAB 10
+## Token
+
+Kata “token” berasal dari bahasa Inggris Kuno “*tācen*,” yang berarti tanda atau simbol. Kata ini biasa digunakan untuk merujuk pada barang-barang mirip koin untuk tujuan khusus yang dikeluarkan secara pribadi dengan nilai intrinsik yang tidak signifikan, seperti token transportasi, token binatu, dan token permainan arkade.
+
+Saat ini, “token” yang dikelola di blockchain mendefinisikan ulang kata tersebut menjadi **abstraksi berbasis blockchain yang dapat dimiliki dan mewakili aset, mata uang, atau hak akses**.
+
+Asosiasi antara kata “token” dan nilai yang tidak signifikan banyak berkaitan dengan penggunaan terbatas versi fisik dari token. Seringkali terbatas pada bisnis, organisasi, atau lokasi tertentu, token fisik tidak mudah dipertukarkan dan biasanya hanya memiliki satu fungsi. Dengan token blockchain, batasan-batasan ini dihilangkan—atau, lebih tepatnya, dapat didefinisikan ulang sepenuhnya. Banyak token blockchain melayani berbagai tujuan secara global dan dapat diperdagangkan satu sama lain atau dengan mata uang lain di pasar likuid global. Dengan hilangnya batasan penggunaan dan kepemilikan, ekspektasi “nilai yang tidak signifikan” juga menjadi sesuatu dari masa lalu.
+
+Dalam bab ini, kita akan melihat berbagai penggunaan token dan bagaimana mereka dibuat. Kita juga akan membahas atribut token seperti fungibilitas dan intrinsikalitas. Akhirnya, kita akan memeriksa standar dan teknologi yang menjadi dasar mereka, dan bereksperimen dengan membangun token kita sendiri.
+
+### Bagaimana Token Digunakan
+
+Penggunaan token yang paling jelas adalah sebagai mata uang pribadi digital. Namun, ini hanyalah salah satu kemungkinan penggunaan. Token dapat diprogram untuk melayani banyak fungsi yang berbeda, seringkali tumpang tindih. Misalnya, sebuah token dapat secara bersamaan menyampaikan hak suara, hak akses, dan kepemilikan atas suatu sumber daya. Seperti yang ditunjukkan oleh daftar berikut, mata uang hanyalah “aplikasi” pertama:
+
+  * **Mata Uang**
+    Sebuah token dapat berfungsi sebagai bentuk mata uang, dengan nilai yang ditentukan melalui perdagangan pribadi.
+  * **Sumber Daya**
+    Sebuah token dapat mewakili sumber daya yang diperoleh atau diproduksi dalam ekonomi berbagi atau lingkungan berbagi sumber daya; misalnya, token penyimpanan atau CPU yang mewakili sumber daya yang dapat dibagikan melalui jaringan.
+  * **Aset**
+    Sebuah token dapat mewakili kepemilikan aset intrinsik atau ekstrinsik, berwujud atau tidak berwujud; misalnya, emas, real estat, mobil, minyak, energi, barang-barang MMOG, dll.
+  * **Akses**
+    Sebuah token dapat mewakili hak akses dan memberikan akses ke properti digital atau fisik, seperti forum diskusi, situs web eksklusif, kamar hotel, atau mobil sewaan.
+  * **Ekuitas**
+    Sebuah token dapat mewakili ekuitas pemegang saham dalam organisasi digital (mis., DAO) atau badan hukum (mis., perusahaan).
+  * **Hak Suara**
+    Sebuah token dapat mewakili hak suara dalam sistem digital atau hukum.
+  * **Barang Koleksi**
+    Sebuah token dapat mewakili barang koleksi digital (mis., CryptoPunks) atau barang koleksi fisik (mis., lukisan).
+  * **Identitas**
+    Sebuah token dapat mewakili identitas digital (mis., avatar) atau identitas hukum (mis., KTP nasional).
+  * **Atestasi**
+    Sebuah token dapat mewakili sertifikasi atau atestasi fakta oleh suatu otoritas atau oleh sistem reputasi terdesentralisasi (mis., catatan pernikahan, akta kelahiran, ijazah perguruan tinggi).
+  * **Utilitas**
+    Sebuah token dapat digunakan untuk mengakses atau membayar suatu layanan.
+
+Seringkali, satu token mencakup beberapa fungsi ini. Terkadang sulit untuk membedakannya, karena padanan fisiknya selalu terkait erat. Misalnya, di dunia fisik, surat izin mengemudi (atestasi) juga merupakan dokumen identitas (identitas) dan keduanya tidak dapat dipisahkan. Di dunia digital, fungsi-fungsi yang sebelumnya menyatu dapat dipisahkan dan dikembangkan secara independen (mis., atestasi anonim).
+
+### Token dan Fungibilitas
+
+Wikipedia mengatakan: “Dalam ekonomi, **fungibilitas** adalah properti dari suatu barang atau komoditas yang unit-unit individunya pada dasarnya dapat dipertukarkan.”
+
+Token bersifat **fungible** ketika kita dapat mengganti satu unit token dengan unit lainnya tanpa ada perbedaan nilai atau fungsinya.
+
+Secara tegas, jika asal-usul historis sebuah token dapat dilacak, maka token tersebut tidak sepenuhnya fungible. Kemampuan untuk melacak asal-usul dapat menyebabkan *blacklisting* dan *whitelisting*, mengurangi atau menghilangkan fungibilitas.
+
+Token **non-fungible** adalah token yang masing-masing mewakili barang berwujud atau tidak berwujud yang unik dan oleh karena itu tidak dapat dipertukarkan. Misalnya, sebuah token yang mewakili kepemilikan lukisan Van Gogh tertentu tidak setara dengan token lain yang mewakili lukisan Picasso, meskipun keduanya mungkin merupakan bagian dari sistem “token kepemilikan seni” yang sama. Demikian pula, sebuah token yang mewakili barang koleksi digital tertentu seperti CryptoKitty tertentu tidak dapat dipertukarkan dengan CryptoKitty lainnya. Setiap token non-fungible dikaitkan dengan pengenal unik, seperti nomor seri.
+
+Kita akan melihat contoh token fungible dan non-fungible nanti di bab ini.
+
+> Perhatikan bahwa “fungible” sering digunakan untuk berarti “dapat ditukarkan langsung dengan uang” (misalnya, token kasino dapat “diuangkan,” sementara token binatu biasanya tidak bisa). Ini bukan pengertian kata yang kami gunakan di sini.
+
+### Risiko Pihak Lawan (Counterparty Risk)
+
+**Risiko pihak lawan** adalah risiko bahwa pihak lain dalam suatu transaksi akan gagal memenuhi kewajiban mereka. Beberapa jenis transaksi menderita risiko pihak lawan tambahan karena ada lebih dari dua pihak yang terlibat. Misalnya, jika Anda memegang sertifikat deposito untuk logam mulia dan Anda menjualnya kepada seseorang, setidaknya ada tiga pihak dalam transaksi itu: penjual, pembeli, dan kustodian logam mulia. Seseorang memegang aset fisik; karena kebutuhan, mereka menjadi pihak dalam pemenuhan transaksi dan menambahkan risiko pihak lawan pada setiap transaksi yang melibatkan aset tersebut. Secara umum, ketika sebuah aset diperdagangkan secara tidak langsung melalui pertukaran token kepemilikan, ada risiko pihak lawan tambahan dari kustodian aset tersebut. Apakah mereka memiliki asetnya? Apakah mereka akan mengakui (atau mengizinkan) transfer kepemilikan berdasarkan transfer token (seperti sertifikat, akta, titel, atau token digital)? Di dunia token digital yang mewakili aset, seperti di dunia non-digital, penting untuk memahami siapa yang memegang aset yang diwakili oleh token dan aturan apa yang berlaku untuk aset yang mendasarinya.
+
+### Token dan Intrinsikalitas
+
+Kata “intrinsik” berasal dari bahasa Latin “*intra*,” yang berarti “dari dalam.”
+
+Beberapa token mewakili barang digital yang **intrinsik** terhadap blockchain. Aset-aset digital tersebut diatur oleh aturan konsensus, sama seperti token itu sendiri. Ini memiliki implikasi penting: token yang mewakili aset intrinsik **tidak membawa risiko pihak lawan tambahan**. Jika Anda memegang kunci untuk CryptoKitty, tidak ada pihak lain yang memegang CryptoKitty itu untuk Anda—Anda memilikinya secara langsung. Aturan konsensus blockchain berlaku dan kepemilikan Anda (yaitu, kontrol) atas kunci privat setara dengan kepemilikan aset, tanpa perantara apa pun.
+
+Sebaliknya, banyak token digunakan untuk mewakili hal-hal **ekstrinsik**, seperti real estat, saham pemungutan suara perusahaan, merek dagang, dan batangan emas. Kepemilikan barang-barang ini, yang tidak berada “di dalam” blockchain, diatur oleh hukum, kebiasaan, dan kebijakan, terpisah dari aturan konsensus yang mengatur token. Dengan kata lain, penerbit dan pemilik token mungkin masih bergantung pada kontrak non-pintar di dunia nyata. Akibatnya, aset-aset ekstrinsik ini membawa risiko pihak lawan tambahan karena dipegang oleh kustodian, dicatat dalam registri eksternal, atau dikendalikan oleh hukum dan kebijakan di luar lingkungan blockchain.
+
+Salah satu konsekuensi terpenting dari token berbasis blockchain adalah kemampuan untuk mengubah aset ekstrinsik menjadi aset intrinsik dan dengan demikian menghilangkan risiko pihak lawan. Contoh yang baik adalah beralih dari ekuitas di perusahaan (ekstrinsik) ke token ekuitas atau pemungutan suara di DAO atau organisasi serupa (intrinsik).
+
+### Menggunakan Token: Utilitas atau Ekuitas
+
+Hampir semua proyek di Ethereum saat ini diluncurkan dengan semacam token. Tetapi apakah semua proyek ini benar-benar membutuhkan token? Apakah ada kerugian menggunakan token, atau akankah kita melihat slogan “tokenisasi semua hal” menjadi kenyataan? Pada prinsipnya, penggunaan token dapat dilihat sebagai alat manajemen atau organisasi pamungkas. Dalam praktiknya, integrasi platform blockchain, termasuk Ethereum, ke dalam struktur masyarakat yang ada berarti bahwa, sejauh ini, ada banyak batasan pada penerapannya.
+
+Mari kita mulai dengan mengklarifikasi peran token dalam proyek baru. Mayoritas proyek menggunakan token dalam salah satu dari dua cara: baik sebagai “**token utilitas**” atau sebagai “**token ekuitas**.” Sangat sering, kedua peran itu digabungkan.
+
+**Token utilitas** adalah token di mana penggunaan token diperlukan untuk mendapatkan akses ke layanan, aplikasi, atau sumber daya. Contoh token utilitas termasuk token yang mewakili sumber daya seperti penyimpanan bersama, atau akses ke layanan seperti jaringan media sosial.
+
+**Token ekuitas** adalah token yang mewakili saham dalam kontrol atau kepemilikan sesuatu, seperti sebuah startup. Token ekuitas bisa sesederhana saham tanpa hak suara untuk distribusi dividen dan keuntungan, atau seluas saham dengan hak suara dalam organisasi otonom terdesentralisasi, di mana manajemen platform melalui beberapa sistem tata kelola yang kompleks berdasarkan suara oleh pemegang token.
+
+#### Itu Bebek\!
+
+Banyak startup menghadapi masalah sulit: token adalah mekanisme penggalangan dana yang hebat, tetapi menawarkan sekuritas (ekuitas) kepada publik adalah kegiatan yang diatur di sebagian besar yurisdiksi. Dengan menyamarkan token ekuitas sebagai token utilitas, banyak startup berharap untuk menghindari pembatasan peraturan ini dan mengumpulkan uang dari penawaran publik sambil menampilkannya sebagai pra-penjualan “voucher akses layanan” atau, seperti yang kita sebut, token utilitas. Apakah penawaran ekuitas yang disamarkan tipis ini akan dapat menghindari regulator masih harus dilihat. Seperti kata pepatah populer: “Jika berjalan seperti bebek dan bersuara seperti bebek, itu bebek.” Regulator kemungkinan tidak akan terganggu oleh pemutarbalikan semantik ini; justru sebaliknya, mereka lebih mungkin melihat akal-akalan hukum seperti itu sebagai upaya untuk menipu publik.
+
+#### Token Utilitas: Siapa yang Membutuhkannya?
+
+Masalah sebenarnya adalah bahwa token utilitas menimbulkan risiko signifikan dan hambatan adopsi bagi startup. Mungkin di masa depan yang jauh “tokenisasi semua hal” akan menjadi kenyataan, tetapi saat ini himpunan orang yang memiliki pemahaman dan keinginan untuk menggunakan token adalah bagian dari pasar mata uang kripto yang sudah kecil.
+
+Bagi sebuah startup, setiap inovasi mewakili risiko dan filter pasar. Inovasi adalah mengambil jalan yang paling jarang dilalui, menjauh dari jalur tradisi. Ini sudah merupakan perjalanan yang sepi. Jika sebuah startup mencoba berinovasi di bidang teknologi baru, seperti berbagi penyimpanan melalui jaringan P2P, itu sudah merupakan jalur yang cukup sepi. Menambahkan token utilitas ke inovasi itu dan mengharuskan pengguna untuk mengadopsi token untuk menggunakan layanan tersebut akan memperparah risiko dan meningkatkan hambatan adopsi. Ini seperti berjalan keluar dari jalur inovasi penyimpanan P2P yang sudah sepi dan masuk ke hutan belantara.
+
+Pikirkan setiap inovasi sebagai filter. Ini membatasi adopsi ke bagian pasar yang dapat menjadi pengadopsi awal inovasi ini. Menambahkan filter kedua akan memperparah efek itu, lebih lanjut membatasi pasar yang dapat ditangani. Anda meminta pengadopsi awal Anda untuk mengadopsi tidak hanya satu tetapi dua teknologi yang sama sekali baru: aplikasi/platform/layanan baru yang Anda bangun, dan ekonomi token.
+
+Bagi sebuah startup, setiap inovasi menimbulkan risiko yang meningkatkan kemungkinan kegagalan startup. Jika Anda mengambil ide startup Anda yang sudah berisiko dan menambahkan token utilitas, Anda menambahkan semua risiko dari platform yang mendasarinya (Ethereum), ekonomi yang lebih luas (bursa, likuiditas), lingkungan peraturan (regulator ekuitas/komoditas), dan teknologi (kontrak pintar, standar token). Itu adalah banyak risiko bagi sebuah startup.
+
+Para pendukung “tokenisasi semua hal” kemungkinan akan membalas bahwa dengan mengadopsi token, mereka juga mewarisi antusiasme pasar, pengadopsi awal, teknologi, inovasi, dan likuiditas dari seluruh ekonomi token. Itu juga benar. Pertanyaannya adalah apakah manfaat dan antusiasme lebih besar daripada risiko dan ketidakpastian.
+
+Namun demikian, beberapa ide bisnis paling inovatif memang terjadi di dunia kripto. Jika regulator tidak cukup cepat untuk mengadopsi undang-undang dan mendukung model bisnis baru, pengusaha dan talenta terkait akan berusaha beroperasi di yurisdiksi lain yang lebih ramah kripto. Ini sudah terjadi.
+
+Akhirnya, di awal bab ini, saat memperkenalkan token, kami membahas arti sehari-hari “token” sebagai “sesuatu yang bernilai tidak signifikan.” Alasan mendasar dari nilai yang tidak signifikan dari sebagian besar token adalah karena mereka hanya dapat digunakan dalam konteks yang sangat sempit: satu perusahaan bus, satu binatu, satu arkade, satu hotel, atau satu toko perusahaan. Likuiditas terbatas, penerapan terbatas, dan biaya konversi tinggi mengurangi nilai token hingga hanya bernilai “token”. Jadi ketika Anda menambahkan token utilitas ke platform Anda, tetapi token tersebut hanya dapat digunakan di satu platform Anda dengan pasar kecil, Anda menciptakan kembali kondisi yang membuat token fisik tidak berharga. Ini mungkin memang cara yang benar untuk memasukkan tokenisasi ke dalam proyek Anda. Namun, jika untuk menggunakan platform Anda, seorang pengguna harus mengubah sesuatu menjadi token utilitas Anda, menggunakannya, dan kemudian mengubah sisanya kembali menjadi sesuatu yang lebih berguna secara umum, Anda telah menciptakan **skrip perusahaan (*company scrip*)**. Biaya peralihan dari token digital jauh lebih rendah daripada token fisik tanpa pasar, tetapi tidak nol. Token utilitas yang berfungsi di seluruh sektor industri akan sangat menarik dan mungkin cukup berharga. Tetapi jika Anda mendirikan startup Anda untuk harus memulai standar industri secara keseluruhan agar berhasil, Anda mungkin sudah gagal.
+
+> Salah satu manfaat menerapkan layanan di platform serbaguna seperti Ethereum adalah kemampuan untuk menghubungkan kontrak pintar (dan oleh karena itu utilitas token) di seluruh proyek, meningkatkan potensi likuiditas dan utilitas token.
+
+Buat keputusan ini karena alasan yang tepat. Adopsi token karena aplikasi Anda tidak dapat bekerja tanpa token. Adopsi karena token tersebut menghilangkan hambatan pasar mendasar atau memecahkan masalah akses. Jangan memperkenalkan token utilitas karena itu adalah satu-satunya cara Anda dapat mengumpulkan uang dengan cepat dan Anda perlu berpura-pura itu bukan penawaran sekuritas publik.
+
+### Token di Ethereum
+
+Token blockchain sudah ada sebelum Ethereum. Dalam beberapa hal, mata uang blockchain pertama, Bitcoin, adalah sebuah token itu sendiri. Banyak platform token juga dikembangkan di Bitcoin dan mata uang kripto lainnya sebelum Ethereum. Namun, pengenalan standar token pertama di Ethereum menyebabkan ledakan token.
+
+Vitalik Buterin menyarankan token sebagai salah satu aplikasi yang paling jelas dan berguna dari blockchain yang dapat diprogram secara umum seperti Ethereum. Faktanya, pada tahun pertama Ethereum, umum untuk melihat Vitalik dan lainnya mengenakan T-shirt yang dihiasi dengan logo Ethereum dan contoh kontrak pintar di bagian belakang. Ada beberapa variasi T-shirt ini, tetapi yang paling umum menunjukkan implementasi sebuah token.
+
+Sebelum kita mendalami detail pembuatan token di Ethereum, penting untuk memiliki gambaran umum tentang bagaimana token bekerja di Ethereum. Token berbeda dari ether karena **protokol Ethereum tidak tahu apa-apa tentang mereka**. Mengirim ether adalah tindakan intrinsik dari platform Ethereum, tetapi mengirim atau bahkan memiliki token tidak. Saldo ether dari akun Ethereum ditangani di tingkat protokol, sedangkan saldo token dari akun Ethereum ditangani di tingkat kontrak pintar. Untuk membuat token baru di Ethereum, Anda harus membuat kontrak pintar baru. Setelah diterapkan, kontrak pintar menangani semuanya, termasuk kepemilikan, transfer, dan hak akses. Anda dapat menulis kontrak pintar Anda untuk melakukan semua tindakan yang diperlukan dengan cara apa pun yang Anda inginkan, tetapi mungkin paling bijaksana untuk mengikuti standar yang ada. Kita akan melihat standar semacam itu selanjutnya. Kami membahas pro dan kontra dari standar berikut di akhir bab.
+
+#### Standar Token ERC20
+
+Standar pertama diperkenalkan pada November 2015 oleh Fabian Vogelsteller sebagai Ethereum Request for Comments (ERC). Secara otomatis diberi nomor isu GitHub 20, yang memunculkan nama “token ERC20.” Sebagian besar token saat ini didasarkan pada standar ERC20. Permintaan komentar ERC20 akhirnya menjadi Ethereum Improvement Proposal 20 (EIP-20), tetapi sebagian besar masih disebut dengan nama asli, ERC20.
+
+**ERC20** adalah standar untuk **token fungible**, yang berarti bahwa unit-unit yang berbeda dari token ERC20 dapat dipertukarkan dan tidak memiliki properti unik.
+
+Standar ERC20 mendefinisikan antarmuka umum untuk kontrak yang mengimplementasikan sebuah token, sehingga setiap token yang kompatibel dapat diakses dan digunakan dengan cara yang sama. Antarmuka terdiri dari sejumlah fungsi yang harus ada di setiap implementasi standar, serta beberapa fungsi dan atribut opsional yang dapat ditambahkan oleh pengembang.
+
+##### Fungsi dan *event* yang diwajibkan oleh ERC20
+
+Kontrak token yang sesuai dengan ERC20 harus menyediakan setidaknya fungsi dan *event* berikut:
+
+  * **`totalSupply`**
+    Mengembalikan jumlah total unit token ini yang saat ini ada. Token ERC20 dapat memiliki pasokan tetap atau variabel.
+  * **`balanceOf`**
+    Dengan alamat yang diberikan, mengembalikan saldo token dari alamat tersebut.
+  * **`transfer`**
+    Dengan alamat dan jumlah yang diberikan, mentransfer jumlah token tersebut ke alamat itu, dari saldo alamat yang mengeksekusi transfer.
+  * **`transferFrom`**
+    Dengan pengirim, penerima, dan jumlah yang diberikan, mentransfer token dari satu akun ke akun lain. Digunakan dalam kombinasi dengan `approve`.
+  * **`approve`**
+    Dengan alamat penerima dan jumlah yang diberikan, memberi wewenang kepada alamat tersebut untuk mengeksekusi beberapa transfer hingga jumlah tersebut, dari akun yang mengeluarkan persetujuan.
+  * **`allowance`**
+    Dengan alamat pemilik dan alamat pembelanja, mengembalikan jumlah sisa yang disetujui untuk ditarik oleh pembelanja dari pemilik.
+  * **`Transfer`**
+    *Event* yang dipicu setelah transfer berhasil (panggilan ke `transfer` atau `transferFrom`) (bahkan untuk transfer bernilai nol).
+  * **`Approval`**
+    *Event* yang dicatat setelah panggilan berhasil ke `approve`.
+
+##### Fungsi opsional ERC20
+
+Selain fungsi yang diwajibkan yang tercantum di bagian sebelumnya, fungsi opsional berikut juga didefinisikan oleh standar:
+
+  * **`name`**
+    Mengembalikan nama yang dapat dibaca manusia (mis., “Dolar AS”) dari token.
+  * **`symbol`**
+    Mengembalikan simbol yang dapat dibaca manusia (mis., “USD”) untuk token.
+  * **`decimals`**
+    Mengembalikan jumlah desimal yang digunakan untuk membagi jumlah token. Misalnya, jika `decimals` adalah 2, maka jumlah token dibagi 100 untuk mendapatkan representasi penggunanya.
+
+##### Antarmuka ERC20 yang didefinisikan di Solidity
+
+Berikut adalah seperti apa spesifikasi antarmuka ERC20 di Solidity:
+
+```solidity
+contract ERC20 {
+  function totalSupply() public view returns (uint theTotalSupply);
+  function balanceOf(address _owner) public view returns (uint balance);
+  function transfer(address _to, uint _value) public returns (bool success);
+  function transferFrom(address _from, address _to, uint _value) public returns (bool success);
+  function approve(address _spender, uint _value) public returns (bool success);
+  function allowance(address _owner, address _spender) public view returns (uint remaining);
+
+  event Transfer(address indexed _from, address indexed _to, uint _value);
+  event Approval(address indexed _owner, address indexed _spender, uint _value);
+}
+```
+
+##### Struktur data ERC20
+
+Jika Anda memeriksa implementasi ERC20 apa pun, Anda akan melihat bahwa ia berisi dua struktur data, satu untuk melacak saldo dan satu untuk melacak tunjangan (*allowances*). Di Solidity, mereka diimplementasikan dengan *mapping* data.
+
+*Mapping* data pertama mengimplementasikan tabel internal saldo token, berdasarkan pemilik. Ini memungkinkan kontrak token untuk melacak siapa yang memiliki token. Setiap transfer adalah pengurangan dari satu saldo dan penambahan ke saldo lain:
+
+```solidity
+mapping(address => uint256) balances;
+```
+
+Struktur data kedua adalah *mapping* data dari tunjangan. Seperti yang akan kita lihat di bagian berikutnya, dengan token ERC20, seorang pemilik token dapat mendelegasikan wewenang kepada seorang pembelanja, memungkinkan mereka untuk membelanjakan jumlah tertentu (tunjangan) dari saldo pemilik. Kontrak ERC20 melacak tunjangan dengan *mapping* dua dimensi, dengan kunci utama adalah alamat pemilik token, yang memetakan ke alamat pembelanja dan jumlah tunjangan:
+
+```solidity
+mapping (address => mapping (address => uint256)) public allowed;
+```
+
+##### Alur kerja ERC20: “transfer” dan “approve & transferFrom”
+
+Standar token ERC20 memiliki dua fungsi transfer. Anda mungkin bertanya-tanya mengapa. ERC20 memungkinkan dua alur kerja yang berbeda.
+
+Yang pertama adalah alur kerja satu transaksi yang lugas menggunakan fungsi **`transfer`**. Alur kerja ini adalah yang digunakan oleh dompet untuk mengirim token ke dompet lain. Sebagian besar transaksi token terjadi dengan alur kerja `transfer`.
+
+Mengeksekusi kontrak `transfer` sangat sederhana. Jika Alice ingin mengirim 10 token ke Bob, dompetnya mengirimkan transaksi ke alamat kontrak token, memanggil fungsi `transfer` dengan alamat Bob dan 10 sebagai argumen. Kontrak token menyesuaikan saldo Alice (–10) dan saldo Bob (+10) dan mengeluarkan *event* `Transfer`.
+
+Alur kerja kedua adalah alur kerja dua transaksi yang menggunakan **`approve`** diikuti oleh **`transferFrom`**. Alur kerja ini memungkinkan pemilik token untuk mendelegasikan kontrol mereka ke alamat lain. Ini paling sering digunakan untuk mendelegasikan kontrol ke kontrak untuk distribusi token, tetapi juga dapat digunakan oleh bursa.
+
+Misalnya, jika sebuah perusahaan menjual token untuk ICO, mereka dapat menyetujui alamat kontrak *crowdsale* untuk mendistribusikan sejumlah token. Kontrak *crowdsale* kemudian dapat melakukan `transferFrom` dari saldo pemilik kontrak token ke setiap pembeli token, seperti yang diilustrasikan pada Gambar 10-1.
+
+> **Initial Coin Offering (ICO)** adalah mekanisme *crowdfunding* yang digunakan oleh perusahaan dan organisasi untuk mengumpulkan uang dengan menjual token. Istilah ini berasal dari *Initial Public Offering* (IPO), yaitu proses di mana perusahaan publik menawarkan saham untuk dijual kepada investor di bursa saham. Tidak seperti pasar IPO yang sangat diatur, ICO bersifat terbuka, global, dan berantakan. Contoh dan penjelasan ICO dalam buku ini bukan merupakan dukungan terhadap jenis penggalangan dana ini.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-10.1.png" alt="gambar" width="580"/>
+</p>
+
+Untuk alur kerja `approve & transferFrom`, diperlukan dua transaksi. Katakanlah Alice ingin mengizinkan kontrak `AliceICO` untuk menjual 50% dari semua token `AliceCoin` kepada pembeli seperti Bob dan Charlie. Pertama, Alice meluncurkan kontrak `AliceCoin` ERC20, menerbitkan semua `AliceCoin` ke alamatnya sendiri. Kemudian, Alice meluncurkan kontrak `AliceICO` yang dapat menjual token dengan imbalan ether. Selanjutnya, Alice memulai alur kerja `approve & transferFrom`. Dia mengirimkan transaksi ke kontrak `AliceCoin`, memanggil `approve` dengan alamat kontrak `AliceICO` dan 50% dari `totalSupply` sebagai argumen. Ini akan memicu *event* `Approval`. Sekarang, kontrak `AliceICO` dapat menjual `AliceCoin`.
+
+Ketika kontrak `AliceICO` menerima ether dari Bob, ia perlu mengirimkan beberapa `AliceCoin` ke Bob sebagai balasannya. Di dalam kontrak `AliceICO` terdapat nilai tukar antara `AliceCoin` dan ether. Nilai tukar yang ditetapkan Alice saat dia membuat kontrak `AliceICO` menentukan berapa banyak token yang akan diterima Bob untuk jumlah ether yang dikirim ke kontrak `AliceICO`. Ketika kontrak `AliceICO` memanggil fungsi `transferFrom` `AliceCoin`, ia menetapkan alamat Alice sebagai pengirim dan alamat Bob sebagai penerima, dan menggunakan nilai tukar untuk menentukan berapa banyak token `AliceCoin` yang akan ditransfer ke Bob di bidang nilai. Kontrak `AliceCoin` mentransfer saldo dari alamat Alice ke alamat Bob dan memicu *event* `Transfer`. Kontrak `AliceICO` dapat memanggil `transferFrom` dalam jumlah tak terbatas, selama tidak melebihi batas persetujuan yang ditetapkan Alice. Kontrak `AliceICO` dapat melacak berapa banyak token `AliceCoin` yang dapat dijualnya dengan memanggil fungsi `allowance`.
+
+### Implementasi ERC20
+
+Meskipun dimungkinkan untuk mengimplementasikan token yang kompatibel dengan ERC20 dalam sekitar 30 baris kode Solidity, sebagian besar implementasi lebih kompleks. Hal ini untuk memperhitungkan potensi kerentanan keamanan. Ada dua implementasi yang disebutkan dalam standar EIP-20:
+
+  * **Consensys EIP20**
+    Implementasi token yang kompatibel dengan ERC20 yang sederhana dan mudah dibaca.
+  * **OpenZeppelin StandardToken**
+    Implementasi ini kompatibel dengan ERC20, dengan tindakan pencegahan keamanan tambahan. Ini menjadi dasar dari pustaka OpenZeppelin yang mengimplementasikan token yang kompatibel dengan ERC20 yang lebih kompleks dengan batasan penggalangan dana, lelang, jadwal vesting, dan fitur lainnya.
+
+### Meluncurkan Token ERC20 Kita Sendiri
+
+Mari kita buat dan luncurkan token kita sendiri. Untuk contoh ini, kita akan menggunakan kerangka kerja Truffle. Contoh ini mengasumsikan Anda telah menginstal `truffle` dan mengkonfigurasinya, serta akrab dengan operasi dasarnya (untuk detailnya, lihat “Truffle” di halaman 345).
+
+Kita akan menamai token kita “Mastering Ethereum Token,” dengan simbol “MET.”
+
+Anda dapat menemukan contoh ini di repositori [GitHub buku ini](https://github.com/ethereumbook/ethereumbook/blob/develop/code/truffle/METoken).
+
+Pertama, mari kita buat dan inisialisasi direktori proyek Truffle. Jalankan empat perintah ini dan terima jawaban default untuk setiap pertanyaan:
+
+```bash
+$ mkdir METoken
+$ cd METoken
+METoken $ truffle init
+METoken $ npm init
+```
+
+Sekarang Anda seharusnya memiliki struktur direktori berikut:
+
+```
+METoken/
++---- contracts
+|
+`---- Migrations.sol
++---- migrations
+|
+`---- 1_initial_migration.js
++---- package.json
++---- test
++---- truffle-config.js
+`---- truffle.js
+```
+
+Edit file konfigurasi `truffle.js` atau `truffle-config.js` untuk mengatur lingkungan Truffle Anda, atau salin yang terakhir dari repositori.
+
+Jika Anda menggunakan contoh `truffle-config.js`, ingatlah untuk membuat file `.env` di folder `METoken` yang berisi kunci privat pengujian Anda untuk pengujian dan penyebaran di jaringan pengujian publik Ethereum, seperti Ropsten atau Kovan. Anda dapat mengekspor kunci privat jaringan pengujian Anda dari MetaMask.
+
+Setelah itu direktori Anda akan terlihat seperti ini:
+
+```
+METoken/
++---- contracts
+|
+`---- Migrations.sol
++---- migrations
+|
+`---- 1_initial_migration.js
++---- package.json
++---- test
++---- truffle-config.js
++---- truffle.js
+`---- .env *new file*
+```
+
+> ⚠️ Hanya gunakan kunci pengujian atau mnemonik pengujian yang tidak digunakan untuk menyimpan dana di jaringan utama Ethereum. **Jangan pernah menggunakan kunci yang menyimpan uang sungguhan untuk pengujian.**
+
+Untuk contoh kita, kita akan mengimpor pustaka OpenZeppelin, yang mengimplementasikan beberapa pemeriksaan keamanan penting dan mudah untuk diperluas:
+
+```bash
+$ npm install openzeppelin-solidity@1.12.0
++ openzeppelin-solidity@1.12.0
+added 1 package from 1 contributor and audited 2381 packages in 4.074s
+```
+
+Paket `openzeppelin-solidity` akan menambahkan sekitar 250 file di bawah direktori `node_modules`. Pustaka OpenZeppelin mencakup lebih dari sekadar token ERC20, tetapi kita hanya akan menggunakan sebagian kecil darinya.
+
+Selanjutnya, mari kita tulis kontrak token kita. Buat file baru, `METoken.sol`, dan salin kode contoh dari GitHub.
+
+Kontrak kita, yang ditunjukkan pada Contoh 10-1, sangat sederhana, karena ia mewarisi semua fungsionalitasnya dari pustaka OpenZeppelin.
+
+**Contoh 10-1. METoken.sol: Kontrak Solidity yang mengimplementasikan token ERC20**
+
+```solidity
+1 pragma solidity ^0.4.21;
+2
+3 import 'openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
+4
+5 contract METoken is StandardToken {
+6
+7   string public constant name = 'Mastering Ethereum Token';
+8   string public constant symbol = 'MET';
+9   uint8 public constant decimals = 2;
+10  uint256 constant _initial_supply = 2100000000;
+11
+12  constructor() public {
+13    totalSupply_ = _initial_supply;
+14    balances[msg.sender] = _initial_supply;
+15    emit Transfer(address(0), msg.sender, _initial_supply);
+16  }
+17 }
+```
+
+Di sini, kita mendefinisikan variabel opsional `name`, `symbol`, dan `decimals`. Kita juga mendefinisikan variabel `_initial_supply`, yang diatur ke 21 juta token; dengan dua desimal subdivisi, itu memberikan total 2,1 miliar unit. Dalam fungsi inisialisasi (konstruktor) kontrak, kita mengatur `totalSupply_` agar sama dengan `_initial_supply` dan mengalokasikan semua `_initial_supply` ke saldo akun (`msg.sender`) yang membuat kontrak `METoken`.
+
+Sekarang kita menggunakan `truffle` untuk mengkompilasi kode `METoken`:
+
+```bash
+$ truffle compile
+Compiling ./contracts/METoken.sol...
+Compiling ./contracts/Migrations.sol...
+Compiling openzeppelin-solidity/contracts/math/SafeMath.sol...
+Compiling openzeppelin-solidity/contracts/token/ERC20/BasicToken.sol...
+Compiling openzeppelin-solidity/contracts/token/ERC20/ERC20.sol...
+Compiling openzeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol...
+Compiling openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol...
+```
+
+Seperti yang Anda lihat, `truffle` menggabungkan dependensi yang diperlukan dari pustaka OpenZeppelin dan mengkompilasi kontrak-kontrak tersebut juga.
+
+Mari kita siapkan skrip migrasi untuk menerapkan kontrak `METoken`. Buat file baru bernama `2_deploy_contracts.js`, di folder `METoken/migrations`. Salin isinya dari contoh di repositori GitHub:
+
+```javascript
+1 var METoken = artifacts.require("METoken");
+2
+3 module.exports = function(deployer) {
+4   // Menerapkan kontrak METoken sebagai satu-satunya tugas kita
+5   deployer.deploy(METoken);
+6 };
+```
+
+Sebelum kita menerapkan di salah satu jaringan pengujian Ethereum, mari kita mulai blockchain lokal untuk menguji semuanya. Mulai blockchain `ganache`, baik dari baris perintah dengan `ganache-cli` atau dari antarmuka pengguna grafis.
+
+Setelah `ganache` dimulai, kita dapat menerapkan kontrak `METoken` kita dan melihat apakah semuanya berfungsi seperti yang diharapkan:
+
+```bash
+$ truffle migrate --network ganache
+Using network 'ganache'.
+
+Running migration: 1_initial_migration.js
+  Deploying Migrations...
+  ... 0xb2e90a056dc6ad8e654683921fc613c796a03b89df6760ec1db1084ea4a084eb
+  Migrations: 0x8cdaf0cd259887258bc13a92c0a6da92698644c0
+Saving successful migration to network...
+  ... 0xd7bc86d31bee32fa3988f1c1eabce403a1b5d570340a3a9cdba53a472ee8c956
+Saving artifacts...
+Running migration: 2_deploy_contracts.js
+  Deploying METoken...
+  ... 0xbe9290d59678b412e60ed6aefedb17364f4ad2977cfb2076b9b8ad415c5dc9f0
+  METoken: 0x345ca3e014aaf5dca488057592ee47305d9b3e10
+Saving successful migration to network...
+  ... 0xf36163615f41ef7ed8f4a8f192149a0bf633fe1a2398ce001bf44c43dc7bdda0
+Saving artifacts...
+```
+
+Pada konsol `ganache`, kita akan melihat bahwa penerapan kita telah menciptakan empat transaksi baru, seperti yang digambarkan pada Gambar 10-2.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-10.2.png" alt="gambar" width="580"/>
+</p>
+
+### Berinteraksi dengan METoken menggunakan konsol Truffle
+
+Kita dapat berinteraksi dengan kontrak kita di blockchain `ganache` menggunakan konsol Truffle. Ini adalah lingkungan JavaScript interaktif yang menyediakan akses ke lingkungan Truffle dan, melalui `web3`, ke blockchain. Dalam kasus ini, kita akan menghubungkan konsol Truffle ke blockchain `ganache`:
+
+```bash
+$ truffle console --network ganache
+truffle(ganache)>
+```
+
+Prompt `truffle(ganache)>` menunjukkan bahwa kita terhubung ke blockchain `ganache` dan siap untuk mengetik perintah kita. Konsol Truffle mendukung semua perintah `truffle`, jadi kita bisa melakukan kompilasi dan migrasi dari konsol. Kita sudah menjalankan perintah-perintah tersebut, jadi mari kita langsung ke kontrak itu sendiri. Kontrak `METoken` ada sebagai objek JavaScript di dalam lingkungan Truffle. Ketik `METoken` pada prompt dan ia akan menampilkan seluruh definisi kontrak:
+
+```javascript
+truffle(ganache)> METoken
+{ [Function: TruffleContract]
+  _static_methods:
+  [...]
+  currentProvider:
+   HttpProvider {
+     host: 'http://localhost:7545',
+     timeout: 0,
+     user: undefined,
+     password: undefined,
+     headers: undefined,
+     send: [Function],
+     sendAsync: [Function],
+     _alreadyWrapped: true },
+  network_id: '5777' }
+```
+
+Objek `METoken` juga mengekspos beberapa atribut, seperti alamat kontrak (seperti yang diterapkan oleh perintah `migrate`):
+
+```javascript
+truffle(ganache)> METoken.address
+'0x345ca3e014aaf5dca488057592ee47305d9b3e10'
+```
+
+Jika kita ingin berinteraksi dengan kontrak yang telah diterapkan, kita harus menggunakan panggilan asinkron, dalam bentuk “promise” JavaScript. Kita menggunakan fungsi `deployed` untuk mendapatkan instansi kontrak dan kemudian memanggil fungsi `totalSupply`:
+
+```javascript
+truffle(ganache)> METoken.deployed().then(instance => instance.totalSupply())
+BigNumber { s: 1, e: 9, c: [ 2100000000 ] }
+```
+
+Selanjutnya, mari kita gunakan akun yang dibuat oleh `ganache` untuk memeriksa saldo `METoken` kita dan mengirim beberapa `METoken` ke alamat lain. Pertama, mari kita dapatkan alamat akun:
+
+```javascript
+truffle(ganache)> let accounts
+undefined
+truffle(ganache)> web3.eth.getAccounts((err,res) => { accounts = res })
+undefined
+truffle(ganache)> accounts[0]
+'0x627306090abab3a6e1400e9345bc60c78a8bef57'
+```
+
+Daftar `accounts` sekarang berisi semua akun yang dibuat oleh `ganache`, dan `account[0]` adalah akun yang menerapkan kontrak `METoken`. Akun ini seharusnya memiliki saldo `METoken`, karena konstruktor `METoken` kita memberikan seluruh pasokan token ke alamat yang membuatnya. Mari kita periksa:
+
+```javascript
+truffle(ganache)> METoken.deployed().then(instance => { instance.balanceOf(accounts[0]).then(console.log) })
+undefined
+truffle(ganache)> BigNumber { s: 1, e: 9, c: [ 2100000000 ] }
+```
+
+Terakhir, mari kita transfer 1000.00 `METoken` dari `account[0]` ke `account[1]`, dengan memanggil fungsi `transfer` kontrak:
+
+```javascript
+truffle(ganache)> METoken.deployed().then(instance => { instance.transfer(accounts[1], 100000) })
+undefined
+
+truffle(ganache)> METoken.deployed().then(instance => { instance.balanceOf(accounts[0]).then(console.log) })
+undefined
+truffle(ganache)> BigNumber { s: 1, e: 9, c: [ 2099900000 ] }
+
+undefined
+truffle(ganache)> METoken.deployed().then(instance => { instance.balanceOf(accounts[1]).then(console.log) })
+undefined
+truffle(ganache)> BigNumber { s: 1, e: 5, c: [ 100000 ] }
+```
+
+> `METoken` memiliki 2 desimal presisi, yang berarti bahwa 1 `METoken` adalah 100 unit di dalam kontrak. Ketika kita mentransfer 1.000 `METoken`, kita menentukan nilainya sebagai **100000** dalam panggilan ke fungsi `transfer`.
+
+Seperti yang Anda lihat, di konsol, `account[0]` sekarang memiliki 20.999.000 MET, dan `account[1]` memiliki 1.000 MET.
+
+Jika Anda beralih ke antarmuka pengguna grafis `ganache`, seperti yang ditunjukkan pada Gambar 10-3, Anda akan melihat transaksi yang memanggil fungsi `transfer`.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-10.3.png" alt="gambar" width="580"/>
+</p>
+
+### Mengirim token ERC20 ke alamat kontrak
+
+Sejauh ini, kita telah menyiapkan token ERC20 dan mentransfer beberapa token dari satu akun ke akun lain. Semua akun yang kita gunakan untuk demonstrasi ini adalah akun milik eksternal (*externally owned accounts*), yang berarti mereka dikendalikan oleh kunci privat, bukan kontrak. Apa yang terjadi jika kita mengirim MET ke alamat kontrak? Mari kita cari tahu\!
+
+Pertama, mari kita terapkan kontrak lain ke lingkungan pengujian kita. Untuk contoh ini, kita akan menggunakan kontrak pertama kita, `Faucet.sol`. Mari kita tambahkan ke proyek `METoken` dengan menyalinnya ke direktori `contracts`. Direktori kita akan terlihat seperti ini:
+
+```
+METoken/
++---- contracts
+|
++---- Faucet.sol
+|
++---- METoken.sol
+|
+`---- Migrations.sol
+```
+
+Kita juga akan menambahkan sebuah migrasi, untuk menerapkan `Faucet` secara terpisah dari `METoken`:
+
+```javascript
+var Faucet = artifacts.require("Faucet");
+
+module.exports = function(deployer) {
+  // Menerapkan kontrak Faucet sebagai satu-satunya tugas kita
+  deployer.deploy(Faucet);
+};
+```
+
+Mari kita kompilasi dan migrasikan kontrak dari konsol Truffle:
+
+```bash
+$ truffle console --network ganache
+truffle(ganache)> compile
+Compiling ./contracts/Faucet.sol...
+Writing artifacts to ./build/contracts
+
+truffle(ganache)> migrate
+Using network 'ganache'.
+
+Running migration: 1_initial_migration.js
+  Deploying Migrations...
+  ... 0x89f6a7bd2a596829c60a483ec99665c7af71e68c77a417fab503c394fcd7a0c9
+  Migrations: 0xa1ccce36fb823810e729dce293b75f40fb6ea9c9
+Saving artifacts...
+Running migration: 2_deploy_contracts.js
+  Replacing METoken...
+  ... 0x28d0da26f48765f67e133e99dd275fac6a25fdfec6594060fd1a0e09a99b44ba
+  METoken: 0x7d6bf9d5914d37bcba9d46df7107e71c59f3791f
+Saving artifacts...
+Running migration: 3_deploy_faucet.js
+  Deploying Faucet...
+  ... 0x6fbf283bcc97d7c52d92fd91f6ac02d565f5fded483a6a0f824f66edc6fa90c3
+  Faucet: 0xb18a42e9468f7f1342fa3c329ec339f254bc7524
+Saving artifacts...
+```
+
+Bagus. Sekarang mari kita kirim beberapa MET ke kontrak `Faucet`:
+
+```javascript
+truffle(ganache)> METoken.deployed().then(instance => { instance.transfer(Faucet.address, 100000) })
+
+truffle(ganache)> METoken.deployed().then(instance => { instance.balanceOf(Faucet.address).then(console.log)})
+truffle(ganache)> BigNumber { s: 1, e: 5, c: [ 100000 ] }
+```
+
+Baiklah, kita telah mentransfer 1.000 MET ke kontrak `Faucet`. Sekarang, bagaimana cara kita menarik token-token itu?
+
+Ingat, `Faucet.sol` adalah kontrak yang cukup sederhana. Ia hanya memiliki satu fungsi, `withdraw`, yang berfungsi untuk menarik ether. Ia **tidak memiliki fungsi** untuk menarik MET, atau token ERC20 lainnya. Jika kita menggunakan `withdraw`, ia akan mencoba mengirim ether, tetapi karena `Faucet` belum memiliki saldo ether, itu akan gagal.
+
+Kontrak `METoken` tahu bahwa `Faucet` memiliki saldo, tetapi satu-satunya cara ia dapat mentransfer saldo itu adalah jika ia menerima panggilan `transfer` dari alamat kontrak tersebut. Entah bagaimana kita perlu membuat kontrak `Faucet` memanggil fungsi `transfer` di `METoken`.
+
+Jika Anda bertanya-tanya apa yang harus dilakukan selanjutnya, jangan. **Tidak ada solusi untuk masalah ini.** MET yang dikirim ke `Faucet` **terjebak, selamanya**. Hanya kontrak `Faucet` yang dapat mentransfernya, dan kontrak `Faucet` tidak memiliki kode untuk memanggil fungsi `transfer` dari kontrak token ERC20.
+
+Mungkin Anda mengantisipasi masalah ini. Kemungkinan besar, Anda tidak. Faktanya, ratusan pengguna Ethereum juga tidak, yang secara tidak sengaja mentransfer berbagai token ke kontrak yang tidak memiliki kemampuan ERC20. Menurut beberapa perkiraan, token senilai lebih dari sekitar $2,5 juta USD (pada saat penulisan) telah "terjebak" seperti ini dan hilang selamanya.
+
+Salah satu cara pengguna token ERC20 dapat secara tidak sengaja kehilangan token mereka dalam sebuah transfer adalah ketika mereka mencoba mentransfer ke bursa atau layanan lain. Mereka menyalin alamat Ethereum dari situs web bursa, berpikir mereka bisa langsung mengirim token ke sana. Namun, banyak bursa mempublikasikan alamat penerima yang sebenarnya adalah **kontrak**\! Kontrak-kontrak ini hanya dimaksudkan untuk menerima ether, bukan token ERC20, dan paling sering memindahkan semua dana yang dikirim ke "penyimpanan dingin (*cold storage*)" atau dompet terpusat lainnya. Meskipun banyak peringatan yang mengatakan “jangan kirim token ke alamat ini,” banyak token hilang dengan cara ini.
+
+### Mendemonstrasikan alur kerja `approve & transferFrom`
+
+Kontrak `Faucet` kita tidak dapat menangani token ERC20. Mengirim token ke sana menggunakan fungsi `transfer` mengakibatkan hilangnya token-token tersebut. Mari kita tulis ulang kontrak sekarang dan membuatnya menangani token ERC20. Secara khusus, kita akan mengubahnya menjadi *faucet* yang memberikan MET kepada siapa saja yang meminta.
+
+Untuk contoh ini, kita akan membuat salinan dari direktori proyek `truffle` (kita akan menamakannya `METoken_METFaucet`), menginisialisasi `truffle` dan `npm`, menginstal dependensi OpenZeppelin, dan menyalin kontrak `METoken.sol`. Lihat contoh pertama kita, di “Meluncurkan Token ERC20 Kita Sendiri” di halaman 231, untuk instruksi terperinci.
+
+Kontrak *faucet* baru kita, `METFaucet.sol`, akan terlihat seperti Contoh 10-2.
+
+**Contoh 10-2. METFaucet.sol: Sebuah faucet untuk METoken**
+
+```solidity
+1 // Versi kompiler Solidity yang digunakan untuk menulis program ini
+2 pragma solidity ^0.4.19;
+3
+4 import 'openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
+5
+6 // Sebuah faucet untuk token ERC20 MET
+7 contract METFaucet {
+8
+9   StandardToken public METoken;
+10  address public METOwner;
+11
+12  // Konstruktor METFaucet, berikan alamat kontrak METoken dan
+13  // alamat pemilik yang akan kita setujui untuk transferFrom
+14  constructor(address _METoken, address _METOwner) public {
+15    // Inisialisasi METoken dari alamat yang diberikan
+16    METoken = StandardToken(_METoken);
+17    METOwner = _METOwner;
+18  }
+19
+20  function withdraw(uint withdraw_amount) public {
+21    // Batasi jumlah penarikan hingga 10 MET
+22    require(withdraw_amount <= 1000);
+23
+24    // Gunakan fungsi transferFrom dari METoken
+25    METoken.transferFrom(METOwner, msg.sender, withdraw_amount);
+26  }
+27
+28  // TOLAK setiap ether yang masuk
+29  function () public payable {
+30    revert();
+31  }
+32 }
+```
+
+Kami telah membuat beberapa perubahan pada contoh `Faucet` dasar. Karena `METFaucet` akan menggunakan fungsi `transferFrom` di `METoken`, ia akan membutuhkan dua variabel tambahan. Satu akan menampung alamat kontrak `METoken` yang diterapkan. Yang lain akan menampung alamat pemilik MET, yang akan menyetujui penarikan dari *faucet*. Kontrak `METFaucet` akan memanggil `METoken.transferFrom` dan menginstruksikannya untuk memindahkan MET dari pemilik ke alamat dari mana permintaan penarikan *faucet* berasal.
+
+Kami mendeklarasikan dua variabel ini di sini:
+
+```solidity
+StandardToken public METoken;
+address public METOwner;
+```
+
+Karena *faucet* kita perlu diinisialisasi dengan alamat yang benar untuk `METoken` dan `METOwner`, kita perlu mendeklarasikan konstruktor kustom:
+
+```solidity
+// Konstruktor METFaucet - berikan alamat kontrak METoken dan
+// alamat pemilik yang akan kita setujui untuk transferFrom
+constructor(address _METoken, address _METOwner) public {
+  // Inisialisasi METoken dari alamat yang diberikan
+  METoken = StandardToken(_METoken);
+  METOwner = _METOwner;
+}
+```
+
+Perubahan berikutnya adalah pada fungsi `withdraw`. Alih-alih memanggil `transfer`, `METFaucet` menggunakan fungsi `transferFrom` di `METoken` dan meminta `METoken` untuk mentransfer MET ke penerima *faucet*:
+
+```solidity
+// Gunakan fungsi transferFrom dari METoken
+METoken.transferFrom(METOwner, msg.sender, withdraw_amount);
+```
+
+Akhirnya, karena *faucet* kita tidak lagi mengirim ether, kita mungkin harus mencegah siapa pun mengirim ether ke `METFaucet`, karena kita tidak ingin ether tersebut terjebak. Kita mengubah fungsi *fallback* `payable` untuk menolak ether yang masuk, menggunakan fungsi `revert` untuk membatalkan setiap pembayaran yang masuk:
+
+```solidity
+// TOLAK setiap ether yang masuk
+function () public payable { revert(); }
+```
+
+Sekarang setelah kode `METFaucet.sol` kita siap, kita perlu memodifikasi skrip migrasi untuk menerapkannya. Skrip migrasi ini akan sedikit lebih kompleks, karena `METFaucet` bergantung pada alamat `METoken`. Kita akan menggunakan *promise* JavaScript untuk menerapkan kedua kontrak secara berurutan. Buat `2_deploy_contracts.js` sebagai berikut:
+
+```javascript
+var METoken = artifacts.require("METoken");
+var METFaucet = artifacts.require("METFaucet");
+
+var owner = web3.eth.accounts[0];
+
+module.exports = function(deployer) {
+  // Terapkan kontrak METoken terlebih dahulu
+  deployer.deploy(METoken, {from: owner}).then(function() {
+    // Kemudian terapkan METFaucet dan berikan alamat METoken dan
+    // alamat pemilik semua MET yang akan menyetujui METFaucet
+    return deployer.deploy(METFaucet, METoken.address, owner);
+  });
+}
+```
+
+Sekarang, kita bisa menguji semuanya di konsol Truffle. Pertama, kita menggunakan `migrate` untuk menerapkan kontrak. Ketika `METoken` diterapkan, ia akan mengalokasikan semua MET ke akun yang membuatnya, `web3.eth.accounts[0]`. Kemudian, kita memanggil fungsi `approve` di `METoken` untuk menyetujui `METFaucet` mengirim hingga 1.000 MET atas nama `web3.eth.accounts[0]`. Terakhir, untuk menguji *faucet* kita, kita memanggil `METFaucet.withdraw` dari `web3.eth.accounts[1]` dan mencoba menarik 10 MET. Berikut adalah perintah konsolnya:
+
+```bash
+$ truffle console --network ganache
+truffle(ganache)> migrate
+Using network 'ganache'.
+[...]
+METoken: 0xf204a4ef082f5c04bb89f7d5e6568b796096735a
+[...]
+METFaucet: 0x75c35c980c0d37ef46df04d31a140b65503c0eed
+Saving artifacts...
+
+truffle(ganache)> METoken.deployed().then(instance => { instance.approve(METFaucet.address, 100000) })
+
+truffle(ganache)> METoken.deployed().then(instance => { instance.balanceOf(web3.eth.accounts[1]).then(console.log) })
+truffle(ganache)> BigNumber { s: 1, e: 0, c: [ 0 ] }
+
+truffle(ganache)> METFaucet.deployed().then(instance => { instance.withdraw(1000, {from:web3.eth.accounts[1]}) } )
+
+truffle(ganache)> METoken.deployed().then(instance => { instance.balanceOf(web3.eth.accounts[1]).then(console.log) })
+truffle(ganache)> BigNumber { s: 1, e: 3, c: [ 1000 ] }
+```
+
+Seperti yang dapat Anda lihat dari hasilnya, kita dapat menggunakan alur kerja `approve & transferFrom` untuk memberi wewenang pada satu kontrak untuk mentransfer token yang didefinisikan di token lain. Jika digunakan dengan benar, token ERC20 dapat digunakan oleh EOA dan kontrak lain.
+
+Namun, beban untuk mengelola token ERC20 dengan benar didorong ke antarmuka pengguna. Jika seorang pengguna secara salah mencoba mentransfer token ERC20 ke alamat kontrak dan kontrak tersebut tidak dilengkapi untuk menerima token ERC20, token tersebut akan hilang.
+
+### Masalah dengan Token ERC20
+
+Adopsi standar token ERC20 benar-benar meledak. Ribuan token telah diluncurkan, baik untuk bereksperimen dengan kemampuan baru maupun untuk mengumpulkan dana dalam berbagai lelang “*crowdfund*” dan ICO. Namun, ada beberapa potensi jebakan, seperti yang kita lihat dengan masalah transfer token ke alamat kontrak.
+
+Salah satu masalah yang kurang jelas dengan token ERC20 adalah bahwa mereka mengekspos perbedaan halus antara token dan ether itu sendiri. Di mana ether ditransfer oleh transaksi yang memiliki alamat penerima sebagai tujuannya, transfer token terjadi di dalam keadaan kontrak token tertentu dan memiliki **kontrak token sebagai tujuannya**, bukan alamat penerima. Kontrak token melacak saldo dan mengeluarkan *event*. Dalam transfer token, **tidak ada transaksi yang benar-benar dikirim ke penerima token**. Sebaliknya, alamat penerima ditambahkan ke *map* di dalam kontrak token itu sendiri. Transaksi yang mengirim ether ke sebuah alamat mengubah keadaan sebuah alamat. Transaksi yang mentransfer token ke sebuah alamat hanya mengubah keadaan kontrak token, bukan keadaan alamat penerima. Bahkan dompet yang memiliki dukungan untuk token ERC20 tidak akan menyadari saldo token kecuali pengguna secara eksplisit menambahkan kontrak token tertentu untuk "diamati". Beberapa dompet mengamati kontrak token paling populer untuk mendeteksi saldo yang dipegang oleh alamat yang mereka kontrol, tetapi itu terbatas pada sebagian kecil dari kontrak ERC20 yang ada.
+
+Faktanya, tidak mungkin seorang pengguna ingin melacak semua saldo di semua kemungkinan kontrak token ERC20. Banyak token ERC20 lebih seperti spam email daripada token yang dapat digunakan. Mereka secara otomatis membuat saldo untuk akun yang memiliki aktivitas ether, untuk menarik pengguna. Jika Anda memiliki alamat Ethereum dengan riwayat aktivitas yang panjang, terutama jika dibuat pada pra-penjualan, Anda akan menemukannya penuh dengan token "sampah" yang muncul entah dari mana. Tentu saja, alamat tersebut tidak benar-benar penuh dengan token; kontrak tokenlah yang memiliki alamat Anda di dalamnya. Anda hanya melihat saldo ini jika kontrak token ini sedang diamati oleh penjelajah blok atau dompet yang Anda gunakan untuk melihat alamat Anda.
+
+Token tidak berperilaku sama seperti ether. Ether dikirim dengan fungsi `send` dan diterima oleh fungsi `payable` apa pun di dalam kontrak atau alamat milik eksternal mana pun. Token dikirim menggunakan fungsi `transfer` atau `approve & transferFrom` yang hanya ada di kontrak ERC20, dan tidak (setidaknya di ERC20) memicu fungsi `payable` apa pun di kontrak penerima. Token dimaksudkan untuk berfungsi seperti mata uang kripto seperti ether, tetapi mereka datang dengan perbedaan tertentu yang merusak ilusi itu.
+
+Pertimbangkan masalah lain. Untuk mengirim ether atau menggunakan kontrak Ethereum apa pun, Anda memerlukan ether untuk membayar gas. **Untuk mengirim token, Anda juga memerlukan ether.** Anda tidak dapat membayar gas transaksi dengan token dan kontrak token tidak dapat membayar gas untuk Anda. Ini mungkin berubah suatu saat di masa depan yang jauh, tetapi sementara itu ini dapat menyebabkan pengalaman pengguna yang agak aneh. Misalnya, katakanlah Anda menggunakan bursa atau ShapeShift untuk mengubah beberapa bitcoin menjadi sebuah token. Anda "menerima" token di dompet yang melacak kontrak token itu dan menunjukkan saldo Anda. Terlihat sama seperti mata uang kripto lain yang Anda miliki di dompet Anda. Namun, coba kirim token itu, dan dompet Anda akan memberi tahu Anda bahwa Anda memerlukan ether untuk melakukannya. Anda mungkin bingung—lagipula, Anda tidak memerlukan ether untuk menerima token. Mungkin Anda tidak punya ether. Mungkin Anda bahkan tidak tahu token itu adalah token ERC20 di Ethereum; mungkin Anda pikir itu adalah mata uang kripto dengan blockchainnya sendiri. Ilusi baru saja pecah.
+
+Beberapa masalah ini spesifik untuk token ERC20. Yang lain adalah masalah yang lebih umum yang berkaitan dengan abstraksi dan batasan antarmuka di dalam Ethereum. Beberapa dapat diselesaikan dengan mengubah antarmuka token, sementara yang lain mungkin memerlukan perubahan pada struktur fundamental di dalam Ethereum (seperti perbedaan antara EOA dan kontrak, dan antara transaksi dan pesan). Beberapa mungkin tidak "dapat diselesaikan" secara persis dan mungkin memerlukan desain antarmuka pengguna untuk menyembunyikan nuansa dan membuat pengalaman pengguna konsisten terlepas dari perbedaan yang mendasarinya.
+
+Di bagian berikutnya kita akan melihat berbagai proposal yang mencoba mengatasi beberapa masalah ini.
+
+### ERC223: Standar Antarmuka Kontrak Token yang Diusulkan
+
+Proposal ERC223 mencoba menyelesaikan masalah transfer token yang tidak disengaja ke sebuah kontrak (yang mungkin mendukung atau tidak mendukung token) dengan mendeteksi apakah alamat tujuan adalah kontrak atau bukan. ERC223 mengharuskan kontrak yang dirancang untuk menerima token mengimplementasikan fungsi bernama `tokenFallback`. Jika tujuan transfer adalah kontrak dan kontrak tersebut tidak memiliki dukungan untuk token (yaitu, tidak mengimplementasikan `tokenFallback`), transfer gagal.
+
+Untuk mendeteksi apakah alamat tujuan adalah kontrak, implementasi referensi ERC223 menggunakan segmen kecil *bytecode inline* dengan cara yang agak kreatif:
+
+```solidity
+function isContract(address _addr) private view returns (bool is_contract) {
+  uint length;
+  assembly {
+    // ambil ukuran kode di alamat target; ini membutuhkan assembly
+    length := extcodesize(_addr)
+  }
+  return (length>0);
+}
+```
+
+Spesifikasi antarmuka kontrak ERC223 adalah:
+
+```solidity
+interface ERC223Token {
+  uint public totalSupply;
+  function balanceOf(address who) public view returns (uint);
+  function name() public view returns (string _name);
+  function symbol() public view returns (string _symbol);
+  function decimals() public view returns (uint8 _decimals);
+  function totalSupply() public view returns (uint256 _supply);
+  function transfer(address to, uint value) public returns (bool ok);
+  function transfer(address to, uint value, bytes data) public returns (bool ok);
+  function transfer(address to, uint value, bytes data, string custom_fallback) public returns (bool ok);
+
+  event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
+}
+```
+
+ERC223 tidak banyak diimplementasikan, dan ada beberapa perdebatan di utas diskusi ERC tentang kompatibilitas mundur dan pertukaran antara mengimplementasikan perubahan di tingkat antarmuka kontrak versus antarmuka pengguna. Perdebatan terus berlanjut.
+
+### ERC777: Standar Antarmuka Kontrak Token yang Diusulkan
+
+Proposal lain untuk standar kontrak token yang lebih baik adalah ERC777. Proposal ini memiliki beberapa tujuan, termasuk:
+
+  * Menawarkan antarmuka yang kompatibel dengan ERC20
+  * Mentransfer token menggunakan fungsi `send`, mirip dengan transfer ether
+  * Kompatibel dengan ERC820 untuk pendaftaran kontrak token
+  * Memungkinkan kontrak dan alamat untuk mengontrol token mana yang mereka kirim melalui fungsi `tokensToSend` yang dipanggil sebelum pengiriman
+  * Memungkinkan kontrak dan alamat untuk diberi tahu tentang penerimaan token dengan memanggil fungsi `tokensReceived` di penerima, dan untuk mengurangi kemungkinan token terkunci di dalam kontrak dengan mengharuskan kontrak menyediakan fungsi `tokensReceived`
+  * Memungkinkan kontrak yang ada untuk menggunakan kontrak proksi untuk fungsi `tokensToSend` dan `tokensReceived`
+  * Beroperasi dengan cara yang sama baik saat mengirim ke kontrak atau EOA
+  * Menyediakan *event* spesifik untuk pencetakan (*minting*) dan pembakaran (*burning*) token
+  * Memungkinkan operator (pihak ketiga tepercaya, dimaksudkan untuk menjadi kontrak terverifikasi) untuk memindahkan token atas nama pemegang token
+  * Menyediakan metadata pada transaksi transfer token di bidang `userData` dan `operatorData`
+
+Diskusi yang sedang berlangsung tentang ERC777 dapat ditemukan di GitHub.
+
+Spesifikasi antarmuka kontrak ERC777 adalah:
+
+```solidity
+interface ERC777Token {
+  function name() external view returns (string memory);
+  function symbol() external view returns (string memory);
+  function totalSupply() external view returns (uint256);
+  function granularity() external view returns (uint256);
+  function balanceOf(address owner) external view returns (uint256);
+  function send(address to, uint256 amount, bytes calldata userData) external;
+  function authorizeOperator(address operator) external;
+  function revokeOperator(address operator) external;
+  function isOperatorFor(address operator, address tokenHolder) external view returns (bool);
+  function operatorSend(address from, address to, uint256 amount, bytes calldata userData, bytes calldata operatorData) external;
+
+  event Sent(address indexed operator, address indexed from, address indexed to, uint256 amount, bytes userData, bytes operatorData);
+  event Minted(address indexed operator, address indexed to, uint256 amount, bytes operatorData);
+  event Burned(address indexed operator, address indexed from, uint256 amount, bytes userData, bytes operatorData);
+  event AuthorizedOperator(address indexed operator, address indexed tokenHolder);
+  event RevokedOperator(address indexed operator, address indexed tokenHolder);
+}
+```
+
+#### Kait (Hooks) ERC777
+
+Spesifikasi kait pengirim token ERC777 adalah:
+
+```solidity
+interface ERC777TokensSender {
+  function tokensToSend(address operator, address from, address to, uint256 value, bytes calldata userData, bytes calldata operatorData) external;
+}
+```
+
+Implementasi antarmuka ini diperlukan untuk setiap alamat yang ingin diberi tahu, menangani, atau mencegah pendebitan token. Alamat yang kontraknya mengimplementasikan antarmuka ini harus didaftarkan melalui ERC820, baik kontrak mengimplementasikan antarmuka untuk dirinya sendiri atau untuk alamat lain.
+
+Spesifikasi kait penerima token ERC777 adalah:
+
+```solidity
+interface ERC777TokensRecipient {
+  function tokensReceived(address operator, address from, address to, uint256 amount, bytes calldata userData, bytes calldata operatorData) external;
+}
+```
+
+Implementasi antarmuka ini diperlukan untuk setiap alamat yang ingin diberi tahu, menangani, atau menolak penerimaan token. Logika dan persyaratan yang sama berlaku untuk penerima token seperti pada antarmuka pengirim token, dengan batasan tambahan bahwa kontrak penerima harus mengimplementasikan antarmuka ini untuk mencegah penguncian token. Jika kontrak penerima tidak mendaftarkan alamat yang mengimplementasikan antarmuka ini, transfer token akan gagal.
+
+Aspek penting adalah bahwa hanya satu pengirim token dan satu penerima token yang dapat didaftarkan per alamat. Oleh karena itu, untuk setiap transfer token ERC777, fungsi kait yang sama dipanggil saat pendebitan dan penerimaan setiap transfer token ERC777. Token spesifik dapat diidentifikasi dalam fungsi-fungsi ini menggunakan pengirim pesan, yang merupakan alamat kontrak token spesifik, untuk menangani kasus penggunaan tertentu.
+
+Di sisi lain, kait pengirim dan penerima token yang sama dapat didaftarkan untuk beberapa alamat dan kait dapat membedakan siapa pengirim dan penerima yang dituju menggunakan parameter `from` dan `to`.
+
+Implementasi referensi ERC777 ditautkan dalam proposal. ERC777 bergantung pada proposal paralel untuk kontrak registri, yang ditentukan dalam ERC820. Beberapa perdebatan tentang ERC777 adalah tentang kerumitan mengadopsi dua perubahan besar sekaligus: standar token baru dan standar registri. Diskusi terus berlanjut.
+
+### ERC721: Standar Token Non-Fungible (Akta)
+
+Semua standar token yang telah kita lihat sejauh ini adalah untuk token fungible, yang berarti unit-unit dari sebuah token dapat dipertukarkan. Standar token ERC20 hanya melacak saldo akhir dari setiap akun dan tidak (secara eksplisit) melacak asal-usul dari setiap token.
+
+Proposal ERC721 adalah untuk standar token **non-fungible**, juga dikenal sebagai **akta (*deeds*)**.
+
+Dari Kamus Oxford:
+
+> **akta:** Dokumen hukum yang ditandatangani dan diserahkan, terutama yang berkaitan dengan kepemilikan properti atau hak hukum.
+
+Penggunaan kata “akta” dimaksudkan untuk mencerminkan bagian “kepemilikan properti”, meskipun ini tidak diakui sebagai “dokumen hukum” di yurisdiksi mana pun—belum. Kemungkinan besar di masa depan, kepemilikan hukum berdasarkan tanda tangan digital di platform blockchain akan diakui secara hukum.
+
+Token non-fungible melacak kepemilikan atas suatu barang unik. Barang yang dimiliki bisa berupa barang digital, seperti barang dalam game atau barang koleksi digital; atau barang tersebut bisa berupa barang fisik yang kepemilikannya dilacak oleh sebuah token, seperti rumah, mobil, atau karya seni. Akta juga dapat mewakili hal-hal dengan nilai negatif, seperti pinjaman (utang), hak gadai, kemudahan, dll. Standar ERC721 tidak memberlakukan batasan atau ekspektasi pada sifat barang yang kepemilikannya dilacak oleh sebuah akta dan hanya mensyaratkan bahwa ia dapat diidentifikasi secara unik, yang dalam kasus standar ini dicapai dengan pengenal 256-bit.
+
+Detail standar dan diskusi dilacak di dua lokasi GitHub yang berbeda:
+
+  * [Proposal awal](https://github.com/ethereum/EIPs/issues/721)
+  * [Diskusi lanjutan](https://github.com/ethereum/EIPs/pull/841)
+  
+Tentu, ini adalah terjemahan untuk bab berikutnya.
+
+---
+
+# BAB 11
+## Oracle
+
+Dalam bab ini kita akan membahas **oracle**, yaitu sistem yang dapat menyediakan sumber data eksternal ke kontrak pintar Ethereum. Istilah “oracle” berasal dari mitologi Yunani, di mana ia merujuk pada seseorang yang berkomunikasi dengan para dewa dan dapat melihat visi masa depan. Dalam konteks blockchain, oracle adalah sistem yang dapat menjawab pertanyaan yang bersifat eksternal dari Ethereum. Idealnya, oracle adalah sistem yang **nirkepercayaan (*trustless*)**, artinya tidak perlu dipercaya karena beroperasi berdasarkan prinsip-prinsip terdesentralisasi.
+
+### Mengapa Oracle Dibutuhkan
+
+Komponen kunci dari platform Ethereum adalah Ethereum Virtual Machine, dengan kemampuannya untuk mengeksekusi program dan memperbarui keadaan Ethereum, yang dibatasi oleh aturan konsensus, pada setiap *node* di jaringan terdesentralisasi. Untuk menjaga konsensus, eksekusi EVM harus sepenuhnya **deterministik** dan hanya didasarkan pada konteks bersama dari keadaan Ethereum dan transaksi yang ditandatangani. Hal ini memiliki dua konsekuensi yang sangat penting: yang pertama adalah **tidak boleh ada sumber keacakan intrinsik** untuk digunakan oleh EVM dan kontrak pintar; yang kedua adalah **data ekstrinsik hanya dapat dimasukkan sebagai muatan data dari sebuah transaksi.**
+
+Mari kita urai kedua konsekuensi tersebut lebih lanjut. Untuk memahami larangan adanya fungsi acak sejati di EVM untuk menyediakan keacakan bagi kontrak pintar, pertimbangkan efeknya pada upaya untuk mencapai konsensus setelah eksekusi fungsi semacam itu: *node* A akan mengeksekusi perintah dan menyimpan angka 3 atas nama kontrak pintar di penyimpanannya, sementara *node* B, yang mengeksekusi kontrak pintar yang sama, akan menyimpan angka 7. Dengan demikian, *node* A dan B akan sampai pada kesimpulan yang berbeda tentang keadaan akhir yang seharusnya, meskipun telah menjalankan kode yang persis sama dalam konteks yang sama. Memang, bisa jadi keadaan akhir yang berbeda akan tercapai setiap kali kontrak pintar dievaluasi. Dengan demikian, tidak akan ada cara bagi jaringan, dengan banyak *node* yang berjalan secara independen di seluruh dunia, untuk mencapai konsensus terdesentralisasi tentang keadaan akhir yang seharusnya. Dalam praktiknya, akan menjadi jauh lebih buruk dari contoh ini dengan sangat cepat, karena efek berantai, termasuk transfer ether, akan menumpuk secara eksponensial.
+
+Perhatikan bahwa fungsi pseudorandom, seperti fungsi hash yang aman secara kriptografis (yang bersifat deterministik dan oleh karena itu dapat, dan memang, menjadi bagian dari EVM), tidak cukup untuk banyak aplikasi. Ambil contoh permainan judi yang menyimulasikan lemparan koin untuk menyelesaikan pembayaran taruhan, yang perlu mengacak kepala atau ekor—seorang penambang dapat memperoleh keuntungan dengan memainkan permainan tersebut dan hanya memasukkan transaksi mereka ke dalam blok di mana mereka akan menang. Jadi bagaimana kita mengatasi masalah ini? Nah, semua *node* dapat menyetujui isi dari transaksi yang ditandatangani, sehingga informasi ekstrinsik, termasuk sumber keacakan, informasi harga, prakiraan cuaca, dll., dapat dimasukkan sebagai bagian data dari transaksi yang dikirim ke jaringan. Namun, data semacam itu просто tidak dapat dipercaya, karena berasal dari sumber yang tidak dapat diverifikasi. Dengan demikian, kita hanya menunda masalahnya. Kita menggunakan oracle untuk mencoba menyelesaikan masalah-masalah ini, yang akan kita bahas secara rinci di sisa bab ini.
+
+### Kasus Penggunaan dan Contoh Oracle
+
+Oracle, idealnya, menyediakan cara nirkepercayaan (atau setidaknya mendekati nirkepercayaan) untuk mendapatkan informasi ekstrinsik (yaitu, "dunia nyata" atau *off-chain*), seperti hasil pertandingan sepak bola, harga emas, atau angka yang benar-benar acak, ke platform Ethereum untuk digunakan oleh kontrak pintar. Mereka juga dapat digunakan untuk menyampaikan data secara aman ke *frontend* DApp secara langsung.
+
+Oleh karena itu, oracle dapat dianggap sebagai mekanisme untuk menjembatani kesenjangan antara dunia *off-chain* dan kontrak pintar. Mengizinkan kontrak pintar untuk menegakkan hubungan kontraktual berdasarkan peristiwa dan data dunia nyata memperluas cakupan mereka secara dramatis. Namun, ini juga dapat menimbulkan risiko eksternal terhadap model keamanan Ethereum. Pertimbangkan kontrak "surat wasiat pintar" yang mendistribusikan aset ketika seseorang meninggal. Ini adalah sesuatu yang sering dibahas dalam ruang kontrak pintar, dan menyoroti risiko dari oracle yang dipercaya. Jika jumlah warisan yang dikendalikan oleh kontrak semacam itu cukup tinggi, insentif untuk meretas oracle dan memicu distribusi aset sebelum pemiliknya meninggal menjadi sangat tinggi.
+
+Perhatikan bahwa beberapa oracle menyediakan data yang khusus untuk sumber data pribadi tertentu, seperti sertifikat akademik atau KTP pemerintah. Sumber data semacam itu, seperti universitas atau departemen pemerintah, sepenuhnya dipercaya, dan kebenaran data bersifat subjektif (kebenaran hanya ditentukan dengan merujuk pada otoritas sumber). Oleh karena itu, data semacam itu tidak dapat disediakan secara nirkepercayaan—yaitu, tanpa mempercayai sumber—karena tidak ada kebenaran objektif yang dapat diverifikasi secara independen. Dengan demikian, kami menyertakan sumber data ini dalam definisi kami tentang apa yang dianggap sebagai "oracle" karena mereka juga menyediakan jembatan data untuk kontrak pintar. Data yang mereka berikan umumnya berbentuk **atestasi**, seperti paspor atau catatan prestasi. Atestasi akan menjadi bagian besar dari kesuksesan platform blockchain di masa depan, terutama terkait dengan masalah verifikasi identitas atau reputasi, jadi penting untuk mengeksplorasi bagaimana mereka dapat dilayani oleh platform blockchain.
+
+Beberapa contoh data lain yang mungkin disediakan oleh oracle meliputi:
+
+  * Angka acak/entropi dari sumber fisik seperti proses kuantum/termal: mis., untuk memilih pemenang secara adil dalam kontrak pintar lotre
+  * Pemicu parametrik yang diindeks ke bahaya alam: mis., pemicu kontrak pintar obligasi bencana, seperti pengukuran skala Richter untuk obligasi gempa bumi
+  * Data nilai tukar: mis., untuk penentuan patokan (*pegging*) mata uang kripto ke mata uang fiat yang akurat
+  * Data pasar modal: mis., harga keranjang aset/sekuritas yang ditokenisasi
+  * Data referensi patokan: mis., menggabungkan suku bunga ke dalam derivatif keuangan pintar
+  * Data statis/pseudostatis: pengenal keamanan, kode negara, kode mata uang, dll.
+  * Data waktu dan interval: untuk pemicu peristiwa yang didasarkan pada pengukuran waktu yang tepat
+  * Data cuaca: mis., perhitungan premi asuransi berdasarkan prakiraan cuaca
+  * Peristiwa politik: untuk penyelesaian pasar prediksi
+  * Peristiwa olahraga: untuk penyelesaian pasar prediksi dan kontrak olahraga fantasi
+  * Data geolokasi: mis., seperti yang digunakan dalam pelacakan rantai pasokan
+  * Verifikasi kerusakan: untuk kontrak asuransi
+  * Peristiwa yang terjadi di blockchain lain: fungsi interoperabilitas
+  * Harga pasar Ether: mis., untuk oracle harga gas fiat
+  * Statistik penerbangan: mis., seperti yang digunakan oleh kelompok dan klub untuk pengumpulan tiket pesawat
+
+Di bagian berikut, kita akan memeriksa beberapa cara oracle dapat diimplementasikan, termasuk pola oracle dasar, oracle komputasi, oracle terdesentralisasi, dan implementasi klien oracle di Solidity.
+
+### Pola Desain Oracle
+
+Semua oracle, menurut definisi, menyediakan beberapa fungsi utama. Ini termasuk kemampuan untuk:
+
+  * Mengumpulkan data dari sumber *off-chain*.
+  * Mentransfer data secara *on-chain* dengan pesan yang ditandatangani.
+  * Membuat data tersedia dengan menempatkannya di penyimpanan kontrak pintar.
+
+Setelah data tersedia di penyimpanan kontrak pintar, data tersebut dapat diakses oleh kontrak pintar lain melalui panggilan pesan yang memanggil fungsi "ambil" dari kontrak pintar oracle; data tersebut juga dapat diakses oleh *node* Ethereum atau klien yang terhubung ke jaringan secara langsung dengan "melihat ke dalam" penyimpanan oracle.
+
+Tiga cara utama untuk mengatur oracle dapat dikategorikan sebagai **permintaan-respons (*request-response*)**, **publikasi-langganan (*publish-subscribe*)**, dan **baca-langsung (*immediate-read*)**.
+
+Dimulai dari yang paling sederhana, oracle **baca-langsung** adalah oracle yang menyediakan data yang hanya dibutuhkan untuk keputusan mendadak, seperti "Apa alamat untuk `ethereumbook.info`?" atau "Apakah orang ini berusia di atas 18 tahun?". Mereka yang ingin menanyakan data semacam ini cenderung melakukannya secara “*just-in-time*”; pencarian dilakukan saat informasi dibutuhkan dan mungkin tidak akan pernah lagi. Contoh oracle semacam itu termasuk yang menyimpan data tentang atau dikeluarkan oleh organisasi, seperti sertifikat akademik, kode telepon, keanggotaan institusional, pengenal bandara, ID berdaulat mandiri, dll. Jenis oracle ini menyimpan data sekali di penyimpanan kontraknya, dari mana kontrak pintar lain dapat mencarinya menggunakan panggilan permintaan ke kontrak oracle. Data tersebut dapat diperbarui. Data di penyimpanan oracle juga tersedia untuk pencarian langsung oleh aplikasi yang mendukung blockchain (yaitu, terhubung ke klien Ethereum) tanpa harus melalui kerepotan dan menanggung biaya gas dari penerbitan transaksi. Sebuah toko yang ingin memeriksa usia pelanggan yang ingin membeli alkohol dapat menggunakan oracle dengan cara ini. Jenis oracle ini menarik bagi organisasi atau perusahaan yang mungkin sebaliknya harus menjalankan dan memelihara server untuk menjawab permintaan data semacam itu. Perhatikan bahwa data yang disimpan oleh oracle kemungkinan bukan data mentah yang dilayani oleh oracle, mis., karena alasan efisiensi atau privasi. Sebuah universitas mungkin mendirikan oracle untuk sertifikat prestasi akademik mahasiswa masa lalu. Namun, menyimpan detail lengkap dari sertifikat (yang bisa mencapai halaman mata kuliah yang diambil dan nilai yang dicapai) akan berlebihan. Sebaliknya, hash dari sertifikat sudah cukup. Demikian pula, pemerintah mungkin ingin menempatkan KTP warga negara ke platform Ethereum, di mana jelas detail yang disertakan perlu dijaga kerahasiaannya. Sekali lagi, melakukan hashing pada data (lebih hati-hati, di pohon Merkle dengan *salt*) dan hanya menyimpan hash akar di penyimpanan kontrak pintar akan menjadi cara yang efisien untuk mengatur layanan semacam itu.
+
+Pengaturan berikutnya adalah **publikasi-langganan**, di mana oracle yang secara efektif menyediakan layanan siaran untuk data yang diperkirakan akan berubah (mungkin baik secara teratur maupun sering) baik di-*polling* oleh kontrak pintar secara *on-chain*, atau diawasi oleh *daemon off-chain* untuk pembaruan. Kategori ini memiliki pola yang mirip dengan umpan RSS, WebSub, dan sejenisnya, di mana oracle diperbarui dengan informasi baru dan sebuah bendera menandakan bahwa data baru tersedia bagi mereka yang menganggap diri mereka "berlangganan". Pihak yang berkepentingan harus baik melakukan *polling* pada oracle untuk memeriksa apakah informasi terbaru telah berubah, atau mendengarkan pembaruan pada kontrak oracle dan bertindak saat terjadi. Contohnya termasuk umpan harga, informasi cuaca, statistik ekonomi atau sosial, data lalu lintas, dll. *Polling* sangat tidak efisien di dunia server web, tetapi tidak demikian dalam konteks *peer-to-peer* platform blockchain: klien Ethereum harus mengikuti semua perubahan keadaan, termasuk perubahan pada penyimpanan kontrak, jadi *polling* untuk perubahan data adalah panggilan lokal ke klien yang disinkronkan. Log *event* Ethereum membuatnya sangat mudah bagi aplikasi untuk mengawasi pembaruan oracle, sehingga pola ini bahkan dalam beberapa hal dapat dianggap sebagai layanan "dorong" (*push*). Namun, jika *polling* dilakukan dari kontrak pintar, yang mungkin diperlukan untuk beberapa aplikasi terdesentralisasi (mis., di mana insentif aktivasi tidak memungkinkan), maka pengeluaran gas yang signifikan dapat terjadi.
+
+Kategori **permintaan-respons** adalah yang paling rumit: ini adalah di mana ruang data terlalu besar untuk disimpan dalam kontrak pintar dan pengguna diharapkan hanya membutuhkan sebagian kecil dari keseluruhan dataset pada satu waktu. Ini juga merupakan model yang berlaku untuk bisnis penyedia data. Secara praktis, oracle semacam itu mungkin diimplementasikan sebagai sistem kontrak pintar *on-chain* dan infrastruktur *off-chain* yang digunakan untuk memantau permintaan serta mengambil dan mengembalikan data. Permintaan data dari aplikasi terdesentralisasi biasanya merupakan proses asinkron yang melibatkan sejumlah langkah. Dalam pola ini, pertama, EOA bertransaksi dengan aplikasi terdesentralisasi, menghasilkan interaksi dengan fungsi yang didefinisikan dalam kontrak pintar oracle. Fungsi ini memulai permintaan ke oracle, dengan argumen terkait yang merinci data yang diminta selain informasi tambahan yang mungkin mencakup fungsi *callback* dan parameter penjadwalan. Setelah transaksi ini divalidasi, permintaan oracle dapat diamati sebagai *event* EVM yang dipancarkan oleh kontrak oracle, atau sebagai perubahan keadaan; argumen dapat diambil dan digunakan untuk melakukan kueri sebenarnya dari sumber data *off-chain*. Oracle mungkin juga memerlukan pembayaran untuk memproses permintaan, pembayaran gas untuk *callback*, dan izin untuk mengakses data yang diminta. Akhirnya, data yang dihasilkan ditandatangani oleh pemilik oracle, membuktikan validitas data pada waktu tertentu, dan dikirimkan dalam sebuah transaksi ke aplikasi terdesentralisasi yang membuat permintaan—baik secara langsung maupun melalui kontrak oracle. Tergantung pada parameter penjadwalan, oracle dapat menyiarkan transaksi lebih lanjut yang memperbarui data secara berkala (mis., informasi harga akhir hari).
+
+Langkah-langkah untuk oracle permintaan-respons dapat diringkas sebagai berikut:
+
+1.  Menerima kueri dari DApp.
+2.  Menganalisis kueri.
+3.  Memeriksa bahwa pembayaran dan izin akses data disediakan.
+4.  Mengambil data yang relevan dari sumber *off-chain* (dan mengenkripsinya jika perlu).
+5.  Menandatangani transaksi dengan data yang disertakan.
+6.  Menyiarkan transaksi ke jaringan.
+7.  Menjadwalkan transaksi lebih lanjut yang diperlukan, seperti notifikasi, dll.
+
+Berbagai skema lain juga dimungkinkan; misalnya, data dapat diminta dari dan dikembalikan langsung oleh EOA, menghilangkan kebutuhan akan kontrak pintar oracle. Demikian pula, permintaan dan respons dapat dibuat ke dan dari sensor perangkat keras yang mendukung Internet of Things. Oleh karena-karena itu, oracle dapat berupa manusia, perangkat lunak, atau perangkat keras.
+
+Pola permintaan-respons yang dijelaskan di sini biasa terlihat dalam arsitektur klien-server. Meskipun ini adalah pola pengiriman pesan yang berguna yang memungkinkan aplikasi untuk melakukan percakapan dua arah, mungkin tidak sesuai dalam kondisi tertentu. Misalnya, obligasi pintar yang memerlukan suku bunga dari oracle mungkin harus meminta data setiap hari di bawah pola permintaan-respons untuk memastikan suku bunga selalu benar. Mengingat bahwa suku bunga jarang berubah, pola publikasi-langganan mungkin lebih sesuai di sini—terutama ketika mempertimbangkan bandwidth terbatas Ethereum.
+
+**Publikasi-langganan** adalah pola di mana penerbit (dalam konteks ini, oracle) tidak mengirim pesan langsung ke penerima, tetapi sebaliknya mengkategorikan pesan yang dipublikasikan ke dalam kelas-kelas yang berbeda. Pelanggan dapat menyatakan minat pada satu atau lebih kelas dan hanya mengambil pesan yang menarik. Di bawah pola seperti itu, oracle mungkin menulis suku bunga ke penyimpanan internalnya sendiri setiap kali berubah. Beberapa DApps yang berlangganan dapat langsung membacanya dari kontrak oracle, sehingga mengurangi dampak pada bandwidth jaringan sambil meminimalkan biaya penyimpanan.
+
+Dalam pola **siaran (*broadcast*) atau *multicast***, oracle akan memposting semua pesan ke sebuah saluran dan kontrak yang berlangganan akan mendengarkan saluran di bawah berbagai mode langganan. Misalnya, oracle mungkin mempublikasikan pesan ke saluran nilai tukar mata uang kripto. Kontrak pintar yang berlangganan dapat meminta konten penuh dari saluran jika memerlukan deret waktu untuk, mis., perhitungan rata-rata bergerak; yang lain mungkin hanya memerlukan suku bunga terbaru untuk perhitungan harga spot. Pola siaran sesuai di mana oracle tidak perlu mengetahui identitas dari kontrak yang berlangganan.
+
+### Autentikasi Data
+
+Jika kita mengasumsikan bahwa sumber data yang ditanyakan oleh DApp bersifat otoritatif dan tepercaya (asumsi yang tidak remeh), pertanyaan yang masih ada adalah: mengingat bahwa oracle dan mekanisme permintaan-respons dapat dioperasikan oleh entitas yang berbeda, bagaimana kita bisa mempercayai mekanisme ini? Ada kemungkinan besar bahwa data dapat diubah dalam perjalanan, jadi sangat penting bahwa metode *off-chain* dapat membuktikan integritas data yang dikembalikan. Dua pendekatan umum untuk autentikasi data adalah **bukti keaslian (*authenticity proofs*)** dan **lingkungan eksekusi tepercaya (*trusted execution environments* - TEEs)**.
+
+**Bukti keaslian** adalah jaminan kriptografis bahwa data tidak telah diubah. Berdasarkan berbagai teknik atestasi (mis., bukti yang ditandatangani secara digital), mereka secara efektif mengalihkan kepercayaan dari pembawa data ke pemberi atestasi (yaitu, penyedia atestasi). Dengan memverifikasi bukti keaslian secara *on-chain*, kontrak pintar dapat memverifikasi integritas data sebelum beroperasi padanya. Oraclize adalah contoh layanan oracle yang memanfaatkan berbagai bukti keaslian. Salah satu bukti semacam itu yang saat ini tersedia untuk kueri data dari jaringan utama Ethereum adalah bukti **TLSNotary**. Bukti TLSNotary memungkinkan klien untuk memberikan bukti kepada pihak ketiga bahwa lalu lintas web HTTPS terjadi antara klien dan server. Meskipun HTTPS itu sendiri aman, ia tidak mendukung penandatanganan data. Akibatnya, bukti TLSNotary mengandalkan tanda tangan TLSNotary (melalui PageSigner). Bukti TLSNotary memanfaatkan protokol Transport Layer Security (TLS), memungkinkan kunci master TLS, yang menandatangani data setelah diakses, untuk dibagi di antara tiga pihak: server (oracle), auditee (Oraclize), dan auditor. Oraclize menggunakan instansi mesin virtual Amazon Web Services (AWS) sebagai auditor, yang dapat diverifikasi sebagai tidak telah dimodifikasi sejak instansiasi. Instansi AWS ini menyimpan rahasia TLSNotary, memungkinkannya untuk memberikan bukti kejujuran. Meskipun menawarkan jaminan yang lebih tinggi terhadap pengubahan data daripada mekanisme permintaan-respons murni, pendekatan ini memang memerlukan asumsi bahwa Amazon sendiri tidak akan mengubah instansi VM.
+
+**Town Crier** adalah sistem oracle umpan data terautentikasi yang didasarkan pada pendekatan **TEE**; metode semacam itu memanfaatkan *enclave* aman berbasis perangkat keras untuk memastikan integritas data. Town Crier menggunakan **Software Guard eXtensions (SGX)** dari Intel untuk memastikan bahwa respons dari kueri HTTPS dapat diverifikasi sebagai asli. SGX memberikan jaminan integritas, memastikan bahwa aplikasi yang berjalan di dalam *enclave* dilindungi oleh CPU dari pengubahan oleh proses lain. Ia juga memberikan kerahasiaan, memastikan bahwa keadaan aplikasi bersifat buram bagi proses lain saat berjalan di dalam *enclave*. Dan akhirnya, SGX memungkinkan atestasi, dengan menghasilkan bukti yang ditandatangani secara digital bahwa sebuah aplikasi—diidentifikasi secara aman dengan hash dari bangunannya—benar-benar berjalan di dalam *enclave*. Dengan memverifikasi tanda tangan digital ini, dimungkinkan bagi aplikasi terdesentralisasi untuk membuktikan bahwa instansi Town Crier berjalan dengan aman di dalam *enclave* SGX. Ini, pada gilirannya, membuktikan bahwa instansi tidak telah diubah dan bahwa data yang dipancarkan oleh Town Crier oleh karena itu asli. Properti kerahasiaan juga memungkinkan Town Crier untuk menangani data pribadi dengan mengizinkan kueri data dienkripsi menggunakan kunci publik dari instansi Town Crier. Mengoperasikan mekanisme kueri/respons oracle di dalam *enclave* seperti SGX secara efektif memungkinkan kita untuk menganggapnya berjalan dengan aman di perangkat keras pihak ketiga yang tepercaya, memastikan bahwa data yang diminta dikembalikan tanpa diubah (dengan asumsi bahwa kita mempercayai Intel/SGX).
+
+### Oracle Komputasi
+
+Sejauh ini, kita hanya membahas oracle dalam konteks meminta dan mengirimkan data. Namun, oracle juga dapat digunakan untuk melakukan **komputasi sewenang-wenang**, sebuah fungsi yang dapat sangat berguna mengingat batas gas blok inheren Ethereum dan biaya komputasi yang relatif mahal. Daripada hanya menyampaikan hasil kueri, oracle komputasi dapat digunakan untuk melakukan komputasi pada serangkaian input dan mengembalikan hasil yang dihitung yang mungkin tidak mungkin dihitung secara *on-chain*. Misalnya, seseorang mungkin menggunakan oracle komputasi untuk melakukan perhitungan regresi yang intensif secara komputasi untuk memperkirakan imbal hasil dari kontrak obligasi.
+
+Jika Anda bersedia mempercayai layanan terpusat tetapi dapat diaudit, Anda dapat kembali ke **Oraclize**. Mereka menyediakan layanan yang memungkinkan aplikasi terdesentralisasi untuk meminta output dari komputasi yang dilakukan di mesin virtual AWS yang di-*sandbox*. Instansi AWS membuat kontainer yang dapat dieksekusi dari Dockerfile yang dikonfigurasi pengguna yang dikemas dalam arsip yang diunggah ke Inter-Planetary File System (IPFS; lihat “Penyimpanan Data” di halaman 270). Atas permintaan, Oraclize mengambil arsip ini menggunakan hash-nya dan kemudian menginisialisasi dan mengeksekusi kontainer Docker di AWS, memberikan argumen apa pun yang diberikan ke aplikasi sebagai variabel lingkungan. Aplikasi yang dikontainerisasi melakukan perhitungan, tunduk pada batasan waktu, dan menulis hasilnya ke output standar, di mana ia dapat diambil oleh Oraclize dan dikembalikan ke aplikasi terdesentralisasi. Oraclize saat ini menawarkan layanan ini pada instansi AWS t2.micro yang dapat diaudit, jadi jika komputasi memiliki nilai yang tidak remeh, dimungkinkan untuk memeriksa bahwa kontainer Docker yang benar dieksekusi. Namun demikian, ini bukan solusi yang benar-benar terdesentralisasi.
+
+Konsep **cryptlet** sebagai standar untuk kebenaran oracle yang dapat diverifikasi telah diformalkan sebagai bagian dari Kerangka Kerja ESC yang lebih luas dari Microsoft. Cryptlet dieksekusi di dalam kapsul terenkripsi yang mengabstraksi infrastruktur, seperti I/O, dan memiliki CryptoDelegate terpasang sehingga pesan masuk dan keluar ditandatangani, divalidasi, dan dibuktikan secara otomatis. Cryptlet mendukung transaksi terdistribusi sehingga logika kontrak dapat mengambil transaksi sistem eksternal, multi-langkah, multi-blockchain yang kompleks dengan cara ACID. Ini memungkinkan pengembang untuk membuat resolusi kebenaran yang portabel, terisolasi, dan pribadi untuk digunakan dalam kontrak pintar. Cryptlet mengikuti format yang ditunjukkan di sini:
+
+```csharp
+public class SampleContractCryptlet : Cryptlet
+{
+  public SampleContractCryptlet(Guid id, Guid bindingId, string name, string address, IContainerServices hostContainer, bool contract)
+    : base(id, bindingId, name, address, hostContainer, contract)
+  {
+    MessageApi = new CryptletMessageApi(GetType().FullName, new SampleContractConstructor())
+  }
+}
+```
+
+Untuk solusi yang lebih terdesentralisasi, kita dapat beralih ke **TrueBit**, yang menawarkan solusi untuk komputasi *off-chain* yang dapat diskalakan dan diverifikasi. Mereka menggunakan sistem pemecah (*solvers*) dan verifikator (*verifiers*) yang diberi insentif untuk melakukan komputasi dan verifikasi dari komputasi tersebut. Jika sebuah solusi ditantang, proses verifikasi berulang pada subset dari komputasi dilakukan secara *on-chain*—semacam **permainan verifikasi**. Permainan berlanjut melalui serangkaian putaran, masing-masing secara rekursif memeriksa subset komputasi yang semakin kecil. Permainan akhirnya mencapai putaran terakhir, di mana tantangan cukup sepele sehingga para juri—penambang Ethereum—dapat membuat keputusan akhir tentang apakah tantangan terpenuhi, secara *on-chain*. Akibatnya, TrueBit adalah implementasi dari pasar komputasi, memungkinkan aplikasi terdesentralisasi untuk membayar komputasi yang dapat diverifikasi untuk dilakukan di luar jaringan, tetapi mengandalkan Ethereum untuk menegakkan aturan permainan verifikasi. Secara teori, ini memungkinkan kontrak pintar nirkepercayaan untuk secara aman melakukan tugas komputasi apa pun.
+
+Berbagai aplikasi ada untuk sistem seperti TrueBit, mulai dari pembelajaran mesin hingga verifikasi *proof of work*. Contoh yang terakhir adalah jembatan Doge–Ethereum, yang menggunakan TrueBit untuk memverifikasi *proof of work* Dogecoin (Scrypt), yang merupakan fungsi yang sulit secara memori dan intensif secara komputasi yang tidak dapat dihitung dalam batas gas blok Ethereum. Dengan melakukan verifikasi ini di TrueBit, dimungkinkan untuk secara aman memverifikasi transaksi Dogecoin di dalam kontrak pintar di *testnet* Rinkeby Ethereum.
+
+### Oracle Terdesentralisasi
+
+Meskipun oracle data atau komputasi terpusat cukup untuk banyak aplikasi, mereka mewakili **titik kegagalan tunggal** di jaringan Ethereum. Sejumlah skema telah diusulkan seputar gagasan oracle terdesentralisasi sebagai sarana untuk memastikan ketersediaan data dan pembuatan jaringan penyedia data individu dengan sistem agregasi data *on-chain*.
+
+**ChainLink** telah mengusulkan jaringan oracle terdesentralisasi yang terdiri dari tiga kontrak pintar utama—kontrak reputasi, kontrak pencocokan pesanan, dan kontrak agregasi—dan registri penyedia data *off-chain*. Kontrak reputasi digunakan untuk melacak kinerja penyedia data. Skor di kontrak reputasi digunakan untuk mengisi registri *off-chain*. Kontrak pencocokan pesanan memilih tawaran dari oracle menggunakan kontrak reputasi. Kemudian menyelesaikan perjanjian tingkat layanan, yang mencakup parameter kueri dan jumlah oracle yang diperlukan. Ini berarti bahwa pembeli tidak perlu bertransaksi langsung dengan oracle individu. Kontrak agregasi mengumpulkan respons (dikirim menggunakan skema *commit–reveal*) dari beberapa oracle, menghitung hasil kolektif akhir dari kueri, dan akhirnya memberikan hasilnya kembali ke kontrak reputasi.
+
+Salah satu tantangan utama dengan pendekatan terdesentralisasi semacam itu adalah perumusan fungsi agregasi. ChainLink mengusulkan penghitungan respons berbobot, memungkinkan skor validitas dilaporkan untuk setiap respons oracle. Mendeteksi skor yang tidak valid di sini tidak remeh, karena bergantung pada premis bahwa titik data yang menyimpang, yang diukur dengan deviasi dari respons yang diberikan oleh rekan-rekan, tidak benar. Menghitung skor validitas berdasarkan lokasi respons oracle di antara distribusi respons berisiko menghukum jawaban yang benar daripada jawaban rata-rata. Oleh karena itu, ChainLink menawarkan seperangkat standar kontrak agregasi, tetapi juga memungkinkan kontrak agregasi yang disesuaikan untuk ditentukan.
+
+Ide terkait adalah protokol **SchellingCoin**. Di sini, beberapa peserta melaporkan nilai dan median diambil sebagai jawaban yang “benar”. Pelapor diharuskan memberikan deposit yang didistribusikan kembali untuk mendukung nilai yang lebih dekat ke median, sehingga memberi insentif untuk melaporkan nilai yang mirip dengan yang lain. Nilai umum, juga dikenal sebagai **titik Schelling (*Schelling point*)**, yang mungkin dianggap responden sebagai target alami dan jelas untuk berkoordinasi diharapkan mendekati nilai sebenarnya.
+
+Jason Teutsch dari TrueBit baru-baru ini mengusulkan desain baru untuk oracle ketersediaan data *off-chain* yang terdesentralisasi. Desain ini memanfaatkan blockchain *proof-of-work* khusus yang dapat melaporkan dengan benar apakah data yang terdaftar tersedia atau tidak selama epos tertentu. Penambang mencoba mengunduh, menyimpan, dan menyebarkan semua data yang saat ini terdaftar, sehingga menjamin data tersedia secara lokal. Meskipun sistem semacam itu mahal dalam artian bahwa setiap *node* penambangan menyimpan dan menyebarkan semua data yang terdaftar, sistem memungkinkan penyimpanan untuk digunakan kembali dengan melepaskan data setelah periode pendaftaran berakhir.
+
+### Antarmuka Klien Oracle di Solidity
+
+Contoh 11-1 adalah contoh Solidity yang menunjukkan bagaimana Oraclize dapat digunakan untuk secara terus-menerus melakukan *polling* harga ETH/USD dari sebuah API dan menyimpan hasilnya dengan cara yang dapat digunakan.
+
+**Contoh 11-1. Menggunakan Oraclize untuk memperbarui nilai tukar ETH/USD dari sumber eksternal**
+
+```solidity
+/*
+Ticker harga ETH/USD yang memanfaatkan API CryptoCompare
+Kontrak ini menyimpan harga ETH/USD yang diperbarui di penyimpanan,
+yang diperbarui setiap 10 menit.
+*/
+pragma solidity ^0.4.1;
+
+import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
+
+/*
+Metode yang diawali "oraclize_" menunjukkan pewarisan dari "usingOraclize"
+*/
+contract EthUsdPriceTicker is usingOraclize {
+
+  uint public ethUsd;
+
+  event newOraclizeQuery(string description);
+  event newCallbackResult(string result);
+
+  constructor() public payable {
+    // menandakan pembuatan bukti TLSN dan penyimpanan di IPFS
+    oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
+    // meminta kueri
+    queryTicker();
+  }
+
+  function __callback(bytes32 _queryId, string memory _result, bytes memory _proof) public {
+    require(msg.sender == oraclize_cbAddress());
+    emit newCallbackResult(_result);
+    /*
+    * Mengurai string hasil menjadi integer tak bertanda untuk penggunaan on-chain.
+    * Menggunakan pembantu "parseInt" yang diwarisi dari "usingOraclize", memungkinkan
+    * string hasil seperti "123.45" diubah menjadi uint 12345.
+    */
+    ethUsd = parseInt(_result, 2);
+    // dipanggil dari callback karena kita melakukan polling harga
+    queryTicker();
+  }
+
+  function queryTicker() public payable {
+    if (oraclize_getPrice("URL") > address(this).balance) {
+      emit newOraclizeQuery("Kueri Oraclize TIDAK dikirim, harap tambahkan ETH untuk menutupi biaya kueri");
+    } else {
+      emit newOraclizeQuery("Kueri Oraclize dikirim, menunggu jawaban...");
+      // parameter kueri adalah (penundaan dalam detik, jenis sumber data,
+      // argumen sumber data)
+      // menentukan JSONPath, untuk mengambil bagian spesifik dari hasil API JSON
+      oraclize_query(60 * 10, "URL", "json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD,EUR,GBP).USD");
+    }
+  }
+}
+```
+
+Untuk berintegrasi dengan Oraclize, kontrak `EthUsdPriceTicker` harus menjadi anak dari `usingOraclize`; kontrak `usingOraclize` didefinisikan dalam file `oraclizeAPI`. Permintaan data dibuat menggunakan fungsi `oraclize_query`, yang diwarisi dari kontrak `usingOraclize`. Ini adalah fungsi yang di-*overload* yang mengharapkan setidaknya dua argumen:
+
+  * Sumber data yang didukung untuk digunakan, seperti `URL`, `WolframAlpha`, `IPFS`, atau `computation`.
+  * Argumen untuk sumber data yang diberikan, yang mungkin termasuk penggunaan pembantu penguraian JSON atau XML.
+
+Kueri harga dilakukan di fungsi `queryTicker`. Untuk melakukan kueri, Oraclize memerlukan pembayaran biaya kecil dalam ether, yang mencakup biaya gas untuk memproses hasil dan mengirimkannya ke fungsi `__callback` dan biaya tambahan yang menyertainya untuk layanan tersebut. Jumlah ini bergantung pada sumber data dan, jika ditentukan, jenis bukti keaslian yang diperlukan. Setelah data diambil, fungsi `__callback` dipanggil oleh akun yang dikendalikan Oraclize yang diizinkan untuk melakukan *callback*; ia memberikan nilai respons dan argumen `queryId` yang unik, yang, misalnya, dapat digunakan untuk menangani dan melacak beberapa *callback* yang tertunda dari Oraclize.
+
+Penyedia data keuangan Thomson Reuters juga menyediakan layanan oracle untuk Ethereum, yang disebut BlockOne IQ, memungkinkan data pasar dan referensi untuk diminta oleh kontrak pintar yang berjalan di jaringan pribadi atau berizin. Contoh 11-2 menunjukkan antarmuka untuk oracle, dan kontrak klien yang akan membuat permintaan.
+
+**Contoh 11-2. Kontrak yang memanggil layanan BlockOne IQ untuk data pasar**
+
+```solidity
+pragma solidity ^0.4.11;
+
+contract Oracle {
+  uint256 public divisor;
+  function initRequest(uint256 queryType, function(uint256) external onSuccess, function(uint256) external onFailure) public returns (uint256 id);
+  function addArgumentToRequestUint(uint256 id, bytes32 name, uint256 arg) public;
+  function addArgumentToRequestString(uint256 id, bytes32 name, bytes32 arg) public;
+  function executeRequest(uint256 id) public;
+  function getResponseUint(uint256 id, bytes32 name) public view returns(uint256);
+  function getResponseString(uint256 id, bytes32 name) public view returns(bytes32);
+  function getResponseError(uint256 id) public view returns(bytes32);
+  function deleteResponse(uint256 id) public;
+}
+
+contract OracleB1IQClient {
+  Oracle private oracle;
+  event LogError(bytes32 description);
+
+  constructor(address addr) public payable {
+    oracle = Oracle(addr);
+    getIntraday("IBM", now);
+  }
+
+  function getIntraday(bytes32 ric, uint256 timestamp) public {
+    uint256 id = oracle.initRequest(0, this.handleSuccess, this.handleFailure);
+    oracle.addArgumentToRequestString(id, "symbol", ric);
+    oracle.addArgumentToRequestUint(id, "timestamp", timestamp);
+    oracle.executeRequest(id);
+  }
+
+  function handleSuccess(uint256 id) public {
+    require(msg.sender == address(oracle));
+    bytes32 ric = oracle.getResponseString(id, "symbol");
+    uint256 open = oracle.getResponseUint(id, "open");
+    uint256 high = oracle.getResponseUint(id, "high");
+    uint256 low = oracle.getResponseUint(id, "low");
+    uint256 close = oracle.getResponseUint(id, "close");
+    uint256 bid = oracle.getResponseUint(id, "bid");
+    uint256 ask = oracle.getResponseUint(id, "ask");
+    uint256 timestamp = oracle.getResponseUint(id, "timestamp");
+    oracle.deleteResponse(id);
+    // Lakukan sesuatu dengan data harga
+  }
+
+  function handleFailure(uint256 id) public {
+    require(msg.sender == address(oracle));
+    bytes32 error = oracle.getResponseError(id);
+    oracle.deleteResponse(id);
+    emit LogError(error);
+  }
+}
+```
+
+Permintaan data dimulai menggunakan fungsi `initRequest`, yang memungkinkan jenis kueri (dalam contoh ini, permintaan untuk harga intraday) untuk ditentukan, selain dua fungsi *callback*. Ini mengembalikan pengenal `uint256` yang kemudian dapat digunakan untuk memberikan argumen tambahan. Fungsi `addArgumentToRequestString` digunakan untuk menentukan Reuters Instrument Code (RIC), di sini untuk saham IBM, dan `addArgumentToRequestUint` memungkinkan stempel waktu untuk ditentukan. Sekarang, dengan memberikan alias untuk `block.timestamp` akan mengambil harga saat ini untuk IBM. Permintaan kemudian dieksekusi oleh fungsi `executeRequest`. Setelah permintaan diproses, kontrak oracle akan memanggil fungsi *callback* `onSuccess` dengan pengenal kueri, memungkinkan data yang dihasilkan untuk diambil; jika terjadi kegagalan pengambilan, *callback* `onFailure` akan mengembalikan kode kesalahan sebagai gantinya. Bidang yang tersedia yang dapat diambil saat berhasil termasuk harga buka, tinggi, rendah, tutup (OHLC), dan harga jual/beli.
+
+### Kesimpulan
+
+Seperti yang Anda lihat, oracle menyediakan layanan penting untuk kontrak pintar: mereka membawa fakta eksternal ke eksekusi kontrak. Dengan itu, tentu saja, oracle juga menimbulkan risiko yang signifikan—jika mereka adalah sumber tepercaya dan dapat dikompromikan, mereka dapat mengakibatkan eksekusi yang dikompromikan dari kontrak pintar yang mereka suplai.
+
+Secara umum, saat mempertimbangkan penggunaan oracle, berhati-hatilah dengan model kepercayaan. Jika Anda berasumsi oracle dapat dipercaya, Anda mungkin merusak keamanan kontrak pintar Anda dengan mengeksposnya ke input yang berpotensi salah. Meskipun demikian, oracle dapat sangat berguna jika asumsi keamanan dipertimbangkan dengan cermat.
+
+Oracle terdesentralisasi dapat menyelesaikan beberapa masalah ini dan menawarkan data eksternal nirkepercayaan kepada kontrak pintar Ethereum. Pilih dengan hati-hati dan Anda dapat mulai menjelajahi jembatan antara Ethereum dan "dunia nyata" yang ditawarkan oleh oracle.
 
 ---
 
