@@ -2880,3 +2880,42 @@ Gambar 6-7 menunjukkan prosesnya:
   <img src="images/books-07-mastering_ethereum/figure-6.7.png" alt="gambar" width="580"/>
 </p>
 
+Tergantung pada tingkat keamanan yang Anda butuhkan, komputer “penandatangan luring” Anda dapat memiliki berbagai tingkat pemisahan dari komputer daring, mulai dari subnet yang terisolasi dan dilindungi firewall (daring tetapi terpisah) hingga sistem yang sepenuhnya luring yang dikenal sebagai sistem ***air-gapped***. Dalam sistem *air-gapped*, tidak ada konektivitas jaringan sama sekali—komputer dipisahkan dari lingkungan daring oleh celah “udara.” Untuk menandatangani transaksi, Anda mentransfernya ke dan dari komputer *air-gapped* menggunakan media penyimpanan data atau (lebih baik) webcam dan kode QR. Tentu saja, ini berarti Anda harus secara manual mentransfer setiap transaksi yang ingin Anda tandatangani, dan ini tidak dapat diskalakan.
+
+Meskipun tidak banyak lingkungan yang dapat memanfaatkan sistem *air-gapped* sepenuhnya, bahkan tingkat isolasi yang kecil pun memiliki manfaat keamanan yang signifikan. Misalnya, subnet terisolasi dengan firewall yang hanya mengizinkan protokol antrian pesan (*message-queue*) dapat menawarkan permukaan serangan (*attack surface*) yang jauh lebih kecil dan keamanan yang jauh lebih tinggi daripada menandatangani di sistem daring. Banyak perusahaan menggunakan protokol seperti **ZeroMQ (0MQ)** untuk tujuan ini. Dengan pengaturan seperti itu, transaksi diserialisasi dan diantrekan untuk ditandatangani. Protokol antrian mentransmisikan pesan yang diserialisasi, dengan cara yang mirip dengan soket TCP, ke komputer penandatangan. Komputer penandatangan membaca transaksi yang diserialisasi dari antrian (dengan hati-hati), menerapkan tanda tangan dengan kunci yang sesuai, dan menempatkannya pada antrian keluar. Antrian keluar mentransmisikan transaksi yang ditandatangani ke komputer dengan klien Ethereum yang mengambilnya dari antrian dan mentransmisikannya.
+
+### Propagasi Transaksi
+
+Jaringan Ethereum menggunakan protokol ***“flood routing”***. Setiap klien Ethereum bertindak sebagai *node* dalam jaringan *peer-to-peer* (P2P), yang (idealnya) membentuk jaringan *mesh*. Tidak ada *node* jaringan yang istimewa: semuanya bertindak sebagai rekan yang setara. Kami akan menggunakan istilah “*node*” untuk merujuk pada klien Ethereum yang terhubung dan berpartisipasi dalam jaringan P2P.
+
+Propagasi transaksi dimulai dengan *node* Ethereum asal yang membuat (atau menerima dari luring) transaksi yang ditandatangani. Transaksi tersebut divalidasi dan kemudian ditransmisikan ke semua *node* Ethereum lain yang terhubung langsung ke *node* asal. Rata-rata, setiap *node* Ethereum mempertahankan koneksi ke setidaknya 13 *node* lain, yang disebut **tetangganya (*neighbors*)**. Setiap *node* tetangga memvalidasi transaksi segera setelah mereka menerimanya. Jika mereka setuju bahwa itu valid, mereka menyimpan salinan dan menyebarkannya ke semua tetangga mereka (kecuali yang mengirimkannya). Akibatnya, transaksi menyebar keluar dari *node* asal, membanjiri seluruh jaringan, sampai semua *node* di jaringan memiliki salinan transaksi tersebut. *Node* dapat memfilter pesan yang mereka sebarkan, tetapi standarnya adalah menyebarkan semua pesan transaksi valid yang mereka terima.
+
+Hanya dalam beberapa detik, sebuah transaksi Ethereum menyebar ke semua *node* Ethereum di seluruh dunia. Dari perspektif setiap *node*, tidak mungkin untuk membedakan asal transaksi. Tetangga yang mengirimkannya ke *node* tersebut mungkin adalah pembuat transaksi atau mungkin telah menerimanya dari salah satu tetangganya. Untuk dapat melacak asal-usul transaksi, atau mengganggu propagasi, seorang penyerang harus mengendalikan persentase yang signifikan dari semua *node*. Ini adalah bagian dari desain keamanan dan privasi jaringan P2P, terutama yang diterapkan pada jaringan blockchain.
+
+### Pencatatan di Blockchain
+
+Meskipun semua *node* di Ethereum adalah rekan yang setara, beberapa di antaranya dioperasikan oleh **penambang (*miners*)** dan menyalurkan transaksi serta blok ke **ladang penambangan (*mining farms*)**, yaitu komputer dengan unit pemrosesan grafis (GPU) berkinerja tinggi. Komputer penambang menambahkan transaksi ke blok kandidat dan berusaha menemukan bukti kerja (*proof of work*) yang membuat blok kandidat tersebut valid. Kami akan membahas ini lebih detail di Bab 14.
+
+Tanpa terlalu banyak detail, transaksi yang valid pada akhirnya akan dimasukkan ke dalam blok transaksi dan, dengan demikian, dicatat di blockchain Ethereum. Setelah ditambang ke dalam sebuah blok, transaksi juga memodifikasi keadaan tunggal (*singleton state*) Ethereum, baik dengan mengubah saldo sebuah akun (dalam kasus pembayaran sederhana) atau dengan memanggil kontrak yang mengubah keadaan internal mereka. Perubahan ini dicatat bersamaan dengan transaksi, dalam bentuk **resi transaksi (*transaction receipt*)**, yang mungkin juga menyertakan *event*. Kami akan memeriksa semua ini lebih detail di Bab 13.
+
+Sebuah transaksi yang telah menyelesaikan perjalanannya dari pembuatan, penandatanganan oleh EOA, propagasi, dan akhirnya penambangan telah mengubah keadaan tunggal dan meninggalkan jejak yang tak terhapuskan di blockchain.
+
+### Transaksi Tanda Tangan Ganda (Multisig)
+
+Jika Anda akrab dengan kemampuan skrip Bitcoin, Anda tahu bahwa dimungkinkan untuk membuat akun multisig Bitcoin yang hanya dapat membelanjakan dana ketika beberapa pihak menandatangani transaksi (misalnya, 2 dari 2 atau 3 dari 4 tanda tangan). Transaksi nilai EOA dasar Ethereum tidak memiliki ketentuan untuk tanda tangan ganda; namun, batasan penandatanganan sewenang-wenang dapat ditegakkan oleh **kontrak pintar (*smart contracts*)** dengan kondisi apa pun yang dapat Anda pikirkan, untuk menangani transfer ether maupun token.
+
+Untuk memanfaatkan kemampuan ini, ether harus ditransfer ke **kontrak dompet (*wallet contract*)** yang diprogram dengan aturan pengeluaran yang diinginkan, seperti persyaratan tanda tangan ganda atau batas pengeluaran (atau kombinasi keduanya). Kontrak dompet kemudian mengirimkan dana ketika diminta oleh EOA yang berwenang setelah kondisi pengeluaran terpenuhi. Misalnya, untuk melindungi ether Anda di bawah kondisi multisig, transfer ether tersebut ke kontrak multisig. Setiap kali Anda ingin mengirim dana ke akun lain, semua pengguna yang diperlukan harus mengirim transaksi ke kontrak menggunakan aplikasi dompet biasa, yang secara efektif memberi wewenang kepada kontrak untuk melakukan transaksi akhir.
+
+Kontrak-kontrak ini juga dapat dirancang untuk memerlukan beberapa tanda tangan sebelum mengeksekusi kode lokal atau untuk memicu kontrak lain. Keamanan skema pada akhirnya ditentukan oleh kode kontrak multisig.
+
+Kemampuan untuk mengimplementasikan transaksi tanda tangan ganda sebagai kontrak pintar menunjukkan fleksibilitas Ethereum. Namun, ini adalah pedang bermata dua, karena fleksibilitas ekstra dapat menyebabkan bug yang merusak keamanan skema tanda tangan ganda. Ada, faktanya, sejumlah proposal untuk membuat perintah tanda tangan ganda di EVM yang menghilangkan kebutuhan akan kontrak pintar, setidaknya untuk skema tanda tangan ganda M-dari-N yang sederhana. Ini akan setara dengan sistem tanda tangan ganda Bitcoin, yang merupakan bagian dari aturan konsensus inti dan telah terbukti kuat dan aman.
+
+### Kesimpulan
+
+Transaksi adalah titik awal dari setiap aktivitas dalam sistem Ethereum. Transaksi adalah "input" yang menyebabkan Ethereum Virtual Machine mengevaluasi kontrak, memperbarui saldo, dan secara lebih umum memodifikasi keadaan blockchain Ethereum.
+
+Selanjutnya, kita akan bekerja dengan kontrak pintar secara lebih detail dan belajar cara memprogram dalam bahasa berorientasi kontrak, Solidity.
+
+---
+
+
