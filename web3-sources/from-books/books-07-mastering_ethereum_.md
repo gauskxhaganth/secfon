@@ -327,8 +327,6 @@ Dari perspektif yang lebih praktis, **Ethereum adalah infrastruktur komputasi su
 
 Platform Ethereum memungkinkan para pengembang untuk membangun aplikasi terdesentralisasi yang kuat dengan fungsi ekonomi bawaan. Sambil menyediakan **ketersediaan tinggi, kemampuan diaudit, transparansi, dan netralitas**, platform ini juga **mengurangi atau menghilangkan sensor** dan **mengurangi risiko pihak lawan (*counterparty risk*) tertentu**.
 
------
-
 ### **Dibandingkan dengan Bitcoin**
 
 Banyak orang akan datang ke Ethereum dengan pengalaman sebelumnya tentang mata uang kripto, khususnya Bitcoin. Ethereum memiliki banyak elemen yang sama dengan *blockchain* terbuka lainnya: jaringan *peer-to-peer* yang menghubungkan para partisipan, algoritma konsensus yang toleran terhadap kesalahan Bizantium (*Byzantine fault-tolerant*) untuk sinkronisasi pembaruan keadaan (sebuah *blockchain proof-of-work*), penggunaan primitif kriptografi seperti tanda tangan digital dan *hash*, serta sebuah mata uang digital (ether).
@@ -338,8 +336,6 @@ Namun dalam banyak hal, baik tujuan maupun konstruksi Ethereum sangat berbeda da
 **Tujuan Ethereum bukanlah primernya untuk menjadi jaringan pembayaran mata uang digital**. Meskipun mata uang digital ether bersifat integral dan diperlukan untuk operasi Ethereum, ether dimaksudkan sebagai **mata uang utilitas** untuk membayar penggunaan platform Ethereum sebagai komputer dunia.
 
 Berbeda dengan Bitcoin, yang memiliki bahasa skrip yang sangat terbatas, Ethereum dirancang untuk menjadi **blockchain yang dapat diprogram untuk tujuan umum** yang menjalankan mesin virtual yang mampu mengeksekusi kode dengan kompleksitas arbitrer dan tak terbatas. Di mana bahasa Skrip Bitcoin sengaja dibatasi pada evaluasi benar/salah sederhana dari kondisi pengeluaran, bahasa Ethereum adalah **Turing lengkap**, yang berarti Ethereum dapat dengan mudah berfungsi sebagai komputer serbaguna.
-
------
 
 ### **Komponen-Komponen Sebuah Blockchain**
 
@@ -359,8 +355,6 @@ Semua atau sebagian besar komponen ini biasanya digabungkan dalam satu klien per
 Di masa lalu, kita menggunakan istilah "*blockchain*" untuk mewakili semua komponen yang baru saja disebutkan, sebagai referensi singkat untuk kombinasi teknologi yang mencakup semua karakteristik yang dijelaskan. Namun, saat ini, ada berbagai macam *blockchain* dengan properti yang berbeda. Kita memerlukan kualifikasi untuk membantu kita memahami karakteristik *blockchain* yang dimaksud, seperti **terbuka, publik, global, terdesentralisasi, netral, dan tahan sensor**, untuk mengidentifikasi karakteristik penting yang muncul dari sistem "*blockchain*" yang dimungkinkan oleh komponen-komponen ini.
 
 Tidak semua *blockchain* diciptakan sama. Ketika seseorang memberi tahu Anda bahwa sesuatu adalah *blockchain*, Anda belum menerima jawaban; sebaliknya, Anda perlu mulai mengajukan banyak pertanyaan untuk mengklarifikasi apa yang mereka maksud ketika mereka menggunakan kata "*blockchain*". Mulailah dengan meminta deskripsi komponen-komponen dalam daftar sebelumnya, lalu tanyakan apakah "*blockchain*" ini menunjukkan karakteristik terbuka, publik, dll.
-
------
 
 ### **Kelahiran Ethereum**
 
@@ -392,8 +386,6 @@ Para pendiri bekerja selama bertahun-tahun, membangun dan menyempurnakan visi te
 >
 > Anda dapat membacanya di [https://vitalik.ca/general/2017/09/14/prehistory.html](https://www.google.com/search?q=https://vitalik.ca/general/2017/09/14/prehistory.html).
 
------
-
 ### **Empat Tahap Pengembangan Ethereum**
 
 Pengembangan Ethereum direncanakan dalam empat tahap yang berbeda, dengan perubahan besar terjadi di setiap tahap. Sebuah tahap dapat mencakup sub-rilis, yang dikenal sebagai "*hard fork*", yang mengubah fungsionalitas dengan cara yang tidak kompatibel mundur (*backward compatible*).
@@ -423,15 +415,11 @@ Empat tahap pengembangan utama diberi nama kode **Frontier, Homestead, Metropoli
 
 Setelah Byzantium, ada satu lagi *hard fork* yang direncanakan untuk Metropolis: **Constantinople**. Metropolis akan diikuti oleh tahap akhir penyebaran Ethereum, dengan nama kode **Serenity**.
 
------
-
 ### **Ethereum: Blockchain Serbaguna**
 
 *Blockchain* asli, yaitu *blockchain* Bitcoin, melacak keadaan unit bitcoin dan kepemilikannya. Anda dapat menganggap Bitcoin sebagai mesin keadaan konsensus terdistribusi, di mana transaksi menyebabkan transisi keadaan global, mengubah kepemilikan koin. Transisi keadaan dibatasi oleh aturan konsensus, memungkinkan semua partisipan untuk (pada akhirnya) mencapai keadaan umum (konsensus) dari sistem, setelah beberapa blok ditambang.
 
 Ethereum juga merupakan mesin keadaan terdistribusi. Tetapi alih-alih hanya melacak keadaan kepemilikan mata uang, Ethereum melacak transisi keadaan dari sebuah **penyimpanan data serbaguna**, yaitu, sebuah penyimpanan yang dapat menampung data apa pun yang dapat diekspresikan sebagai tupel kunci-nilai (*key-value tuple*). Penyimpanan data kunci-nilai menampung nilai-nilai arbitrer, masing-masing direferensikan oleh beberapa kunci; misalnya, nilai "Mastering Ethereum" yang direferensikan oleh kunci "Book Title". Dalam beberapa hal, ini melayani tujuan yang sama dengan model penyimpanan data *Random Access Memory* (RAM) yang digunakan oleh sebagian besar komputer serbaguna. Ethereum memiliki memori yang menyimpan baik kode maupun data, dan menggunakan *blockchain* Ethereum untuk melacak bagaimana memori ini berubah dari waktu ke waktu. Seperti komputer *stored-program* serbaguna, Ethereum dapat memuat kode ke dalam *state machine*-nya dan menjalankan kode itu, menyimpan perubahan keadaan yang dihasilkan di dalam *blockchain*-nya. Dua perbedaan kritis dari sebagian besar komputer serbaguna adalah bahwa perubahan keadaan Ethereum diatur oleh aturan konsensus dan keadaannya didistribusikan secara global. Ethereum menjawab pertanyaan: "Bagaimana jika kita bisa melacak keadaan arbitrer apa pun dan memprogram *state machine* untuk menciptakan komputer dunia yang beroperasi di bawah konsensus?"
-
------
 
 ### **Komponen-Komponen Ethereum**
 
@@ -461,24 +449,20 @@ Ethereum saat ini menggunakan algoritma PoW yang disebut Ethash, tetapi ini pada
 **Klien**
 Ethereum memiliki beberapa implementasi perangkat lunak klien yang dapat saling beroperasi, yang paling menonjol adalah Go-Ethereum (Geth) dan Parity.
 
------
-
 ### **Bacaan Lebih Lanjut**
 
 Referensi berikut memberikan informasi tambahan tentang teknologi yang disebutkan di sini:
 
-  * The Ethereum Yellow Paper: [https://ethereum.github.io/yellowpaper/paper.pdf](https://ethereum.github.io/yellowpaper/paper.pdf)
-  * The Beige Paper, sebuah penulisan ulang Yellow Paper untuk audiens yang lebih luas dalam bahasa yang kurang formal: [https://github.com/chronaeon/beigepaper](https://github.com/chronaeon/beigepaper)
-  * Protokol jaringan ÐΞVp2p: [http://bit.ly/2quAlTE](http://bit.ly/2quAlTE)
-  * Daftar sumber daya Ethereum Virtual Machine: [http://bit.ly/2PmtjiS](http://bit.ly/2PmtjiS)
-  * Basis data LevelDB (paling sering digunakan untuk menyimpan salinan lokal dari *blockchain*): [http://leveldb.org](http://leveldb.org)
-  * Pohon Merkle Patricia: [https://github.com/ethereum/wiki/wiki/Patricia-Tree](https://github.com/ethereum/wiki/wiki/Patricia-Tree)
-  * Algoritma PoW Ethash: [https://github.com/ethereum/wiki/wiki/Ethash](https://github.com/ethereum/wiki/wiki/Ethash)
-  * Panduan Implementasi Casper PoS v1: [http://bit.ly/2DyPr3l](http://bit.ly/2DyPr3l)
-  * Klien Go-Ethereum (Geth): [https://geth.ethereum.org/](https://geth.ethereum.org/)
-  * Klien Parity Ethereum: [https://parity.io/](https://parity.io/)
-
------
+  * [The Ethereum Yellow Paper](https://ethereum.github.io/yellowpaper/paper.pdf)
+  * [The Beige Paper, sebuah penulisan ulang Yellow Paper untuk audiens yang lebih luas dalam bahasa yang kurang formal](https://github.com/chronaeon/beigepaper)
+  * [Protokol jaringan ÐΞVp2p](http://bit.ly/2quAlTE)
+  * [Daftar sumber daya Ethereum Virtual Machine][http://bit.ly/2PmtjiS](http://bit.ly/2PmtjiS)
+  * [Basis data LevelDB (paling sering digunakan untuk menyimpan salinan lokal dari *blockchain*](http://leveldb.org)
+  * [Pohon Merkle Patricia](https://github.com/ethereum/wiki/wiki/Patricia-Tree)
+  * [Algoritma PoW Ethash](https://github.com/ethereum/wiki/wiki/Ethash)
+  * [Panduan Implementasi Casper PoS v1](http://bit.ly/2DyPr3l)
+  * [Klien Go-Ethereum (Geth)](https://geth.ethereum.org/)
+  * [Klien Parity Ethereum](https://parity.io/)
 
 ### **Ethereum dan Kelengkapan Turing (Turing Completeness)**
 
@@ -1095,12 +1079,7 @@ Kita akan melakukan lebih banyak lagi pemrograman *smart contract* di Bab 7 dan 
 
 ---
 
-Tentu, ini adalah terjemahan dari teks yang Anda berikan, telah dirapikan formatnya.
-
------
-
-## BAB 3
-
+# BAB 3
 ## Klien Ethereum
 
 Sebuah **klien Ethereum** adalah aplikasi perangkat lunak yang mengimplementasikan spesifikasi Ethereum dan berkomunikasi melalui jaringan *peer-to-peer* dengan klien Ethereum lainnya. Klien Ethereum yang berbeda dapat saling beroperasi jika mereka mematuhi spesifikasi referensi dan protokol komunikasi yang terstandarisasi. Meskipun klien-klien yang berbeda ini diimplementasikan oleh tim yang berbeda dan dalam bahasa pemrograman yang berbeda, mereka semua "berbicara" dengan protokol yang sama dan mengikuti aturan yang sama. Dengan demikian, mereka semua dapat digunakan untuk mengoperasikan dan berinteraksi dengan jaringan Ethereum yang sama.
@@ -1111,8 +1090,6 @@ Ethereum didefinisikan oleh spesifikasi formal yang disebut **“Yellow Paper”
 Ini berbeda dengan, misalnya, Bitcoin, yang tidak didefinisikan secara formal. Jika "spesifikasi" Bitcoin adalah implementasi referensi Bitcoin Core, spesifikasi Ethereum didokumentasikan dalam sebuah makalah yang menggabungkan spesifikasi bahasa Inggris dan matematis (formal). Spesifikasi formal ini, selain berbagai *Ethereum Improvement Proposals*, mendefinisikan perilaku standar dari sebuah klien Ethereum. Yellow Paper diperbarui secara berkala seiring dengan perubahan besar yang dibuat pada Ethereum.
 
 Sebagai hasil dari spesifikasi formal Ethereum yang jelas, ada sejumlah implementasi perangkat lunak klien Ethereum yang dikembangkan secara independen namun dapat saling beroperasi. Ethereum memiliki keragaman implementasi yang berjalan di jaringan lebih banyak daripada *blockchain* lainnya, yang secara umum dianggap sebagai hal yang baik. Memang, hal ini telah terbukti menjadi cara yang sangat baik untuk bertahan dari serangan di jaringan, karena eksploitasi terhadap strategi implementasi klien tertentu hanya akan merepotkan para pengembang saat mereka menambal eksploitasi tersebut, sementara klien lain menjaga jaringan tetap berjalan hampir tanpa terpengaruh.
-
------
 
 ### Jaringan Ethereum
 
@@ -1131,8 +1108,6 @@ Saat ini, ada enam implementasi utama dari protokol Ethereum, yang ditulis dalam
 
 Di bagian ini, kita akan melihat dua klien yang paling umum, Parity dan Geth. Kami akan menunjukkan cara menyiapkan *node* menggunakan setiap klien, dan menjelajahi beberapa opsi baris perintah (*command-line*) dan antarmuka pemrograman aplikasi (API) mereka.
 
------
-
 ### Haruskah Saya Menjalankan Full Node?
 
 Kesehatan, ketahanan, dan resistensi terhadap sensor dari *blockchain* bergantung pada banyaknya ***full node*** yang dioperasikan secara independen dan tersebar secara geografis. Setiap *full node* dapat membantu *node* baru lainnya mendapatkan data blok untuk memulai operasi mereka, serta menawarkan operator verifikasi yang otoritatif dan independen dari semua transaksi dan kontrak.
@@ -1146,8 +1121,6 @@ Anda juga memiliki opsi untuk menjalankan **klien jarak jauh** (*remote client*)
 Istilah "klien jarak jauh" dan "dompet" digunakan secara bergantian, meskipun ada beberapa perbedaan. Biasanya, klien jarak jauh menawarkan API (seperti web3.js API) selain fungsionalitas transaksi dari sebuah dompet.
 
 Jangan bingung antara konsep dompet jarak jauh di Ethereum dengan ***light client*** (yang analog dengan klien *Simplified Payment Verification* di Bitcoin). *Light client* memvalidasi *header* blok dan menggunakan bukti Merkle (*Merkle proofs*) untuk memvalidasi penyertaan transaksi di dalam *blockchain* dan menentukan dampaknya, memberikan mereka tingkat keamanan yang serupa dengan *full node*. Sebaliknya, klien jarak jauh Ethereum не memvalidasi *header* blok atau transaksi. Mereka sepenuhnya mempercayai *full client* untuk memberi mereka akses ke *blockchain*, dan karenanya kehilangan jaminan keamanan dan anonimitas yang signifikan. Anda dapat mengurangi masalah ini dengan menggunakan *full client* yang Anda jalankan sendiri.
-
------
 
 ### Kelebihan dan Kekurangan Full Node
 
@@ -1168,8 +1141,6 @@ Memilih untuk menjalankan *full node* membantu operasi jaringan yang Anda hubung
   * Mungkin memerlukan beberapa hari untuk sinkronisasi penuh saat pertama kali dimulai.
   * Harus dipelihara, ditingkatkan, dan dijaga agar tetap *online* untuk tetap tersinkronisasi.
 
------
-
 ### Kelebihan dan Kekurangan Testnet Publik
 
 Baik Anda memilih untuk menjalankan *full node* atau tidak, Anda mungkin ingin menjalankan *node testnet* publik. Mari kita lihat beberapa kelebihan dan kekurangan menggunakan *testnet* publik.
@@ -1185,8 +1156,6 @@ Baik Anda memilih untuk menjalankan *full node* atau tidak, Anda mungkin ingin m
 
   * Anda не dapat menggunakan uang “nyata” di *testnet*; ia berjalan dengan *test ether*. Akibatnya, Anda не dapat menguji keamanan terhadap musuh nyata, karena tidak ada yang dipertaruhkan.
   * Ada beberapa aspek dari *blockchain* publik yang tidak dapat Anda uji secara realistis di *testnet*. Misalnya, biaya transaksi, meskipun diperlukan untuk mengirim transaksi, tidak menjadi pertimbangan di *testnet*, karena gas gratis. Lebih lanjut, *testnet* tidak mengalami kemacetan jaringan seperti yang terkadang terjadi pada *mainnet* publik.
-
------
 
 ### Kelebihan dan Kekurangan Simulasi Blockchain Lokal
 
@@ -1205,8 +1174,6 @@ Untuk banyak tujuan pengujian, opsi terbaik adalah meluncurkan *blockchain* prib
   * Tidak ada penambang selain Anda berarti penambangan lebih dapat diprediksi; oleh karena itu, Anda tidak dapat menguji beberapa skenario yang terjadi di *blockchain* publik.
   * Tidak adanya kontrak lain berarti Anda harus menyebarkan semua yang ingin Anda uji, termasuk dependensi dan pustaka kontrak.
   * Anda tidak dapat menciptakan kembali beberapa kontrak publik dan alamatnya untuk menguji beberapa skenario (misalnya, kontrak DAO).
-
------
 
 ### Menjalankan Klien Ethereum
 
@@ -1244,8 +1211,8 @@ Sulit untuk memprediksi seberapa cepat ukuran *blockchain* akan bertambah dan ka
 
 Tautan-tautan ini memberikan perkiraan terkini tentang ukuran *blockchain*:
 
-  * Ethereum [https://bitinfocharts.com/ethereum/](https://bitinfocharts.com/ethereum/)
-  * Ethereum Classic [https://bitinfocharts.com/ethereum%20classic/](https://bitinfocharts.com/ethereum%20classic/)
+  * [Ethereum](https://bitinfocharts.com/ethereum/)
+  * [Ethereum Classic](https://bitinfocharts.com/ethereum%20classic/)
 
 #### Kebutuhan Perangkat Lunak untuk Membangun dan Menjalankan Klien (Node)
 
@@ -1275,8 +1242,6 @@ Parity juga memerlukan beberapa pustaka perangkat lunak, seperti OpenSSL dan lib
 Untuk sistem operasi lain, gunakan manajer paket OS Anda atau ikuti instruksi Wiki untuk menginstal pustaka yang diperlukan.
 
 Sekarang setelah Anda menginstal git, golang, Rust, dan pustaka yang diperlukan, mari kita mulai bekerja\!
-
------
 
 ### Parity
 
@@ -1333,18 +1298,16 @@ $
 
 Bagus\! Sekarang Parity sudah terinstal, Anda dapat menyinkronkan *blockchain* dan memulai dengan beberapa opsi baris perintah dasar.
 
------
-
 ### Go-Ethereum (Geth)
 
 Geth adalah implementasi bahasa Go yang dikembangkan secara aktif oleh Ethereum Foundation, sehingga dianggap sebagai implementasi "resmi" dari klien Ethereum. Biasanya, setiap *blockchain* berbasis Ethereum akan memiliki implementasi Geth-nya sendiri. Jika Anda menjalankan Geth, maka Anda harus memastikan Anda mengambil versi yang benar untuk *blockchain* Anda menggunakan salah satu tautan repositori berikut:
 
-  * Ethereum [https://github.com/ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) atau [https://geth.ethereum.org/](https://geth.ethereum.org/)
-  * Ethereum Classic [https://github.com/ethereumproject/go-ethereum](https://github.com/ethereumproject/go-ethereum)
-  * Ellaism [https://github.com/ellaism/go-ellaism](https://github.com/ellaism/go-ellaism)
-  * Expanse [https://github.com/expanse-org/go-expanse](https://github.com/expanse-org/go-expanse)
-  * Musicoin [https://github.com/Musicoin/go-musicoin](https://github.com/Musicoin/go-musicoin)
-  * Ubiq [https://github.com/ubiq/go-ubiq](https://github.com/ubiq/go-ubiq)
+  * [Ethereum](https://github.com/ethereum/go-ethereum) (or go [https://geth.ethereum.org/](https://geth.ethereum.org/)))
+  * [Ethereum Classic](https://github.com/ethereumproject/go-ethereum)
+  * [Ellaism](https://github.com/ellaism/go-ellaism)
+  * [Expanse](https://github.com/expanse-org/go-expanse)
+  * [Musicoin](https://github.com/Musicoin/go-musicoin)
+  * [Ubiq](https://github.com/ubiq/go-ubiq)
 
 > Anda juga dapat melewati instruksi ini dan menginstal biner yang sudah dikompilasi (*precompiled binary*) untuk platform pilihan Anda. Rilisan yang sudah dikompilasi jauh lebih mudah untuk diinstal dan dapat ditemukan di bagian "releases" dari salah satu repositori yang tercantum di sini. Namun, Anda mungkin belajar lebih banyak dengan mengunduh dan mengompilasi perangkat lunak sendiri.
 
@@ -1415,8 +1378,6 @@ Perintah `geth version` Anda mungkin menampilkan informasi yang sedikit berbeda,
 
 Jangan jalankan `geth` dulu, karena itu akan mulai menyinkronkan *blockchain* dengan “cara lambat” dan itu akan memakan waktu terlalu lama (berminggu-minggu). Bagian selanjutnya menjelaskan tantangan dengan sinkronisasi awal *blockchain* Ethereum.
 
------
-
 ### Sinkronisasi Pertama Blockchain Berbasis Ethereum
 
 Biasanya, saat menyinkronkan *blockchain* Ethereum, klien Anda akan mengunduh dan memvalidasi setiap blok dan setiap transaksi sejak awal—yaitu, dari blok genesis.
@@ -1426,4 +1387,576 @@ Meskipun dimungkinkan untuk menyinkronkan *blockchain* sepenuhnya dengan cara in
 Banyak *blockchain* berbasis Ethereum menjadi korban serangan *denial-of-service* (DoS) pada akhir tahun 2016. *Blockchain* yang terpengaruh akan cenderung sinkronisasi dengan lambat saat melakukan sinkronisasi penuh.
 
 Misalnya, di Ethereum, klien baru akan membuat kemajuan pesat hingga mencapai blok 2.283.397. Blok ini ditambang pada 18 September 2016, dan menandai awal dari serangan DoS. Dari blok ini hingga blok 2.700.031 (26 November 2016), validasi transaksi menjadi sangat lambat, intensif memori, dan intensif I/O. Ini menghasilkan waktu validasi yang melebihi 1 menit per blok. Ethereum mengimplementasikan serangkaian peningkatan, menggunakan *hard fork*, untuk mengatasi kerentanan mendasar yang dieksploitasi dalam serangan DoS. Peningkatan ini juga membersihkan blockchain dengan menghapus sekitar 20 juta akun kosong yang dibuat oleh transaksi spam.
+
+Jika Anda melakukan sinkronisasi dengan validasi penuh, klien Anda akan melambat dan mungkin memerlukan beberapa hari, atau bahkan lebih lama, untuk memvalidasi blok-blok yang terkena dampak serangan DoS. Untungnya, sebagian besar klien Ethereum menyertakan opsi untuk melakukan sinkronisasi "cepat" (*fast*) yang melewatkan validasi penuh transaksi hingga klien tersinkronisasi ke ujung *blockchain*, kemudian melanjutkan validasi penuh.
+
+Untuk Geth, opsi untuk mengaktifkan sinkronisasi cepat biasanya disebut `--fast`. Anda mungkin perlu merujuk pada instruksi spesifik untuk rantai Ethereum pilihan Anda.
+
+Parity melakukan sinkronisasi cepat secara default.
+
+> Geth hanya dapat mengoperasikan sinkronisasi cepat saat memulai dengan database blok yang kosong. Jika Anda sudah mulai menyinkronkan tanpa mode cepat, Geth tidak dapat beralih. Lebih cepat menghapus direktori data *blockchain* dan memulai sinkronisasi cepat dari awal daripada melanjutkan sinkronisasi dengan validasi penuh. Berhati-hatilah agar tidak menghapus dompet apa pun saat menghapus data *blockchain*\!
+
+#### Menjalankan Geth atau Parity
+
+Sekarang setelah Anda memahami tantangan dari "sinkronisasi pertama," Anda siap untuk memulai klien Ethereum dan menyinkronkan *blockchain*. Baik untuk Geth maupun Parity, Anda dapat menggunakan opsi `--help` untuk melihat semua parameter konfigurasi. Selain menggunakan `--fast` untuk Geth, seperti yang dijelaskan di bagian sebelumnya, pengaturan default biasanya sudah masuk akal dan sesuai untuk sebagian besar penggunaan. Pilih cara mengonfigurasi parameter opsional apa pun sesuai kebutuhan Anda, lalu mulai Geth atau Parity untuk menyinkronkan rantai. Kemudian tunggulah…
+
+> Sinkronisasi *blockchain* Ethereum akan memakan waktu mulai dari setengah hari pada sistem yang sangat cepat dengan banyak RAM, hingga beberapa hari pada sistem yang lebih lambat.
+
+### Antarmuka JSON-RPC
+
+Klien Ethereum menawarkan antarmuka pemrograman aplikasi (API) dan serangkaian perintah *Remote Procedure Call* (RPC), yang dikodekan sebagai *JavaScript Object Notation* (JSON). Anda akan melihat ini disebut sebagai **JSON-RPC API**. Pada dasarnya, JSON-RPC API adalah antarmuka yang memungkinkan kita menulis program yang menggunakan klien Ethereum sebagai gerbang ke jaringan dan *blockchain* Ethereum.
+
+Biasanya, antarmuka RPC ditawarkan sebagai layanan HTTP pada port 8545. Untuk alasan keamanan, secara default dibatasi untuk hanya menerima koneksi dari `localhost` (alamat IP komputer Anda sendiri, yaitu 127.0.0.1).
+
+Untuk mengakses JSON-RPC API, Anda dapat menggunakan pustaka khusus (ditulis dalam bahasa pemrograman pilihan Anda) yang menyediakan pemanggilan fungsi "stub" yang sesuai dengan setiap perintah RPC yang tersedia, atau Anda dapat secara manual membuat permintaan HTTP dan mengirim/menerima permintaan yang dikodekan dalam format JSON. Anda bahkan dapat menggunakan klien HTTP baris perintah generik, seperti `curl`, untuk memanggil antarmuka RPC. Mari kita coba. Pertama, pastikan Anda telah mengonfigurasi dan menjalankan Geth, lalu beralih ke jendela terminal baru (misalnya, dengan Ctrl-Shift-N atau Ctrl-Shift-T di jendela terminal yang ada) seperti yang ditunjukkan di sini:
+
+```
+$ curl -X POST -H "Content-Type: application/json" --data \
+'{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":1}' \
+http://localhost:8545
+{"jsonrpc":"2.0","id":1,
+"result":"Geth/v1.8.0-unstable-02aeb3d7/linux-amd64/go1.8.3"}
+```
+
+Dalam contoh ini, kita menggunakan `curl` untuk membuat koneksi HTTP ke alamat http://localhost:8545. Kita sudah menjalankan `geth`, yang menawarkan JSON-RPC API sebagai layanan HTTP pada port 8545. Kita menginstruksikan `curl` untuk menggunakan perintah HTTP `POST` dan untuk mengidentifikasi konten sebagai tipe `application/json`. Terakhir, kita memberikan permintaan yang dikodekan dalam format JSON sebagai komponen data dari permintaan HTTP kita. Sebagian besar baris perintah kita hanya untuk mengatur `curl` agar membuat koneksi HTTP dengan benar. Bagian yang menarik adalah perintah JSON-RPC sebenarnya yang kita keluarkan:
+
+`{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":1}`
+
+Permintaan JSON-RPC diformat sesuai dengan spesifikasi JSON-RPC 2.0. Setiap permintaan berisi empat elemen:
+
+**`jsonrpc`**
+Versi protokol JSON-RPC. Ini HARUS persis `"2.0"`.
+**`method`**
+Nama metode yang akan dipanggil.
+**`params`**
+Nilai terstruktur yang berisi nilai parameter yang akan digunakan selama pemanggilan metode. Anggota ini DAPAT dihilangkan.
+**`id`**
+Pengenal yang ditetapkan oleh klien yang HARUS berisi String, Angka, atau nilai NULL jika disertakan. Server HARUS membalas dengan nilai yang sama dalam objek respons jika disertakan. Anggota ini digunakan untuk menghubungkan konteks antara dua objek.
+
+> Parameter `id` digunakan terutama saat Anda membuat beberapa permintaan dalam satu panggilan JSON-RPC, sebuah praktik yang disebut *batching*. *Batching* digunakan untuk menghindari *overhead* dari koneksi HTTP dan TCP baru untuk setiap permintaan. Dalam konteks Ethereum, misalnya, kita akan menggunakan *batching* jika kita ingin mengambil ribuan transaksi melalui satu koneksi HTTP. Saat melakukan *batching*, Anda menetapkan `id` yang berbeda untuk setiap permintaan dan kemudian mencocokkannya dengan `id` di setiap respons dari server JSON-RPC. Cara termudah untuk mengimplementasikan ini adalah dengan mempertahankan sebuah penghitung dan menaikkan nilainya untuk setiap permintaan.
+
+Respons yang kita terima adalah:
+
+`{"jsonrpc":"2.0","id":1, "result":"Geth/v1.8.0-unstable-02aeb3d7/linux-amd64/go1.8.3"}`
+
+Ini memberitahu kita bahwa JSON-RPC API dilayani oleh klien Geth versi 1.8.0.
+
+Mari kita coba sesuatu yang sedikit lebih menarik. Dalam contoh berikutnya, kita meminta API JSON-RPC untuk harga gas saat ini dalam wei:
+
+```
+$ curl -X POST -H "Content-Type: application/json" --data \
+'{"jsonrpc":"2.0","method":"eth_gasPrice","params":[],"id":4213}' \
+http://localhost:8545
+{"jsonrpc":"2.0","id":4213,"result":"0x430e23400"}
+```
+
+Respons, `0x430e23400`, memberitahu kita bahwa harga gas saat ini adalah 18 gwei (gigawei atau miliar wei). Jika, seperti kami, Anda tidak berpikir dalam heksadesimal, Anda dapat mengubahnya menjadi desimal di baris perintah dengan sedikit trik `bash`:
+
+`$ echo $((0x430e23400))`
+`18000000000`
+
+JSON-RPC API lengkap dapat diselidiki di wiki Ethereum.
+
+#### Mode Kompatibilitas Geth pada Parity
+
+Parity memiliki "mode kompatibilitas Geth" khusus, di mana ia menawarkan JSON-RPC API yang identik dengan yang ditawarkan oleh Geth. Untuk menjalankan Parity dalam mode ini, gunakan sakelar `--geth`:
+
+`$ parity --geth`
+
+### Klien Ethereum Jarak Jauh (Remote)
+
+Klien jarak jauh menawarkan sebagian kecil dari fungsionalitas klien penuh. Mereka tidak menyimpan seluruh *blockchain* Ethereum, sehingga lebih cepat untuk disiapkan dan memerlukan penyimpanan data yang jauh lebih sedikit. Klien-klien ini biasanya menyediakan kemampuan untuk melakukan satu atau lebih dari hal berikut:
+
+  * Mengelola kunci privat dan alamat Ethereum dalam sebuah dompet (*wallet*).
+  * Membuat, menandatangani, dan menyiarkan transaksi.
+  * Berinteraksi dengan *smart contract*, menggunakan *data payload*.
+  * Menjelajahi dan berinteraksi dengan DApps.
+  * Menawarkan tautan ke layanan eksternal seperti penjelajah blok (*block explorer*).
+  * Mengonversi unit ether dan mengambil nilai tukar dari sumber eksternal.
+  * Menyuntikkan (*inject*) instans `web3` ke dalam peramban web sebagai objek JavaScript.
+  * Menggunakan instans `web3` yang disediakan/disuntikkan ke dalam peramban oleh klien lain.
+  * Mengakses layanan RPC pada *node* Ethereum lokal atau jarak jauh.
+
+Beberapa klien jarak jauh, misalnya dompet seluler (*smartphone*), hanya menawarkan fungsionalitas dompet dasar. Klien jarak jauh lainnya adalah peramban DApp yang lengkap. Klien jarak jauh umumnya menawarkan beberapa fungsi klien Ethereum *full-node* tanpa menyinkronkan salinan lokal dari *blockchain* Ethereum dengan terhubung ke *full node* yang dijalankan di tempat lain, misalnya, oleh Anda secara lokal di mesin Anda atau di server web, atau oleh pihak ketiga di server mereka.
+
+Mari kita lihat beberapa klien jarak jauh paling populer dan fungsi yang mereka tawarkan.
+
+#### Dompet Seluler (*Smartphone*)
+
+Semua dompet seluler adalah klien jarak jauh, karena *smartphone* tidak memiliki sumber daya yang memadai untuk menjalankan klien Ethereum penuh. *Light client* sedang dalam pengembangan dan belum digunakan secara umum untuk Ethereum. Dalam kasus Parity, *light client* ditandai "eksperimental" dan dapat digunakan dengan menjalankan `parity` dengan opsi `--light`.
+
+Dompet seluler populer termasuk yang berikut (kami mencantumkannya hanya sebagai contoh; ini bukan merupakan dukungan atau indikasi keamanan atau fungsionalitas dompet-dompet ini):
+
+**Jaxx**
+Dompet seluler multi-mata uang berdasarkan *mnemonic seed* BIP-39, dengan dukungan untuk Bitcoin, Litecoin, Ethereum, Ethereum Classic, ZCash, berbagai token ERC20, dan banyak mata uang lainnya. Jaxx tersedia di Android dan iOS, sebagai dompet *plug-in* peramban, dan sebagai dompet desktop untuk berbagai sistem operasi.
+
+**Status**
+Dompet seluler dan peramban DApp, dengan dukungan untuk berbagai token dan DApps populer. Tersedia untuk iOS dan Android.
+
+**Trust Wallet**
+Dompet seluler Ethereum dan Ethereum Classic yang mendukung token ERC20 dan ERC223. Trust Wallet tersedia untuk iOS dan Android.
+
+**Cipher Browser**
+Peramban DApp dan dompet seluler berkemampuan Ethereum yang berfitur lengkap yang memungkinkan integrasi dengan aplikasi dan token Ethereum. Tersedia untuk iOS dan Android.
+
+#### Dompet Peramban (*Browser Wallet*)
+
+Berbagai dompet dan peramban DApp tersedia sebagai *plug-in* atau ekstensi dari peramban web seperti Chrome dan Firefox. Ini adalah klien jarak jauh yang berjalan di dalam peramban Anda.
+
+Beberapa yang lebih populer adalah MetaMask, Jaxx, MyEtherWallet/MyCrypto, dan Mist.
+
+**MetaMask**
+MetaMask, yang diperkenalkan di Bab 2, adalah dompet berbasis peramban yang serbaguna, klien RPC, dan penjelajah kontrak dasar. Ini tersedia di Chrome, Firefox, Opera, dan Brave Browser.
+Tidak seperti dompet peramban lainnya, MetaMask menyuntikkan instans `web3` ke dalam konteks JavaScript peramban, bertindak sebagai klien RPC yang terhubung ke berbagai *blockchain* Ethereum (*mainnet*, *testnet* Ropsten, *testnet* Kovan, *node* RPC lokal, dll.). Kemampuan untuk menyuntikkan instans `web3` dan bertindak sebagai gerbang ke layanan RPC eksternal membuat MetaMask menjadi alat yang sangat kuat bagi pengembang dan pengguna. Ini dapat digabungkan, misalnya, dengan MyEtherWallet atau MyCrypto, bertindak sebagai penyedia `web3` dan gerbang RPC untuk alat-alat tersebut.
+
+**Jaxx**
+Jaxx, yang diperkenalkan sebagai dompet seluler di bagian sebelumnya, juga tersedia sebagai ekstensi Chrome dan Firefox dan sebagai dompet desktop.
+
+**MyEtherWallet (MEW)**
+MyEtherWallet adalah klien jarak jauh JavaScript berbasis peramban yang menawarkan:
+
+  * Dompet perangkat lunak yang berjalan di JavaScript.
+  * Jembatan ke dompet perangkat keras populer seperti Trezor dan Ledger.
+  * Antarmuka `web3` yang dapat terhubung ke instans `web3` yang disuntikkan oleh klien lain (misalnya, MetaMask).
+  * Klien RPC yang dapat terhubung ke klien penuh Ethereum.
+  * Antarmuka dasar yang dapat berinteraksi dengan *smart contract*, dengan adanya alamat kontrak dan *application binary interface* (ABI).
+
+MyEtherWallet sangat berguna untuk pengujian dan sebagai antarmuka ke dompet perangkat keras. Ini tidak boleh digunakan sebagai dompet perangkat lunak utama, karena terpapar ancaman melalui lingkungan peramban dan bukan sistem penyimpanan kunci yang aman.
+
+> Anda harus sangat berhati-hati saat mengakses MyEtherWallet dan dompet JavaScript berbasis peramban lainnya, karena mereka sering menjadi target *phishing*. Selalu gunakan *bookmark* dan bukan mesin pencari atau tautan untuk mengakses URL web yang benar.
+
+**MyCrypto**
+Tepat sebelum publikasi buku ini, proyek MyEtherWallet terpecah menjadi dua implementasi yang bersaing, dipandu oleh dua tim pengembangan independen: sebuah “*fork*,” sebagaimana disebut dalam pengembangan sumber terbuka. Kedua proyek tersebut disebut MyEtherWallet (merek asli) dan MyCrypto. Pada saat perpecahan, MyCrypto menawarkan fungsionalitas yang identik dengan MyEtherWallet, tetapi kemungkinan kedua proyek akan berbeda seiring kedua tim pengembangan mengadopsi tujuan dan prioritas yang berbeda.
+
+**Mist**
+Mist adalah peramban berkemampuan Ethereum pertama, yang dibuat oleh Ethereum Foundation. Ini berisi dompet berbasis peramban yang merupakan implementasi pertama dari standar token ERC20 (Fabian Vogelsteller, penulis ERC20, juga merupakan pengembang utama Mist). Mist juga merupakan dompet pertama yang memperkenalkan *checksum* camelCase (EIP-55). Mist menjalankan *full node*, dan menawarkan peramban DApp penuh dengan dukungan untuk penyimpanan berbasis Swarm dan alamat ENS.
+
+### Kesimpulan
+
+Dalam bab ini kita menjelajahi klien Ethereum. Anda telah mengunduh, menginstal, dan menyinkronkan klien, menjadi peserta dalam jaringan Ethereum, dan berkontribusi pada kesehatan dan stabilitas sistem dengan mereplikasi *blockchain* di komputer Anda sendiri.
+
+---
+
+# BAB 4
+## Kriptografi
+
+Salah satu teknologi dasar Ethereum adalah **kriptografi**, yang merupakan cabang matematika yang digunakan secara luas dalam keamanan komputer. Kriptografi berarti “tulisan rahasia” dalam bahasa Yunani, tetapi studi tentang kriptografi mencakup lebih dari sekadar tulisan rahasia, yang disebut sebagai **enkripsi**. Kriptografi, misalnya, juga dapat digunakan untuk membuktikan pengetahuan tentang suatu rahasia tanpa mengungkapkan rahasia itu (misalnya, dengan **tanda tangan digital**), atau untuk membuktikan keaslian data (misalnya, dengan sidik jari digital, juga dikenal sebagai “**hash**”). Jenis-jenis bukti kriptografis ini adalah alat matematika yang sangat penting untuk pengoperasian platform Ethereum (dan, memang, semua sistem *blockchain*), dan juga digunakan secara luas dalam aplikasi Ethereum.
+
+Perlu dicatat bahwa, pada saat publikasi ini, tidak ada bagian dari protokol Ethereum yang melibatkan enkripsi; artinya semua komunikasi dengan platform Ethereum dan antar-*node* (termasuk data transaksi) tidak dienkripsi dan dapat (dan memang harus) dibaca oleh siapa saja. Hal ini bertujuan agar semua orang dapat memverifikasi kebenaran pembaruan *state* dan konsensus dapat tercapai. Di masa depan, alat kriptografi canggih, seperti *zero knowledge proofs* dan enkripsi homomorfik, akan tersedia yang akan memungkinkan beberapa perhitungan terenkripsi untuk dicatat di *blockchain* sambil tetap memungkinkan konsensus; namun, meskipun persiapan telah dibuat untuknya, alat-alat tersebut belum diterapkan.
+
+Dalam bab ini kita akan memperkenalkan beberapa kriptografi yang digunakan di Ethereum: yaitu **kriptografi kunci publik (PKC)**, yang digunakan untuk mengontrol kepemilikan dana, dalam bentuk kunci privat dan alamat.
+
+### Kunci dan Alamat
+
+Seperti yang kita lihat sebelumnya dalam buku ini, Ethereum memiliki dua jenis akun yang berbeda: **akun milik eksternal (EOA)** dan **kontrak**. Kepemilikan ether oleh EOA ditetapkan melalui kunci privat digital, alamat Ethereum, dan tanda tangan digital. Kunci privat adalah inti dari semua interaksi pengguna dengan Ethereum. Faktanya, alamat akun diturunkan langsung dari kunci privat: sebuah kunci privat secara unik menentukan satu alamat Ethereum, yang juga dikenal sebagai akun.
+
+Kunci privat tidak digunakan secara langsung dalam sistem Ethereum dengan cara apa pun; kunci tersebut tidak pernah ditransmisikan atau disimpan di Ethereum. Artinya, kunci privat harus tetap bersifat privat dan tidak pernah muncul dalam pesan yang diteruskan ke jaringan, juga tidak boleh disimpan secara *on-chain*; hanya alamat akun dan tanda tangan digital yang pernah ditransmisikan dan disimpan di sistem Ethereum. Untuk informasi lebih lanjut tentang cara menjaga keamanan kunci privat, lihat “Kontrol dan Tanggung Jawab” di halaman 15 dan Bab 5.
+
+Akses dan kontrol dana dicapai dengan tanda tangan digital, yang juga dibuat menggunakan kunci privat. Transaksi Ethereum memerlukan tanda tangan digital yang valid untuk dimasukkan ke dalam *blockchain*. Siapa pun yang memiliki salinan kunci privat memiliki kendali atas akun yang sesuai dan ether apa pun yang dimilikinya. Dengan asumsi pengguna menjaga keamanan kunci privatnya, tanda tangan digital dalam transaksi Ethereum membuktikan pemilik sebenarnya dari dana tersebut, karena tanda tangan tersebut membuktikan kepemilikan kunci privat.
+
+Dalam sistem berbasis kriptografi kunci publik, seperti yang digunakan oleh Ethereum, kunci datang berpasangan yang terdiri dari kunci privat (rahasia) dan kunci publik. Anggaplah kunci publik mirip dengan nomor rekening bank, dan kunci privat mirip dengan PIN rahasia; yang terakhir inilah yang memberikan kontrol atas akun, dan yang pertama yang mengidentifikasinya kepada orang lain. Kunci privat itu sendiri sangat jarang dilihat oleh pengguna Ethereum; sebagian besar, kunci tersebut disimpan (dalam bentuk terenkripsi) dalam file khusus dan dikelola oleh perangkat lunak dompet Ethereum.
+
+Dalam bagian pembayaran dari sebuah transaksi Ethereum, penerima yang dituju diwakili oleh sebuah alamat Ethereum, yang digunakan dengan cara yang sama seperti detail rekening penerima manfaat dari sebuah transfer bank. Seperti yang akan kita lihat lebih detail nanti, alamat Ethereum untuk sebuah EOA dihasilkan dari bagian kunci publik dari sepasang kunci. Namun, tidak semua alamat Ethereum mewakili pasangan kunci publik-privat; alamat tersebut juga bisa mewakili kontrak, yang, seperti yang akan kita lihat di Bab 7, tidak didukung oleh kunci privat.
+
+Di sisa bab ini, pertama-tama kita akan menjelajahi kriptografi dasar dengan sedikit lebih detail dan menjelaskan matematika yang digunakan di Ethereum. Kemudian kita akan melihat bagaimana kunci dibuat, disimpan, dan dikelola. Terakhir, kita akan meninjau berbagai format pengkodean yang digunakan untuk merepresentasikan kunci privat, kunci publik, dan alamat.
+
+### Kriptografi Kunci Publik dan Mata Uang Kripto
+
+**Kriptografi kunci publik** (juga disebut “kriptografi asimetris”) adalah bagian inti dari keamanan informasi modern. Protokol pertukaran kunci, yang pertama kali diterbitkan pada tahun 1970-an oleh Martin Hellman, Whitfield Diffie, dan Ralph Merkle, merupakan terobosan monumental yang memicu gelombang besar pertama minat publik di bidang kriptografi. Sebelum tahun 1970-an, pengetahuan kriptografi yang kuat dirahasiakan oleh pemerintah.
+
+Kriptografi kunci publik menggunakan kunci unik untuk mengamankan informasi. Kunci-kunci ini didasarkan pada fungsi matematika yang memiliki sifat khusus: mudah untuk dihitung, tetapi sulit untuk menghitung kebalikannya. Berdasarkan fungsi-fungsi ini, kriptografi memungkinkan pembuatan rahasia digital dan tanda tangan digital yang tidak dapat dipalsukan, yang dijamin oleh hukum matematika.
+
+Misalnya, mengalikan dua bilangan prima besar adalah hal yang sepele. Tetapi jika diberikan hasil kali dari dua bilangan prima besar, sangat sulit untuk menemukan faktor-faktor primanya (sebuah masalah yang disebut **faktorisasi prima**). Katakanlah kami menyajikan angka 8.018.009 dan memberitahu Anda bahwa itu adalah hasil kali dari dua bilangan prima. Menemukan kedua bilangan prima tersebut jauh lebih sulit bagi Anda daripada bagi saya untuk mengalikannya untuk menghasilkan 8.018.009.
+
+Beberapa fungsi matematika ini dapat dibalik dengan mudah jika Anda mengetahui beberapa informasi rahasia. Dalam contoh sebelumnya, jika saya memberitahu Anda bahwa salah satu faktor primanya adalah 2.003, Anda dapat dengan mudah menemukan yang lain dengan pembagian sederhana: 8.018.009 ÷ 2.003 = 4.003. Fungsi semacam itu sering disebut ***trapdoor function*** karena sangat sulit untuk dibalik kecuali Anda diberi sepotong informasi rahasia yang dapat digunakan sebagai jalan pintas untuk membalikkan fungsi tersebut.
+
+Kategori fungsi matematika yang lebih canggih yang berguna dalam kriptografi didasarkan pada operasi aritmatika pada **kurva eliptik**. Dalam aritmatika kurva eliptik, perkalian modulo sebuah bilangan prima itu sederhana tetapi pembagian (kebalikannya) secara praktis tidak mungkin. Ini disebut **masalah logaritma diskrit** dan saat ini tidak ada *trapdoor* yang diketahui. Kriptografi kurva eliptik digunakan secara luas dalam sistem komputer modern dan merupakan dasar dari penggunaan kunci privat dan tanda tangan digital oleh Ethereum (dan mata uang kripto lainnya).
+
+> Lihat sumber daya berikut jika Anda tertarik untuk membaca lebih lanjut tentang kriptografi dan fungsi matematika yang digunakan dalam kriptografi modern:
+>
+>   * Kriptografi [http://bit.ly/2DcwNhn](http://bit.ly/2DcwNhn)
+>   * *Trapdoor function* [http://bit.ly/2zeZV3c](http://bit.ly/2zeZV3c)
+>   * Faktorisasi prima [http://bit.ly/2ACJjnV](http://bit.ly/2ACJjnV)
+>   * Logaritma diskrit [http://bit.ly/2Q7mZYI](http://bit.ly/2Q7mZYI)
+>   * Kriptografi kurva eliptik [http://bit.ly/2zfeKCP](http://bit.ly/2zfeKCP)
+
+Di Ethereum, kita menggunakan kriptografi kunci publik (juga dikenal sebagai kriptografi asimetris) untuk membuat pasangan kunci publik-privat yang telah kita bicarakan dalam bab ini. Keduanya dianggap sebagai "pasangan" karena kunci publik diturunkan dari kunci privat. Bersama-sama, keduanya mewakili sebuah akun Ethereum dengan menyediakan, masing-masing, sebuah penanda akun yang dapat diakses publik (alamat) dan kontrol privat atas akses ke ether apa pun di akun tersebut dan atas otentikasi apa pun yang dibutuhkan akun saat menggunakan *smart contract*. Kunci privat mengontrol akses dengan menjadi satu-satunya informasi yang diperlukan untuk membuat tanda tangan digital, yang diperlukan untuk menandatangani transaksi untuk membelanjakan dana apa pun di akun tersebut. Tanda tangan digital juga digunakan untuk mengotentikasi pemilik atau pengguna kontrak, seperti yang akan kita lihat di Bab 7.
+
+> Dalam sebagian besar implementasi dompet, kunci privat dan publik disimpan bersama sebagai pasangan kunci untuk kenyamanan. Namun, kunci publik dapat dihitung dengan mudah dari kunci privat, jadi menyimpan hanya kunci privat juga dimungkinkan.
+
+Tanda tangan digital dapat dibuat untuk menandatangani pesan apa pun. Untuk transaksi Ethereum, detail dari transaksi itu sendiri digunakan sebagai pesan. Matematika kriptografi—dalam hal ini, kriptografi kurva eliptik—menyediakan cara agar pesan (yaitu, detail transaksi) dapat digabungkan dengan kunci privat untuk membuat kode yang hanya dapat diproduksi dengan pengetahuan tentang kunci privat. Kode itu disebut **tanda tangan digital**. Perhatikan bahwa transaksi Ethereum pada dasarnya adalah permintaan untuk mengakses akun tertentu dengan alamat Ethereum tertentu. Ketika sebuah transaksi dikirim ke jaringan Ethereum untuk memindahkan dana atau berinteraksi dengan *smart contract*, transaksi tersebut perlu dikirim dengan tanda tangan digital yang dibuat dengan kunci privat yang sesuai dengan alamat Ethereum yang bersangkutan. Matematika kurva eliptik berarti bahwa siapa pun dapat memverifikasi bahwa sebuah transaksi valid, dengan memeriksa bahwa tanda tangan digital cocok dengan detail transaksi dan alamat Ethereum yang aksesnya diminta. Proses verifikasi tidak melibatkan kunci privat sama sekali; itu tetap privat. Namun, proses verifikasi menentukan tanpa keraguan bahwa transaksi tersebut hanya bisa berasal dari seseorang dengan kunci privat yang sesuai dengan kunci publik di balik alamat Ethereum tersebut. Inilah "keajaiban" dari kriptografi kunci publik.
+
+> Tidak ada enkripsi sebagai bagian dari protokol Ethereum—semua pesan yang dikirim sebagai bagian dari operasi jaringan Ethereum dapat (dan harus) dibaca oleh semua orang. Dengan demikian, kunci privat hanya digunakan untuk membuat tanda tangan digital untuk otentikasi transaksi.
+
+### Kunci Privat
+
+**Kunci privat** hanyalah sebuah angka, yang dipilih secara acak. Kepemilikan dan kontrol atas kunci privat adalah akar dari kontrol pengguna atas semua dana yang terkait dengan alamat Ethereum yang sesuai, serta akses ke kontrak yang mengotorisasi alamat tersebut. Kunci privat digunakan untuk membuat tanda tangan yang diperlukan untuk membelanjakan ether dengan membuktikan kepemilikan dana yang digunakan dalam sebuah transaksi. Kunci privat harus tetap **rahasia** setiap saat, karena mengungkapkannya kepada pihak ketiga sama dengan memberi mereka kendali atas ether dan kontrak yang diamankan oleh kunci privat tersebut. Kunci privat juga harus **dicadangkan** dan dilindungi dari kehilangan yang tidak disengaja. Jika hilang, kunci tersebut tidak dapat dipulihkan dan dana yang diamankan olehnya juga akan hilang selamanya.
+
+> Kunci privat Ethereum hanyalah sebuah angka. Salah satu cara untuk memilih kunci privat Anda secara acak adalah dengan hanya menggunakan koin, pensil, dan kertas: lempar koin sebanyak 256 kali dan Anda memiliki digit biner dari kunci privat acak yang dapat Anda gunakan di dompet Ethereum (mungkin—lihat bagian selanjutnya). Kunci publik dan alamat kemudian dapat dihasilkan dari kunci privat.
+
+#### Menghasilkan Kunci Privat dari Angka Acak
+
+Langkah pertama dan terpenting dalam menghasilkan kunci adalah menemukan sumber entropi, atau keacakan, yang aman. Membuat kunci privat Ethereum pada dasarnya melibatkan pemilihan angka antara 1 dan 2\<sup\>256\</sup\>. Metode persis yang Anda gunakan untuk memilih angka itu tidak menjadi masalah selama tidak dapat diprediksi atau deterministik. Perangkat lunak Ethereum menggunakan generator angka acak dari sistem operasi yang mendasarinya untuk menghasilkan 256 bit acak. Biasanya, generator angka acak OS diinisialisasi oleh sumber keacakan manusia, itulah sebabnya Anda mungkin diminta untuk menggoyangkan mouse Anda selama beberapa detik, atau menekan tombol acak di keyboard Anda. Alternatifnya bisa berupa derau radiasi kosmik di saluran mikrofon komputer.
+
+Lebih tepatnya, kunci privat dapat berupa angka bukan nol apa pun hingga angka yang sangat besar sedikit kurang dari 2\<sup\>256\</sup\>—angka 78 digit yang sangat besar, sekitar 1,158 \* 10\<sup\>77\</sup\>. Angka pastinya berbagi 38 digit pertama dengan 2\<sup\>256\</sup\> dan didefinisikan sebagai urutan kurva eliptik yang digunakan di Ethereum (lihat “Penjelasan Kriptografi Kurva Eliptik” di halaman 65). Untuk membuat kunci privat, kita secara acak memilih angka 256-bit dan memeriksa apakah berada dalam rentang yang valid. Dalam istilah pemrograman, ini biasanya dicapai dengan memasukkan string bit acak yang lebih besar (dikumpulkan dari sumber keacakan yang aman secara kriptografis) ke dalam algoritma hash 256-bit seperti Keccak-256 atau SHA-256, keduanya akan dengan mudah menghasilkan angka 256-bit. Jika hasilnya berada dalam rentang yang valid, kita memiliki kunci privat yang sesuai. Jika tidak, kita cukup mencoba lagi dengan angka acak lainnya.
+
+> 2\<sup\>256\</sup\>—ukuran ruang kunci privat Ethereum—adalah angka yang luar biasa besar. Kira-kira 10\<sup\>77\</sup\> dalam desimal; yaitu, angka dengan 77 digit. Sebagai perbandingan, alam semesta yang terlihat diperkirakan mengandung 10\<sup\>80\</sup\> atom. Jadi, hampir ada cukup kunci privat untuk memberikan setiap atom di alam semesta sebuah akun Ethereum. Jika Anda memilih kunci privat secara acak, tidak ada cara yang masuk akal bagi siapa pun untuk menebaknya atau memilihnya sendiri.
+
+Perhatikan bahwa proses pembuatan kunci privat adalah proses *offline*; tidak memerlukan komunikasi apa pun dengan jaringan Ethereum, atau bahkan komunikasi dengan siapa pun. Dengan demikian, untuk memilih angka yang tidak akan pernah dipilih oleh orang lain, angka itu harus benar-benar acak. Jika Anda memilih angka itu sendiri, kemungkinan orang lain akan mencobanya (dan kemudian kabur dengan ether Anda) terlalu tinggi. Menggunakan generator angka acak yang buruk (seperti fungsi `rand` pseudorandom di sebagian besar bahasa pemrograman) bahkan lebih buruk, karena lebih jelas dan lebih mudah untuk direplikasi. Sama seperti kata sandi untuk akun online, kunci privat harus tidak dapat ditebak. Untungnya, Anda tidak perlu mengingat kunci privat Anda, jadi Anda dapat mengambil pendekatan terbaik untuk memilihnya: yaitu, keacakan sejati.
+
+> Jangan menulis kode Anda sendiri untuk membuat angka acak atau menggunakan generator angka acak "sederhana" yang ditawarkan oleh bahasa pemrograman Anda. Sangat penting bagi Anda untuk menggunakan generator angka pseudorandom yang aman secara kriptografis (seperti CSPRNG) dengan *seed* dari sumber entropi yang cukup. Pelajari dokumentasi pustaka generator angka acak yang Anda pilih untuk memastikannya aman secara kriptografis. Implementasi yang benar dari pustaka CSPRNG sangat penting untuk keamanan kunci.
+
+Berikut ini adalah kunci privat yang dihasilkan secara acak yang ditampilkan dalam format heksadesimal (256 bit ditampilkan sebagai 64 digit heksadesimal, masing-masing 4 bit):
+
+`f8f8a2f43c8376ccb0871305060d7b27b0554d2cc72bccf41b2705608452f315`
+
+### Kunci Publik
+
+Kunci publik Ethereum adalah sebuah titik pada kurva eliptik, yang berarti itu adalah satu set koordinat x dan y yang memenuhi persamaan kurva eliptik.
+
+Dalam istilah yang lebih sederhana, kunci publik Ethereum adalah dua angka, yang digabungkan. Angka-angka ini dihasilkan dari kunci privat melalui perhitungan yang hanya bisa berjalan satu arah. Itu berarti bahwa sangat mudah untuk menghitung kunci publik jika Anda memiliki kunci privat, tetapi Anda tidak dapat menghitung kunci privat dari kunci publik.
+
+> **MATEMATIKA** akan segera terjadi\! Jangan panik. Jika Anda mulai bingung di salah satu paragraf berikut, Anda dapat melewati beberapa bagian berikutnya. Ada banyak alat dan pustaka yang akan melakukan perhitungan untuk Anda.
+
+Kunci publik dihitung dari kunci privat menggunakan perkalian kurva eliptik, yang secara praktis tidak dapat dibalik: **K = k \* G**, di mana **k** adalah kunci privat, **G** adalah titik konstan yang disebut *generator point*, **K** adalah kunci publik yang dihasilkan, dan \*\*\*\*\* adalah operator "perkalian" kurva eliptik khusus. Perhatikan bahwa perkalian kurva eliptik tidak seperti perkalian normal. Ia memiliki atribut fungsional yang sama dengan perkalian normal, tetapi hanya itu. Misalnya, operasi kebalikannya (yang akan menjadi pembagian untuk bilangan normal), yang dikenal sebagai "menemukan logaritma diskrit"—yaitu, menghitung **k** jika Anda tahu **K**—sama sulitnya dengan mencoba semua nilai **k** yang mungkin (pencarian *brute-force* yang kemungkinan akan memakan waktu lebih lama dari yang diizinkan oleh alam semesta ini).
+
+Dalam istilah yang lebih sederhana: aritmatika pada kurva eliptik berbeda dari aritmatika integer "biasa". Sebuah titik (**G**) dapat dikalikan dengan sebuah integer (**k**) untuk menghasilkan titik lain (**K**). Tetapi tidak ada yang namanya pembagian, jadi tidak mungkin untuk hanya "membagi" kunci publik **K** dengan titik **G** untuk menghitung kunci privat **k**. Inilah fungsi matematika satu arah yang dijelaskan dalam “Kriptografi Kunci Publik dan Mata Uang Kripto” di halaman 60.
+
+> Perkalian kurva eliptik adalah jenis fungsi yang oleh para kriptografer disebut fungsi "satu arah": mudah dilakukan dalam satu arah (perkalian) dan tidak mungkin dilakukan dalam arah sebaliknya (pembagian). Pemilik kunci privat dapat dengan mudah membuat kunci publik dan kemudian membagikannya kepada dunia, dengan mengetahui bahwa tidak ada yang dapat membalikkan fungsi tersebut dan menghitung kunci privat dari kunci publik. Trik matematika ini menjadi dasar untuk tanda tangan digital yang tidak dapat dipalsukan dan aman yang membuktikan kepemilikan dana Ethereum dan kontrol atas kontrak.
+
+Sebelum kita mendemonstrasikan cara menghasilkan kunci publik dari kunci privat, mari kita lihat kriptografi kurva eliptik dengan sedikit lebih detail.
+
+### Penjelasan Kriptografi Kurva Eliptik
+
+Kriptografi kurva eliptik adalah jenis kriptografi asimetris atau kunci publik yang didasarkan pada masalah logaritma diskrit seperti yang diekspresikan oleh penjumlahan dan perkalian pada titik-titik kurva eliptik.
+
+Gambar 4-1 adalah contoh kurva eliptik, mirip dengan yang digunakan oleh Ethereum.
+
+> Ethereum menggunakan kurva eliptik yang sama persis, yang disebut **secp256k1**, seperti Bitcoin. Hal itu memungkinkan untuk menggunakan kembali banyak pustaka dan alat kurva eliptik dari Bitcoin.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-4.1.png" alt="gambar" width="580"/>
+</p>
+
+Ethereum uses a specific elliptic curve and set of mathematical constants, as defined
+in a standard called secp256k1, established by the US National Institute of Standards
+and Technology (NIST). The secp256k1 curve is defined by the following function,
+which produces an elliptic curve:
+y2 = x3 + 7 over � p
+or:
+y2 mod p = x3 + 7 mod p
+The mod p (modulo prime number p) indicates that this curve is over a finite field of
+prime order p, also written as � p, where p = 2256 – 232 – 29 – 28 – 27 – 26 – 24 – 1, which
+is a very large prime number.
+Because this curve is defined over a finite field of prime order instead of over the real
+numbers, it looks like a pattern of dots scattered in two dimensions, which makes it
+difficult to visualize. However, the math is identical to that of an elliptic curve over
+real numbers. As an example, Figure 4-2 shows the same elliptic curve over a much
+smaller finite field of prime order 17, showing a pattern of dots on a grid. The
+secp256k1 Ethereum elliptic curve can be thought of as a much more complex pat‐
+tern of dots on an unfathomably large grid.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-4.1.png" alt="gambar" width="580"/>
+</p>
+
+Tentu, ini adalah terjemahan dan perapian dari teks yang Anda berikan, dengan mempertahankan semua konten asli dan memformatnya agar sesuai untuk file Markdown (`.md`).
+
+Jadi, sebagai contoh, berikut ini adalah titik Q dengan koordinat (x,y) yang merupakan sebuah titik pada kurva `secp256k1`:
+$Q =$
+(49790390825249384486033144355916864607616083520101638681403973749255924539515,
+59574132161899900045862086493921015780032175291755807399284007721050341297360\)
+
+Contoh 4-1 menunjukkan bagaimana Anda dapat memeriksanya sendiri menggunakan Python. Variabel `x` dan `y` adalah koordinat dari titik Q, seperti pada contoh sebelumnya. Variabel `p` adalah orde prima dari kurva eliptik (bilangan prima yang digunakan untuk semua operasi modulo). Baris terakhir Python adalah persamaan kurva eliptik (operator `%` di Python adalah operator modulo). Jika `x` dan `y` memang koordinat dari sebuah titik pada kurva eliptik, maka mereka memenuhi persamaan dan hasilnya adalah nol (`0L` adalah bilangan bulat panjang dengan nilai nol). Cobalah sendiri, dengan mengetik `python` pada baris perintah dan menyalin setiap baris (setelah prompt `>>>`) dari daftar.
+
+**Contoh 4-1. Menggunakan Python untuk mengonfirmasi bahwa titik ini berada pada kurva eliptik**
+
+```python
+Python 3.4.0 (default, Mar 30 2014, 19:23:13) 
+[GCC 4.2.1 Compatible Apple LLVM 5.1 (clang-503.0.38)] on darwin 
+Type "help", "copyright", "credits" or "license" for more information. 
+>>> p = 115792089237316195423570985008687907853269984665640564039457584007908834671663 
+>>> x = 49790390825249384486033144355916864607616083520101638681403973749255924539515 
+>>> y = 59574132161899900045862086493921015780032175291755807399284007721050341297360 
+>>> (x ** 3 + 7 - y**2) % p 
+0L
+```
+
+## Operasi Aritmetika Kurva Eliptik
+
+Banyak matematika kurva eliptik terlihat dan bekerja sangat mirip dengan aritmetika bilangan bulat yang kita pelajari di sekolah. Secara spesifik, kita dapat mendefinisikan sebuah operator penjumlahan, yang alih-alih melompat di sepanjang garis bilangan, ia melompat ke titik-titik lain pada kurva. Setelah kita memiliki operator penjumlahan, kita juga dapat mendefinisikan perkalian antara sebuah titik dan sebuah bilangan bulat, yang setara dengan penjumlahan berulang.
+
+Penjumlahan kurva eliptik didefinisikan sedemikian rupa sehingga jika diberikan dua titik $P\_1$ dan $P\_2$ pada kurva eliptik, ada titik ketiga $P\_3 = P\_1 + P\_2$, yang juga berada pada kurva eliptik.
+
+Secara geometris, titik ketiga $P\_3$ ini dihitung dengan menggambar garis antara $P\_1$ dan $P\_2$. Garis ini akan memotong kurva eliptik di tepat satu tempat tambahan (luar biasa). Sebut titik ini $P\_3' = (x, y)$. Kemudian cerminkan terhadap sumbu-x untuk mendapatkan $P\_3 = (x, –y)$.
+
+Jika $P\_1$ dan $P\_2$ adalah titik yang sama, garis "antara" $P\_1$ dan $P\_2$ harus diperluas menjadi garis singgung kurva pada titik $P\_1$ ini. Garis singgung ini akan memotong kurva di tepat satu titik baru. Anda dapat menggunakan teknik dari kalkulus untuk menentukan kemiringan garis singgung. Anehnya, teknik-teknik ini berfungsi, meskipun kita membatasi minat kita pada titik-titik di kurva dengan dua koordinat bilangan bulat\!
+
+Dalam matematika kurva eliptik, ada juga sebuah titik yang disebut **“titik di tak terhingga” (point at infinity)**, yang secara kasar sesuai dengan peran angka nol dalam penjumlahan. Di komputer, terkadang direpresentasikan dengan $x = y = 0$ (yang tidak memenuhi persamaan kurva eliptik, tetapi ini adalah kasus terpisah yang mudah diperiksa). Ada beberapa kasus khusus yang menjelaskan perlunya titik di tak terhingga.
+
+  * Dalam beberapa kasus (misalnya, jika $P\_1$ dan $P\_2$ memiliki nilai x yang sama tetapi nilai y yang berbeda), garisnya akan persis vertikal, dalam hal ini $P\_3 =$ titik di tak terhingga.
+
+  * Jika $P\_1$ adalah titik di tak terhingga, maka $P\_1 + P\_2 = P\_2$. Demikian pula, jika $P\_2$ adalah titik di tak terhingga, maka $P\_1 + P\_2 = P\_1$. Ini menunjukkan bagaimana titik di tak terhingga memainkan peran yang sama seperti nol dalam aritmetika "normal".
+
+Ternyata `+` bersifat asosiatif, yang berarti $(A + B) + C = A + (B + C)$. Ini berarti kita dapat menulis $A + B + C$ (tanpa tanda kurung) tanpa ambiguitas.
+
+Sekarang setelah kita mendefinisikan penjumlahan, kita dapat mendefinisikan perkalian dengan cara standar yang memperluas penjumlahan. Untuk sebuah titik $P$ pada kurva eliptik, jika $k$ adalah bilangan bulat, maka $k \* P = P + P + P + … + P$ ($k$ kali). Perhatikan bahwa $k$ kadang-kadang (mungkin membingungkan) disebut sebagai “eksponen” dalam kasus ini.
+
+## Menghasilkan Kunci Publik
+
+Dimulai dengan kunci privat dalam bentuk angka yang dihasilkan secara acak, $k$, kita mengalikannya dengan titik yang telah ditentukan sebelumnya pada kurva yang disebut **titik generator $G$** untuk menghasilkan titik lain di tempat lain pada kurva, yang merupakan kunci publik $K$ yang sesuai:
+
+$$K = k*G$$
+
+Titik generator ditentukan sebagai bagian dari standar `secp256k1`; ia sama untuk semua implementasi `secp256k1`, dan semua kunci yang berasal dari kurva tersebut menggunakan titik $G$ yang sama. Karena titik generator selalu sama untuk semua pengguna Ethereum, kunci privat $k$ yang dikalikan dengan $G$ akan selalu menghasilkan kunci publik $K$ yang sama. Hubungan antara $k$ dan $K$ adalah tetap, tetapi hanya dapat dihitung dalam satu arah, dari $k$ ke $K$. Itulah mengapa alamat Ethereum (yang diturunkan dari $K$) dapat dibagikan dengan siapa pun dan tidak mengungkapkan kunci privat pengguna ($k$).
+
+Seperti yang kami jelaskan di bagian sebelumnya, perkalian $k \* G$ setara dengan penjumlahan berulang, yaitu $G + G + G + … + G$, diulang sebanyak $k$ kali. Singkatnya, untuk menghasilkan kunci publik $K$ dari kunci privat $k$, kita menambahkan titik generator $G$ ke dirinya sendiri, sebanyak $k$ kali.
+
+> **Kunci privat dapat diubah menjadi kunci publik, tetapi kunci publik tidak dapat diubah kembali menjadi kunci privat, karena matematikanya hanya bekerja satu arah.**
+
+Mari kita terapkan perhitungan ini untuk menemukan kunci publik untuk kunci privat spesifik yang kami tunjukkan di “Private Keys” di halaman 62:
+$K = \\text{f8f8a2f43c8376ccb0871305060d7b27b0554d2cc72bccf41b2705608452f315} \* G$
+
+Sebuah pustaka kriptografi dapat membantu kita menghitung $K$, menggunakan perkalian kurva eliptik. Kunci publik $K$ yang dihasilkan didefinisikan sebagai titik:
+$K = (x, y)$
+
+di mana:
+$x = \\text{6e145ccef1033dea239875dd00dfb4fee6e3348b84985c92f103444683bae07b}$
+$y = \\text{83b5c38e5e2b0c8529d7fa3f64d46daa1ece2d9ac14cab9477d042c84c32ccd0}$
+
+Di Ethereum, Anda mungkin melihat kunci publik direpresentasikan sebagai serialisasi dari 130 karakter heksadesimal (65 byte). Ini diadopsi dari format serialisasi standar yang diusulkan oleh konsorsium industri Standards for Efficient Cryptography Group (SECG), yang didokumentasikan dalam Standards for Efficient Cryptography (SEC1). Standar ini mendefinisikan empat kemungkinan awalan yang dapat digunakan untuk mengidentifikasi titik pada kurva eliptik, yang tercantum dalam Tabel 4-1.
+
+\<p align="center"\>
+  \<img src="images/books-07-mastering\_ethereum/tabel-4.1.png" alt="gambar" width="580"/\>
+\</p\>
+
+Ethereum hanya menggunakan kunci publik yang tidak terkompresi; oleh karena itu satu-satunya awalan yang relevan adalah (hex) `04`. Serialisasi ini menggabungkan koordinat `x` dan `y` dari kunci publik:
+
+`04 + koordinat-x (32 byte/64 hex) + koordinat-y (32 byte/64 hex)`
+
+Oleh karena itu, kunci publik yang kita hitung sebelumnya diserialisasikan sebagai:
+`046e145ccef1033dea239875dd00dfb4fee6e3348b84985c92f103444683bae07b83b5c38e5e2b0c8529d7fa3f64d46daa1ece2d9ac14cab9477d042c84c32ccd0`
+
+## Pustaka (Library) Kurva Eliptik
+
+Ada beberapa implementasi dari kurva eliptik `secp256k1` yang digunakan dalam proyek-proyek terkait mata uang kripto:
+
+  * **OpenSSL** `https://www.openssl.org/`
+    Pustaka OpenSSL menawarkan seperangkat primitif kriptografi yang komprehensif, termasuk implementasi penuh `secp256k1`. Misalnya, untuk menurunkan kunci publik, fungsi `EC_POINT_mul` dapat digunakan.
+
+  * **libsecp256k1** `https://github.com/bitcoin-core/secp256k1`
+    `libsecp256k1` dari Bitcoin Core adalah implementasi bahasa C dari kurva eliptik `secp256k1` dan primitif kriptografi lainnya. Ini ditulis dari awal untuk menggantikan OpenSSL dalam perangkat lunak Bitcoin Core, dan dianggap lebih unggul baik dalam kinerja maupun keamanan.
+
+## Fungsi Hash Kriptografis
+
+Fungsi hash kriptografis digunakan di seluruh Ethereum. Faktanya, fungsi hash digunakan secara ekstensif di hampir semua sistem kriptografi—sebuah fakta yang ditangkap oleh kriptografer Bruce Schneier, yang berkata, “Jauh lebih dari algoritma enkripsi, fungsi hash satu arah adalah pekerja keras kriptografi modern.”
+
+Di bagian ini kita akan membahas fungsi hash, menjelajahi properti dasarnya, dan melihat bagaimana properti tersebut membuatnya begitu berguna di begitu banyak area kriptografi modern. Kami membahas fungsi hash di sini karena mereka adalah bagian dari transformasi kunci publik Ethereum menjadi alamat. Mereka juga dapat digunakan untuk membuat sidik jari digital, yang membantu dalam verifikasi data.
+
+Secara sederhana, **fungsi hash** adalah "fungsi apa pun yang dapat digunakan untuk memetakan data berukuran sembarang ke data berukuran tetap." Input ke fungsi hash disebut *pre-image*, *pesan*, atau просто *data input*. Outputnya disebut *hash*. **Fungsi hash kriptografis** adalah subkategori khusus yang memiliki properti spesifik yang berguna untuk platform aman, seperti Ethereum.
+
+Fungsi hash kriptografis adalah **fungsi hash satu arah** yang memetakan data berukuran sembarang ke string bit berukuran tetap. Sifat "satu arah" berarti secara komputasi tidak memungkinkan untuk membuat ulang data input jika seseorang hanya mengetahui hash outputnya. Satu-satunya cara untuk menentukan input yang mungkin adalah dengan melakukan pencarian *brute-force*, memeriksa setiap kandidat untuk output yang cocok; mengingat ruang pencarian yang hampir tak terbatas, mudah untuk memahami ketidakmungkinan praktis dari tugas tersebut. Bahkan jika Anda menemukan beberapa data input yang menciptakan hash yang cocok, itu mungkin bukan data input asli: fungsi hash adalah fungsi "banyak-ke-satu". Menemukan dua set data input yang menghasilkan hash output yang sama disebut menemukan **tabrakan hash (hash collision)**. Secara kasar, semakin baik fungsi hash, semakin jarang tabrakan hash terjadi. Untuk Ethereum, hal ini secara efektif tidak mungkin.
+
+Mari kita lihat lebih dekat properti utama dari fungsi hash kriptografis. Ini termasuk:
+
+  * **Deterministik**
+    Pesan input yang diberikan selalu menghasilkan output hash yang sama.
+
+  * **Dapat Diverifikasi (Verifiability)**
+    Menghitung hash dari sebuah pesan itu efisien (kompleksitas linear).
+
+  * **Non-korelasi**
+    Perubahan kecil pada pesan (misalnya, perubahan 1-bit) harus mengubah output hash secara ekstensif sehingga tidak dapat dikorelasikan dengan hash dari pesan asli.
+
+  * **Tidak dapat dibalik (Irreversibility)**
+    Menghitung pesan dari hash-nya tidak memungkinkan, setara dengan pencarian *brute-force* melalui semua kemungkinan pesan.
+
+  * **Perlindungan terhadap tabrakan (Collision protection)**
+    Seharusnya tidak memungkinkan untuk menghitung dua pesan berbeda yang menghasilkan output hash yang sama.
+
+Ketahanan terhadap tabrakan hash sangat penting untuk menghindari pemalsuan tanda tangan digital di Ethereum.
+
+Kombinasi dari properti-properti ini membuat fungsi hash kriptografis berguna untuk berbagai aplikasi keamanan, termasuk:
+
+  * Sidik jari data (Data fingerprinting)
+  * Integritas pesan (deteksi kesalahan)
+  * Proof of work
+  * Otentikasi (hashing kata sandi dan peregangan kunci)
+  * Generator angka pseudo-acak
+  * Komitmen pesan (mekanisme commit-reveal)
+  * Pengidentifikasi unik
+
+Kita akan menemukan banyak dari ini di Ethereum saat kita maju melalui berbagai lapisan sistem.
+
+## Fungsi Hash Kriptografis Ethereum: Keccak-256
+
+Ethereum menggunakan fungsi hash kriptografis **Keccak-256** di banyak tempat. Keccak-256 dirancang sebagai kandidat untuk Kompetisi Fungsi Hash Kriptografis SHA-3 yang diadakan pada tahun 2007 oleh National Institute of Science and Technology (NIST). Keccak adalah algoritma pemenang, yang menjadi standar sebagai Federal Information Processing Standard (FIPS) 202 pada tahun 2015.
+
+Namun, selama periode ketika Ethereum dikembangkan, standardisasi NIST belum final. NIST menyesuaikan beberapa parameter Keccak setelah penyelesaian proses standar, yang diduga untuk meningkatkan efisiensinya. Ini terjadi pada saat yang sama ketika pelapor pelanggaran (whistleblower) heroik Edward Snowden mengungkapkan dokumen yang menyiratkan bahwa NIST mungkin telah dipengaruhi secara tidak semestinya oleh National Security Agency (NSA) untuk sengaja melemahkan standar generator angka acak Dual\_EC\_DRBG, yang secara efektif menempatkan *backdoor* di dalam standar generator angka acak tersebut. Hasil dari kontroversi ini adalah reaksi keras terhadap perubahan yang diusulkan dan penundaan yang signifikan dalam standardisasi SHA-3. Pada saat itu, Ethereum Foundation memutuskan untuk mengimplementasikan algoritma Keccak asli, seperti yang diusulkan oleh para penemunya, daripada standar SHA-3 yang dimodifikasi oleh NIST.
+
+> **Meskipun Anda mungkin melihat "SHA-3" disebutkan di seluruh dokumen dan kode Ethereum, banyak jika tidak semua contoh tersebut sebenarnya merujuk pada Keccak-256, bukan standar FIPS-202 SHA-3 yang sudah final.** Perbedaan implementasinya kecil, berkaitan dengan parameter *padding*, tetapi signifikan karena Keccak-256 menghasilkan output hash yang berbeda dari FIPS-202 SHA-3 untuk input yang sama.
+
+### Fungsi Hash Mana yang Saya Gunakan?
+
+Bagaimana Anda bisa tahu jika pustaka perangkat lunak yang Anda gunakan mengimplementasikan FIPS-202 SHA-3 atau Keccak-256, jika keduanya mungkin disebut "SHA-3"?
+
+Cara mudah untuk mengetahuinya adalah dengan menggunakan *test vector*, yaitu output yang diharapkan untuk input tertentu. Tes yang paling umum digunakan untuk fungsi hash adalah input kosong. Jika Anda menjalankan fungsi hash dengan string kosong sebagai input, Anda akan melihat hasil berikut:
+
+`Keccak256("") = c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470`
+
+`SHA3("") = a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a`
+
+Terlepas dari apa nama fungsinya, Anda dapat mengujinya untuk melihat apakah itu Keccak-256 asli atau standar NIST final FIPS-202 SHA-3 dengan menjalankan tes sederhana ini. Ingat, Ethereum menggunakan Keccak-256, meskipun sering disebut SHA-3 dalam kode.
+
+> Karena kebingungan yang diciptakan oleh perbedaan antara fungsi hash yang digunakan di Ethereum (Keccak-256) dan standar yang sudah final (FIP-202 SHA-3), ada upaya yang sedang berlangsung untuk mengganti nama semua instansi `sha3` di semua kode, *opcode*, dan pustaka menjadi `keccak256`. Lihat ERC59 untuk detailnya.
+
+Selanjutnya, mari kita periksa aplikasi pertama Keccak-256 di Ethereum, yaitu untuk menghasilkan alamat Ethereum dari kunci publik.
+
+## Alamat Ethereum
+
+Alamat Ethereum adalah pengidentifikasi unik yang diturunkan dari kunci publik atau kontrak menggunakan fungsi hash satu arah Keccak-256.
+
+Dalam contoh kita sebelumnya, kita mulai dengan kunci privat dan menggunakan perkalian kurva eliptik untuk mendapatkan kunci publik:
+
+**Kunci privat k:**
+`k = f8f8a2f43c8376ccb0871305060d7b27b0554d2cc72bccf41b2705608452f315`
+
+**Kunci publik K** (koordinat x dan y digabungkan dan ditampilkan sebagai hex):
+`K = 6e145ccef1033dea239875dd00dfb4fee6e3348b84985c92f103444683bae07b83b5c38e5e...`
+
+> Perlu dicatat bahwa kunci publik tidak diformat dengan awalan (hex) `04` saat alamat dihitung.
+
+Kita menggunakan Keccak-256 untuk menghitung hash dari kunci publik ini:
+
+`Keccak256(K) = 2a5bc342ed616b5ba5732269001d3f1ef827552ae1114027bd3ecf1f086ba0f9`
+
+Kemudian kita hanya menyimpan 20 byte terakhir (byte yang paling tidak signifikan), yang merupakan alamat Ethereum kita:
+
+`001d3f1ef827552ae1114027bd3ecf1f086ba0f9`
+
+Paling sering Anda akan melihat alamat Ethereum dengan awalan `0x` yang menunjukkan bahwa mereka dikodekan dalam heksadesimal, seperti ini:
+
+`0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9`
+
+## Format Alamat Ethereum
+
+Alamat Ethereum adalah angka heksadesimal, pengidentifikasi yang diturunkan dari 20 byte terakhir dari hash Keccak-256 dari kunci publik.
+
+Tidak seperti alamat Bitcoin, yang dikodekan di antarmuka pengguna semua klien untuk menyertakan *checksum* bawaan untuk melindungi dari kesalahan pengetikan alamat, alamat Ethereum disajikan sebagai heksadesimal mentah tanpa *checksum* apa pun.
+
+Alasan di balik keputusan itu adalah bahwa alamat Ethereum pada akhirnya akan disembunyikan di balik abstraksi (seperti layanan nama) di lapisan yang lebih tinggi dari sistem dan *checksum* harus ditambahkan di lapisan yang lebih tinggi jika perlu.
+
+Pada kenyataannya, lapisan-lapisan yang lebih tinggi ini dikembangkan terlalu lambat dan pilihan desain ini menyebabkan sejumlah masalah di masa-masa awal ekosistem, termasuk hilangnya dana karena kesalahan pengetikan alamat dan kesalahan validasi input. Selain itu, karena layanan nama Ethereum dikembangkan lebih lambat dari yang diperkirakan, pengkodean alternatif diadopsi dengan sangat lambat oleh pengembang dompet. Kita akan melihat beberapa opsi pengkodean selanjutnya.
+
+### Inter exchange Client Address Protocol (ICAP)
+
+Inter exchange Client Address Protocol (ICAP) adalah pengkodean alamat Ethereum yang sebagian kompatibel dengan pengkodean International Bank Account Number (IBAN), menawarkan pengkodean yang serbaguna, memiliki *checksum*, dan dapat dioperasikan untuk alamat Ethereum. Alamat ICAP dapat mengkodekan alamat Ethereum atau nama umum yang terdaftar di registri nama Ethereum. Anda dapat membaca lebih lanjut tentang ICAP di Wiki Ethereum.
+
+IBAN adalah standar internasional untuk mengidentifikasi nomor rekening bank, sebagian besar digunakan untuk transfer kawat. Ini diadopsi secara luas di Area Pembayaran Euro Tunggal Eropa (SEPA) dan sekitarnya. IBAN adalah layanan terpusat dan sangat teregulasi. ICAP adalah implementasi yang terdesentralisasi namun kompatibel untuk alamat Ethereum.
+
+IBAN terdiri dari string hingga 34 karakter alfanumerik (tidak peka huruf besar-kecil) yang terdiri dari kode negara, *checksum*, dan pengidentifikasi rekening bank (yang spesifik untuk negara).
+
+ICAP menggunakan struktur yang sama dengan memperkenalkan kode negara non-standar, "XE," yang merupakan singkatan dari "Ethereum," diikuti oleh *checksum* dua karakter dan tiga kemungkinan variasi pengenal akun:
+
+  * **Direct**
+    Sebuah integer *big-endian base-36* yang terdiri dari hingga 30 karakter alfanumerik, mewakili 155 bit paling tidak signifikan dari sebuah alamat Ethereum. Karena pengkodean ini kurang dari 160 bit penuh dari alamat Ethereum umum, ini hanya berfungsi untuk alamat Ethereum yang dimulai dengan satu atau lebih byte nol. Keuntungannya adalah kompatibel dengan IBAN, dalam hal panjang bidang dan *checksum*.
+    Contoh: `XE60HAMICDXSV5QXVJA7TJW47Q9CHWKJD` (panjang 33 karakter).
+
+  * **Basic**
+    Sama seperti pengkodean Direct, kecuali panjangnya 31 karakter. Hal ini memungkinkannya untuk mengkodekan alamat Ethereum apa pun, tetapi membuatnya tidak kompatibel dengan validasi bidang IBAN.
+    Contoh: `XE18CHDJBPLTBCJ03FE9O2NS0BPOJVQCU2P` (panjang 35 karakter).
+
+  * **Indirect**
+    Mengkodekan pengidentifikasi yang mengarah ke alamat Ethereum melalui penyedia registri nama. Ini menggunakan 16 karakter alfanumerik, terdiri dari pengidentifikasi aset (mis., ETH), layanan nama (mis., XREG), dan nama 9 karakter yang dapat dibaca manusia (mis., KITTYCATS).
+    Contoh: `XE##ETHXREGKITTYCATS` (panjang 20 karakter), di mana `##` harus diganti dengan dua karakter *checksum* yang dihitung.
+
+Kita dapat menggunakan alat baris perintah `helpeth` untuk membuat alamat ICAP. Mari kita coba dengan kunci privat contoh kita (diawali dengan `0x` dan diteruskan sebagai parameter ke `helpeth`):
+
+```bash
+$ helpeth keyDetails \
+ -p 0xf8f8a2f43c8376ccb0871305060d7b27b0554d2cc72bccf41b2705608452f315
+
+Address: 0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9
+ICAP: XE60 HAMI CDXS V5QX VJA7 TJW4 7Q9C HWKJ D
+Public key: 0x6e145ccef1033dea239875dd00dfb4fee6e3348b84985c92f103444683bae07b...
+```
+
+Perintah `helpeth` membuat alamat Ethereum heksadesimal serta alamat ICAP untuk kita. Alamat ICAP untuk kunci contoh kita adalah:
+`XE60HAMICDXSV5QXVJA7TJW47Q9CHWKJD`
+
+Karena alamat Ethereum contoh kita kebetulan dimulai dengan byte nol, ia dapat dikodekan menggunakan metode pengkodean ICAP Direct yang valid dalam format IBAN. Anda bisa tahu karena panjangnya 33 karakter.
+
+Jika alamat kita tidak dimulai dengan nol, itu akan dikodekan dengan pengkodean Basic, yang akan memiliki panjang 35 karakter dan tidak valid sebagai IBAN.
+
+> **Peluang alamat Ethereum apa pun dimulai dengan byte nol adalah 1 banding 256.** Untuk menghasilkan yang seperti itu, rata-rata akan membutuhkan 256 percobaan dengan 256 kunci privat acak yang berbeda sebelum kita menemukan satu yang berfungsi sebagai alamat ICAP yang dikodekan "Direct" yang kompatibel dengan IBAN.
+
+Saat ini, ICAP sayangnya hanya didukung oleh beberapa dompet.
+
+### Pengkodean Hex dengan Checksum dalam Kapitalisasi (EIP-55)
+
+Karena lambatnya penerapan ICAP dan layanan nama, sebuah standar diusulkan oleh Ethereum Improvement Proposal 55 (EIP-55). EIP-55 menawarkan *checksum* yang kompatibel ke belakang untuk alamat Ethereum dengan memodifikasi kapitalisasi alamat heksadesimal. Idenya adalah bahwa alamat Ethereum tidak peka huruf besar-kecil dan semua dompet seharusnya menerima alamat Ethereum yang diekspresikan dalam karakter huruf besar atau kecil, tanpa perbedaan interpretasi.
+
+Dengan memodifikasi kapitalisasi karakter alfabet dalam alamat, kita dapat menyampaikan *checksum* yang dapat digunakan untuk melindungi integritas alamat terhadap kesalahan pengetikan atau pembacaan. Dompet yang tidak mendukung *checksum* EIP-55 hanya mengabaikan fakta bahwa alamat tersebut mengandung kapitalisasi campuran, tetapi yang mendukungnya dapat memvalidasinya dan mendeteksi kesalahan dengan akurasi 99,986%.
+
+Pengkodean kapitalisasi campuran ini halus dan Anda mungkin tidak menyadarinya pada awalnya. Alamat contoh kita adalah:
+`0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9`
+
+Dengan *checksum* kapitalisasi campuran EIP-55, menjadi:
+`0x001d3F1ef827552Ae1114027BD3ECF1f086bA0F9`
+
+Bisakah Anda melihat perbedaannya? Beberapa karakter alfabet (A–F) dari alfabet pengkodean heksadesimal sekarang menjadi huruf besar, sementara yang lain huruf kecil.
+
+EIP-55 cukup sederhana untuk diimplementasikan. Kita mengambil hash Keccak-256 dari alamat heksadesimal huruf kecil. Hash ini bertindak sebagai sidik jari digital dari alamat, memberi kita *checksum* yang nyaman. Setiap perubahan kecil pada input (alamat) akan menyebabkan perubahan besar pada hash yang dihasilkan (*checksum*), memungkinkan kita mendeteksi kesalahan secara efektif. Hash dari alamat kita kemudian dikodekan dalam kapitalisasi alamat itu sendiri.
+
+Mari kita uraikan, langkah demi langkah:
+
+1.  Hash alamat huruf kecil, tanpa awalan `0x`:
+    `Keccak256("001d3f1ef827552ae1114027bd3ecf1f086ba0f9") = 23a69c1653e4ebbb619b0b2cb8a9bad49892a8b9695d9a19d8f673ca991deae1`
+
+2.  Kapitalkan setiap karakter alfabet alamat jika digit heksadesimal yang sesuai dari hash lebih besar dari atau sama dengan `0x8`. Ini lebih mudah ditunjukkan jika kita menyejajarkan alamat dan hash:
+
+    ```
+    Alamat: 001d3f1ef827552ae1114027bd3ecf1f086ba0f9
+    Hash  : 23a69c1653e4ebbb619b0b2cb8a9bad49892a8b9...
+    ```
+
+    Alamat kita mengandung karakter alfabet `d` di posisi keempat. Karakter keempat dari hash adalah `6`, yang lebih kecil dari 8. Jadi, kita biarkan `d` tetap huruf kecil. Karakter alfabet berikutnya di alamat kita adalah `f`, di posisi keenam. Karakter keenam dari hash heksadesimal adalah `c`, yang lebih besar dari 8. Oleh karena itu, kita mengkapitalkan `F` di alamat, dan seterusnya. Seperti yang Anda lihat, kita hanya menggunakan 20 byte pertama (40 karakter hex) dari hash sebagai *checksum*, karena kita hanya memiliki 20 byte (40 karakter hex) di alamat untuk dikapitalkan dengan tepat.
+
+Periksa sendiri alamat kapitalisasi campuran yang dihasilkan dan lihat apakah Anda dapat mengetahui karakter mana yang dikapitalkan dan karakter mana yang sesuai dengannya di hash alamat:
+
+```
+Alamat: 001d3F1ef827552Ae1114027BD3ECF1f086bA0F9
+Hash  : 23a69c1653e4ebbb619b0b2cb8a9bad49892a8b9...
+```
+
+#### Mendeteksi kesalahan pada alamat yang dikodekan EIP-55
+
+Sekarang, mari kita lihat bagaimana alamat EIP-55 akan membantu kita menemukan kesalahan. Mari kita asumsikan kita telah mencetak alamat Ethereum, yang dikodekan EIP-55:
+`0x001d3F1ef827552Ae1114027BD3ECF1f086bA0F9`
+
+Sekarang mari kita buat kesalahan dasar dalam membaca alamat itu. Karakter sebelum yang terakhir adalah huruf `F` besar. Untuk contoh ini, mari kita asumsikan kita salah membacanya sebagai huruf `E` besar, dan kita mengetik alamat berikut (yang salah) ke dompet kita:
+`0x001d3F1ef827552Ae1114027BD3ECF1f086bA0E9`
+
+Untungnya, dompet kita sesuai dengan EIP-55\! Dompet memperhatikan kapitalisasi campuran dan mencoba memvalidasi alamat tersebut. Dompet mengubahnya menjadi huruf kecil, dan menghitung hash *checksum*:
+
+`Keccak256("001d3f1ef827552ae1114027bd3ecf1f086ba0e9") = 5429b5d9460122fb4b11af9cb88b7bb76d8928862e0a57d46dd18dd8e08a6927`
+
+Seperti yang Anda lihat, meskipun alamat hanya berubah satu karakter (faktanya, hanya satu bit, karena `e` dan `f` berbeda satu bit), hash alamat telah berubah secara radikal. Itulah properti dari fungsi hash yang membuatnya sangat berguna untuk *checksum*\!
+
+Sekarang, mari kita sejajarkan keduanya dan periksa kapitalisasinya:
+
+```
+Alamat: 001d3F1ef827552Ae1114027BD3ECF1f086bA0E9
+Hash  : 5429b5d9460122fb4b11af9cb88b7bb76d892886...
+```
+
+Semuanya salah\! Beberapa karakter alfabet dikapitalkan secara tidak benar. Ingat bahwa kapitalisasi adalah pengkodean dari *checksum* yang benar.
+
+Kapitalisasi alamat yang kita masukkan tidak cocok dengan *checksum* yang baru saja dihitung, yang berarti ada sesuatu yang telah berubah di alamat, dan sebuah kesalahan telah terjadi.
+
+## Kesimpulan
+
+Dalam bab ini kami memberikan survei singkat tentang kriptografi kunci publik dan berfokus pada penggunaan kunci publik dan privat di Ethereum serta penggunaan alat kriptografi, seperti fungsi hash, dalam pembuatan dan verifikasi alamat Ethereum. Kami juga melihat tanda tangan digital dan bagaimana mereka dapat menunjukkan kepemilikan kunci privat tanpa mengungkapkan kunci privat tersebut. Di Bab 5, kita akan menyatukan ide-ide ini dan melihat bagaimana dompet dapat digunakan untuk mengelola koleksi kunci.
+
+---
 
