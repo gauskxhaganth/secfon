@@ -6901,3 +6901,691 @@ Oracle terdesentralisasi dapat menyelesaikan beberapa masalah ini dan menawarkan
 
 ---
 
+# BAB 12
+## Aplikasi Terdesentralisasi (DApps)
+
+Dalam bab ini kita akan menjelajahi dunia aplikasi terdesentralisasi, atau **DApps**.
+
+Sejak awal Ethereum, visi para pendirinya jauh lebih luas daripada “kontrak pintar”: tidak kurang dari menciptakan kembali web dan menciptakan dunia baru DApps, yang tepat disebut **web3**. Kontrak pintar adalah cara untuk mendesentralisasi logika pengendali dan fungsi pembayaran dari aplikasi. DApps Web3 adalah tentang mendesentralisasi semua aspek lain dari sebuah aplikasi: penyimpanan, pengiriman pesan, penamaan, dll. (lihat Gambar 12-1).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.1.png" alt="gambar" width="580"/>
+</p>
+
+> Meskipun “aplikasi terdesentralisasi” adalah visi masa depan yang berani, istilah “DApp” sering diterapkan pada kontrak pintar apa pun yang memiliki *frontend* web. Beberapa dari yang disebut DApp ini adalah aplikasi yang sangat terpusat (*Centralized Applications* - CApps?). Waspadalah terhadap DApp palsu!
+
+Dalam bab ini kita akan mengembangkan dan menerapkan contoh DApp: sebuah platform lelang. Anda dapat menemukan kode sumbernya di repositori buku di bawah `code/auction_dapp`. Kita akan melihat setiap aspek dari aplikasi lelang dan melihat bagaimana kita dapat mendesentralisasi aplikasi sebanyak mungkin. Namun, pertama-tama, mari kita lihat lebih dekat karakteristik dan keunggulan DApps.
+
+### Apa Itu DApp?
+
+DApp adalah aplikasi yang sebagian besar atau seluruhnya terdesentralisasi.
+
+Pertimbangkan semua aspek yang mungkin dari sebuah aplikasi yang dapat didesentralisasi:
+* Perangkat lunak backend (logika aplikasi)
+* Perangkat lunak frontend
+* Penyimpanan data
+* Komunikasi pesan
+* Resolusi nama
+
+Masing-masing dari ini bisa agak terpusat atau agak terdesentralisasi. Misalnya, *frontend* dapat dikembangkan sebagai aplikasi web yang berjalan di server terpusat, atau sebagai aplikasi seluler yang berjalan di perangkat Anda. *Backend* dan penyimpanan bisa berada di server pribadi dan basis data berpemilik, atau Anda bisa menggunakan kontrak pintar dan penyimpanan P2P.
+
+Ada banyak keuntungan membuat DApp yang tidak dapat diberikan oleh arsitektur terpusat biasa:
+
+* **Ketahanan (*Resiliency*)**
+    Karena logika bisnis dikendalikan oleh kontrak pintar, *backend* DApp akan sepenuhnya terdistribusi dan dikelola di platform blockchain. Berbeda dengan aplikasi yang diterapkan di server terpusat, DApp tidak akan memiliki waktu henti (*downtime*) dan akan terus tersedia selama platform masih beroperasi.
+* **Transparansi**
+    Sifat *on-chain* dari DApp memungkinkan semua orang untuk memeriksa kode dan lebih yakin tentang fungsinya. Setiap interaksi dengan DApp akan disimpan selamanya di dalam blockchain.
+* **Ketahanan terhadap sensor (*Censorship resistance*)**
+    Selama pengguna memiliki akses ke *node* Ethereum (menjalankannya jika perlu), pengguna akan selalu dapat berinteraksi dengan DApp tanpa campur tangan dari kontrol terpusat mana pun. Tidak ada penyedia layanan, atau bahkan pemilik kontrak pintar, yang dapat mengubah kode setelah diterapkan di jaringan.
+
+Dalam ekosistem Ethereum seperti saat ini, hanya ada sedikit aplikasi yang benar-benar terdesentralisasi—sebagian besar masih bergantung pada layanan dan server terpusat untuk sebagian operasinya. Di masa depan, kami berharap akan memungkinkan setiap bagian dari DApp mana pun untuk dioperasikan dengan cara yang sepenuhnya terdesentralisasi.
+
+### Backend (Kontrak Pintar)
+
+Dalam sebuah DApp, kontrak pintar digunakan untuk menyimpan logika bisnis (kode program) dan keadaan terkait dari aplikasi Anda. Anda bisa menganggap kontrak pintar menggantikan komponen sisi server (alias “backend”) dalam aplikasi biasa. Tentu saja, ini adalah penyederhanaan yang berlebihan. Salah satu perbedaan utamanya adalah bahwa setiap komputasi yang dieksekusi dalam kontrak pintar sangat mahal dan karenanya harus dijaga seminimal mungkin. Oleh karena itu, penting untuk mengidentifikasi aspek mana dari aplikasi yang memerlukan platform eksekusi yang tepercaya dan terdesentralisasi.
+
+Kontrak pintar Ethereum memungkinkan Anda membangun arsitektur di mana jaringan kontrak pintar saling memanggil dan meneruskan data, membaca dan menulis variabel keadaan mereka sendiri saat berjalan, dengan kompleksitasnya hanya dibatasi oleh batas gas blok. Setelah Anda menerapkan kontrak pintar Anda, logika bisnis Anda bisa jadi akan digunakan oleh banyak pengembang lain di masa depan.
+
+Salah satu pertimbangan utama dari desain arsitektur kontrak pintar adalah ketidakmampuan untuk mengubah kode kontrak pintar setelah diterapkan. Kontrak tersebut dapat dihapus jika diprogram dengan *opcode* `SELFDESTRUCT` yang dapat diakses, tetapi selain penghapusan total, kodenya tidak dapat diubah dengan cara apa pun.
+
+Pertimbangan utama kedua dari desain arsitektur kontrak pintar adalah ukuran DApp. Kontrak pintar monolitik yang sangat besar mungkin memerlukan banyak gas untuk diterapkan dan digunakan. Oleh karena itu, beberapa aplikasi mungkin memilih untuk memiliki komputasi *off-chain* dan sumber data eksternal. Namun, perlu diingat bahwa memiliki logika bisnis inti DApp yang bergantung pada data eksternal (misalnya, dari server terpusat) berarti pengguna Anda harus mempercayai sumber daya eksternal ini.
+
+### Frontend (Antarmuka Pengguna Web)
+
+Berbeda dengan logika bisnis DApp, yang mengharuskan pengembang untuk memahami EVM dan bahasa baru seperti Solidity, antarmuka sisi klien dari sebuah DApp dapat menggunakan teknologi web standar (HTML, CSS, JavaScript, dll.). Hal ini memungkinkan pengembang web tradisional untuk menggunakan alat, pustaka, dan kerangka kerja yang sudah dikenal. Interaksi dengan Ethereum, seperti menandatangani pesan, mengirim transaksi, dan mengelola kunci, sering dilakukan melalui peramban web, melalui ekstensi seperti MetaMask (lihat Bab 2).
+
+Meskipun dimungkinkan untuk membuat DApp seluler juga, saat ini hanya ada sedikit sumber daya untuk membantu membuat *frontend* DApp seluler, terutama karena kurangnya klien seluler yang dapat berfungsi sebagai klien ringan dengan fungsionalitas manajemen kunci.
+
+*Frontend* biasanya terhubung ke Ethereum melalui pustaka JavaScript `web3.js`, yang dibundel dengan sumber daya *frontend* dan disajikan ke peramban oleh server web.
+
+### Penyimpanan Data
+
+Karena biaya gas yang tinggi dan batas gas blok yang saat ini rendah, kontrak pintar tidak cocok untuk menyimpan atau memproses data dalam jumlah besar. Karenanya, sebagian besar DApps menggunakan layanan penyimpanan data *off-chain*, yang berarti mereka menyimpan data berukuran besar di luar rantai Ethereum, di platform penyimpanan data. Platform penyimpanan data tersebut bisa terpusat (misalnya, basis data *cloud* biasa), atau data bisa terdesentralisasi, disimpan di platform P2P seperti IPFS, atau platform Swarm milik Ethereum sendiri.
+
+Penyimpanan P2P terdesentralisasi ideal untuk menyimpan dan mendistribusikan aset statis besar seperti gambar, video, dan sumber daya antarmuka web *frontend* aplikasi (HTML, CSS, JavaScript, dll.). Kita akan melihat beberapa opsinya selanjutnya.
+
+#### IPFS
+
+**Inter-Planetary File System (IPFS)** adalah sistem penyimpanan beralamat-konten (*content-addressable*) terdesentralisasi yang mendistribusikan objek yang disimpan di antara rekan-rekan dalam jaringan P2P. “Beralamat-konten” berarti bahwa setiap bagian konten (file) di-hash dan hash tersebut digunakan untuk mengidentifikasi file itu. Anda kemudian dapat mengambil file apa pun dari *node* IPFS mana pun dengan memintanya berdasarkan hash-nya.
+
+IPFS bertujuan untuk menggantikan HTTP sebagai protokol pilihan untuk pengiriman aplikasi web. Alih-alih menyimpan aplikasi web di satu server, file-filenya disimpan di IPFS dan dapat diambil dari *node* IPFS mana pun.
+
+Informasi lebih lanjut tentang IPFS dapat ditemukan di [https://ipfs.io](https://ipfs.io).
+
+#### Swarm
+
+**Swarm** adalah sistem penyimpanan P2P beralamat-konten lainnya, mirip dengan IPFS. Swarm diciptakan oleh Ethereum Foundation, sebagai bagian dari rangkaian alat Go-Ethereum. Seperti IPFS, Swarm memungkinkan Anda menyimpan file yang disebarluaskan dan direplikasi oleh *node* Swarm. Anda dapat mengakses file Swarm apa pun dengan merujuknya berdasarkan hash. Swarm memungkinkan Anda mengakses situs web dari sistem P2P terdesentralisasi, alih-alih server web terpusat.
+
+Halaman beranda untuk Swarm itu sendiri disimpan di Swarm dan dapat diakses di *node* Swarm Anda atau gerbang: [https://swarm-gateways.net/bzz:/theswarm.eth/](https://swarm-gateways.net/bzz:/theswarm.eth/).
+
+### Protokol Komunikasi Pesan Terdesentralisasi
+
+Komponen utama lain dari aplikasi apa pun adalah komunikasi antar-proses. Itu berarti kemampuan untuk bertukar pesan antar aplikasi, antara instansi aplikasi yang berbeda, atau antara pengguna aplikasi. Secara tradisional, ini dicapai dengan mengandalkan server terpusat. Namun, ada berbagai alternatif terdesentralisasi untuk protokol berbasis server, yang menawarkan pengiriman pesan melalui jaringan P2P.
+
+Protokol pengiriman pesan P2P yang paling menonjol untuk DApps adalah **Whisper**, yang merupakan bagian dari rangkaian alat Go-Ethereum dari Ethereum Foundation.
+
+Aspek terakhir dari sebuah aplikasi yang dapat didesentralisasi adalah resolusi nama. Kita akan melihat lebih dekat layanan nama Ethereum nanti di bab ini; namun, sekarang mari kita gali sebuah contoh.
+
+### Contoh DApp Dasar: Auction DApp
+
+Di bagian ini kita akan mulai membangun contoh DApp, untuk menjelajahi berbagai alat desentralisasi. DApp kita akan mengimplementasikan lelang terdesentralisasi.
+
+Auction DApp memungkinkan pengguna untuk mendaftarkan token **“akta” (*deed*)**, yang mewakili beberapa aset unik, seperti rumah, mobil, merek dagang, dll. Setelah token terdaftar, kepemilikan token ditransfer ke Auction DApp, memungkinkannya untuk didaftarkan untuk dijual. Auction DApp mendaftar setiap token yang terdaftar, memungkinkan pengguna lain untuk menempatkan penawaran. Selama setiap lelang, pengguna dapat bergabung dengan ruang obrolan yang dibuat khusus untuk lelang itu. Setelah lelang diselesaikan, kepemilikan token akta ditransfer ke pemenang lelang.
+
+Proses lelang secara keseluruhan dapat dilihat pada Gambar 12-2.
+
+Komponen utama dari Auction DApp kita adalah:
+* Kontrak pintar yang mengimplementasikan token non-fungible “akta” ERC721 (`DeedRepository`)
+* Kontrak pintar yang mengimplementasikan lelang (`AuctionRepository`) untuk menjual akta
+* *Frontend* web menggunakan kerangka kerja JavaScript Vue/Vuetify
+* Pustaka `web3.js` untuk terhubung ke rantai Ethereum (melalui MetaMask atau klien lain)
+* Klien Swarm, untuk menyimpan sumber daya seperti gambar
+* Klien Whisper, untuk membuat ruang obrolan per lelang untuk semua peserta
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.2.png" alt="gambar" width="580"/>
+</p>
+
+### Auction DApp: Kontrak Pintar Backend
+
+Contoh Auction DApp kita didukung oleh dua kontrak pintar yang perlu kita terapkan di blockchain Ethereum untuk mendukung aplikasi: `AuctionRepository` dan `DeedRepository`.
+
+Mari kita mulai dengan melihat `DeedRepository`, yang ditunjukkan pada Contoh 12-1. Kontrak ini adalah token non-fungible yang kompatibel dengan ERC721 (lihat “ERC721: Standar Token Non-Fungible (Akta)” di halaman 247).
+
+**Contoh 12-1. DeedRepository.sol: Token akta ERC721 untuk digunakan dalam lelang**
+
+```solidity
+pragma solidity ^0.4.17;
+import "./ERC721/ERC721Token.sol";
+/**
+* @title Repositori Akta ERC721
+* Kontrak ini berisi daftar akta yang didaftarkan oleh pengguna.
+* Ini adalah demo untuk menunjukkan bagaimana token (akta) dapat dicetak dan ditambahkan
+* ke repositori.
+*/
+contract DeedRepository is ERC721Token {
+  /**
+  * @dev Membuat DeedRepository dengan nama dan simbol
+  * @param _name string merepresentasikan nama repositori
+  * @param _symbol string merepresentasikan simbol repositori
+  */
+  constructor(string _name, string _symbol)
+    public ERC721Token(_name, _symbol) {}
+  /**
+  * @dev Fungsi publik untuk mendaftarkan akta baru
+  * @dev Memanggil minter ERC721Token
+  * @param _tokenId uint256 merepresentasikan akta spesifik
+  * @param _uri string berisi metadata/uri
+  */
+  function registerDeed(uint256 _tokenId, string _uri) public {
+    _mint(msg.sender, _tokenId);
+    addDeedMetadata(_tokenId, _uri);
+    emit DeedRegistered(msg.sender, _tokenId);
+  }
+  /**
+  * @dev Fungsi publik untuk menambahkan metadata ke sebuah akta
+  * @param _tokenId merepresentasikan akta spesifik
+  * @param _uri teks yang mendeskripsikan karakteristik dari akta yang diberikan
+  * @return apakah metadata akta ditambahkan ke repositori
+  */
+  function addDeedMetadata(uint256 _tokenId, string _uri) public returns(bool){
+    _setTokenURI(_tokenId, _uri);
+    return true;
+  }
+  /**
+  * @dev Event dipicu jika akta/token terdaftar
+  * @param _by alamat pendaftar
+  * @param _tokenId uint256 merepresentasikan akta spesifik
+  */
+  event DeedRegistered(address _by, uint256 _tokenId);
+}
+```
+
+Seperti yang Anda lihat, kontrak `DeedRepository` adalah implementasi langsung dari token yang kompatibel dengan ERC721.
+
+Auction DApp kita menggunakan kontrak `DeedRepository` untuk menerbitkan dan melacak token untuk setiap lelang. Lelang itu sendiri diatur oleh kontrak `AuctionRepository`. Kontrak ini terlalu panjang untuk disertakan secara penuh di sini, tetapi Contoh 12-2 menunjukkan definisi utama dari kontrak dan struktur datanya.
+
+**Contoh 12-2. AuctionRepository.sol: Kontrak pintar utama Auction DApp**
+
+```solidity
+contract AuctionRepository {
+  // Array dengan semua lelang
+  Auction[] public auctions;
+  // Pemetaan dari indeks lelang ke penawaran pengguna
+  mapping(uint256 => Bid[]) public auctionBids;
+  // Pemetaan dari pemilik ke daftar lelang yang dimiliki
+  mapping(address => uint[]) public auctionOwner;
+  // Struct Bid untuk menampung penawar dan jumlah
+  struct Bid {
+    address from;
+    uint256 amount;
+  }
+  // Struct Auction yang menampung semua info yang diperlukan
+  struct Auction {
+    string name;
+    uint256 blockDeadline;
+    uint256 startPrice;
+    string metadata;
+    uint256 deedId;
+    address deedRepositoryAddress;
+    address owner;
+    bool active;
+    bool finalized;
+  }
+}
+```
+
+Kontrak `AuctionRepository` mengelola semua lelang dengan fungsi-fungsi berikut:
+
+  * `getCount()`
+  * `getBidsCount(uint _auctionId)`
+  * `getAuctionsOf(address _owner)`
+  * `getCurrentBid(uint _auctionId)`
+  * `getAuctionsCountOfOwner(address _owner)`
+  * `getAuctionById(uint _auctionId)`
+  * `createAuction(address _deedRepositoryAddress, uint256 _deedId, string _auctionTitle, string _metadata, uint256 _startPrice, uint _blockDeadline)`
+  * `approveAndTransfer(address _from, address _to, address _deedRepositoryAddress, uint256 _deedId)`
+  * `cancelAuction(uint _auctionId)`
+  * `finalizeAuction(uint _auctionId)`
+  * `bidOnAuction(uint _auctionId)`
+
+Anda dapat menerapkan kontrak-kontrak ini ke blockchain Ethereum pilihan Anda (mis., Ropsten) menggunakan `truffle` di repositori buku:
+
+```bash
+$ cd code/auction_dapp/backend
+$ truffle init
+$ truffle compile
+$ truffle migrate --network ropsten
+```
+
+#### Tata kelola DApp
+
+Jika Anda membaca kedua kontrak pintar dari Auction DApp, Anda akan melihat sesuatu yang penting: **tidak ada akun atau peran khusus yang memiliki hak istimewa atas DApp tersebut**. Setiap lelang memiliki seorang pemilik dengan beberapa kapabilitas khusus, tetapi Auction DApp itu sendiri tidak memiliki pengguna yang berhak istimewa.
+
+Ini adalah pilihan yang disengaja untuk **mendesentralisasi tata kelola DApp** dan melepaskan kontrol apa pun setelah DApp tersebut diterapkan. Sebagai perbandingan, beberapa DApp memiliki satu atau lebih akun berhak istimewa dengan kapabilitas khusus, seperti kemampuan untuk menghentikan kontrak DApp, untuk menimpa atau mengubah konfigurasinya, atau untuk "memveto" operasi tertentu. Biasanya, fungsi-fungsi tata kelola ini diperkenalkan di DApp untuk menghindari masalah tak dikenal yang mungkin timbul karena *bug*.
+
+Masalah tata kelola adalah masalah yang sangat sulit untuk dipecahkan, karena ia merupakan pedang bermata dua. Di satu sisi, akun berhak istimewa berbahaya; jika disusupi, mereka dapat merusak keamanan DApp. Di sisi lain, tanpa akun berhak istimewa, tidak ada opsi pemulihan jika *bug* ditemukan. Kami telah melihat kedua risiko ini terwujud dalam DApps Ethereum. Dalam kasus The DAO (“Contoh Dunia Nyata: The DAO” di halaman 176 dan Lampiran A), ada beberapa akun berhak istimewa yang disebut “kurator,” tetapi mereka sangat terbatas dalam kapabilitasnya. Akun-akun tersebut tidak dapat menimpa penarikan dana oleh penyerang DAO. Dalam kasus yang lebih baru, bursa terdesentralisasi Bancor mengalami pencurian besar-besaran karena akun manajemen berhak istimewa disusupi. Ternyata, Bancor tidak sedesentralisasi seperti yang diasumsikan pada awalnya.
+
+Saat membangun DApp, Anda harus memutuskan apakah Anda ingin membuat kontrak pintar benar-benar independen, meluncurkannya dan kemudian tidak memiliki kontrol, atau membuat akun berhak istimewa dan menanggung risiko akun-akun tersebut disusupi. Pilihan mana pun membawa risiko, tetapi dalam jangka panjang, DApp sejati tidak dapat memiliki akses khusus untuk akun berhak istimewa—itu tidak terdesentralisasi.
+
+### Auction DApp: Antarmuka Pengguna Frontend
+
+Setelah kontrak Auction DApp diterapkan, Anda dapat berinteraksi dengannya menggunakan konsol JavaScript favorit Anda dan `web3.js`, atau pustaka web3 lainnya. Namun, sebagian besar pengguna akan membutuhkan antarmuka yang mudah digunakan. Antarmuka pengguna Auction DApp kami dibangun menggunakan kerangka kerja JavaScript **Vue2/Vuetify** dari Google.
+
+Anda dapat menemukan kode antarmuka pengguna di folder `code/auction_dapp/frontend` di repositori buku. Direktori tersebut memiliki struktur dan konten berikut:
+
+```
+frontend/
+|-- build
+|   |-- build.js
+|   |-- check-versions.js
+|   |-- logo.png
+|   |-- utils.js
+|   |-- vue-loader.conf.js
+|   |-- webpack.base.conf.js
+|   |-- webpack.dev.conf.js
+|   `-- webpack.prod.conf.js
+|-- config
+|   |-- dev.env.js
+|   |-- index.js
+|   `-- prod.env.js
+|-- index.html
+|-- package.json
+|-- package-lock.json
+|-- README.md
+`-- src
+    |-- App.vue
+    |-- components
+    |   |-- Auction.vue
+    |   `-- Home.vue
+    |-- config.js
+    |-- contracts
+    |   |-- AuctionRepository.json
+    |   `-- DeedRepository.json
+    |-- main.js
+    |-- models
+    |   |-- AuctionRepository.js
+    |   |-- ChatRoom.js
+    |   `-- DeedRepository.js
+    `-- router
+        `-- index.js
+```
+
+Setelah Anda menerapkan kontrak, edit konfigurasi *frontend* di `frontend/src/config.js` dan masukkan alamat kontrak `DeedRepository` dan `AuctionRepository`, seperti yang telah diterapkan. Aplikasi *frontend* juga memerlukan akses ke *node* Ethereum yang menawarkan antarmuka JSON-RPC dan WebSockets. Setelah Anda mengkonfigurasi *frontend*, luncurkan dengan server web di mesin lokal Anda:
+
+```bash
+$ npm install
+$ npm run dev
+```
+
+*Frontend* Auction DApp akan diluncurkan dan dapat diakses melalui peramban web apa pun di http://localhost:8080.
+
+Jika semuanya berjalan dengan baik, Anda akan melihat layar yang ditunjukkan pada Gambar 12-3, yang mengilustrasikan Auction DApp berjalan di peramban web.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.3.png" alt="gambar" width="580"/>
+</p>
+
+### Mendesentralisasi Auction DApp Lebih Lanjut
+
+DApp kita sudah cukup terdesentralisasi, tetapi kita bisa membuatnya lebih baik.
+
+Kontrak `AuctionRepository` beroperasi secara independen tanpa pengawasan apa pun, terbuka untuk siapa saja. Setelah diterapkan, kontrak ini tidak dapat dihentikan, begitu pula lelang apa pun tidak dapat dikendalikan. Setiap lelang memiliki ruang obrolan terpisah yang memungkinkan siapa saja untuk berkomunikasi tentang lelang tanpa sensor atau identifikasi. Berbagai aset lelang, seperti deskripsi dan gambar terkait, disimpan di Swarm, membuatnya sulit untuk disensor atau diblokir.
+
+Siapa pun dapat berinteraksi dengan DApp dengan membuat transaksi secara manual atau dengan menjalankan *frontend* Vue di mesin lokal mereka. Kode DApp itu sendiri bersifat sumber terbuka dan dikembangkan secara kolaboratif di repositori publik.
+
+Ada dua hal yang bisa kita lakukan untuk membuat DApp ini terdesentralisasi dan tangguh:
+
+  * Menyimpan semua kode aplikasi di Swarm atau IPFS.
+  * Mengakses DApp dengan merujuk pada sebuah nama, menggunakan Ethereum Name Service.
+
+Kita akan menjelajahi opsi pertama di bagian berikutnya, dan kita akan menggali lebih dalam opsi kedua di “The Ethereum Name Service (ENS)”.
+
+### Menyimpan Auction DApp di Swarm
+
+Kita telah memperkenalkan Swarm di “Swarm” di halaman 270, sebelumnya di bab ini. Auction DApp kita sudah menggunakan Swarm untuk menyimpan gambar ikon untuk setiap lelang. Ini adalah solusi yang jauh lebih efisien daripada mencoba menyimpan data di Ethereum, yang mahal. Ini juga jauh lebih tangguh daripada jika gambar-gambar ini disimpan di layanan terpusat seperti server web atau server file.
+
+Tetapi kita bisa melangkah lebih jauh. Kita dapat menyimpan seluruh *frontend* dari DApp itu sendiri di Swarm dan menjalankannya langsung dari *node* Swarm, alih-alih menjalankan server web.
+
+#### Mempersiapkan Swarm
+
+Untuk memulai, Anda perlu menginstal Swarm dan menginisialisasi *node* Swarm Anda. Swarm adalah bagian dari rangkaian alat Go-Ethereum dari Ethereum Foundation. Rujuk ke instruksi untuk menginstal Go-Ethereum di “Go-Ethereum (Geth)” di halaman 49, atau untuk menginstal rilis biner Swarm, ikuti instruksi di dokumentasi Swarm.
+
+Setelah Anda menginstal Swarm, Anda dapat memeriksa apakah ia berfungsi dengan benar dengan menjalankannya dengan perintah `version`:
+
+```bash
+$ swarm version
+Version: 0.3
+Git Commit: 37685930d953bcbe023f9bc65b135a8d8b8f1488
+Go Version: go1.10.1
+OS: linux
+```
+
+Untuk mulai menjalankan Swarm, Anda harus memberitahunya cara terhubung ke instansi Geth, untuk mengakses API JSON-RPC. Mulailah dengan mengikuti instruksi di panduan Memulai.
+
+Saat Anda memulai Swarm, Anda akan melihat sesuatu seperti ini:
+
+```
+Maximum peer count
+ETH=25 LES=0 total=25
+Starting peer-to-peer node
+ instance=swarm/v0.3.1-225171a4/linux...
+connecting to ENS API
+ url=http://127.0.0.1:8545
+swarm[5955]: [189B blob data]
+Starting P2P networking
+ UDP listener up
+ self=enode://f50c8e19ff841bcd5ce7d2d...
+Updated bzz local addr
+ oaddr=9c40be8b83e648d50f40ad3... uaddr=e
+Starting Swarm service
+ 9c40be8b hive starting
+ detected an existing store. trying to load peers
+ hive 9c40be8b: peers loaded
+Swarm network started on bzz address: 9c40be8b83e648d50f40ad3d35f...
+Pss started
+Streamer started
+IPC endpoint opened
+ url=/home/ubuntu/.ethereum/bzzd.ipc
+RLPx listener up
+ self=enode://f50c8e19ff841bcd5ce7d2d...
+```
+
+Anda dapat mengkonfirmasi bahwa *node* Swarm Anda berjalan dengan benar dengan terhubung ke antarmuka web gerbang Swarm lokal: http://localhost:8500.
+
+Anda akan melihat layar seperti yang ada di Gambar 12-4 dan dapat menanyakan hash Swarm atau nama ENS apa pun.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.4.png" alt="gambar" width="580"/>
+</p>
+
+### Mengunggah File ke Swarm
+
+Setelah *node* dan gerbang Swarm lokal Anda berjalan, Anda dapat mengunggah ke Swarm dan file-file tersebut akan dapat diakses di *node* Swarm mana pun, hanya dengan merujuk pada hash file.
+
+Mari kita uji ini dengan mengunggah sebuah file:
+
+```bash
+$ swarm up code/auction_dapp/README.md
+ec13042c83ffc2fb5cb0aa8c53f770d36c9b3b35d0468a0c0a77c97016bb8d7c
+```
+
+Swarm telah mengunggah file `README.md` dan mengembalikan sebuah hash yang dapat Anda gunakan untuk mengakses file dari *node* Swarm mana pun. Misalnya, Anda bisa menggunakan gerbang Swarm publik.
+
+Meskipun mengunggah satu file relatif mudah, mengunggah seluruh *frontend* DApp sedikit lebih kompleks. Hal ini karena berbagai sumber daya DApp (HTML, CSS, JavaScript, pustaka, dll.) memiliki referensi yang tertanam satu sama lain. Biasanya, server web menerjemahkan URL ke file lokal dan menyajikan sumber daya yang benar. Kita dapat mencapai hal yang sama untuk Swarm dengan mengemas DApp kita.
+
+Di Auction DApp, ada skrip untuk mengemas semua sumber daya:
+
+```bash
+$ cd code/auction_dapp/frontend
+$ npm run build
+
+> frontend@1.0.0 build /home/aantonop/Dev/ethereumbook/code/auction_dapp/frontend
+> node build/build.js
+
+Hash: 9ee134d8db3c44dd574d
+Version: webpack 3.10.0
+Time: 25665ms
+                                                  Asset       Size
+    static/js/vendor.77913f316aaf102cec11.js    1.25 MB
+       static/js/app.5396ead17892922422d4.js     502 kB
+  static/js/manifest.87447dd4f5e60a5f9652.js    1.54 kB
+static/css/app.0e50d6a1d2b1ed4daa03d306ced779cc.css    1.13 kB
+...
+index.html    1.15 kB
+
+  Build complete.
+```
+
+Hasil dari perintah ini akan menjadi direktori baru, `code/auction_dapp/frontend/dist`, yang berisi seluruh *frontend* Auction DApp, yang dikemas bersama:
+
+```
+dist/
+|-- index.html
+`-- static
+    |-- css
+    |   |-- app.0e50d6a1d2b1ed4daa03d306ced779cc.css
+    |   `-- app.0e50d6a1d2b1ed4daa03d306ced779cc.css.map
+    `-- js
+        |-- app.5396ead17892922422d4.js
+        |-- app.5396ead17892922422d4.js.map
+        |-- manifest.87447dd4f5e60a5f9652.js
+        |-- manifest.87447dd4f5e60a5f9652.js.map
+        |-- vendor.77913f316aaf102cec11.js
+        `-- vendor.77913f316aaf102cec11.js.map
+```
+
+Sekarang Anda dapat mengunggah seluruh DApp ke Swarm, dengan menggunakan perintah `up` dan opsi `--recursive`. Di sini, kita juga memberitahu Swarm bahwa `index.html` adalah `defaultpath` untuk memuat DApp ini:
+
+```bash
+$ swarm --bzzapi http://localhost:8500 --recursive \
+--defaultpath dist/index.html up dist/
+ab164cf37dc10647e43a233486cdeffa8334b026e32a480dd9cbd020c12d4581
+```
+
+Sekarang, seluruh Auction DApp kita di-hosting di Swarm dan dapat diakses dengan URL Swarm:
+`bzz://ab164cf37dc10647e43a233486cdeffa8334b026e32a480dd9cbd020c12d4581`
+
+Kita telah membuat beberapa kemajuan dalam mendesentralisasi DApp kita, tetapi kita membuatnya lebih sulit untuk digunakan. URL seperti itu jauh kurang ramah pengguna daripada nama yang bagus seperti `auction_dapp.com`. Apakah kita terpaksa mengorbankan kegunaan untuk mendapatkan desentralisasi?
+
+Tidak harus. Di bagian berikutnya kita akan memeriksa layanan nama Ethereum, yang memungkinkan kita menggunakan nama yang mudah dibaca tetapi tetap mempertahankan sifat terdesentralisasi dari aplikasi kita.
+
+### Ethereum Name Service (ENS)
+
+Anda dapat merancang kontrak pintar terbaik di dunia, tetapi jika Anda tidak menyediakan antarmuka yang baik untuk pengguna, mereka не akan dapat mengaksesnya.
+
+Di internet tradisional, **Domain Name System (DNS)** memungkinkan kita menggunakan nama yang dapat dibaca manusia di peramban sambil menyelesaikan nama-nama tersebut ke alamat IP atau pengenal lain di belakang layar. Di blockchain Ethereum, **Ethereum Naming System (ENS)** memecahkan masalah yang sama, tetapi dengan cara yang terdesentralisasi.
+
+Misalnya, alamat donasi Ethereum Foundation adalah `0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359`; di dalam dompet yang mendukung ENS, alamat itu cukup ditulis `ethereum.eth`.
+
+ENS lebih dari sekadar kontrak pintar; ia adalah DApp fundamental itu sendiri, yang menawarkan layanan nama terdesentralisasi. Lebih jauh lagi, ENS didukung oleh sejumlah DApp untuk pendaftaran, manajemen, dan lelang nama terdaftar. ENS menunjukkan bagaimana DApp dapat bekerja sama: ia adalah DApp yang dibangun untuk melayani DApp lain, didukung oleh ekosistem DApp, tertanam di DApp lain, dan seterusnya.
+
+Di bagian ini kita akan melihat cara kerja ENS. Kami akan mendemonstrasikan bagaimana Anda dapat menyiapkan nama Anda sendiri dan menautkannya ke dompet atau alamat Ethereum, bagaimana Anda dapat menyematkan ENS di DApp lain, dan bagaimana Anda dapat menggunakan ENS untuk menamai sumber daya DApp Anda agar lebih mudah digunakan.
+
+#### Sejarah Layanan Nama Ethereum
+
+Pendaftaran nama adalah aplikasi non-mata uang pertama dari blockchain, yang dipelopori oleh Namecoin. White Paper Ethereum memberikan sistem pendaftaran mirip Namecoin dua baris sebagai salah satu contoh aplikasinya.
+
+Rilis awal Geth dan klien Ethereum C++ memiliki kontrak `namereg` bawaan (tidak digunakan lagi), dan banyak proposal serta ERC untuk layanan nama dibuat, tetapi baru setelah Nick Johnson mulai bekerja untuk Ethereum Foundation pada tahun 2016 dan mengambil proyek di bawah sayapnya, pekerjaan serius pada registrar dimulai.
+
+ENS diluncurkan pada Hari Star Wars, 4 Mei 2017 (setelah upaya yang gagal untuk meluncurkannya pada Hari Pi, 15 Maret).
+
+#### Spesifikasi ENS
+
+ENS ditentukan terutama dalam tiga Ethereum Improvement Proposals: EIP-137, yang menentukan fungsi dasar ENS; EIP-162, yang menjelaskan sistem lelang untuk akar `.eth`; dan EIP-181, yang menentukan pendaftaran balik alamat.
+
+ENS mengikuti filosofi desain “sandwich”: lapisan yang sangat sederhana di bagian bawah, diikuti oleh lapisan kode yang lebih kompleks tetapi dapat diganti, dengan lapisan atas yang sangat sederhana yang menyimpan semua dana di akun terpisah.
+
+#### Lapisan Bawah: Pemilik Nama dan Resolver
+
+ENS beroperasi pada “**node**” alih-alih nama yang dapat dibaca manusia: nama yang dapat dibaca manusia diubah menjadi sebuah *node* menggunakan algoritma “**Namehash**”.
+
+Lapisan dasar ENS adalah kontrak yang cerdas dan sederhana (kurang dari 50 baris kode) yang didefinisikan oleh EIP-137 yang hanya memungkinkan pemilik *node* untuk mengatur informasi tentang nama mereka dan untuk membuat subnode (setara ENS dengan subdomain DNS).
+
+Satu-satunya fungsi di lapisan dasar adalah yang memungkinkan pemilik *node* untuk mengatur informasi tentang *node* mereka sendiri (khususnya *resolver*, *time to live*, atau mentransfer kepemilikan) dan untuk membuat pemilik subnode baru.
+
+##### Algoritma Namehash
+
+Namehash adalah algoritma rekursif yang dapat mengubah nama apa pun menjadi hash yang mengidentifikasi nama tersebut.
+
+“Rekursif” berarti kita memecahkan masalah dengan memecahkan sub-masalah yang merupakan masalah yang lebih kecil dari jenis yang sama, dan kemudian menggunakan solusi untuk sub-masalah untuk memecahkan masalah asli.
+
+Namehash secara rekursif melakukan hash pada komponen nama, menghasilkan string unik dengan panjang tetap (atau “*node*”) untuk setiap domain input yang valid. Misalnya, *node* Namehash dari `subdomain.example.eth` adalah `keccak('<example.eth>' node) + keccak('<subdomain>')`. Sub-masalah yang harus kita selesaikan adalah menghitung *node* untuk `example.eth`, yaitu `keccak('<.eth>' node) + keccak('<example>')`. Untuk memulai, kita harus menghitung *node* untuk `eth`, yaitu `keccak(<root node>) + keccak('<eth>')`.
+
+*Root node* adalah apa yang kita sebut “kasus dasar” dari rekursi kita, dan kita jelas tidak bisa mendefinisikannya secara rekursif, atau algoritma tidak akan pernah berakhir\! *Root node* didefinisikan sebagai `0x0000000000000000000000000000000000000000000000000000000000000000` (32 byte nol).
+
+Menyatukan semua ini, *node* dari `subdomain.example.eth` oleh karena itu adalah `keccak(keccak(keccak(0x0...0 + keccak('eth')) + keccak('example')) + keccak('subdomain'))`.
+
+Secara umum, kita dapat mendefinisikan fungsi Namehash sebagai berikut (kasus dasar untuk *root node*, atau nama kosong, diikuti oleh langkah rekursif):
+`namehash([]) = 0x0000000000000000000000000000000000000000000000000000000000000000`
+`namehash([label, ...]) = keccak256(namehash(...) + keccak256(label))`
+
+Di Python ini menjadi:
+
+```python
+def namehash(name):
+  if name == '':
+    return '\0' * 32
+  else:
+    label, _, remainder = name.partition('.')
+    return sha3(namehash(remainder) + sha3(label))
+```
+
+Jadi, `mastering-ethereum.eth` akan diproses sebagai berikut:
+`namehash('mastering-ethereum.eth')`
+⇒ `sha3(namehash('eth') + sha3('mastering-ethereum'))`
+⇒ `sha3(sha3(namehash('') + sha3('eth')) + sha3('mastering-ethereum'))`
+⇒ `sha3(sha3(('\0' * 32) + sha3('eth')) + sha3('mastering-ethereum'))`
+
+Tentu saja, subdomain sendiri bisa memiliki subdomain: bisa ada `sub.subdomain.example.eth` setelah `subdomain.example.eth`, lalu `sub.sub.subdomain.example.eth`, dan seterusnya. Untuk menghindari komputasi ulang yang mahal, karena Namehash hanya bergantung pada nama itu sendiri, *node* untuk nama tertentu dapat dihitung sebelumnya dan dimasukkan ke dalam kontrak, menghilangkan kebutuhan untuk manipulasi string dan memungkinkan pencarian langsung catatan ENS terlepas dari jumlah komponen dalam nama mentah.
+
+##### Cara memilih nama yang valid
+
+Nama terdiri dari serangkaian label yang dipisahkan titik. Meskipun huruf besar dan kecil diizinkan, semua label harus mengikuti proses normalisasi UTS \#46 yang mengubah huruf besar menjadi huruf kecil sebelum melakukan hash, jadi nama dengan huruf besar-kecil yang berbeda tetapi ejaan yang identik akan berakhir dengan Namehash yang sama.
+
+Anda bisa menggunakan label dan domain dengan panjang berapa pun, tetapi demi kompatibilitas dengan DNS lama, aturan berikut direkomendasikan:
+
+  * Label tidak boleh lebih dari 64 karakter.
+  * Nama ENS lengkap tidak boleh lebih dari 255 karakter.
+  * Label tidak boleh dimulai atau diakhiri dengan tanda hubung, atau dimulai dengan angka.
+
+##### Kepemilikan *root node*
+
+Salah satu hasil dari sistem hierarkis ini adalah ia bergantung pada pemilik *root node*, yang dapat membuat domain tingkat atas (TLD).
+
+Meskipun tujuan akhirnya adalah untuk mengadopsi proses pengambilan keputusan terdesentralisasi untuk TLD baru, pada saat penulisan, *root node* dikendalikan oleh multisig 4-dari-7, yang dipegang oleh orang-orang di berbagai negara (dibangun sebagai cerminan dari 7 pemegang kunci sistem DNS). Akibatnya, mayoritas setidaknya 4 dari 7 pemegang kunci diperlukan untuk melakukan perubahan apa pun.
+
+Saat ini tujuan dan sasaran dari para pemegang kunci ini adalah untuk bekerja dalam konsensus dengan komunitas untuk:
+
+  * Memigrasi dan meningkatkan kepemilikan sementara TLD `.eth` ke kontrak yang lebih permanen setelah sistem dievaluasi.
+  * Mengizinkan penambahan TLD baru, jika komunitas setuju bahwa mereka dibutuhkan.
+  * Memigrasi kepemilikan multisig akar ke kontrak yang lebih terdesentralisasi, ketika sistem semacam itu disetujui, diuji, dan diimplementasikan.
+  * Berfungsi sebagai jalan terakhir untuk menangani *bug* atau kerentanan apa pun di registri tingkat atas.
+
+##### Resolver
+
+Kontrak ENS dasar не dapat menambahkan metadata ke nama; itu adalah tugas dari apa yang disebut “**kontrak resolver**.” Ini adalah kontrak buatan pengguna yang dapat menjawab pertanyaan tentang nama, seperti alamat Swarm apa yang terkait dengan aplikasi, alamat apa yang menerima pembayaran ke aplikasi (dalam ether atau token), atau apa hash dari aplikasi (untuk memverifikasi integritasnya).
+
+#### Lapisan Tengah: Node .eth
+
+Pada saat penulisan, satu-satunya domain tingkat atas yang dapat didaftarkan secara unik dalam kontrak pintar adalah `.eth`.
+
+> Sedang ada pekerjaan untuk memungkinkan pemilik domain DNS tradisional mengklaim kepemilikan ENS. Meskipun secara teori ini bisa berhasil untuk `.com`, satu-satunya domain yang implementasinya telah dilakukan sejauh ini adalah `.xyz`, dan hanya di *testnet* Ropsten.
+
+Domain `.eth` didistribusikan melalui sistem lelang. Tidak ada daftar yang dicadangkan atau prioritas, dan satu-satunya cara untuk mendapatkan nama adalah dengan menggunakan sistem tersebut. Sistem lelang adalah kode yang kompleks (lebih dari 500 baris); sebagian besar upaya pengembangan awal (dan *bug*\!) di ENS ada di bagian sistem ini. Namun, ini juga dapat diganti dan ditingkatkan, tanpa risiko terhadap dana—lebih lanjut tentang itu nanti.
+
+##### Lelang Vickrey
+
+Nama didistribusikan melalui lelang Vickrey yang dimodifikasi. Dalam lelang Vickrey tradisional, setiap penawar mengirimkan tawaran tertutup, dan semuanya diungkapkan secara bersamaan, di mana penawar tertinggi memenangkan lelang tetapi hanya membayar tawaran tertinggi kedua. Oleh karena itu, penawar terinsentif untuk tidak menawar lebih rendah dari nilai sebenarnya dari nama bagi mereka, karena menawar nilai sebenarnya meningkatkan peluang mereka untuk menang tetapi tidak mempengaruhi harga yang pada akhirnya akan mereka bayar.
+
+Di blockchain, beberapa perubahan diperlukan:
+
+  * Untuk memastikan penawar tidak mengirimkan tawaran yang tidak ingin mereka bayar, mereka harus **mengunci nilai yang sama atau lebih tinggi dari tawaran mereka** sebelumnya, untuk menjamin tawaran itu valid.
+  * Karena Anda tidak dapat menyembunyikan rahasia di blockchain, penawar harus melakukan **setidaknya dua transaksi (proses *commit–reveal*)**, untuk menyembunyikan nilai asli dan nama yang mereka tawar.
+  * Karena Anda tidak dapat mengungkapkan semua tawaran secara bersamaan dalam sistem terdesentralisasi, **penawar harus mengungkapkan tawaran mereka sendiri**; jika tidak, mereka akan kehilangan dana yang terkunci. Tanpa penyitaan ini, seseorang dapat membuat banyak tawaran dan memilih untuk mengungkapkan hanya satu atau dua, mengubah lelang tawaran tertutup menjadi lelang harga naik tradisional.
+
+Oleh karena itu, lelang adalah proses empat langkah:
+
+1.  **Mulai lelang.** Ini diperlukan untuk menyiarkan niat untuk mendaftarkan nama. Ini menciptakan semua tenggat waktu lelang. Nama-nama di-hash, sehingga hanya mereka yang memiliki nama di kamus mereka yang akan tahu lelang mana yang dibuka. Ini memungkinkan beberapa privasi, yang berguna jika Anda membuat proyek baru dan tidak ingin berbagi detail tentangnya. Anda dapat membuka beberapa lelang dummy pada saat yang sama, jadi jika seseorang mengikuti Anda, mereka tidak bisa begitu saja menawar di semua lelang yang Anda buka.
+2.  **Buat tawaran tertutup.** Anda harus melakukan ini sebelum batas waktu penawaran, dengan mengikat sejumlah ether ke hash dari pesan rahasia (yang berisi, antara lain, hash dari nama, jumlah tawaran sebenarnya, dan *salt*). Anda dapat mengunci lebih banyak ether daripada yang sebenarnya Anda tawar untuk menutupi valuasi Anda yang sebenarnya.
+3.  **Ungkapkan tawaran.** Selama periode pengungkapan, Anda harus membuat transaksi yang mengungkapkan tawaran, yang kemudian akan menghitung tawaran tertinggi dan tawaran tertinggi kedua dan mengirim ether kembali ke penawar yang tidak berhasil. Setiap kali tawaran diungkapkan, pemenang saat ini dihitung ulang; oleh karena itu, yang terakhir ditetapkan sebelum batas waktu pengungkapan berakhir menjadi pemenang keseluruhan.
+4.  **Bersihkan setelahnya.** Jika Anda adalah pemenang, Anda dapat menyelesaikan lelang untuk mendapatkan kembali selisih antara tawaran Anda dan tawaran tertinggi kedua. Jika Anda lupa mengungkapkan, Anda dapat melakukan pengungkapan terlambat dan memulihkan sedikit dari tawaran Anda.
+
+#### Lapisan Atas: Akta (The Deeds)
+
+Lapisan atas ENS adalah kontrak super sederhana lainnya dengan satu tujuan: untuk **menyimpan dana**.
+
+Ketika Anda memenangkan sebuah nama, dana sebenarnya tidak dikirim ke mana pun, tetapi hanya **dikunci** selama periode Anda ingin memegang nama tersebut (setidaknya satu tahun). Ini berfungsi seperti pembelian kembali yang dijamin: jika pemilik tidak menginginkan nama itu lagi, mereka dapat menjualnya kembali ke sistem dan memulihkan ether mereka (jadi biaya memegang nama adalah biaya peluang untuk melakukan sesuatu dengan pengembalian lebih besar dari nol).
+
+Tentu saja, memiliki satu kontrak yang menyimpan jutaan dolar dalam ether terbukti sangat berisiko, jadi sebagai gantinya ENS membuat **kontrak akta (*deed contract*)** untuk setiap nama baru. Kontrak akta sangat sederhana (sekitar 50 baris kode), dan hanya memungkinkan dana untuk ditransfer kembali ke satu akun (pemilik akta) dan dipanggil oleh satu entitas tunggal (kontrak registrar). Pendekatan ini secara drastis mengurangi permukaan serangan di mana *bug* dapat membahayakan dana.
+
+### Mendaftarkan Nama
+
+Mendaftarkan nama di ENS adalah proses empat langkah, seperti yang kita lihat di “Lelang Vickrey” di halaman 285. Pertama kita menempatkan tawaran untuk nama yang tersedia, lalu kita mengungkapkan tawaran kita setelah 48 jam untuk mengamankan nama tersebut. Gambar 12-5 adalah diagram yang menunjukkan garis waktu pendaftaran.
+
+Mari kita daftarkan nama pertama kita\!
+
+Kita akan menggunakan salah satu dari beberapa antarmuka ramah pengguna yang tersedia untuk mencari nama yang tersedia, menempatkan tawaran pada nama `ethereumbook.eth`, mengungkapkan tawaran, dan mengamankan nama tersebut.
+
+Ada sejumlah antarmuka berbasis web ke ENS yang memungkinkan kita berinteraksi dengan DApp ENS. Untuk contoh ini, kita akan menggunakan antarmuka **MyCrypto**, bersama dengan **MetaMask** sebagai dompet kita.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.5.png" alt="gambar" width="580"/>
+</p>
+
+Pertama, kita perlu memastikan nama yang kita inginkan tersedia. Saat menulis buku ini, kami sangat ingin mendaftarkan nama `mastering.eth`, tetapi sayang, Gambar 12-6 menunjukkan bahwa nama itu sudah diambil! Karena pendaftaran ENS hanya berlaku selama satu tahun, mungkin saja nama itu bisa didapatkan di masa depan. Sementara itu, mari kita cari `ethereumbook.eth` (Gambar 12-6).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.6.png" alt="gambar" width="580"/>
+</p>
+
+Bagus! Nama tersebut tersedia. Untuk mendaftarkannya, kita perlu melanjutkan dengan Gambar 12-7. Mari kita buka kunci MetaMask dan memulai lelang untuk `ethereumbook.eth`.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.7.png" alt="gambar" width="580"/>
+</p>
+
+Baik, ayo kita ajukan penawaran. Untuk melakukannya, kita perlu mengikuti langkah-langkah di Gambar 12-8.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.8.png" alt="gambar" width="580"/>
+</p>
+
+> Seperti yang disebutkan di “Lelang Vickrey” di halaman 285, Anda harus **mengungkapkan penawaran Anda dalam waktu 48 jam** setelah lelang selesai, atau Anda akan kehilangan dana dalam penawaran Anda. Apakah kami lupa melakukan ini dan kehilangan 0,01 ETH kami sendiri? Tentu saja kami lupa.
+>
+> **Ambil tangkapan layar (*screenshot*), simpan frasa rahasia Anda (sebagai cadangan untuk penawaran Anda), dan tambahkan pengingat di kalender Anda untuk tanggal dan waktu pengungkapan, agar Anda tidak lupa dan kehilangan dana Anda.**
+
+Terakhir, kita konfirmasi transaksi dengan mengklik tombol kirim (*submit*) besar berwarna hijau yang ditunjukkan pada Gambar 12-9.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.9.png" alt="gambar" width="580"/>
+</p>
+
+Jika semua berjalan lancar, setelah mengirimkan transaksi dengan cara ini Anda dapat kembali dan **mengungkapkan penawaran dalam 48 jam**, dan nama yang Anda minta akan terdaftar ke alamat Ethereum Anda.
+
+## Mengelola Nama ENS Anda
+
+Setelah Anda mendaftarkan nama ENS, Anda dapat mengelolanya menggunakan antarmuka ramah pengguna lainnya: **ENS Manager**.
+
+Sesampai di sana, masukkan nama yang ingin Anda kelola di kotak pencarian (lihat Gambar 12-10). Anda perlu memastikan dompet Ethereum Anda (misalnya, MetaMask) tidak terkunci, agar DApp ENS Manager dapat mengelola nama tersebut atas nama Anda.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.10.png" alt="gambar" width="580"/>
+</p>
+
+Dari antarmuka ini, kita dapat membuat subdomain, mengatur kontrak resolver (lebih lanjut tentang ini nanti), dan menghubungkan setiap nama ke sumber daya yang sesuai, seperti alamat Swarm dari *frontend* DApp.
+
+### ### Membuat subdomain ENS
+
+Pertama, mari kita buat subdomain untuk contoh Auction DApp kita (lihat Gambar 12-11). Kita akan menamai subdomainnya `auction`, sehingga nama yang sepenuhnya memenuhi syarat (*fully qualified name*) akan menjadi `auction.ethereumbook.eth`.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.11.png" alt="gambar" width="580"/>
+</p>
+
+Setelah kita membuat subdomain, kita dapat memasukkan `auction.ethereumbook.eth` di kotak pencarian dan mengelolanya, sama seperti kita mengelola domain `ethereumbook.eth` sebelumnya.
+
+## Resolver ENS
+
+Di ENS, menyelesaikan sebuah nama adalah proses **dua langkah**:
+
+1.  Registri ENS dipanggil dengan nama yang akan diresolusi setelah di-*hash*. Jika catatan ada, registri akan mengembalikan alamat *resolver*-nya.
+2.  *Resolver* dipanggil, menggunakan metode yang sesuai untuk sumber daya yang diminta. *Resolver* mengembalikan hasil yang diinginkan.
+
+Proses dua langkah ini memiliki beberapa keuntungan. Memisahkan fungsionalitas *resolver* dari sistem penamaan itu sendiri memberi kita lebih banyak fleksibilitas. Pemilik nama dapat menggunakan *resolver* kustom untuk meresolusi tipe atau sumber daya apa pun, memperluas fungsionalitas ENS. Misalnya, jika di masa depan Anda ingin menautkan sumber daya geolokasi (bujur/lintang) ke nama ENS, Anda dapat membuat *resolver* baru yang menjawab kueri geolokasi. Siapa yang tahu aplikasi apa yang mungkin berguna di masa depan? Dengan *resolver* kustom, satu-satunya batasan adalah imajinasi Anda.
+
+Untuk kenyamanan, ada ***resolver* publik default** yang dapat meresolusi berbagai sumber daya, termasuk alamat (untuk dompet atau kontrak) dan konten (hash Swarm untuk DApps atau kode sumber kontrak).
+
+Karena kita ingin menautkan Auction DApp kita ke hash Swarm, kita dapat menggunakan *resolver* publik, yang mendukung resolusi konten, seperti yang ditunjukkan pada Gambar 12-12; kita tidak perlu membuat kode atau menerapkan *resolver* kustom.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.12.png" alt="gambar" width="580"/>
+</p>
+
+## Meresolusi Nama ke Hash Swarm (Konten)
+
+Setelah resolver untuk `auction.ethereumbook.eth` diatur menjadi resolver publik, kita dapat mengaturnya untuk mengembalikan hash Swarm sebagai **konten** dari nama kita (lihat Gambar 12-13).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.13.png" alt="gambar" width="580"/>
+</p>
+
+Setelah menunggu sebentar hingga transaksi kita dikonfirmasi, kita seharusnya dapat meresolusi nama dengan benar. Sebelum mengatur nama, Auction DApp kita dapat ditemukan di gerbang Swarm berdasarkan *hash*-nya:
+
+```
+https://swarm-gateways.net/bzz:/ab164cf37dc10647e43a233486cdeffa8334b026e32a480dd9cbd020c12d4581
+```
+
+atau dengan mencari di peramban DApp atau gerbang Swarm untuk URL Swarm:
+
+```
+bzz://ab164cf37dc10647e43a233486cdeffa8334b026e32a480dd9cbd020c12d4581
+```
+
+Sekarang setelah kita menautkannya ke sebuah nama, segalanya menjadi jauh lebih mudah:
+
+```
+http://swarm-gateways.net/bzz:/auction.ethereumbook.eth/
+```
+
+Kita juga dapat menemukannya dengan mencari “auction.ethereumbook.eth” di dompet atau peramban DApp yang kompatibel dengan ENS (misalnya, Mist).
+
+## Dari App menjadi DApp
+
+Selama beberapa bagian terakhir, kita telah secara bertahap membangun sebuah aplikasi terdesentralisasi. Kita memulai dengan sepasang kontrak pintar untuk menjalankan lelang akta ERC721. Kontrak-kontrak ini dirancang untuk tidak memiliki akun yang mengatur atau berhak istimewa, sehingga operasinya benar-benar terdesentralisasi. Kita menambahkan *frontend*, yang diimplementasikan dalam JavaScript, yang menawarkan antarmuka yang nyaman dan ramah pengguna untuk DApp kita. Auction DApp menggunakan sistem penyimpanan terdesentralisasi Swarm untuk menyimpan sumber daya aplikasi seperti gambar. DApp ini juga menggunakan protokol komunikasi terdesentralisasi Whisper untuk menawarkan ruang obrolan terenkripsi untuk setiap lelang, tanpa server pusat apa pun.
+
+Kita mengunggah seluruh *frontend* ke Swarm, sehingga DApp kita не bergantung pada server web mana pun untuk menyajikan file. Terakhir, kita mengalokasikan sebuah nama untuk DApp kita menggunakan ENS, menghubungkannya ke *hash* Swarm dari *frontend*, sehingga pengguna dapat mengaksesnya dengan nama yang sederhana dan mudah diingat yang dapat dibaca manusia.
+
+Dengan setiap langkah ini, kita meningkatkan desentralisasi aplikasi kita. Hasil akhirnya adalah sebuah **DApp yang tidak memiliki titik otoritas pusat, tidak ada titik kegagalan pusat, dan mengekspresikan visi “web3”.**
+
+Gambar 12-14 menunjukkan arsitektur lengkap dari Auction DApp.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-12.14.png" alt="gambar" width="580"/>
+</p>
+
+## Kesimpulan
+
+Aplikasi terdesentralisasi adalah puncak dari visi Ethereum, seperti yang diungkapkan oleh para pendiri sejak rancangan-rancangan paling awal. Meskipun saat ini banyak aplikasi yang menyebut diri mereka “DApps”, sebagian besar belum sepenuhnya terdesentralisasi. Namun, kini sudah memungkinkan untuk membangun aplikasi yang hampir sepenuhnya terdesentralisasi. Seiring berjalannya waktu, seiring teknologi semakin matang, akan semakin banyak aplikasi kita yang dapat didesentralisasi, menghasilkan web yang lebih tangguh, tahan sensor, dan bebas.
+
+---
