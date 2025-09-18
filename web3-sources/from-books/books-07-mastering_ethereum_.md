@@ -8262,3 +8262,667 @@ Bab ini menandai akhir dari perjalanan kita, menyelesaikan *Mastering Ethereum*.
 
 ---
 
+# Appendix A
+## Sejarah Fork Ethereum
+
+Sebagian besar ***hard fork*** direncanakan sebagai bagian dari peta jalan pemutakhiran dan terdiri dari pembaruan yang umumnya disetujui oleh komunitas (yaitu, ada **konsensus sosial**). Namun, beberapa *hard fork* tidak memiliki konsensus, yang mengarah pada munculnya beberapa *blockchain* yang berbeda. Peristiwa yang menyebabkan perpecahan Ethereum/Ethereum Classic adalah salah satu kasus tersebut, dan dibahas dalam lampiran ini.
+
+## Ethereum Classic (ETC)
+
+**Ethereum Classic** muncul setelah anggota komunitas Ethereum mengimplementasikan *hard fork* yang sensitif terhadap waktu (dengan nama kode “DAO”). Pada tanggal 20 Juli 2016, pada ketinggian blok 1,92 juta, Ethereum memperkenalkan **perubahan *state* yang tidak reguler** melalui *hard fork* dalam upaya untuk mengembalikan sekitar 3,6 juta ether yang telah diambil dari sebuah *smart contract* yang dikenal sebagai **The DAO**. Hampir semua orang setuju bahwa ether yang diambil telah dicuri dan membiarkan semuanya di tangan pencuri akan sangat merugikan perkembangan ekosistem Ethereum serta platform itu sendiri.
+
+Mengembalikan ether kepada pemiliknya masing-masing seolah-olah The DAO tidak pernah ada secara teknis mudah dilakukan, meskipun cukup kontroversial secara politis. Sejumlah orang di ekosistem tidak setuju dengan perubahan ini, meyakini bahwa **kekekalan (*immutability*)** harus menjadi prinsip fundamental dari *blockchain* Ethereum tanpa terkecuali; mereka memilih untuk melanjutkan rantai asli dengan nama Ethereum Classic. Meskipun perpecahan itu pada awalnya bersifat ideologis, kedua rantai tersebut sejak saat itu telah berevolusi menjadi entitas yang terpisah.
+
+### The Decentralized Autonomous Organization (The DAO)
+
+The DAO diciptakan oleh Slock.it, dengan tujuan menyediakan pendanaan dan tata kelola berbasis komunitas untuk proyek-proyek. Ide intinya adalah bahwa proposal akan diajukan, kurator akan mengelola proposal, dana akan dikumpulkan dari investor dalam komunitas Ethereum, dan, jika proyek terbukti berhasil, investor akan menerima bagian dari keuntungan.
+
+The DAO juga merupakan salah satu eksperimen pertama dalam token Ethereum. Daripada mendanai proyek secara langsung dengan ether, peserta akan menukar ether mereka dengan token DAO, menggunakannya untuk memberikan suara pada pendanaan proyek, dan nantinya dapat menukarnya kembali dengan ether.
+
+Token DAO tersedia untuk dibeli dalam *crowdsale* yang berlangsung dari 5 April hingga 30 April 2016, mengumpulkan hampir 14% dari total ether yang ada, yang bernilai ~$150 juta pada saat itu.
+
+### Bug *Reentrancy*
+
+Pada tanggal 9 Juni 2016, pengembang Peter Vessenes dan Chriseth melaporkan bahwa sebagian besar kontrak berbasis Ethereum yang mengelola dana berpotensi rentan terhadap eksploitasi yang dapat mengosongkan dana kontrak. Beberapa hari kemudian, pada 12 Juni, Stephen Tual (salah satu pendiri Slock.it) melaporkan bahwa kode The DAO tidak rentan terhadap bug yang dijelaskan oleh Peter dan Chriseth. Kontributor DAO yang khawatir pun bernapas lega—sampai lima hari kemudian, ketika seorang penyerang tak dikenal mulai menguras The DAO menggunakan eksploitasi yang mirip dengan yang telah diperingatkan sebelumnya. Pada akhirnya, penyerang The DAO menyedot ~3,6 juta ether dari The DAO.
+
+Secara bersamaan, sekelompok relawan yang menamakan diri mereka **Robin Hood Group (RHG)** mulai menggunakan eksploitasi yang sama untuk menarik sisa dana guna menyelamatkannya agar tidak dicuri oleh penyerang The DAO. Pada tanggal 21 Juni, RHG mengumumkan bahwa mereka telah mengamankan sekitar 70% dana The DAO (sekitar 7,2 juta ether), dengan rencana untuk mengembalikannya kepada komunitas (yang berhasil mereka lakukan di jaringan ETC, dan tidak perlu dilakukan di jaringan Ethereum setelah *fork*). Banyak ucapan terima kasih dan pujian diberikan kepada RHG atas pemikiran cepat dan tindakan cepat mereka yang membantu mengamankan sebagian besar ether komunitas.
+
+#### Detail Teknis
+
+Meskipun penjelasan yang lebih rinci dan menyeluruh tentang bug ini diberikan oleh Phil Daian, penjelasan singkatnya adalah bahwa fungsi krusial dalam DAO memiliki dua baris kode dalam urutan yang salah, yang berarti penyerang dapat membuat permintaan untuk menarik ether ditindaklanjuti berulang kali, sebelum pemeriksaan apakah penyerang berhak atas penarikan tersebut selesai dilakukan. Jenis kerentanan ini dijelaskan dalam bab “Reentrancy”.
+
+#### Alur Serangan
+
+Bayangkan Anda memiliki $100 di rekening bank Anda dan Anda dapat membawa sejumlah slip penarikan kepada teller bank. Teller akan memberi Anda uang untuk setiap slip secara berurutan, dan hanya setelah memproses semua slip, mereka akan mencatat penarikan Anda. Bagaimana jika Anda membawa tiga slip, masing-masing meminta penarikan $100? Bagaimana jika Anda membawa tiga ribu?
+
+Serangan DAO bekerja seperti ini:
+1. Penyerang meminta kontrak DAO untuk menarik token DAO (DAO).
+2. Penyerang meminta kontrak untuk menarik DAO lagi, sebelum kontrak memperbarui catatannya untuk menunjukkan bahwa DAO telah ditarik.
+3. Penyerang mengulangi langkah 2 sebanyak mungkin.
+4. Kontrak akhirnya mencatat satu penarikan DAO tunggal, kehilangan jejak penarikan yang terjadi sementara itu.
+
+### Hard Fork The DAO
+
+Untungnya, ada beberapa pengaman yang dibangun ke dalam The DAO: terutama, semua permintaan penarikan tunduk pada penundaan 28 hari. Ini memberi komunitas sedikit waktu untuk membahas apa yang harus dilakukan tentang eksploitasi tersebut, karena dari sekitar 17 Juni–20 Juli, penyerang The DAO tidak akan dapat mengubah token DAO mereka menjadi ether.
+
+Beberapa pengembang fokus mencari solusi yang layak, dan berbagai jalan dieksplorasi dalam waktu singkat ini. Di antaranya adalah *soft fork* DAO, yang diumumkan pada 24 Juni, untuk menunda penarikan DAO hingga konsensus tercapai, dan *hard fork* DAO, yang diumumkan pada 15 Juli, untuk membalikkan efek serangan DAO dengan perubahan *state* yang luar biasa.
+
+Pada tanggal 28 Juni, pengembang menemukan eksploitasi DoS di *soft fork* DAO dan menyimpulkan bahwa *hard fork* DAO akan menjadi satu-satunya pilihan yang layak untuk menyelesaikan situasi sepenuhnya. *Hard fork* DAO akan mentransfer semua ether yang telah diinvestasikan di The DAO ke dalam *smart contract* pengembalian dana baru, memungkinkan pemilik asli ether untuk mengklaim pengembalian dana penuh. Ini memberikan solusi untuk mengembalikan dana yang diretas, tetapi juga berarti mengganggu saldo alamat tertentu di jaringan, meskipun terisolasi. Juga akan ada sisa ether di bagian-bagian DAO yang dikenal sebagai childDAO. Sekelompok wali amanat akan secara manual mengesahkan sisa ether tersebut, yang bernilai ~$6–7 juta pada saat itu.
+
+Dengan waktu yang hampir habis, beberapa tim pengembangan Ethereum membuat klien yang memungkinkan pengguna untuk memutuskan apakah mereka ingin mengaktifkan *fork* ini. Namun, para pembuat klien ingin memutuskan apakah akan membuat pilihan ini *opt-in* (tidak melakukan *fork* secara *default*) atau *opt-out* (*fork* secara *default*). Pada tanggal 15 Juli, pemungutan suara dibuka di carbonvote.com. Keesokan harinya, pada ketinggian blok 1.894.000, pemungutan suara ditutup. Dari 5,5% total pasokan ether yang memberikan suara, ~80% suara (~4,5% dari total pasokan ether) memilih *opt-out*. Seperempat dari suara *opt-out* berasal dari satu alamat tunggal.
+
+Pada akhirnya keputusannya menjadi *opt-out*, jadi mereka yang menentang *hard fork* DAO harus secara eksplisit menyatakan penolakan mereka dengan mengubah opsi konfigurasi di perangkat lunak yang mereka jalankan.
+
+Pada tanggal 20 Juli, pada ketinggian blok 1.920.000, Ethereum mengimplementasikan *hard fork* DAO dan dengan demikian dua jaringan Ethereum tercipta: satu termasuk perubahan *state*, dan yang lainnya mengabaikannya.
+
+Ketika Ethereum yang di-*hard-fork* (Ethereum saat ini) memperoleh mayoritas kekuatan penambangan, banyak yang berasumsi bahwa konsensus telah tercapai dan rantai minoritas akan lenyap, seperti pada *fork* sebelumnya. Meskipun demikian, sebagian besar komunitas Ethereum (sekitar 10% berdasarkan nilai dan kekuatan penambangan) mulai mendukung rantai yang tidak di-*fork*, yang kemudian dikenal sebagai **Ethereum Classic**.
+
+Dalam beberapa hari setelah *fork*, beberapa bursa mulai mendaftarkan Ethereum (“ETH”) dan Ethereum Classic (“ETC”). Karena sifat *hard fork*, semua pengguna Ethereum yang memegang ether pada saat perpecahan kemudian memegang dana di kedua rantai tersebut, dan nilai pasar untuk ETC segera terbentuk dengan Poloniex mendaftarkan ETC pada 24 Juli.
+
+### Linimasa Hard Fork The DAO
+
+* **5 April 2016**: Slock.it menciptakan The DAO setelah audit keamanan oleh Dejavu Security.
+* **30 April 2016**: *Crowdsale* The DAO diluncurkan.
+* **27 Mei 2016**: *Crowdsale* The DAO berakhir.
+* **9 Juni 2016**: Bug panggilan rekursif generik ditemukan dan diyakini memengaruhi banyak kontrak Solidity yang melacak saldo pengguna.
+* **12 Juni 2016**: Stephen Tual menyatakan bahwa dana The DAO tidak berisiko.
+* **17 Juni 2016**: The DAO dieksploitasi dan varian dari bug yang ditemukan (disebut “bug *reentrancy*”) digunakan untuk mulai menguras dana, akhirnya meraup ~30% dari ether.
+* **21 Juni 2016**: RHG mengumumkan telah mengamankan ~70% ether lainnya yang disimpan di dalam The DAO.
+* **24 Juni 2016**: Pemungutan suara *soft fork* diumumkan melalui sinyal *opt-in* melalui klien Geth dan Parity, yang dirancang untuk menahan dana sementara hingga komunitas dapat memutuskan apa yang harus dilakukan.
+* **28 Juni 2016**: Kerentanan ditemukan di *soft fork* dan ditinggalkan.
+* **28 Juni 2016 hingga 15 Juli**: Pengguna memperdebatkan apakah akan melakukan *hard fork* atau tidak; sebagian besar debat publik vokal terjadi di subreddit /r/ethereum.
+* **15 Juli 2016**: *Hard fork* DAO diusulkan, untuk mengembalikan dana yang diambil dalam serangan DAO.
+* **15 Juli 2016**: Pemungutan suara diadakan di CarbonVote untuk memutuskan apakah *hard fork* DAO akan bersifat *opt-in* (tidak melakukan *fork* secara *default*) atau *opt-out* (*fork* secara *default*).
+* **16 Juli 2016**: 5,5% dari total pasokan ether memberikan suara; ~80% suara (~4,5% dari total pasokan) mendukung *hard fork opt-out*, dengan seperempat dari suara pro-fork berasal dari satu alamat tunggal.
+* **20 Juli 2016**: *Hard fork* terjadi pada blok 1.920.000.
+* **20 Juli 2016**: Mereka yang menentang *hard fork* DAO terus menjalankan perangkat lunak klien lama; ini menyebabkan masalah dengan transaksi yang diputar ulang (*replayed*) di kedua rantai.
+* **24 Juli 2016**: Poloniex mendaftarkan rantai Ethereum asli dengan simbol ticker ETC; ini adalah bursa pertama yang melakukannya.
+* **10 Agustus 2016**: RHG mentransfer 2,9 juta ETC yang dipulihkan ke Poloniex untuk mengubahnya menjadi ETH atas saran dari Bity SA; 14% dari total kepemilikan RHG diubah dari ETC menjadi ETH dan mata uang kripto lainnya, dan Poloniex membekukan 86% sisa ETH yang didepositkan.
+* **30 Agustus 2016**: Dana yang dibekukan dikirim kembali oleh Poloniex ke RHG, yang kemudian membuat kontrak pengembalian dana di rantai ETC.
+* **11 Desember 2016**: Tim pengembangan ETC dari IOHK terbentuk, dipimpin oleh anggota pendiri Ethereum, Charles Hoskinson.
+* **13 Januari 2017**: Jaringan ETC diperbarui untuk menyelesaikan masalah pemutaran ulang transaksi; rantai-rantai tersebut kini secara fungsional terpisah.
+* **20 Februari 2017**: ETCDEVTeam terbentuk, dipimpin oleh pengembang awal ETC, Igor Artamonov (splix).
+
+## Ethereum dan Ethereum Classic
+
+Meskipun perpecahan awal berpusat di sekitar The DAO, kedua jaringan, Ethereum dan Ethereum Classic, sekarang adalah proyek yang terpisah, meskipun sebagian besar pengembangan masih dilakukan oleh komunitas Ethereum dan hanya di-*porting* ke basis kode Ethereum Classic. Namun demikian, serangkaian perbedaan lengkap terus berkembang dan terlalu luas untuk dibahas dalam lampiran ini. Namun, perlu dicatat bahwa kedua rantai tersebut berbeda secara signifikan dalam pengembangan inti dan struktur komunitasnya. Beberapa perbedaan teknis dibahas selanjutnya.
+
+### EVM
+
+Untuk sebagian besar (pada saat penulisan), kedua jaringan tetap sangat kompatibel: kode kontrak yang dibuat untuk satu rantai berjalan seperti yang diharapkan di rantai lainnya; tetapi ada beberapa perbedaan kecil dalam OPCODE EVM.
+
+### Pengembangan Jaringan Inti
+
+Sebagai proyek terbuka, platform *blockchain* sering kali memiliki banyak pengguna dan kontributor. Namun, pengembangan jaringan inti (yaitu, kode yang menjalankan jaringan) sering kali dilakukan oleh kelompok-kelompok kecil karena keahlian dan pengetahuan yang diperlukan untuk mengembangkan jenis perangkat lunak ini. Di Ethereum, pekerjaan ini dilakukan oleh Ethereum Foundation dan para relawan. Di Ethereum Classic, pekerjaan ini dilakukan oleh ETCDEV, IOHK, dan para relawan.
+
+## Fork Ethereum Terkemuka Lainnya
+
+**Ellaism** adalah jaringan berbasis Ethereum yang bermaksud menggunakan PoW secara eksklusif untuk mengamankan *blockchain*. Jaringan ini tidak memiliki *pre-mine* dan tidak ada biaya pengembang wajib, dengan semua dukungan dan pengembangan disumbangkan secara bebas oleh komunitas. Pengembangnya percaya ini membuat milik mereka “salah satu proyek Ethereum murni yang paling jujur,” dan yang “unik menarik sebagai platform bagi pengembang serius, pendidik, dan peminat. Ellaism adalah platform *smart contract* murni. Tujuannya adalah menciptakan platform *smart contract* yang adil dan dapat dipercaya.” Prinsip-prinsip platform ini adalah sebagai berikut:
+
+* Semua perubahan dan pemutakhiran pada protokol harus berusaha untuk mempertahankan dan memperkuat Prinsip-prinsip Ellaism ini.
+* **Kebijakan Moneter**: 280 juta koin.
+* **Tanpa Sensor**: Tidak seorang pun boleh dapat mencegah transaksi yang valid untuk dikonfirmasi.
+* ***Open-Source***: Kode sumber Ellaism harus selalu terbuka bagi siapa saja untuk dibaca, dimodifikasi, disalin, dan dibagikan.
+* **Tanpa Izin (*Permissionless*)**: Tidak ada penjaga gerbang sewenang-wenang yang boleh mencegah siapa pun menjadi bagian dari jaringan (pengguna, node, penambang, dll.).
+* **Pseudonim**: Tidak ada ID yang diperlukan untuk memiliki atau menggunakan Ellaism.
+* **Dapat Dipertukarkan (*Fungible*)**: Semua koin adalah sama dan harus dapat dibelanjakan secara setara.
+* **Transaksi Tidak Dapat Dibatalkan**: Blok yang telah dikonfirmasi harus ditetapkan secara permanen. Sejarah *blockchain* harus tidak dapat diubah (*immutable*).
+* **Tidak Ada Hard Fork Kontroversial**: Jangan pernah melakukan *hard fork* tanpa konsensus dari seluruh komunitas. Hanya langgar konsensus yang ada jika diperlukan.
+* Banyak pemutakhiran fitur dapat dilakukan tanpa *hard fork*, seperti meningkatkan kinerja EVM.
+
+Beberapa *fork* lain juga telah terjadi di Ethereum. Beberapa di antaranya adalah ***hard fork***, dalam artian mereka berpisah langsung dari jaringan Ethereum yang sudah ada sebelumnya. Yang lain adalah ***software fork***: mereka menggunakan perangkat lunak klien/node Ethereum tetapi menjalankan jaringan yang sepenuhnya terpisah tanpa riwayat yang sama dengan Ethereum. Kemungkinan akan ada lebih banyak *fork* selama masa hidup Ethereum.
+
+Ada juga beberapa proyek lain yang mengklaim sebagai *fork* Ethereum tetapi sebenarnya berbasis token ERC20 dan berjalan di jaringan Ethereum. Dua contohnya adalah EtherBTC (ETHB) dan Ethereum Modification (EMOD). Ini bukanlah *fork* dalam pengertian tradisional, dan terkadang disebut “***airdrops***.”
+
+Berikut adalah ringkasan singkat dari beberapa *fork* yang lebih terkemuka yang telah terjadi:
+
+* **Expanse** adalah *fork* pertama dari *blockchain* Ethereum yang mendapatkan daya tarik. Diumumkan melalui forum Bitcoin Talk pada 7 September 2015. *Fork* sebenarnya terjadi seminggu kemudian pada 14 September 2015, pada ketinggian blok 800.000. Awalnya didirikan oleh Christopher Franko dan James Clayton. Visi yang mereka nyatakan adalah menciptakan rantai canggih untuk: “identitas, tata kelola, amal, perdagangan, dan ekuitas”.
+* **EthereumFog (ETF)** diluncurkan pada 14 Desember 2017, dan melakukan *fork* pada ketinggian blok 4.730.660. Tujuan yang dinyatakan proyek ini adalah untuk mengembangkan “komputasi kabut terdesentralisasi dunia” dengan berfokus pada komputasi kabut (*fog computing*) dan penyimpanan terdesentralisasi. Masih sedikit informasi tentang apa yang sebenarnya akan dicakup oleh hal ini.
+* **EtherZero (ETZ)** diluncurkan pada 19 Januari 2018, pada ketinggian blok 4.936.270. Inovasi utamanya adalah pengenalan arsitektur *masternode* dan penghapusan biaya transaksi untuk *smart contract* guna memungkinkan keragaman DApps yang lebih luas. Terdapat beberapa kritik dari beberapa anggota terkemuka komunitas Ethereum, MyEtherWallet, dan MetaMask, karena kurangnya kejelasan seputar pengembangan dan beberapa tuduhan kemungkinan *phishing*.
+* **EtherInc (ETI)** diluncurkan pada 13 Februari 2018, pada ketinggian blok 5.078.585, dengan fokus pada pembangunan organisasi terdesentralisasi. Tujuan yang dinyatakan termasuk pengurangan waktu blok, peningkatan imbalan penambang, penghapusan imbalan *uncle*, dan penetapan batas pada koin yang dapat ditambang. EtherInc menggunakan kunci privat yang sama dengan Ethereum dan telah mengimplementasikan perlindungan pemutaran ulang (*replay protection*) untuk melindungi ether di rantai asli yang tidak di-*fork*.
+
+---
+
+# Appendix B
+## Standar Ethereum
+
+## Proposal Peningkatan Ethereum (EIPs)
+
+Repositori **Proposal Peningkatan Ethereum** (*Ethereum Improvement Proposal*) terletak di [https://github.com/ethereum/EIPs/](https://github.com/ethereum/EIPs/). Alur kerjanya diilustrasikan pada Gambar B-1.
+
+Dari [EIP-1](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md):
+> EIP adalah singkatan dari *Ethereum Improvement Proposal*. Sebuah EIP adalah dokumen desain yang menyediakan informasi kepada komunitas Ethereum, atau menjelaskan fitur baru untuk Ethereum atau proses maupun lingkungannya. EIP harus menyediakan spesifikasi teknis yang ringkas dari fitur tersebut dan alasan (rasional) untuk fitur tersebut. Penulis EIP bertanggung jawab untuk membangun konsensus di dalam komunitas dan mendokumentasikan pendapat-pendapat yang berbeda.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-b.1.png" alt="gambar" width="580"/>
+</p>
+
+### Tabel EIP dan ERC Terpenting
+
+**Tabel B-1. EIP dan ERC Penting**
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-b.1.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-b.2.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-b.3.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-b.4.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-b.5.png" alt="gambar" width="580"/>
+</p>
+
+---
+
+# Appendix C
+## Opcode EVM Ethereum dan Konsumsi Gas
+
+Lampiran ini didasarkan pada pekerjaan konsolidasi yang dilakukan oleh orang-orang di [https://github.com/trailofbits/evm-opcodes](https://github.com/trailofbits/evm-opcodes) sebagai referensi untuk *opcode* dan informasi instruksi Mesin Virtual Ethereum (EVM) yang dilisensikan di bawah Lisensi Apache 2.0.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-c.1.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-c.2.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-c.3.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-c.4.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-c.5.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-c.6.png" alt="gambar" width="580"/>
+</p>
+
+---
+
+# Appendix D
+
+## Alat, Kerangka Kerja, dan Pustaka Pengembangan
+
+## Kerangka Kerja (*Frameworks*)
+
+Kerangka kerja dapat digunakan untuk mempermudah pengembangan *smart contract* Ethereum. Dengan melakukan semuanya sendiri, Anda mendapatkan pemahaman yang lebih baik tentang bagaimana semua bagian saling terkait, tetapi itu adalah pekerjaan yang membosankan dan berulang. Kerangka kerja yang dijelaskan di bagian ini dapat mengotomatiskan tugas-tugas tertentu dan membuat pengembangan menjadi lebih mudah.
+
+### Truffle
+
+  * **GitHub**: [https://github.com/trufflesuite/truffle](https://github.com/trufflesuite/truffle)
+  * **Situs Web**: [https://truffleframework.com](https://truffleframework.com)
+  * **Dokumentasi**: [https://truffleframework.com/docs](https://truffleframework.com/docs)
+  * **Truffle Boxes**: [http://truffleframework.com/boxes/](http://truffleframework.com/boxes/)
+  * **Repositori paket npm**: [https://www.npmjs.com/package/truffle](https://www.npmjs.com/package/truffle)
+
+#### Menginstal kerangka kerja Truffle
+
+Kerangka kerja Truffle terdiri dari beberapa paket Node.js. Sebelum Anda menginstal `truffle`, Anda perlu memiliki instalasi Node.js dan Node Package Manager (npm) yang terbaru dan berfungsi.
+
+Cara yang disarankan untuk menginstal Node.js dan npm adalah dengan menggunakan Node Version Manager (nvm). Setelah Anda menginstal `nvm`, ia akan menangani semua dependensi dan pembaruan untuk Anda. Ikuti instruksi yang ditemukan di [http://nvm.sh](http://nvm.sh).
+
+Setelah `nvm` terinstal di sistem operasi Anda, menginstal Node.js menjadi sederhana. Gunakan flag `--lts` untuk memberitahu `nvm` bahwa Anda menginginkan versi “dukungan jangka panjang” (*long-term support* atau LTS) terbaru dari Node.js:
+
+```sh
+$ nvm install --lts
+```
+
+Konfirmasikan bahwa Anda telah menginstal `node` dan `npm`:
+
+```sh
+$ node -v
+v8.9.4
+$ npm -v
+5.6.0
+```
+
+Selanjutnya, buat file tersembunyi, `.nvmrc`, yang berisi versi Node.js yang didukung oleh DApp Anda sehingga pengembang hanya perlu menjalankan `nvm install` di direktori root proyek dan itu akan secara otomatis menginstal dan beralih menggunakan versi tersebut:
+
+```sh
+$ node -v > .nvmrc
+$ nvm install
+```
+
+Terlihat bagus. Sekarang saatnya menginstal `truffle`:
+
+```sh
+$ npm -g install truffle
++ truffle@4.0.6
+installed 1 package in 37.508s
+```
+
+#### Mengintegrasikan proyek Truffle yang sudah jadi (Truffle Box)
+
+Jika Anda ingin menggunakan atau membuat DApp yang dibangun di atas *boilerplate* yang sudah jadi, kunjungi situs web Truffle Boxes, pilih proyek Truffle yang ada, lalu jalankan perintah berikut untuk mengunduh dan mengekstraknya:
+
+```sh
+$ truffle unbox NAMA_BOX
+```
+
+#### Membuat direktori proyek truffle
+
+Untuk setiap proyek di mana Anda akan menggunakan `truffle`, buat direktori proyek dan inisialisasi `truffle` di dalam direktori tersebut. `truffle` akan membuat struktur direktori yang diperlukan di dalam direktori proyek Anda. Sudah menjadi kebiasaan untuk memberi nama direktori proyek yang mendeskripsikan proyek tersebut. Untuk contoh ini, kita akan menggunakan `truffle` untuk men-deploy kontrak `Faucet` kita, dan oleh karena itu kita akan menamai folder proyek `Faucet`:
+
+```sh
+$ mkdir Faucet
+$ cd Faucet
+Faucet $
+```
+
+Setelah berada di dalam direktori `Faucet`, kita menginisialisasi `truffle`:
+
+```sh
+Faucet $ truffle init
+```
+
+`truffle` membuat struktur direktori dan beberapa file default:
+
+```
+Faucet
++---- contracts
+|
+`---- Migrations.sol
++---- migrations
+|
+`---- 1_initial_migration.js
++---- test
++---- truffle-config.js
+`---- truffle.js
+```
+
+Kita juga akan menggunakan sejumlah paket pendukung JavaScript (Node.js), selain `truffle` itu sendiri. Kita dapat menginstalnya dengan `npm`. Kita menginisialisasi struktur direktori `npm` dan menerima default yang disarankan oleh `npm`:
+
+```sh
+$ npm init
+package name: (faucet)
+version: (1.0.0)
+description:
+entry point: (truffle-config.js)
+test command:
+git repository:
+keywords:
+author:
+license: (ISC)
+About to write to Faucet/package.json:
+{
+  "name": "faucet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
+Is this ok? (yes)
+```
+
+Sekarang, kita dapat menginstal dependensi yang akan kita gunakan untuk mempermudah bekerja dengan `truffle`:
+
+```sh
+$ npm install dotenv truffle-wallet-provider ethereumjs-wallet
+```
+
+Kita sekarang memiliki direktori `node_modules` dengan beberapa ribu file di dalam direktori `Faucet` kita.
+
+> Sebelum men-deploy DApp ke lingkungan produksi cloud atau integrasi berkelanjutan (*continuous integration*), penting untuk menentukan kolom `engines` agar DApp Anda dibangun dengan versi Node.js yang benar dan dependensi terkaitnya diinstal. Untuk detail tentang mengonfigurasi kolom ini, lihat dokumentasi.
+
+#### Mengonfigurasi truffle
+
+`truffle` membuat beberapa file konfigurasi kosong, `truffle.js` dan `truffle-config.js`. Pada sistem Windows, nama `truffle.js` dapat menyebabkan konflik ketika Anda mencoba menjalankan perintah `truffle` dan Windows malah mencoba menjalankan `truffle.js`. Untuk menghindari ini, kita akan menghapus `truffle.js` dan menggunakan `truffle-config.js` (untuk mendukung pengguna Windows, yang, sejujurnya, sudah cukup menderita):
+
+```sh
+$ rm truffle.js
+```
+
+Sekarang kita edit `truffle-config.js` dan ganti isinya dengan contoh konfigurasi yang ditunjukkan di sini:
+
+```javascript
+module.exports = {
+  networks: {
+    localnode: { // Jaringan apa pun yang terhubung dengan node lokal kita
+      network_id: "*", // Cocokkan dengan ID jaringan apa pun
+      host: "localhost",
+      port: 8545,
+    }
+  }
+};
+```
+
+Konfigurasi ini adalah titik awal yang baik. Ini menyiapkan satu jaringan Ethereum default (bernama `localnode`), yang mengasumsikan kita menjalankan klien Ethereum seperti Parity, baik sebagai node penuh maupun sebagai klien ringan. Konfigurasi ini akan menginstruksikan `truffle` untuk berkomunikasi dengan node lokal melalui RPC, di port 8545. `truffle` akan menggunakan jaringan Ethereum apa pun yang terhubung dengan node lokal, seperti jaringan utama Ethereum, atau jaringan uji seperti Ropsten. Node lokal juga akan menyediakan fungsionalitas dompet.
+
+Di bagian berikutnya, kita akan mengonfigurasi jaringan tambahan untuk digunakan `truffle`, seperti *blockchain* uji lokal `ganache` dan Infura, penyedia jaringan yang di-*hosting*. Seiring kita menambahkan lebih banyak jaringan, file konfigurasi akan menjadi lebih kompleks, tetapi juga akan memberi kita lebih banyak opsi untuk alur kerja pengujian dan pengembangan kita.
+
+#### Menggunakan truffle untuk men-deploy kontrak
+
+Kita sekarang memiliki direktori kerja dasar untuk proyek `Faucet` kita, dan kita telah mengonfigurasi `truffle` dan dependensinya. Kontrak ditempatkan di subdirektori `contracts` dari proyek kita. Direktori tersebut sudah berisi kontrak “pembantu”, `Migrations.sol`, yang mengelola pemutakhiran kontrak untuk kita. Kita akan memeriksa penggunaan `Migrations.sol` di bagian berikutnya.
+
+Mari kita salin kontrak `Faucet.sol` ke dalam subdirektori `contracts`, sehingga direktori proyek terlihat seperti ini:
+
+```
+Faucet
++---- contracts
+|
++---- Faucet.sol
+|
+`---- Migrations.sol
+...
+```
+
+Sekarang kita bisa meminta `truffle` untuk mengompilasi kontrak untuk kita:
+
+```sh
+$ truffle compile
+Compiling ./contracts/Faucet.sol...
+Compiling ./contracts/Migrations.sol...
+Writing artifacts to ./build/contracts
+```
+
+#### Migrasi Truffle—memahami skrip deployment
+
+Truffle menawarkan sistem *deployment* yang disebut **migrasi** (*migration*). Jika Anda pernah bekerja dengan kerangka kerja lain, Anda mungkin pernah melihat sesuatu yang serupa: Ruby on Rails, Python Django, dan banyak bahasa serta kerangka kerja lain memiliki perintah `migrate`.
+
+Di semua kerangka kerja tersebut, tujuan migrasi adalah untuk menangani perubahan skema data antar versi perangkat lunak yang berbeda. Tujuan migrasi di Ethereum sedikit berbeda. Karena kontrak Ethereum tidak dapat diubah (*immutable*) dan memerlukan gas untuk di-*deploy*, Truffle menawarkan mekanisme migrasi untuk melacak kontrak mana (dan versi mana) yang telah di-*deploy*. Dalam proyek yang kompleks dengan puluhan kontrak dan dependensi yang rumit, Anda tidak ingin harus membayar untuk men-*deploy* ulang kontrak yang tidak berubah. Anda juga tidak ingin secara manual melacak versi kontrak mana yang telah di-*deploy*. Mekanisme migrasi Truffle melakukan semua itu dengan men-*deploy smart contract* `Migrations.sol`, yang kemudian melacak semua *deployment* kontrak lainnya.
+
+Kita hanya memiliki satu kontrak, `Faucet.sol`, yang berarti sistem migrasi ini berlebihan, setidaknya. Sayangnya, kita harus menggunakannya. Tetapi, dengan belajar cara menggunakannya untuk satu kontrak, kita dapat mulai mempraktikkan beberapa kebiasaan baik untuk alur kerja pengembangan kita. Upaya ini akan terbayar seiring dengan semakin rumitnya hal-hal.
+
+Direktori `migrations` Truffle adalah tempat skrip migrasi ditemukan. Saat ini hanya ada satu skrip, `1_initial_migration.js`, yang men-*deploy* kontrak `Migrations.sol` itu sendiri:
+
+```javascript
+1 var Migrations = artifacts.require("./Migrations.sol");
+2
+3 module.exports = function(deployer) {
+4   deployer.deploy(Migrations);
+5 };
+```
+
+Kita membutuhkan skrip migrasi kedua, untuk men-*deploy* `Faucet.sol`. Mari kita sebut `2_deploy_contracts.js`. Skrip ini sangat sederhana, sama seperti `1_initial_migration.js`, dengan hanya beberapa perubahan kecil. Bahkan, Anda dapat menyalin isi dari `1_initial_migration.js` dan cukup ganti semua kemunculan `Migrations` dengan `Faucet`:
+
+```javascript
+1 var Faucet = artifacts.require("./Faucet.sol");
+2
+3 module.exports = function(deployer) {
+4   deployer.deploy(Faucet);
+5 };
+```
+
+Skrip ini menginisialisasi variabel `Faucet`, mengidentifikasi kode sumber Solidity `Faucet.sol` sebagai artefak yang mendefinisikan `Faucet`. Kemudian ia memanggil fungsi `deploy` untuk men-*deploy* kontrak ini.
+
+Kita sudah siap. Mari kita gunakan `truffle migrate` untuk men-*deploy*-nya. Kita harus menentukan jaringan mana untuk men-*deploy* kontrak, menggunakan argumen `--network`. Kita hanya memiliki satu jaringan yang ditentukan dalam file konfigurasi, yang kita beri nama `localnode`. Pastikan klien Ethereum lokal Anda berjalan lalu ketik:
+
+```sh
+Faucet $ truffle migrate --network localnode
+```
+
+Karena kita menggunakan node lokal untuk terhubung ke jaringan Ethereum dan mengelola dompet kita, kita harus mengotorisasi transaksi yang dibuat oleh `truffle`. Kita menjalankan `parity` yang terhubung ke *blockchain* uji Ropsten, jadi selama migrasi kita akan melihat *pop-up* seperti yang ada di Gambar D-1 di konsol web Parity.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-d.1.png" alt="gambar" width="580"/>
+</p>
+
+Tentu, ini adalah terjemahan dan format yang telah dirapikan untuk bagian terakhir dari lampiran.
+
+-----
+
+Meskipun saat ini masih dalam pengembangan, **ZeppelinOS** bertujuan untuk menyediakan serangkaian fitur tambahan yang luas, seperti alat pengembang, **penjadwal (*scheduler*)** yang mengotomatiskan operasi latar belakang di dalam kontrak, **sayembara (*bounties*)** pengembangan, **pasar (*marketplace*)** yang memfasilitasi komunikasi dan pertukaran nilai antar aplikasi, dan masih banyak lagi. Semua ini dijelaskan dalam *whitepaper* ZeppelinOS.
+
+-----
+
+## Utilitas
+
+### EthereumJS helpeth: Utilitas Baris Perintah
+
+  * **GitHub**: [https://github.com/ethereumjs/helpeth](https://github.com/ethereumjs/helpeth)
+
+**helpeth** adalah alat baris perintah untuk manipulasi kunci dan transaksi yang membuat pekerjaan pengembang menjadi jauh lebih mudah.
+
+Alat ini merupakan bagian dari koleksi pustaka dan alat berbasis JavaScript dari EthereumJS:
+
+```
+Penggunaan: helpeth [perintah]
+
+Perintah:
+  signMessage <pesan>                       Menandatangani sebuah pesan
+  verifySig <hash> <sig>                    Memverifikasi tanda tangan
+  verifySigParams <hash> <r> <s> <v>        Memverifikasi parameter tanda tangan
+  createTx <nonce> <ke> <nilai> <data>      Menandatangani sebuah transaksi
+    <gasLimit> <gasPrice>
+  assembleTx <nonce> <ke> <nilai> <data>    Merakit transaksi dari
+    <gasLimit> <gasPrice> <v> <r> <s>         komponen-komponennya
+  parseTx <tx>                              Mengurai transaksi mentah
+  keyGenerate [format] [icapdirect]         Membuat kunci baru
+  keyConvert                                Mengonversi kunci ke format keystore V3
+  keyDetails                                Mencetak detail kunci
+  bip32Details <path>                       Mencetak detail kunci untuk path tertentu
+  addressDetails <alamat>                   Mencetak detail tentang sebuah alamat
+  unitConvert <nilai> <dari> <ke>           Mengonversi antar unit Ethereum
+
+Opsi:
+  -p, --private         Kunci privat sebagai string heksadesimal      [string]
+  --password            Kata sandi untuk kunci privat                 [boolean]
+  --password-prompt     Meminta kata sandi kunci privat               [string]
+  -k, --keyfile         File kunci yang di-encode                     [boolean]
+  --show-private        Menampilkan detail kunci privat               [string]
+  --mnemonic            Mnemonic untuk derivasi kunci HD              [boolean]
+  --version             Menampilkan nomor versi                       [boolean]
+  --help                Menampilkan bantuan                           [boolean]
+```
+
+### dapp.tools
+
+  * **Situs Web**: [https://dapp.tools/](https://dapp.tools/)
+
+**dapp.tools** adalah serangkaian lengkap alat pengembang berorientasi *blockchain* yang dibuat dalam semangat **filsafat Unix**. Alat-alat yang disertakan adalah:
+
+  * **Dapp**
+    Dapp adalah alat dasar yang dihadapi pengguna, untuk membuat DApps baru, menjalankan uji unit Solidity, men-debug dan men-*deploy* kontrak, meluncurkan *testnet*, dan banyak lagi.
+  * **Seth**
+    Seth digunakan untuk menyusun transaksi, membuat kueri ke *blockchain*, mengonversi antar format data, melakukan panggilan jarak jauh, dan tugas sehari-hari serupa.
+  * **Hevm**
+    Hevm adalah implementasi EVM Haskell dengan *debugger* Solidity berbasis terminal yang gesit. Ini digunakan untuk menguji dan men-debug DApps.
+  * **evmdis**
+    evmdis adalah *disassembler* EVM; ia melakukan analisis statis pada *bytecode* untuk memberikan tingkat abstraksi yang lebih tinggi daripada operasi EVM mentah.
+
+### SputnikVM
+
+**SputnikVM** adalah mesin virtual *pluggable* mandiri untuk berbagai *blockchain* berbasis Ethereum. Ditulis dalam Rust dan dapat digunakan sebagai biner, *cargo crate*, atau pustaka bersama, atau diintegrasikan melalui antarmuka FFI, Protobuf, dan JSON. Ia memiliki biner terpisah, `sputnikvm-dev`, yang ditujukan untuk tujuan pengujian, yang meniru sebagian besar API JSON-RPC dan penambangan blok.
+
+-----
+
+## Pustaka (*Libraries*)
+
+### web3.js
+
+**web3.js** adalah API JavaScript yang kompatibel dengan Ethereum untuk berkomunikasi dengan klien melalui JSON-RPC, yang dikembangkan oleh Ethereum Foundation.
+
+  * **GitHub**: [https://github.com/ethereum/web3.js](https://github.com/ethereum/web3.js)
+  * **Repositori npm**: [https://www.npmjs.com/package/web3](https://www.npmjs.com/package/web3)
+  * **Dokumentasi (API 0.2x.x)**: [http://bit.ly/2Qcyq1C](http://bit.ly/2Qcyq1C)
+  * **Dokumentasi (API 1.0.0-beta.xx)**: [http://bit.ly/2CT33p0](http://bit.ly/2CT33p0)
+
+### web3.py
+
+**web3.py** adalah pustaka Python untuk berinteraksi dengan *blockchain* Ethereum, yang dikelola oleh Ethereum Foundation.
+
+  * **GitHub**: [https://github.com/ethereum/web3.py](https://github.com/ethereum/web3.py)
+  * **PyPi**: [https://pypi.python.org/pypi/web3/4.0.0b9](https://pypi.python.org/pypi/web3/4.0.0b9)
+  * **Dokumentasi**: [https://web3py.readthedocs.io/](https://web3py.readthedocs.io/)
+
+### EthereumJS
+
+**EthereumJS** adalah kumpulan pustaka dan utilitas untuk Ethereum.
+
+  * **GitHub**: [https://github.com/ethereumjs](https://github.com/ethereumjs)
+  * **Situs Web**: [https://ethereumjs.github.io/](https://ethereumjs.github.io/)
+
+### web3j
+
+**web3j** adalah pustaka Java dan Android untuk berintegrasi dengan klien Ethereum dan bekerja dengan *smart contract*.
+
+  * **GitHub**: [https://github.com/web3j/web3j](https://github.com/web3j/web3j)
+  * **Situs Web**: [https://web3j.io](https://web3j.io)
+  * **Dokumentasi**: [https://docs.web3j.io](https://docs.web3j.io)
+
+### EtherJar
+
+**EtherJar** adalah pustaka Java lain untuk berintegrasi dengan Ethereum dan bekerja dengan *smart contract*. Dirancang untuk proyek sisi server berbasis Java 8+ dan menyediakan akses tingkat rendah serta pembungkus tingkat tinggi di sekitar RPC, struktur data Ethereum, dan akses *smart contract*.
+
+  * **GitHub**: [https://github.com/infinitape/etherjar](https://github.com/infinitape/etherjar)
+
+### Nethereum
+
+**Nethereum** adalah pustaka integrasi .Net untuk Ethereum.
+
+  * **GitHub**: [https://github.com/Nethereum/Nethereum](https://github.com/Nethereum/Nethereum)
+  * **Situs Web**: [http://nethereum.com/](http://nethereum.com/)
+  * **Dokumentasi**: [https://nethereum.readthedocs.io/en/latest/](https://nethereum.readthedocs.io/en/latest/)
+
+### ethers.js
+
+Pustaka **ethers.js** adalah pustaka Ethereum berlisensi MIT yang ringkas, lengkap, berfitur penuh, dan telah diuji secara ekstensif, yang telah menerima hibah DevEx dari Ethereum Foundation untuk perluasan dan pemeliharaannya.
+
+  * **GitHub**: [https://github.com/ethers-io/ethers.js](https://github.com/ethers-io/ethers.js)
+  * **Dokumentasi**: [https://docs.ethers.io](https://docs.ethers.io)
+
+### Emerald Platform
+
+**Emerald Platform** menyediakan pustaka dan komponen UI untuk membangun DApps di atas Ethereum. Emerald JS dan Emerald JS UI menyediakan serangkaian modul dan komponen React untuk membangun aplikasi dan situs web JavaScript; Emerald SVG Icons adalah seperangkat ikon terkait *blockchain*. Selain pustaka JavaScript, Emerald memiliki pustaka Rust untuk mengoperasikan kunci privat dan tanda tangan transaksi. Semua pustaka dan komponen Emerald dilisensikan di bawah Lisensi Apache, versi 2.0.
+
+  * **GitHub**: [https://github.com/etcdevteam/emerald-platform](https://github.com/etcdevteam/emerald-platform)
+  * **Dokumentasi**: [https://docs.etcdevteam.com](https://docs.etcdevteam.com)
+
+-----
+
+## Menguji Smart Contract
+
+Ada beberapa kerangka kerja pengujian yang umum digunakan untuk pengembangan *smart contract*, yang dirangkum dalam Tabel D-1:
+
+**Tabel D-1. Ringkasan kerangka kerja pengujian smart contract**
+| Kerangka Kerja | Bahasa Uji | Kerangka Pengujian | Emulator Rantai | Situs Web |
+| --- | --- | --- | --- | --- |
+| Truffle | JavaScript/Solidity | Mocha | TestRPC/Ganache | [https://truffleframework.com/](https://truffleframework.com/) |
+| Embark | JavaScript | Mocha | TestRPC/Ganache | [https://embark.status.im/docs/](https://embark.status.im/docs/) |
+| Dapp | Solidity | ds-test (custom) | ethrun (Parity) | [https://dapp.tools/dapp/](https://dapp.tools/dapp/) |
+| Populus | Python | pytest | Emulator rantai Python | [https://populus.readthedocs.io](https://populus.readthedocs.io) |
+
+### Truffle
+
+Truffle memungkinkan **uji unit (*unit tests*)** ditulis dalam JavaScript (berbasis Mocha) atau Solidity. Pengujian ini dijalankan terhadap Ganache.
+
+### Embark
+
+Embark terintegrasi dengan Mocha untuk menjalankan uji unit yang ditulis dalam JavaScript. Pengujian tersebut pada gilirannya dijalankan terhadap kontrak yang di-*deploy* di TestRPC/Ganache. Kerangka kerja Embark secara otomatis men-*deploy smart contract*, dan akan secara otomatis men-*deploy* ulang kontrak ketika diubah. Ia juga melacak kontrak yang telah di-*deploy* dan hanya men-*deploy* kontrak bila benar-benar diperlukan. Embark menyertakan pustaka pengujian untuk menjalankan dan menguji kontrak Anda dengan cepat di EVM, dengan fungsi seperti `assert.equal`. Perintah `embark test` akan menjalankan file pengujian apa pun di bawah direktori `test`.
+
+### Dapp
+
+Dapp menggunakan kode Solidity asli (pustaka bernama `ds-test`) dan pustaka Rust buatan Parity bernama `ethrun` untuk mengeksekusi *bytecode* Ethereum dan kemudian menegaskan kebenarannya. Pustaka `ds-test` menyediakan **fungsi asersi** untuk memvalidasi kebenaran dan *event* untuk mencatat data di konsol.
+
+Fungsi asersi meliputi:
+
+```solidity
+assert(bool condition)
+assertEq(address a, address b)
+assertEq(bytes32 a, bytes32 b)
+assertEq(int a, int b)
+assertEq(uint a, uint b)
+assertEq0(bytes a, bytes b)
+expectEventsExact(address target)
+```
+
+Perintah *logging* akan mencatat informasi ke konsol, membuatnya berguna untuk *debugging*:
+
+```solidity
+logs(bytes)
+log_bytes32(bytes32)
+log_named_bytes32(bytes32 key, bytes32 val)
+log_named_address(bytes32 key, address val)
+log_named_int(bytes32 key, int val)
+log_named_uint(bytes32 key, uint val)
+log_named_decimal_int(bytes32 key, int val, uint decimals)
+log_named_decimal_uint(bytes32 key, uint val, uint decimals)
+```
+
+### Populus
+
+Populus menggunakan Python dan emulator rantainya sendiri untuk menjalankan kontrak yang ditulis dalam Solidity. Uji unit ditulis dalam Python dengan pustaka `pytest`. Populus mendukung penulisan kontrak khusus untuk pengujian. Nama file kontrak ini harus cocok dengan pola glob `Test*.sol` dan terletak di mana saja di bawah direktori `tests` proyek.
+
+### Pengujian di Blockchain
+
+Meskipun sebagian besar pengujian tidak boleh terjadi pada kontrak yang telah di-*deploy*, perilaku kontrak dapat diperiksa melalui klien Ethereum. Perintah berikut dapat digunakan untuk menilai *state smart contract*. Perintah-perintah ini harus diketik di terminal `geth`, meskipun konsol web3 apa pun juga akan mendukungnya.
+
+Untuk mendapatkan alamat kontrak di `txhash`, gunakan:
+
+```javascript
+eth.getTransactionReceipt(txhash);
+```
+
+Perintah ini mendapatkan kode kontrak yang di-*deploy* di `contractaddress`; ini dapat digunakan untuk memverifikasi *deployment* yang benar:
+
+```javascript
+eth.getCode(contractaddress)
+```
+
+Ini mendapatkan log penuh dari kontrak yang terletak di alamat yang ditentukan dalam `options`, yang berguna untuk melihat riwayat panggilan kontrak:
+
+```javascript
+eth.getPastLogs(options)
+```
+
+Terakhir, perintah ini mendapatkan penyimpanan yang terletak di `address` dengan *offset* `position`:
+
+```javascript
+eth.getStorageAt(address, position)
+```
+
+-----
+
+## Ganache: Blockchain Uji Lokal
+
+**Ganache** adalah *blockchain* uji lokal yang dapat Anda gunakan untuk men-*deploy* kontrak, mengembangkan aplikasi, dan menjalankan pengujian. Tersedia sebagai aplikasi desktop (dengan antarmuka pengguna grafis) untuk Windows, macOS, dan Linux. Juga tersedia sebagai utilitas baris perintah bernama `ganache-cli`. Untuk detail lebih lanjut dan instruksi instalasi aplikasi desktop Ganache, lihat [https://truffleframework.com/ganache](https://truffleframework.com/ganache).
+
+Kode `ganache-cli` dapat ditemukan di [https://github.com/trufflesuite/ganache-cli/](https://github.com/trufflesuite/ganache-cli/).
+
+Untuk menginstal `ganache-cli` baris perintah, gunakan `npm`:
+
+```sh
+$ npm install -g ganache-cli
+```
+
+Anda dapat menggunakan `ganache-cli` untuk memulai *blockchain* lokal untuk pengujian sebagai berikut:
+
+```sh
+$ ganache-cli \
+--networkId=3 \
+--port="8545" \
+--verbose \
+--gasLimit=8000000 \
+--gasPrice=4000000000;
+```
+
+Beberapa catatan tentang baris perintah ini:
+
+  * Periksa nilai *flag* `--networkId` dan `--port` cocok dengan konfigurasi Anda di `truffle.js`.
+  * Periksa nilai *flag* `--gasLimit` cocok dengan batas gas *mainnet* terbaru (misalnya, 8.000.000 gas) yang ditampilkan di [https://ethstats.net](https://ethstats.net) untuk menghindari pengecualian “*out of gas*” yang tidak perlu. Perhatikan bahwa `--gasPrice` sebesar `4000000000` mewakili harga gas 4 gwei.
+  * Anda dapat secara opsional memasukkan nilai *flag* `--mnemonic` untuk memulihkan **dompet HD** sebelumnya dan alamat terkait.
+  
+---
+
