@@ -7589,3 +7589,28 @@ Gambar 12-14 menunjukkan arsitektur lengkap dari Auction DApp.
 Aplikasi terdesentralisasi adalah puncak dari visi Ethereum, seperti yang diungkapkan oleh para pendiri sejak rancangan-rancangan paling awal. Meskipun saat ini banyak aplikasi yang menyebut diri mereka “DApps”, sebagian besar belum sepenuhnya terdesentralisasi. Namun, kini sudah memungkinkan untuk membangun aplikasi yang hampir sepenuhnya terdesentralisasi. Seiring berjalannya waktu, seiring teknologi semakin matang, akan semakin banyak aplikasi kita yang dapat didesentralisasi, menghasilkan web yang lebih tangguh, tahan sensor, dan bebas.
 
 ---
+
+# BAB 13
+## Mesin Virtual Ethereum
+
+Inti dari protokol dan operasi Ethereum adalah **Mesin Virtual Ethereum**, atau disingkat **EVM**. Seperti yang bisa Anda duga dari namanya, ini adalah sebuah mesin komputasi, yang tidak jauh berbeda dengan mesin virtual dari .NET Framework Microsoft, atau *interpreter* dari bahasa pemrograman lain yang dikompilasi ke *bytecode* seperti Java. Dalam bab ini kita akan melihat secara rinci tentang EVM, termasuk set instruksi, struktur, dan operasinya, dalam konteks pembaruan *state* Ethereum.
+
+### Apa Itu EVM?
+
+EVM adalah bagian dari Ethereum yang menangani **penempatan (*deployment*) dan eksekusi *smart contract***. Secara praktis, transaksi transfer nilai sederhana dari satu EOA ke EOA lain tidak perlu melibatkannya, tetapi semua hal lainnya akan melibatkan pembaruan *state* yang dihitung oleh EVM. Pada tingkat tinggi, EVM yang berjalan di *blockchain* Ethereum dapat dianggap sebagai **komputer terdesentralisasi global** yang berisi jutaan objek yang dapat dieksekusi, masing-masing dengan penyimpanan data permanennya sendiri.
+
+EVM adalah mesin *state* yang **kuasi–Turing-*complete***; disebut “kuasi” karena semua proses eksekusi dibatasi pada jumlah langkah komputasi yang terbatas oleh jumlah ***gas*** yang tersedia untuk eksekusi *smart contract* tertentu. Dengan demikian, *halting problem* (masalah penghentian) dapat “diselesaikan” (semua eksekusi program akan berhenti) dan situasi di mana eksekusi mungkin (secara tidak sengaja atau sengaja) berjalan selamanya, yang dapat menghentikan seluruh platform Ethereum, dapat dihindari.
+
+EVM memiliki **arsitektur berbasis *stack***, menyimpan semua nilai dalam memori pada sebuah *stack*. Ia bekerja dengan ukuran kata (*word size*) **256 bit** (terutama untuk memfasilitasi operasi *hashing* dan kurva eliptik bawaan) dan memiliki beberapa komponen data yang dapat dialamati:
+
+* ROM kode program yang ***immutable*** (tidak dapat diubah), yang dimuat dengan *bytecode* dari *smart contract* yang akan dieksekusi.
+* Memori yang ***volatile*** (tidak permanen), dengan setiap lokasi diinisialisasi secara eksplisit ke nilai nol.
+* **Penyimpanan permanen** yang merupakan bagian dari *state* Ethereum, juga diinisialisasi ke nilai nol.
+
+Ada juga seperangkat variabel lingkungan dan data yang tersedia selama eksekusi. Kita akan membahas ini lebih detail nanti di bab ini.
+
+*Gambar 13-1 menunjukkan arsitektur dan konteks eksekusi EVM.*
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-13.1.png" alt="gambar" width="580"/>
+</p>
