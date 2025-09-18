@@ -2622,3 +2622,261 @@ Setelah kontrak ditambang, kita dapat melihatnya di penjelajah blok Etherscan, s
   <img src="images/books-07-mastering_ethereum/figure-6.5.png" alt="gambar" width="580"/>
 </p>
 
+Kita dapat melihat **resi (*receipt*)** dari transaksi untuk mendapatkan informasi tentang kontrak:
+
+```javascript
+> eth.getTransactionReceipt("0x7bcc327ae5d369f75b98c0d59037eec41d44dfae75447fd753d9f2db9439124b");
+
+{
+  blockHash: "0x6fa7d8bf982490de6246875deb2c21e5f3665b4422089c060138fc3907a95bb2",
+  blockNumber: 3105256,
+  contractAddress: "0xb226270965b43373e98ffc6e2c7693c17e2cf40b",
+  cumulativeGasUsed: 113558,
+  from: "0x2a966a87db5913c1b22a59b0d8a11cc51c167a89",
+  gasUsed: 113558,
+  logs: [],
+  logsBloom: "0x00000000000000000000000000000000000000000000000000...00000",
+  status: "0x1",
+  to: null,
+  transactionHash: "0x7bcc327ae5d369f75b98c0d59037eec41d44dfae75447fd753d9f2db9439124b",
+  transactionIndex: 0
+}
+```
+
+Resi ini mencakup alamat kontrak, yang dapat kita gunakan untuk mengirim dana ke dan menerima dana dari kontrak seperti yang ditunjukkan di bagian sebelumnya:
+
+```javascript
+> contract_address = "0xb226270965b43373e98ffc6e2c7693c17e2cf40b"
+
+> web3.eth.sendTransaction({from: src, to: contract_address, value: web3.toWei(0.1, "ether"), data: ""});
+"0x6ebf2e1fe95cc9c1fe2e1a0dc45678ccd127d374fdf145c5c8e6cd4ea2e6ca9f"
+
+> web3.eth.sendTransaction({from: src, to: contract_address, value: 0, data: "0x2e1a7d4d000000000000000000000000000000000000000000000000002386f26fc10000"});
+"0x59836029e7ce43e92daf84313816ca31420a76a9a571b69e31ec4bf4b37cd16e"
+```
+
+Setelah beberapa saat, kedua transaksi tersebut terlihat di Etherscan, seperti yang ditunjukkan pada Gambar 6-6.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-6.6.png" alt="gambar" width="580"/>
+</p>
+
+### Tanda Tangan Digital
+
+Sejauh ini, kita belum mendalami detail apa pun tentang tanda tangan digital. Di bagian ini, kita akan melihat cara kerja tanda tangan digital dan bagaimana tanda tangan tersebut dapat digunakan untuk menyajikan bukti kepemilikan kunci privat tanpa mengungkapkan kunci privat tersebut.
+
+#### Algoritma Tanda Tangan Digital Kurva Eliptik (Elliptic Curve Digital Signature Algorithm)
+
+Algoritma tanda tangan digital yang digunakan di Ethereum adalah **Elliptic Curve Digital Signature Algorithm (ECDSA)**. Algoritma ini didasarkan pada pasangan kunci privat-publik kurva eliptik, seperti yang dijelaskan dalam “Penjelasan Kriptografi Kurva Eliptik” di halaman 65.
+
+Tanda tangan digital melayani tiga tujuan di Ethereum (lihat *sidebar* berikut). Pertama, tanda tangan membuktikan bahwa pemilik kunci privat, yang secara implisit adalah pemilik akun Ethereum, telah **mengizinkan** pembelanjaan ether, atau eksekusi sebuah kontrak. Kedua, ia menjamin **non-repudiasi**: bukti otorisasi tidak dapat disangkal. Ketiga, tanda tangan membuktikan bahwa data transaksi **tidak telah dan tidak dapat diubah** oleh siapa pun setelah transaksi ditandatangani.
+
+> #### Definisi Tanda Tangan Digital dari Wikipedia
+>
+> Tanda tangan digital adalah skema matematis untuk menyajikan keaslian pesan atau dokumen digital. Tanda tangan digital yang valid memberi penerima alasan untuk percaya bahwa pesan tersebut dibuat oleh pengirim yang dikenal (**autentikasi**), bahwa pengirim tidak dapat menyangkal telah mengirim pesan tersebut (**non-repudiasi**), dan bahwa pesan tersebut tidak diubah dalam perjalanan (**integritas**).
+>
+> Sumber: [https://en.wikipedia.org/wiki/Digital\_signature](https://en.wikipedia.org/wiki/Digital_signature)
+
+#### Cara Kerja Tanda Tangan Digital
+
+Tanda tangan digital adalah skema matematis yang terdiri dari dua bagian. Bagian pertama adalah algoritma untuk **membuat tanda tangan**, menggunakan kunci privat (kunci penandatangan), dari sebuah pesan (yang dalam kasus kita adalah transaksi). Bagian kedua adalah algoritma yang memungkinkan siapa pun untuk **memverifikasi tanda tangan** hanya dengan menggunakan pesan dan kunci publik.
+
+##### Membuat tanda tangan digital
+
+Dalam implementasi ECDSA di Ethereum, "pesan" yang ditandatangani adalah transaksi, atau lebih akuratnya, hash Keccak-256 dari data yang dikodekan RLP dari transaksi tersebut. Kunci penandatangan adalah kunci privat EOA. Hasilnya adalah tanda tangan:
+
+$Sig = F\_{sig}(F\_{keccak256}(m), k)$
+
+di mana:
+
+  * $k$ adalah kunci privat penandatangan.
+  * $m$ adalah transaksi yang dikodekan RLP.
+  * $F\_{keccak256}$ adalah fungsi hash Keccak-256.
+  * $F\_{sig}$ adalah algoritma penandatanganan.
+  * $Sig$ adalah tanda tangan yang dihasilkan.
+
+Fungsi $F\_{sig}$ menghasilkan tanda tangan $Sig$ yang terdiri dari dua nilai, yang biasa disebut sebagai $r$ dan $s$:
+
+$Sig = (r, s)$
+
+##### Memverifikasi Tanda Tangan
+
+Untuk memverifikasi tanda tangan, seseorang harus memiliki tanda tangan ($r$ dan $s$), transaksi yang diserialisasi, dan kunci publik yang sesuai dengan kunci privat yang digunakan untuk membuat tanda tangan. Pada dasarnya, verifikasi tanda tangan berarti "hanya pemilik kunci privat yang menghasilkan kunci publik ini yang dapat menghasilkan tanda tangan ini pada transaksi ini."
+
+Algoritma verifikasi tanda tangan mengambil pesan (yaitu, hash dari transaksi untuk penggunaan kita), kunci publik penanda tangan, dan tanda tangan (nilai $r$ dan $s$), dan mengembalikan `true` jika tanda tangan tersebut valid untuk pesan dan kunci publik ini.
+
+#### Matematika ECDSA
+
+Seperti yang disebutkan sebelumnya, tanda tangan dibuat oleh fungsi matematis $F\_{sig}$ yang menghasilkan tanda tangan yang terdiri dari dua nilai, $r$ dan $s$. Di bagian ini kita akan melihat fungsi $F\_{sig}$ secara lebih detail.
+
+Algoritma penandatanganan pertama-tama menghasilkan kunci privat *ephemeral* (sementara) dengan cara yang aman secara kriptografis. Kunci sementara ini digunakan dalam perhitungan nilai $r$ dan $s$ untuk memastikan bahwa kunci privat asli pengirim tidak dapat dihitung oleh penyerang yang mengamati transaksi yang ditandatangani di jaringan Ethereum.
+
+Seperti yang kita ketahui dari “Kunci Publik” di halaman 64, kunci privat *ephemeral* digunakan untuk menurunkan kunci publik yang sesuai (*ephemeral*), jadi kita memiliki:
+
+  * Angka acak yang aman secara kriptografis $q$, yang digunakan sebagai kunci privat *ephemeral*.
+  * Kunci publik *ephemeral* yang sesuai $Q$, yang dihasilkan dari $q$ dan titik generator kurva eliptik $G$.
+
+Nilai **$r$** dari tanda tangan digital kemudian adalah koordinat x dari kunci publik *ephemeral* $Q$.
+
+Dari sana, algoritma menghitung nilai **$s$** dari tanda tangan, sedemikian rupa sehingga:
+
+$s \\equiv q^{-1} (\\text{Keccak256}(m) + r \\cdot k) \\pmod{p}$
+
+di mana:
+
+  * $q$ adalah kunci privat *ephemeral*.
+  * $r$ adalah koordinat x dari kunci publik *ephemeral*.
+  * $k$ adalah kunci privat penandatangan (pemilik EOA).
+  * $m$ adalah data transaksi.
+  * $p$ adalah orde prima dari kurva eliptik.
+
+**Verifikasi** adalah kebalikan dari fungsi pembuatan tanda tangan, menggunakan nilai $r$ dan $s$ serta kunci publik pengirim untuk menghitung nilai $Q$, yang merupakan sebuah titik pada kurva eliptik (kunci publik *ephemeral* yang digunakan dalam pembuatan tanda tangan). Langkah-langkahnya adalah sebagai berikut:
+
+1.  Periksa semua input terbentuk dengan benar.
+2.  Hitung $w = s^{-1} \\pmod{p}$.
+3.  Hitung $u\_1 = \\text{Keccak256}(m) \\cdot w \\pmod{p}$.
+4.  Hitung $u\_2 = r \\cdot w \\pmod{p}$.
+5.  Terakhir, hitung titik pada kurva eliptik $Q \\equiv u\_1 \\cdot G + u\_2 \\cdot K \\pmod{p}$.
+
+di mana:
+
+  * $r$ dan $s$ adalah nilai tanda tangan.
+  * $K$ adalah kunci publik penanda tangan (pemilik EOA).
+  * $m$ adalah data transaksi yang ditandatangani.
+  * $G$ adalah titik generator kurva eliptik.
+  * $p$ adalah orde prima dari kurva eliptik.
+
+Jika koordinat x dari titik $Q$ yang dihitung sama dengan $r$, maka verifikator dapat menyimpulkan bahwa tanda tangan tersebut valid.
+
+Perhatikan bahwa dalam memverifikasi tanda tangan, kunci privat tidak diketahui maupun diungkapkan.
+
+> ECDSA tentu saja merupakan matematika yang cukup rumit; penjelasan lengkap berada di luar cakupan buku ini. Sejumlah panduan hebat secara daring akan memandu Anda langkah demi langkah: cari "ECDSA explained" atau coba yang ini: [http://bit.ly/2r0HhGB](http://bit.ly/2r0HhGB).
+
+#### Praktik Penandatanganan Transaksi
+
+Untuk menghasilkan transaksi yang valid, pengirim harus menandatangani pesan secara digital, menggunakan Elliptic Curve Digital Signature Algorithm. Ketika kita mengatakan "menandatangani transaksi", kita sebenarnya bermaksud "menandatangani hash Keccak-256 dari data transaksi yang diserialisasi RLP."
+**Tanda tangan diterapkan pada hash dari data transaksi, bukan pada transaksi itu sendiri.**
+
+Untuk menandatangani transaksi di Ethereum, pengirim harus:
+
+1.  Membuat struktur data transaksi, yang berisi sembilan bidang: `nonce`, `gasPrice`, `gasLimit`, `to`, `value`, `data`, `chainID`, `0`, `0`.
+2.  Menghasilkan pesan serial yang dikodekan RLP dari struktur data transaksi.
+3.  Menghitung hash Keccak-256 dari pesan serial ini.
+4.  Menghitung tanda tangan ECDSA, menandatangani hash dengan kunci privat EOA asal.
+5.  Menambahkan nilai $v$, $r$, dan $s$ dari tanda tangan ECDSA ke transaksi.
+
+Variabel tanda tangan khusus **$v$** menunjukkan dua hal: ID rantai (*chain ID*) dan pengidentifikasi pemulihan (*recovery identifier*) untuk membantu fungsi `ECDSArecover` memeriksa tanda tangan. Nilai ini dihitung sebagai salah satu dari 27 atau 28, atau sebagai ID rantai dikalikan dua ditambah 35 atau 36. Untuk informasi lebih lanjut tentang ID rantai, lihat “Pembuatan Transaksi Mentah dengan EIP-155” di halaman 120. Pengidentifikasi pemulihan (27 atau 28 dalam tanda tangan "gaya lama", atau 35 atau 36 dalam transaksi gaya Spurious Dragon penuh) digunakan untuk menunjukkan paritas komponen y dari kunci publik (lihat “Nilai Awalan Tanda Tangan (v) dan Pemulihan Kunci Publik” di halaman 120 untuk detail lebih lanjut).
+
+> Pada blok \#2.675.000, Ethereum mengimplementasikan *hard fork* "Spurious Dragon", yang, di antara perubahan lainnya, memperkenalkan skema penandatanganan baru yang mencakup perlindungan pemutaran ulang transaksi (*replay protection*), mencegah transaksi yang ditujukan untuk satu jaringan diputar ulang di jaringan lain. Skema penandatanganan baru ini ditentukan dalam EIP-155. Perubahan ini memengaruhi bentuk transaksi dan tanda tangannya, jadi perhatian harus diberikan pada variabel tanda tangan pertama dari tiga (yaitu, v), yang mengambil salah satu dari dua bentuk dan menunjukkan bidang data yang termasuk dalam pesan transaksi yang di-hash.
+
+#### Pembuatan dan Penandatanganan Transaksi Mentah
+
+Di bagian ini kita akan membuat transaksi mentah dan menandatanganinya, menggunakan pustaka `ethereumjs-tx`. Ini menunjukkan fungsi-fungsi yang biasanya digunakan di dalam dompet, atau aplikasi yang menandatangani transaksi atas nama pengguna. Kode sumber untuk contoh ini ada di file `raw_tx_demo.js` di repositori GitHub buku ini:
+
+```javascript
+// Muat persyaratan terlebih dahulu:
+//
+// npm init
+// npm install ethereumjs-tx
+//
+// Jalankan dengan: $ node raw_tx_demo.js
+
+const ethTx = require('ethereumjs-tx');
+
+const txData = {
+  nonce: '0x0',
+  gasPrice: '0x09184e72a000',
+  gasLimit: '0x30000',
+  to: '0xb0920c523d582040f2bcb1bd7fb1c7c1ecebdb34',
+  value: '0x00',
+  data: '',
+  v: "0x1c", // ID rantai utama Ethereum
+  r: 0,
+  s: 0
+};
+
+tx = new ethTx(txData);
+console.log('Tx Terenkode RLP: 0x' + tx.serialize().toString('hex'))
+
+txHash = tx.hash(); // Langkah ini mengkodekan ke RLP dan menghitung hash
+console.log('Hash Tx: 0x' + txHash.toString('hex'))
+
+// Tandatangani transaksi
+const privKey = Buffer.from(
+  '91c8360c4cb4b5fac45513a7213f31d4e4a7bfcb4630e9fbf074f42a203ac0b9', 'hex');
+
+tx.sign(privKey);
+
+serializedTx = tx.serialize();
+rawTx = 'Transaksi Mentah yang Ditandatangani: 0x' + serializedTx.toString('hex');
+console.log(rawTx)
+```
+
+Menjalankan kode contoh menghasilkan hasil berikut:
+
+```bash
+$ node raw_tx_demo.js
+Tx Terenkode RLP: 0xe6808609184e72a0008303000094b0920c523d582040f2bcb1bd7fb1c7c1...
+Hash Tx: 0xaa7f03f9f4e52fcf69f836a6d2bbc7706580adce0a068ff6525ba337218e6992
+Transaksi Mentah yang Ditandatangani: 0xf866808609184e72a0008303000094b0920c523d582040f2bcb1...
+```
+
+#### Pembuatan Transaksi Mentah dengan EIP-155
+
+Standar EIP-155 "Perlindungan Serangan Pemutaran Ulang Sederhana" menentukan pengkodean transaksi yang dilindungi dari serangan pemutaran ulang, yang mencakup pengidentifikasi rantai (*chain identifier*) di dalam data transaksi, sebelum penandatanganan. Ini memastikan bahwa transaksi yang dibuat untuk satu blockchain (mis., jaringan utama Ethereum) tidak valid di blockchain lain (mis., Ethereum Classic atau jaringan uji Ropsten). Oleh karena itu, transaksi yang disiarkan di satu jaringan tidak dapat diputar ulang di jaringan lain, sesuai dengan nama standar tersebut.
+
+EIP-155 menambahkan tiga bidang ke enam bidang utama dari struktur data transaksi, yaitu **pengidentifikasi rantai, 0, dan 0**. Tiga bidang ini ditambahkan ke data transaksi sebelum dikodekan dan di-hash. Oleh karena itu, mereka mengubah hash transaksi, yang kemudian diterapkan tanda tangan. Dengan menyertakan pengidentifikasi rantai dalam data yang ditandatangani, tanda tangan transaksi mencegah perubahan apa pun, karena tanda tangan menjadi tidak valid jika pengidentifikasi rantai diubah. Oleh karena itu, EIP-155 membuat tidak mungkin sebuah transaksi diputar ulang di rantai lain, karena validitas tanda tangan bergantung pada pengidentifikasi rantai.
+
+Bidang pengidentifikasi rantai mengambil nilai sesuai dengan jaringan yang dituju oleh transaksi, seperti yang diuraikan dalam Tabel 6-1.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-6.1.png" alt="gambar" width="580"/>
+</p>
+
+Struktur transaksi yang dihasilkan dikodekan dengan RLP, di-hash, dan ditandatangani. Algoritma tanda tangan sedikit dimodifikasi untuk mengkodekan pengidentifikasi rantai di awalan `v` juga. Untuk detail lebih lanjut, lihat spesifikasi EIP-155.
+
+### Nilai Awalan Tanda Tangan (v) dan Pemulihan Kunci Publik
+
+Seperti yang disebutkan dalam “Struktur Transaksi” di halaman 99, pesan transaksi tidak menyertakan bidang "from". Itu karena kunci publik pengirim dapat dihitung langsung dari tanda tangan ECDSA. Setelah Anda memiliki kunci publik, Anda dapat menghitung alamatnya dengan mudah. Proses memulihkan kunci publik penanda tangan disebut **pemulihan kunci publik (*public key recovery*)**.
+
+Dengan nilai $r$ dan $s$ yang dihitung dalam “Matematika ECDSA” di halaman 116, kita dapat menghitung dua kemungkinan kunci publik.
+
+Pertama, kita menghitung dua titik kurva eliptik, $R$ dan $R'$, dari nilai koordinat x yaitu $r$ yang ada di tanda tangan. Ada dua titik karena kurva eliptik simetris terhadap sumbu x, sehingga untuk setiap nilai x ada dua kemungkinan nilai yang sesuai dengan kurva, satu di setiap sisi sumbu x.
+
+Dari $r$ kita juga menghitung $r^{-1}$, yang merupakan invers perkalian dari $r$.
+
+Terakhir, kita menghitung $z$, yang merupakan bit terendah `n` dari hash pesan, di mana `n` adalah orde kurva eliptik.
+
+Dua kemungkinan kunci publik tersebut adalah:
+
+$K_1 = r^{-1} (sR – zG)$
+
+dan:
+
+$K_2 = r^{-1} (sR' – zG)$
+
+di mana:
+* $K_1$ dan $K_2$ adalah dua kemungkinan untuk kunci publik penanda tangan.
+* $r^{-1}$ adalah invers perkalian dari nilai $r$ tanda tangan.
+* $s$ adalah nilai $s$ tanda tangan.
+* $R$ dan $R'$ adalah dua kemungkinan untuk kunci publik *ephemeral* $Q$.
+* $z$ adalah bit terendah `n` dari hash pesan.
+* $G$ adalah titik generator kurva eliptik.
+
+Untuk membuat segalanya lebih efisien, tanda tangan transaksi menyertakan nilai awalan **$v$**, yang memberi tahu kita mana dari dua kemungkinan nilai $R$ yang merupakan kunci publik *ephemeral*. Jika $v$ **genap**, maka $R$ adalah nilai yang benar. Jika $v$ **ganjil**, maka itu adalah $R'$. Dengan begitu, kita hanya perlu menghitung satu nilai untuk $R$ dan hanya satu nilai untuk $K$.
+
+### Memisahkan Penandatanganan dan Transmisi (Penandatanganan Luring)
+
+Setelah sebuah transaksi ditandatangani, ia siap untuk dikirim ke jaringan Ethereum. Tiga langkah membuat, menandatangani, dan menyiarkan transaksi biasanya terjadi sebagai satu operasi tunggal, misalnya menggunakan `web3.eth.sendTransaction`. Namun, seperti yang Anda lihat di “Pembuatan dan Penandatanganan Transaksi Mentah” di halaman 119, Anda dapat membuat dan menandatangani transaksi dalam dua langkah terpisah. Setelah Anda memiliki transaksi yang ditandatangani, Anda kemudian dapat mengirimkannya menggunakan `web3.eth.sendSignedTransaction`, yang mengambil transaksi yang dikodekan heksadesimal dan ditandatangani lalu mentransmisikannya di jaringan Ethereum.
+
+Mengapa Anda ingin memisahkan penandatanganan dan transmisi transaksi? Alasan paling umum adalah **keamanan**. Komputer yang menandatangani transaksi harus memiliki kunci privat yang tidak terkunci yang dimuat di memori. Komputer yang melakukan transmisi harus terhubung ke internet (dan menjalankan klien Ethereum). Jika kedua fungsi ini berada di satu komputer, maka Anda memiliki kunci privat di sistem daring, yang cukup berbahaya. Memisahkan fungsi penandatanganan dan transmisi dan melakukannya di mesin yang berbeda (masing-masing di perangkat luring dan daring) disebut **penandatanganan luring (*offline signing*)** dan merupakan praktik keamanan yang umum.
+
+Gambar 6-7 menunjukkan prosesnya:
+1.  Buat transaksi yang belum ditandatangani di komputer daring di mana keadaan akun saat ini, terutama nonce saat ini dan dana yang tersedia, dapat diambil.
+2.  Transfer transaksi yang belum ditandatangani ke perangkat luring yang terisolasi (*air-gapped*) untuk penandatanganan transaksi, mis., melalui kode QR atau USB flash drive.
+3.  Kirim transaksi yang sudah ditandatangani (kembali) ke perangkat daring untuk disiarkan di blockchain Ethereum, mis., melalui kode QR atau USB flash drive.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-6.7.png" alt="gambar" width="580"/>
+</p>
+
