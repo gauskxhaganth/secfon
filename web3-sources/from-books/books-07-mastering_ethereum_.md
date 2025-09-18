@@ -2285,3 +2285,185 @@ Tabel 5-6 menunjukkan beberapa contoh lagi.
 ### Kesimpulan
 
 Dompet adalah fondasi dari setiap aplikasi blockchain yang menghadap pengguna. Mereka memungkinkan pengguna untuk mengelola koleksi kunci dan alamat. Dompet juga memungkinkan pengguna untuk menunjukkan kepemilikan mereka atas ether, dan mengotorisasi transaksi, dengan menerapkan tanda tangan digital, seperti yang akan kita lihat di Bab 6.
+
+---
+
+# BAB 6
+## Transaksi
+
+**Transaksi** adalah pesan yang ditandatangani yang berasal dari akun milik eksternal (*externally owned account* - EOA), ditransmisikan oleh jaringan Ethereum, dan dicatat di blockchain Ethereum. Definisi dasar ini menyembunyikan banyak detail yang mengejutkan dan menarik. Cara lain untuk melihat transaksi adalah sebagai satu-satunya hal yang dapat memicu perubahan keadaan (*state*), atau menyebabkan sebuah kontrak dieksekusi di EVM. Ethereum adalah mesin keadaan tunggal (*singleton state machine*) global, dan transaksi adalah apa yang membuat mesin keadaan itu "berdetak," mengubah keadaannya.
+
+Kontrak tidak berjalan sendiri. Ethereum tidak berjalan secara otonom. Semuanya dimulai dengan sebuah transaksi.
+
+Dalam bab ini, kita akan membedah transaksi, menunjukkan cara kerjanya, dan memeriksa detailnya. Perhatikan bahwa sebagian besar bab ini ditujukan bagi mereka yang tertarik mengelola transaksi mereka sendiri pada tingkat rendah, mungkin karena mereka sedang menulis aplikasi dompet; Anda tidak perlu khawatir tentang ini jika Anda senang menggunakan aplikasi dompet yang ada, meskipun Anda mungkin menemukan detailnya menarik\!
+
+### Struktur Transaksi
+
+Pertama, mari kita lihat struktur dasar sebuah transaksi, sebagaimana ia diserialisasi dan ditransmisikan di jaringan Ethereum. Setiap klien dan aplikasi yang menerima transaksi yang diserialisasi akan menyimpannya di dalam memori menggunakan struktur data internalnya sendiri, mungkin dihiasi dengan metadata yang tidak ada dalam transaksi yang diserialisasi di jaringan itu sendiri. Serialisasi jaringan adalah satu-satunya bentuk standar dari sebuah transaksi.
+
+Transaksi adalah pesan biner yang diserialisasi yang berisi data berikut:
+
+  * **Nonce**
+    Nomor urut, yang dikeluarkan oleh EOA asal, digunakan untuk mencegah pemutaran ulang pesan (*message replay*).
+  * **Harga gas (Gas price)**
+    Harga gas (dalam wei) yang bersedia dibayar oleh pengirim.
+  * **Batas gas (Gas limit)**
+    Jumlah maksimum gas yang bersedia dibeli oleh pengirim untuk transaksi ini.
+  * **Penerima (Recipient)**
+    Alamat tujuan Ethereum.
+  * **Nilai (Value)**
+    Jumlah ether yang akan dikirim ke tujuan.
+  * **Data**
+    Muatan data biner (*binary data payload*) dengan panjang variabel.
+  * **v,r,s**
+    Tiga komponen dari tanda tangan digital ECDSA dari EOA asal.
+
+Struktur pesan transaksi diserialisasi menggunakan skema pengkodean **Recursive Length Prefix (RLP)**, yang dibuat khusus untuk serialisasi data yang sederhana dan sempurna-per-byte (*byte-perfect*) di Ethereum. Semua angka di Ethereum dikodekan sebagai integer *big-endian*, dengan panjang yang merupakan kelipatan 8 bit.
+
+Perhatikan bahwa label bidang (*to, gas limit*, dll.) ditampilkan di sini untuk kejelasan, tetapi bukan bagian dari data transaksi yang diserialisasi, yang berisi nilai-nilai bidang yang dikodekan dengan RLP. Secara umum, RLP tidak mengandung pembatas bidang atau label apa pun. Awalan panjang RLP digunakan untuk mengidentifikasi panjang setiap bidang. Apa pun di luar panjang yang ditentukan menjadi milik bidang berikutnya dalam struktur.
+
+Meskipun ini adalah struktur transaksi aktual yang ditransmisikan, sebagian besar representasi internal dan visualisasi antarmuka pengguna memperindahnya dengan informasi tambahan, yang berasal dari transaksi atau dari blockchain.
+
+Misalnya, Anda mungkin memperhatikan tidak ada data "from" di alamat yang mengidentifikasi EOA asal. Itu karena kunci publik EOA dapat diturunkan dari komponen `v,r,s` dari tanda tangan ECDSA. Alamat, pada gilirannya, dapat diturunkan dari kunci publik. Ketika Anda melihat transaksi yang menunjukkan bidang "from", itu ditambahkan oleh perangkat lunak yang digunakan untuk memvisualisasikan transaksi tersebut. Metadata lain yang sering ditambahkan ke transaksi oleh perangkat lunak klien termasuk nomor blok (setelah ditambang dan dimasukkan ke dalam blockchain) dan ID transaksi (hash yang dihitung). Sekali lagi, data ini berasal dari transaksi, dan bukan merupakan bagian dari pesan transaksi itu sendiri.
+
+### Nonce Transaksi
+
+Nonce adalah salah satu komponen transaksi yang paling penting dan paling sedikit dipahami. Definisi dalam *Yellow Paper* (lihat “Bacaan Lebih Lanjut”) berbunyi:
+
+> **nonce**: Nilai skalar yang sama dengan jumlah transaksi yang dikirim dari alamat ini atau, dalam kasus akun dengan kode terkait, jumlah pembuatan kontrak yang dibuat oleh akun ini.
+
+Secara tegas, nonce adalah atribut dari alamat asal; artinya, ia hanya memiliki makna dalam konteks alamat pengirim. Namun, nonce tidak disimpan secara eksplisit sebagai bagian dari keadaan akun di blockchain. Sebaliknya, ia dihitung secara dinamis, dengan menghitung jumlah transaksi terkonfirmasi yang berasal dari suatu alamat.
+
+Ada dua skenario di mana keberadaan nonce penghitung transaksi menjadi penting: fitur kegunaan dari transaksi yang dimasukkan dalam urutan pembuatan, dan fitur vital perlindungan duplikasi transaksi. Mari kita lihat skenario contoh untuk masing-masing skenario ini:
+
+1.  Bayangkan Anda ingin melakukan dua transaksi. Anda memiliki pembayaran penting sebesar 6 ether, dan juga pembayaran lain sebesar 8 ether. Anda menandatangani dan menyiarkan transaksi 6-ether terlebih dahulu, karena itu yang lebih penting, lalu Anda menandatangani dan menyiarkan transaksi kedua, 8-ether. Sayangnya, Anda mengabaikan fakta bahwa akun Anda hanya berisi 10 ether, jadi jaringan tidak dapat menerima kedua transaksi: salah satunya akan gagal. Karena Anda mengirim yang lebih penting 6-ether terlebih dahulu, Anda tentu berharap yang itu akan berhasil dan yang 8-ether akan ditolak. Namun, dalam sistem terdesentralisasi seperti Ethereum, *node* dapat menerima transaksi dalam urutan apa pun; tidak ada jaminan bahwa *node* tertentu akan menerima satu transaksi sebelum yang lain. Dengan demikian, hampir pasti akan ada beberapa *node* yang menerima transaksi 6-ether terlebih dahulu dan yang lain menerima transaksi 8-ether terlebih dahulu. Tanpa nonce, akan acak mana yang diterima dan mana yang ditolak. Namun, dengan nonce disertakan, transaksi pertama yang Anda kirim akan memiliki nonce, katakanlah, 3, sedangkan transaksi 8-ether memiliki nilai nonce berikutnya (yaitu, 4). Jadi, transaksi itu akan diabaikan sampai transaksi dengan nonce dari 0 hingga 3 telah diproses, bahkan jika diterima lebih dulu. Fiuh\!
+
+2.  Sekarang bayangkan Anda memiliki akun dengan 100 ether. Fantastis\! Anda menemukan seseorang secara daring yang akan menerima pembayaran dalam ether untuk *widget-mcguffin* yang sangat ingin Anda beli. Anda mengirim mereka 2 ether dan mereka mengirimi Anda *widget-mcguffin*. Bagus sekali. Untuk melakukan pembayaran 2-ether itu, Anda menandatangani transaksi yang mengirim 2 ether dari akun Anda ke akun mereka, lalu menyiarkannya ke jaringan Ethereum untuk diverifikasi dan dimasukkan ke dalam blockchain. Sekarang, tanpa nilai nonce dalam transaksi, transaksi kedua yang mengirim 2 ether ke alamat yang sama untuk kedua kalinya akan terlihat persis sama dengan transaksi pertama. Ini berarti bahwa siapa pun yang melihat transaksi Anda di jaringan Ethereum (yang berarti semua orang, termasuk penerima atau musuh Anda) dapat "memutar ulang" transaksi itu berulang kali sampai semua ether Anda habis hanya dengan menyalin dan menempel transaksi asli Anda dan mengirimkannya kembali ke jaringan. Namun, dengan nilai nonce yang disertakan dalam data transaksi, setiap transaksi menjadi unik, bahkan saat mengirim jumlah ether yang sama ke alamat penerima yang sama beberapa kali. Jadi, dengan memiliki nonce yang bertambah sebagai bagian dari transaksi, tidak mungkin bagi siapa pun untuk "menduplikasi" pembayaran yang telah Anda lakukan.
+
+Singkatnya, penting untuk dicatat bahwa penggunaan nonce sebenarnya vital untuk protokol berbasis akun, berbeda dengan mekanisme “Unspent Transaction Output” (UTXO) dari protokol Bitcoin.
+
+#### Melacak Nonce
+
+Secara praktis, nonce adalah hitungan terkini dari jumlah transaksi yang telah dikonfirmasi (yaitu, *on-chain*) yang berasal dari sebuah akun. Untuk mengetahui berapa nonce saat ini, Anda dapat menanyakannya ke blockchain, misalnya melalui antarmuka web3.
+
+Buka konsol JavaScript di browser dengan MetaMask berjalan, atau gunakan perintah `truffle console` untuk mengakses pustaka JavaScript web3, lalu ketik:
+
+```javascript
+> web3.eth.getTransactionCount("0x9e713963a92c02317a681b9bb3065a8249de124f")
+40
+```
+
+> Nonce adalah penghitung berbasis nol, artinya transaksi pertama memiliki nonce 0. Dalam contoh ini, kita memiliki jumlah transaksi 40, yang berarti nonce 0 hingga 39 telah terlihat. Nonce transaksi berikutnya harus 40.
+
+Dompet Anda akan melacak nonce untuk setiap alamat yang dikelolanya. Cukup sederhana untuk melakukannya, selama Anda hanya memulai transaksi dari satu titik. Katakanlah Anda sedang menulis perangkat lunak dompet Anda sendiri atau aplikasi lain yang memulai transaksi. Bagaimana Anda melacak nonce?
+
+Saat Anda membuat transaksi baru, Anda menetapkan nonce berikutnya dalam urutan. Tetapi sampai transaksi itu dikonfirmasi, itu tidak akan dihitung dalam total `getTransactionCount`.
+
+> Berhati-hatilah saat menggunakan fungsi `getTransactionCount` untuk menghitung transaksi yang tertunda (*pending*), karena Anda mungkin mengalami beberapa masalah jika Anda mengirim beberapa transaksi secara berurutan.
+
+Mari kita lihat sebuah contoh:
+
+```javascript
+> web3.eth.getTransactionCount("0x9e713963a92c02317a681b9bb3065a8249de124f", "pending")
+40
+> web3.eth.sendTransaction({from: web3.eth.accounts[0], to: "0xB0920c523d582040f2BCB1bD7FB1c7C1ECEbdB34", value: web3.toWei(0.01, "ether")});
+> web3.eth.getTransactionCount("0x9e713963a92c02317a681b9bb3065a8249de124f", "pending")
+41
+> web3.eth.sendTransaction({from: web3.eth.accounts[0], to: "0xB0920c523d582040f2BCB1bD7FB1c7C1ECEbdB34", value: web3.toWei(0.01, "ether")});
+> web3.eth.getTransactionCount("0x9e713963a92c02317a681b9bb3065a8249de124f", "pending")
+41
+> web3.eth.sendTransaction({from: web3.eth.accounts[0], to: "0xB0920c523d582040f2BCB1bD7FB1c7C1ECEbdB34", value: web3.toWei(0.01, "ether")});
+> web3.eth.getTransactionCount("0x9e713963a92c02317a681b9bb3065a8249de124f", "pending")
+41
+```
+
+Seperti yang Anda lihat, transaksi pertama yang kami kirim meningkatkan jumlah transaksi menjadi 41, menunjukkan transaksi yang tertunda. Tetapi ketika kami mengirim tiga transaksi lagi secara berurutan, panggilan `getTransactionCount` tidak menghitungnya. Itu hanya menghitung satu, meskipun Anda mungkin berharap ada tiga yang tertunda di *mempool*. Jika kita menunggu beberapa detik agar komunikasi jaringan stabil, panggilan `getTransactionCount` akan mengembalikan angka yang diharapkan. Tetapi sementara itu, ketika ada lebih dari satu transaksi yang tertunda, itu mungkin tidak membantu kita.
+
+Ketika Anda membangun aplikasi yang membuat transaksi, ia tidak dapat mengandalkan `getTransactionCount` untuk transaksi yang tertunda. Hanya ketika jumlah transaksi tertunda dan terkonfirmasi sama (semua transaksi yang beredar telah dikonfirmasi), Anda dapat mempercayai output `getTransactionCount` untuk memulai penghitung nonce Anda. Setelah itu, lacak nonce di aplikasi Anda sampai setiap transaksi dikonfirmasi.
+
+Antarmuka JSON RPC Parity menawarkan fungsi `parity_nextNonce`, yang mengembalikan nonce berikutnya yang harus digunakan dalam sebuah transaksi. Fungsi `parity_nextNonce` menghitung nonce dengan benar, bahkan jika Anda membuat beberapa transaksi secara berurutan tanpa mengonfirmasinya:
+
+```bash
+$ curl --data '{"method":"parity_nextNonce", \
+"params":["0x9e713963a92c02317a681b9bb3065a8249de124f"],\
+"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST \
+localhost:8545
+{"jsonrpc":"2.0","result":"0x32","id":1}
+```
+
+> Parity memiliki konsol web untuk mengakses antarmuka JSON RPC, tetapi di sini kami menggunakan klien HTTP baris perintah untuk mengaksesnya.
+
+#### Kesenjangan Nonce, Nonce Duplikat, dan Konfirmasi
+
+Penting untuk melacak nonce jika Anda membuat transaksi secara terprogram, terutama jika Anda melakukannya dari beberapa proses independen secara bersamaan.
+
+Jaringan Ethereum memproses transaksi secara berurutan, berdasarkan nonce. Itu berarti jika Anda mengirimkan transaksi dengan nonce 0 dan kemudian mengirimkan transaksi dengan nonce 2, transaksi kedua tidak akan dimasukkan ke dalam blok mana pun. Ia akan disimpan di *mempool*, sementara jaringan Ethereum menunggu nonce yang hilang muncul. Semua *node* akan berasumsi bahwa nonce yang hilang hanya tertunda dan transaksi dengan nonce 2 diterima di luar urutan.
+
+Jika Anda kemudian mengirimkan transaksi dengan nonce yang hilang yaitu 1, kedua transaksi (nonce 1 dan 2) akan diproses dan dimasukkan (jika valid, tentu saja). Setelah Anda mengisi celah tersebut, jaringan dapat menambang transaksi di luar urutan yang disimpannya di *mempool*.
+
+Artinya, jika Anda membuat beberapa transaksi secara berurutan dan salah satunya tidak secara resmi dimasukkan ke dalam blok mana pun, semua transaksi berikutnya akan "terjebak", menunggu nonce yang hilang. Sebuah transaksi dapat menciptakan "celah" yang tidak disengaja dalam urutan nonce karena tidak valid atau memiliki gas yang tidak mencukupi. Untuk membuat semuanya bergerak lagi, Anda harus mengirimkan transaksi yang valid dengan nonce yang hilang. Anda juga harus ingat bahwa setelah transaksi dengan nonce yang "hilang" divalidasi oleh jaringan, semua transaksi yang disiarkan dengan nonce berikutnya akan secara bertahap menjadi valid; tidak mungkin untuk "menarik kembali" sebuah transaksi\!
+
+Jika, di sisi lain, Anda secara tidak sengaja menduplikasi nonce, misalnya dengan mengirimkan dua transaksi dengan nonce yang sama tetapi penerima atau nilai yang berbeda, maka salah satunya akan dikonfirmasi dan salah satunya akan ditolak. Mana yang dikonfirmasi akan ditentukan oleh urutan kedatangan mereka di *node* validasi pertama yang menerimanya—yaitu, akan cukup acak.
+
+Seperti yang Anda lihat, melacak nonce adalah perlu, dan jika aplikasi Anda tidak mengelola proses itu dengan benar, Anda akan mengalami masalah. Sayangnya, segalanya menjadi lebih sulit jika Anda mencoba melakukan ini secara bersamaan, seperti yang akan kita lihat di bagian berikutnya.
+
+#### Konkurensi, Pembuatan Transaksi, dan Nonce
+
+Konkurensi adalah aspek kompleks dalam ilmu komputer, dan terkadang muncul secara tak terduga, terutama dalam sistem waktu-nyata yang terdesentralisasi dan terdistribusi seperti Ethereum.
+
+Secara sederhana, konkurensi adalah ketika Anda memiliki komputasi simultan oleh beberapa sistem independen. Ini bisa terjadi dalam program yang sama (mis., *multithreading*), pada CPU yang sama (mis., *multiprocessing*), atau di komputer yang berbeda (yaitu, sistem terdistribusi). Ethereum, menurut definisinya, adalah sistem yang memungkinkan konkurensi operasi (*node*, klien, DApps) tetapi memberlakukan keadaan tunggal melalui konsensus.
+
+Sekarang, bayangkan Anda memiliki beberapa aplikasi dompet independen yang menghasilkan transaksi dari alamat atau alamat yang sama. Salah satu contoh situasi seperti itu adalah bursa yang memproses penarikan dari *hot wallet* bursa (dompet yang kuncinya disimpan secara daring, berbeda dengan *cold wallet* di mana kuncinya tidak pernah daring). Idealnya, Anda ingin memiliki lebih dari satu komputer yang memproses penarikan, sehingga tidak menjadi hambatan atau satu titik kegagalan. Namun, ini dengan cepat menjadi masalah, karena memiliki lebih dari satu komputer yang menghasilkan penarikan akan menghasilkan beberapa masalah konkurensi yang rumit, salah satunya adalah pemilihan nonce. Bagaimana beberapa komputer yang menghasilkan, menandatangani, dan menyiarkan transaksi dari akun *hot wallet* yang sama berkoordinasi?
+
+Anda bisa menggunakan satu komputer untuk menetapkan nonce, berdasarkan *first-come first-served*, ke komputer yang menandatangani transaksi. Namun, komputer ini sekarang menjadi satu titik kegagalan. Lebih buruk lagi, jika beberapa nonce ditetapkan dan salah satunya tidak pernah digunakan (karena kegagalan di komputer yang memproses transaksi dengan nonce itu), semua transaksi berikutnya menjadi macet.
+
+Pendekatan lain adalah dengan menghasilkan transaksi, tetapi tidak menetapkan nonce padanya (dan karena itu membiarkannya tidak ditandatangani—ingat bahwa nonce adalah bagian integral dari data transaksi dan oleh karena itu perlu dimasukkan dalam tanda tangan digital yang mengotentikasi transaksi). Anda kemudian bisa mengantrekannya ke satu *node* yang menandatanganinya dan juga melacak nonce. Sekali lagi, ini akan menjadi titik hambat dalam proses: penandatanganan dan pelacakan nonce adalah bagian dari operasi Anda yang kemungkinan akan menjadi padat di bawah beban, sedangkan pembuatan transaksi yang tidak ditandatangani adalah bagian yang tidak terlalu perlu Anda paralelisasi. Anda akan memiliki beberapa konkurensi, tetapi akan kurang di bagian kritis dari proses tersebut.
+
+Pada akhirnya, masalah konkurensi ini, di atas kesulitan melacak saldo akun dan konfirmasi transaksi dalam proses independen, memaksa sebagian besar implementasi untuk menghindari konkurensi dan menciptakan hambatan seperti proses tunggal yang menangani semua transaksi penarikan di bursa, atau menyiapkan beberapa *hot wallet* yang dapat bekerja sepenuhnya secara independen untuk penarikan dan hanya perlu diseimbangkan kembali secara berkala.
+
+### Gas Transaksi
+
+Kami telah membahas sedikit tentang gas di bab-bab sebelumnya, dan kami akan membahasnya lebih detail di “Gas” di halaman 314. Namun, mari kita bahas beberapa dasar tentang peran komponen `gasPrice` dan `gasLimit` dari sebuah transaksi.
+
+Gas adalah bahan bakar Ethereum. Gas bukan ether—ini adalah mata uang virtual terpisah dengan nilai tukarnya sendiri terhadap ether. Ethereum menggunakan gas untuk mengontrol jumlah sumber daya yang dapat digunakan oleh sebuah transaksi, karena akan diproses di ribuan komputer di seluruh dunia. Model komputasi yang terbuka (*Turing-complete*) memerlukan beberapa bentuk pengukuran untuk menghindari serangan *denial-of-service* atau transaksi yang secara tidak sengaja menghabiskan sumber daya.
+
+Gas terpisah dari ether untuk melindungi sistem dari volatilitas yang mungkin timbul seiring dengan perubahan cepat nilai ether, dan juga sebagai cara untuk mengelola rasio penting dan sensitif antara biaya berbagai sumber daya yang dibayar oleh gas (yaitu, komputasi, memori, dan penyimpanan).
+
+Bidang `gasPrice` dalam sebuah transaksi memungkinkan pengirim transaksi untuk menetapkan harga yang bersedia mereka bayar sebagai ganti gas. Harga diukur dalam wei per unit gas. Misalnya, dalam contoh transaksi di Bab 2, dompet Anda menetapkan `gasPrice` menjadi 3 gwei (3 gigawei atau 3 miliar wei).
+
+> Situs populer **ETH Gas Station** menyediakan informasi tentang harga gas saat ini dan metrik gas relevan lainnya untuk jaringan utama Ethereum.
+
+Dompet dapat menyesuaikan `gasPrice` dalam transaksi yang mereka mulai untuk mencapai konfirmasi transaksi yang lebih cepat. Semakin tinggi `gasPrice`, semakin cepat transaksi kemungkinan akan dikonfirmasi. Sebaliknya, transaksi dengan prioritas lebih rendah dapat membawa harga yang lebih rendah, menghasilkan konfirmasi yang lebih lambat. Nilai minimum yang dapat diatur untuk `gasPrice` adalah nol, yang berarti transaksi bebas biaya. Selama periode permintaan ruang di blok rendah, transaksi semacam itu mungkin saja akan ditambang.
+
+> `gasPrice` minimum yang dapat diterima adalah nol. Itu berarti dompet dapat menghasilkan transaksi yang sepenuhnya gratis. Tergantung pada kapasitas, ini mungkin tidak pernah dikonfirmasi, tetapi tidak ada dalam protokol yang melarang transaksi gratis. Anda dapat menemukan beberapa contoh transaksi semacam itu yang berhasil dimasukkan ke dalam blockchain Ethereum.
+
+Antarmuka web3 menawarkan saran `gasPrice`, dengan menghitung harga median di beberapa blok (kita bisa menggunakan konsol truffle atau konsol web3 JavaScript mana pun untuk melakukannya):
+
+```javascript
+> web3.eth.getGasPrice(console.log)
+> null BigNumber { s: 1, e: 10, c: [ 10000000000 ] }
+```
+
+Bidang penting kedua yang terkait dengan gas adalah `gasLimit`. Secara sederhana, `gasLimit` memberikan jumlah maksimum unit gas yang bersedia dibeli oleh pengirim transaksi untuk menyelesaikan transaksi tersebut. Untuk pembayaran sederhana, yaitu transaksi yang mentransfer ether dari satu EOA ke EOA lain, jumlah gas yang dibutuhkan ditetapkan sebesar **21.000 unit gas**. Untuk menghitung berapa biaya ether yang akan dikeluarkan, Anda mengalikan 21.000 dengan `gasPrice` yang bersedia Anda bayar. Contohnya:
+
+```javascript
+> web3.eth.getGasPrice(function(err, res) {console.log(res*21000)} )
+> 210000000000000
+```
+
+Jika alamat tujuan transaksi Anda adalah sebuah kontrak, maka jumlah gas yang dibutuhkan dapat diperkirakan tetapi tidak dapat ditentukan dengan akurat. Itu karena sebuah kontrak dapat mengevaluasi kondisi yang berbeda yang mengarah ke jalur eksekusi yang berbeda, dengan total biaya gas yang berbeda. Kontrak mungkin hanya mengeksekusi komputasi sederhana atau yang lebih kompleks, tergantung pada kondisi yang berada di luar kendali Anda dan tidak dapat diprediksi. Untuk mendemonstrasikan ini, mari kita lihat sebuah contoh: kita bisa menulis kontrak pintar yang menaikkan penghitung setiap kali dipanggil dan menjalankan *loop* tertentu sejumlah kali sama dengan jumlah panggilan. Mungkin pada panggilan ke-100 ia memberikan hadiah khusus, seperti lotre, tetapi perlu melakukan komputasi tambahan untuk menghitung hadiah. Jika Anda memanggil kontrak 99 kali, satu hal terjadi, tetapi pada panggilan ke-100, sesuatu yang sangat berbeda terjadi. Jumlah gas yang akan Anda bayar tergantung pada berapa banyak transaksi lain yang telah memanggil fungsi itu sebelum transaksi Anda dimasukkan ke dalam blok. Mungkin perkiraan Anda didasarkan pada menjadi transaksi ke-99, tetapi tepat sebelum transaksi Anda dikonfirmasi, orang lain memanggil kontrak untuk ke-99 kalinya. Sekarang Anda adalah transaksi ke-100 yang memanggil, dan upaya komputasi (dan biaya gas) jauh lebih tinggi.
+
+Meminjam analogi umum yang digunakan di Ethereum, Anda dapat menganggap `gasLimit` sebagai kapasitas tangki bahan bakar di mobil Anda (mobil Anda adalah transaksi). Anda mengisi tangki dengan bahan bakar sebanyak yang Anda pikir akan dibutuhkan untuk perjalanan (komputasi yang diperlukan untuk memvalidasi transaksi Anda). Anda dapat memperkirakan jumlahnya sampai batas tertentu, tetapi mungkin ada perubahan tak terduga pada perjalanan Anda, seperti pengalihan (jalur eksekusi yang lebih kompleks), yang meningkatkan konsumsi bahan bakar.
+
+Namun, analogi dengan tangki bahan bakar agak menyesatkan. Sebenarnya lebih seperti akun kredit untuk perusahaan pom bensin, di mana Anda membayar setelah perjalanan selesai, berdasarkan berapa banyak gas yang sebenarnya Anda gunakan. Saat Anda mengirimkan transaksi Anda, salah satu langkah validasi pertama adalah memeriksa bahwa akun asalnya memiliki cukup ether untuk membayar biaya `gasPrice * gasLimit`. Tetapi jumlahnya tidak benar-benar dikurangi dari akun Anda sampai transaksi selesai dieksekusi. Anda hanya ditagih untuk gas yang benar-benar dikonsumsi oleh transaksi Anda, tetapi Anda harus memiliki saldo yang cukup untuk jumlah maksimum yang bersedia Anda bayar sebelum Anda mengirim transaksi Anda.
+
+### Penerima Transaksi
+
+Penerima transaksi ditentukan dalam bidang `to`. Bidang ini berisi alamat Ethereum 20-byte. Alamat tersebut bisa berupa EOA atau alamat kontrak.
+
+Ethereum tidak melakukan validasi lebih lanjut pada bidang ini. Nilai 20-byte apa pun dianggap valid. Jika nilai 20-byte sesuai dengan alamat tanpa kunci privat yang sesuai, atau tanpa kontrak yang sesuai, transaksi tersebut tetap valid. Ethereum tidak memiliki cara untuk mengetahui apakah sebuah alamat diturunkan dengan benar dari kunci publik (dan karena itu dari kunci privat) yang ada.
+
+> Protokol Ethereum tidak memvalidasi alamat penerima dalam transaksi. Anda dapat mengirim ke alamat yang tidak memiliki kunci privat atau kontrak yang sesuai, dengan demikian "membakar" (*burning*) ether tersebut, membuatnya tidak dapat dibelanjakan selamanya. Validasi harus dilakukan di tingkat antarmuka pengguna.
+
+Mengirim transaksi ke alamat yang salah kemungkinan besar akan membakar ether yang dikirim, membuatnya tidak dapat diakses selamanya (tidak dapat dibelanjakan), karena sebagian besar alamat tidak memiliki kunci privat yang diketahui dan oleh karena itu tidak ada tanda tangan yang dapat dihasilkan untuk membelanjakannya. Diasumsikan bahwa validasi alamat terjadi di tingkat antarmuka pengguna (lihat “Pengkodean Hex dengan Checksum dalam Kapitalisasi (EIP-55)” di halaman 76). Faktanya, ada sejumlah alasan yang valid untuk membakar ether—misalnya, sebagai disinsentif untuk berbuat curang di *payment channel* dan kontrak pintar lainnya—dan karena jumlah ether terbatas, membakar ether secara efektif mendistribusikan nilai yang dibakar ke semua pemegang ether (sebanding dengan jumlah ether yang mereka pegang).
+
