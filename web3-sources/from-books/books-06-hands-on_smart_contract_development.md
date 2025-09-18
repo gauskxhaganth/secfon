@@ -419,4 +419,301 @@ Kopi biasanya ditanam di wilayah yang disebut sebagai **Sabuk Kopi (*Bean Belt*)
   <img src="images/books-06-hands-on_smart_contract_development/figure-2.1.png" alt="gambar" width="580"/>
 </p>
 
+Setiap peran ini, dari petani hingga kedai kopi, bisa menjadi perusahaan atau badan usaha tersendiri. Ini berarti setiap organisasi kemungkinan akan memiliki sistem independen untuk melacak pembelian dari pemasok hingga penjualan. Beberapa akan menghubungkan penjualan ke lot produk masuk tertentu, sementara yang lain mungkin tidak membuat koneksi ini. Dalam kasus di mana hubungan tidak dibuat secara eksplisit, menelusuri secangkir kopi kembali ke pertanian dan panen spesifik bisa memakan waktu yang sangat lama.
+
+Memindahkan proses ini ke **blockchain** akan memungkinkan kita untuk melacak asal-usul secangkir kopi kembali ke panen dengan jauh lebih cepat. Setiap panen akan dicatat di dalam rantai (*on-chain*), bersama dengan setiap pergantian kepemilikan, hingga sampai ke kedai kopi. Gabungkan ini dengan **perangkat IoT** yang ikut serta dalam pengiriman, memposting kondisi seperti suhu dan kelembaban ke *blockchain*, dan Anda dapat memiliki perjalanan yang sangat detail dari pertanian hingga ke cangkir. Bayangkan memindai **kode QR** pada sekantong kopi dan melihat di mana kopi itu ditanam, beserta jalur dan kondisi lingkungan dari saat meninggalkan pertanian hingga tiba di kedai kopi.
+
+Sekarang, ini mungkin berlebihan untuk kopi, tetapi ini tidak terlalu jauh dari eksperimen yang sedang dijalankan oleh **Walmart**. Dalam eksperimen Walmart, mereka melacak mangga di Meksiko dan babi di Tiongkok, dengan tujuan meningkatkan **ketertelusuran (*traceability*)**. Untuk menetapkan titik acuan (*baseline*), sebuah tim diminta untuk mengidentifikasi pertanian asal dari sebungkus irisan mangga. Tim tersebut membutuhkan waktu hampir seminggu untuk melakukan penelusuran manual yang diperlukan untuk melacak irisan mangga tersebut ke pertaniannya. Setelah mengimplementasikan solusi *blockchain*, proses itu hanya memakan waktu 2,2 detik. Dalam kasus kontaminasi makanan, mengidentifikasi sumbernya bisa sangat berarti dalam menyelamatkan nyawa.
+
+> Walmart menggunakan Hyperledger Fabric untuk eksperimen *blockchain*-nya. Hyperledger Fabric adalah sebuah ***blockchain* berizin (*permissioned*)**, yang berarti bahwa peran dan aktivitas tertentu, seperti validasi transaksi (penambangan), pembuatan akun, dll., dapat dibatasi atau dikendalikan oleh aturan yang mungkin ada atau tidak ada di dalam chain.
+
+Sejauh ini kita sebagian besar telah membahas pelacakan makanan, tetapi aplikasi rantai pasok (*supply chain*) dapat digunakan untuk hampir semua barang yang Anda lihat di rak toko. Sebagai contoh, bayangkan menggunakan ini sebagai konsumen untuk melihat dari mana kapas dari kemeja yang Anda beli berasal, atau perjalanan sebuah perabot hingga sampai ke ruang tamu Anda. Memiliki informasi ini akan memberi konsumen wawasan yang jauh lebih mendalam tentang produk mereka, memungkinkan mereka untuk membuat **keputusan yang terinformasi**.
+
+Sekarang kita tahu bagaimana rantai pasok bisa menjadi aplikasi yang hebat di atas *blockchain*, bagaimana dengan pencatatan data (*record keeping*)?
+
+## Catatan Permanen
+
+Ketika Anda memiliki aset jangka panjang seperti rumah atau mobil, akan sangat baik jika semua perawatan yang telah dilakukan terhadapnya dapat dilacak dalam sejenis buku catatan (*log*). Yang lebih baik lagi daripada sekadar melacaknya adalah menyimpannya di tempat di mana catatan-catatan ini **tidak dapat dihancurkan**, dan di sinilah *blockchain* dapat membantu.
+
+Jenis aplikasi pencatatan data seperti ini adalah sesuatu yang sedang dikembangkan oleh [Aeron Labs](https://aeron.aero/). Aeron berfokus pada industri penerbangan, dengan tujuan membuat catatan seperti perawatan pesawat dan buku catatan pilot tersedia di *blockchain*.
+
+Di Amerika Serikat, persyaratan pengalaman pilot dan persyaratan perawatan pesawat diatur oleh **Administrasi Penerbangan Federal (FAA)**. Melihat persyaratan untuk pilot, ada berbagai tingkatan sertifikat pilot yang, setelah diperoleh, memberikan hak-hak istimewa tertentu seperti terbang di awan atau menerbangkan pesawat dengan banyak mesin. Selain mendapatkan sertifikat ini, pilot mungkin diharuskan untuk mempertahankan tingkat kemahiran (*currency*) dengan melakukan manuver spesifik dalam periode waktu tertentu. Sebagai contoh, seorang pilot tidak boleh membawa penumpang kecuali mereka telah melakukan [3 kali lepas landas dan pendaratan dalam 90 hari terakhir](https://oreil.ly/ehPRI), dan cara saat ini untuk membuktikannya adalah dengan melihat buku catatan pilot.
+
+Membuktikan hal seperti ini bisa menjadi hampir mustahil jika buku catatan yang bersangkutan hilang atau hancur. Menempatkan jenis informasi ini di *blockchain* akan berarti informasi tersebut menjadi **permanen, dapat diakses oleh pihak yang berwenang** seperti FAA atau Dewan Keselamatan Transportasi Nasional (NTSB), dan **terlindungi dari pemalsuan**.
+
+Sama seperti pilot, pesawat juga diwajibkan memiliki buku catatan. Buku catatan pesawat melacak perawatan dan kepatuhan terhadap **Petunjuk Kelaikan Udara** (*Airworthiness Directives*), yang mirip dengan pemberitahuan penarikan kembali (*recall*) dari produsen mobil. Dengan buku catatan pesawat, mekanik menambahkan catatan setiap kali mereka melakukan item pemeliharaan atau perbaikan apa pun pada pesawat. Jika ini dipindahkan ke *blockchain*, seperti yang coba dilakukan oleh Aeron, catatan-catatan ini akan tersedia lebih cepat dan tidak akan bisa hilang atau dihancurkan.
+
+Aeron saat ini sedang membangun dua aplikasi. Satu berfokus pada pilot dan akan menggantikan buku catatan tradisional, dan yang lainnya berfokus pada perawatan pesawat untuk menggantikan buku catatan pemeliharaan. Ini akan menjadi perubahan signifikan bagi industri penerbangan, dan keberhasilannya bergantung pada adopsi teknologi ini oleh banyak organisasi. Jika Aeron dapat membantu memelopori layanan *blockchain* di industri ini, mereka dapat menunjukkan contoh bagi banyak industri lain untuk mengadopsinya. Sistem pencatatan atau pencatatan aditif (yang terus bertambah) semacam ini bisa sangat bagus untuk aset apa pun yang berumur panjang, dan jika teknologi ini diadaptasi untuk membantu layanan kesehatan, Anda bahkan bisa memiliki **rekam medis yang mengikuti Anda seumur hidup**.
+
+Dengan mempertimbangkan jenis-jenis aplikasi ini, mari kita alihkan perhatian kita untuk memutuskan apakah *blockchain* cocok untuk Anda.
+
+## Mengevaluasi Blockchain untuk Aplikasi Anda
+
+Bagaimana Anda tahu jika *blockchain* tepat untuk aplikasi Anda? Hal-hal apa yang harus Anda pertimbangkan saat membuat keputusan ini? Bagian berikut menjelaskan beberapa keunggulan dari *blockchain*.
+
+### Dapat Diverifikasi (*Verifiable*)
+
+Jika Anda perlu memastikan bahwa perubahan dilakukan oleh individu yang berwenang, *blockchain* Ethereum dapat diandalkan. Ini secara khusus berguna untuk lingkungan tanpa kepercayaan (*trustless environments*), atau lingkungan tanpa otoritas terpusat. Dengan menggunakan transaksi yang **ditandatangani dan diverifikasi secara kriptografis**, setiap perubahan status (*state*) terlindungi dari pemalsuan atau manipulasi. Satu-satunya cara seseorang selain pemilik EOA (*Externally Owned Account*) dapat melakukan transaksi atas nama mereka adalah jika mereka berhasil mendapatkan salinan kunci privat (*private key*) mereka.
+
+### Transparan (*Transparent*)
+
+Dengan sifat publik dari *blockchain* Ethereum, siapa pun dapat melihat transaksi yang sedang terjadi. Ini berarti segalanya **sepenuhnya tersedia untuk diaudit**. Ada alat-alat seperti **Etherscan** yang memungkinkan Anda untuk memeriksa semua blok dan transaksinya melalui peramban web, atau Anda dapat menjalankan *node* Ethereum Anda sendiri dan menelusuri transaksi di mesin lokal Anda. Ini berarti pengguna tidak lagi harus bergantung pada informasi yang diberikan kepada mereka dari entitas mana pun; ketika aplikasi berada di *blockchain*, mereka dapat memeriksanya sendiri. Jika aplikasi Anda bertujuan untuk memberikan kejelasan bagi konsumen atau kolaborator industri lainnya, fungsionalitas ini sudah menjadi bagian tak terpisahkan.
+
+### Tangguh (*Resilient*)
+
+Setiap *node* Ethereum menyimpan **salinan lengkap dari data *blockchain***. Ini berarti Anda tidak akan pernah berada dalam situasi di mana data tidak sengaja hancur dan tidak dapat dipulihkan. Jika data ada di dalam rantai (*chain*), Anda bisa mendapatkannya kembali dengan melakukan sinkronisasi ulang (*resyncing*) sebuah *node*.
+
+Jika salah satu dari hal-hal ini cocok dengan persyaratan aplikasi Anda, maka Ethereum layak untuk ditinjau lebih dalam.
+
+## Ringkasan
+
+Dalam bab ini kita membahas bagaimana *blockchain* digunakan untuk membangun token, menyediakan transparansi dalam rantai pasok, dan menciptakan cara untuk mengaudit buku catatan pilot dan pesawat. Aplikasi-aplikasi ini hanyalah puncak dari gunung es dari sebuah tumpukan teknologi (*tech stack*) yang menarik.
+
+Di bab berikutnya, kita akan mulai menyiapkan mesin kita untuk pengembangan *smart contract*!
+
+---
+
+## BAB 3
+### Sebelum Kita Memulai
+
+Dalam bab ini, kita akan menyiapkan semua alat yang dibutuhkan untuk pengembangan *smart contract*. Kita akan mulai dengan menginstal klien Ethereum, yaitu perangkat lunak yang dapat digunakan untuk berinteraksi dengan *blockchain* Ethereum. Selanjutnya, kita akan menginstal Node.js, yang menyediakan lingkungan JavaScript untuk Truffle. Terakhir, kita akan menginstal Truffle dan Ganache dari **Truffle Suite**. Truffle menyediakan serangkaian utilitas fantastis yang digunakan untuk menguji dan menerapkan (*deploy*) *contract* kita, sementara Ganache memberi kita lingkungan *blockchain* lokal untuk menjalankan aplikasi kita secara lokal.
+
+Setelah semua alat ini terinstal, kita akan siap untuk menulis *smart contract* pertama kita. Tanpa basa-basi lagi, mari kita mulai.
+
+### Klien Ethereum
+
+Sebelum kita mulai menginstal klien Ethereum, kita harus meluangkan waktu sejenak untuk membahas bagaimana klien Ethereum berbeda dari klien HTTP, yang kemungkinan besar jauh lebih Anda kenal.
+
+Dalam aplikasi web tradisional, *server*-nya terpusat dan berlokasi dengan sebuah URL atau alamat IP. Perangkat lunak ini dapat ditulis dalam bahasa pemrograman apa pun yang mampu mengirim permintaan HTTP. Perangkat lunak klien akan membuat interaksi dengan *server* menjadi lebih mudah karena akan berisi semua logika dan abstraksi untuk membangun permintaan dan mem-parsing respons. Klien juga dapat dirilis sebagai sebuah *library* dan tersedia untuk aplikasi lain guna mempercepat adopsi layanan tersebut.
+
+**Twilio** adalah contoh yang bagus untuk jenis klien ini. Jika Anda mengunjungi halaman GitHub mereka, Anda dapat melihat bahwa mereka mendukung *library* dalam bahasa seperti Java, C\#, Ruby, Node, dll. Ini berarti menginstal klien Twilio biasanya dilakukan dengan menggunakan manajer dependensi (*dependency manager*) dari bahasa tersebut dan menjalankan beberapa perintah di baris perintah (*command line*) atau IDE.
+
+Ketika Anda menginstal klien Ethereum, Anda sedang menginstal perangkat lunak yang akan memungkinkan Anda untuk **menjalankan sebuah *node* Ethereum** di mesin Anda. Perangkat lunak ini dilengkapi dengan antarmuka baris perintah (CLI), yang memungkinkan Anda membuat akun atau meluncurkan konsol interaktif yang memuat Web3 terlebih dahulu (lebih lanjut tentang ini di bab-bab selanjutnya). Selain itu, perangkat lunak ini akan menjalankan sebuah *server* untuk mengekspos API JSON RPC Ethereum.
+
+Jika Anda tidak terbiasa dengan JSON RPC, ini adalah protokol *remote procedure call* (RPC) yang ringan. Ini berarti kita menggunakan JSON untuk mengirim permintaan ke *server*, yang kemudian menjalankan beberapa operasi yang telah ditentukan sebelumnya. Melalui JSON RPC inilah kita akan berinteraksi dengan *blockchain*. Spesifikasi lengkap tentang apa saja yang tersedia dapat ditemukan di [wiki Ethereum](https://ethereum.org/en/developers/docs/apis/json-rpc/).
+
+Ada sejumlah klien Ethereum yang bisa Anda gunakan, termasuk **cpp-ethereum**, **go-ethereum** (juga dikenal sebagai **Geth**), dan beberapa lainnya, tetapi yang akan kita gunakan adalah **Parity**. Parity adalah klien yang ditulis dalam bahasa Rust dan menyediakan salah satu opsi sinkronisasi tercepat di antara klien yang tersedia. Klien ini juga dikelola oleh Parity Technologies, sebuah perusahaan yang didirikan oleh penulis *yellow paper* Ethereum, Dr. Gavin Wood. Meskipun kami memilih Parity untuk tujuan buku ini, klien mana pun yang telah mengimplementasikan spesifikasi Ethereum akan berfungsi. Untuk daftar lengkap yang terkini, periksa dokumentasinya.
+
+### Menginstal Parity
+
+Parity menyediakan *binary* yang sudah jadi (*prebuilt*) untuk sistem operasi Windows, Mac, dan Linux. Jika Anda menjalankan Mac atau Ubuntu (atau Ubuntu versi WSL di Windows 10), maka Anda dapat menggunakan skrip instalasi otomatis dengan menjalankan perintah berikut:
+
+```bash
+$ bash <(curl https://get.parity.io -L)
+```
+
+Setelah skrip selesai menginstal, Anda dapat mulai menyinkronkan blok dari jaringan. Dalam kasus kita, alih-alih melakukan sinkronisasi dari *mainnet*, atau apa yang mungkin Anda anggap sebagai lingkungan "produksi", kita akan menyinkronkan salah satu jaringan uji (*test network*). Ini akan jauh lebih cepat sambil menyediakan perangkat yang dibutuhkan untuk pengembangan kita. Kami telah memilih untuk menggunakan **Goerli**, yang merupakan jaringan yang dirancang untuk bekerja dengan beberapa klien Ethereum yang berbeda seperti Geth dan Parity. Mari kita mulai sinkronisasi dengan perintah berikut:
+
+```bash
+$ parity --chain=goerli
+```
+
+Setelah Anda menjalankan perintah ini, Anda akan mulai melihat output terminal yang terlihat mirip dengan Contoh 3-1.
+
+**Contoh 3-1. Output sinkronisasi Parity**
+
+```
+2019-07-17 14:28:17
+2019-07-17 14:28:17
+2019-07-17 14:28:17
+2019-07-17 14:28:17
+2019-07-17 14:28:17
+2019-07-17 14:28:17
+2019-07-17 14:28:19
+2019-07-17 14:28:24
+...
+Starting Parity-Ethereum/v2.5.5-stable-3ebc76975-20190708/...
+Keys path ~/Library/Application Support/io.parity.ethereum/...
+DB path ~/Library/Application Support/io.parity.ethereum/...
+State DB configuration: fast
+Operating mode: active
+Configured for Görli Testnet ...
+Listening for new connections...
+Syncing #954677 0x6105…6a9a ...
+```
+
+Meninjau output di atas, baris pertama memberi kita informasi tentang klien apa yang sedang diluncurkan dan versinya. Beberapa baris berikutnya menampilkan detail konfigurasi, yang mencakup di mana kunci (*keys*) dan basis data (DB) disimpan. Setelah itu, kita melihat sebuah *server* dimulai pada `127.0.0.1:8546`. Terakhir, kita melihat proses sinkronisasi dimulai. Setelah sinkronisasi awal selesai, meluncurkan Parity akan berjalan cepat, karena hanya perlu mengambil blok-blok terbaru yang telah ditambahkan ke rantai. Pada titik ini, Anda dapat melanjutkan dan mematikan prosesnya dengan **Ctrl-C**.
+
+Kita akan membahas Parity lebih lanjut ketika tiba saatnya untuk menerapkan *smart contract* di Bab 6. Untuk saat ini, kita siap untuk melanjutkan ke MetaMask.
+
+### Menginstal MetaMask
+
+Jika aplikasi Anda mengharuskan pengguna untuk mengunduh dan menjalankan klien Ethereum penuh seperti Parity atau Geth, Anda baru saja kehilangan banyak calon pengguna. Meminta pengguna untuk menginstal dan menjalankan *node* Ethereum penuh adalah permintaan yang berlebihan bagi sebagian besar orang, kecuali bagi penggemar kripto yang berdedikasi. Di luar para pengguna awal (*early adopters*), Anda perlu menyediakan cara yang jauh lebih mudah bagi mereka yang kurang melek teknologi untuk mulai menggunakan aplikasi, dan di sinilah **MetaMask** berperan.
+
+MetaMask didistribusikan sebagai **ekstensi peramban (*browser*)** yang tersedia di Chrome, Firefox, Opera, dan Brave. Perangkat lunak MetaMask memberi pengguna kemampuan untuk membuat akun, dan memuat instansi Web3 yang sudah dikonfigurasi sebelumnya ke dalam peramban yang digunakan untuk berinteraksi dengan *blockchain* melalui JSON RPC. MetaMask juga menyediakan pengguna **frasa mnemonik 12 kata** yang dapat mereka simpan untuk memulihkan akun mereka di kemudian hari jika mereka berganti komputer, peramban, atau kehilangan kata sandi. Jika itu belum cukup, MetaMask juga menyediakan beberapa pilihan bagi pengguna untuk membeli ether untuk mendanai akun mereka, menjadikannya cara termudah bagi pengguna baru untuk memulai dengan Ethereum.
+
+Mari kita instal MetaMask terlebih dahulu agar kita dapat berinteraksi dengan aplikasi kita nanti. Buka **[https://metamask.io](https://metamask.io)** dan instal ekstensi untuk Chrome. Mari kita ikuti proses penyiapannya, seperti yang diilustrasikan pada Gambar 3-1.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.1.png" alt="gambar" width="580"/>
+</p>
+
+Setelah Anda mengeklik Unduh (Download), Anda akan diarahkan ke Chrome store, seperti yang ditunjukkan pada Gambar 3-2.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.2.png" alt="gambar" width="580"/>
+</p>
+
+Instal ekstensi tersebut dan setujui prompt “Tambahkan MetaMask?” di Chrome, seperti yang ditunjukkan pada Gambar 3-3.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.3.png" alt="gambar" width="580"/>
+</p>
+
+Jika terinstal dengan benar, Anda akan diarahkan ke sebuah halaman yang meminta Anda untuk menyiapkan MetaMask, seperti yang ditunjukkan pada Gambar 3-4.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.4.png" alt="gambar" width="580"/>
+</p>
+
+As part of the setup, we’re going to create a new wallet on MetaMask. We’ll click the
+button on the right in Figure 3-5 labeled Create a Wallet.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.5.png" alt="gambar" width="580"/>
+</p>
+
+Pada Gambar 3-6, Anda diminta untuk membuat password. Pastikan untuk membuat password yang sulit; lebih baik lagi, gunakan pengelola password (password manager) untuk membuatnya untuk Anda. Jika seseorang berhasil menebak password Anda di komputer Anda, mereka akan mendapatkan akses ke kunci privat (private keys) Anda dan dengan itu mereka dapat mengirimkan transaksi dari EOA Anda.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.6.png" alt="gambar" width="580"/>
+</p>
+
+Selanjutnya pada Gambar 3-7, Anda akan melihat sebuah area yang dapat diklik, yang akan menampilkan frasa pencadangan rahasia (secret backup phrase). Tuliskan frasa ini di selembar kertas dan amankan di lokasi yang aman. Jika Anda menggunakan pengelola password, simpan juga frasa ini di sana.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.7.png" alt="gambar" width="580"/>
+</p>
+
+Setelah Anda menyimpan frasa pencadangan Anda, klik **Berikutnya** (*Next*) dan Anda akan dibawa ke halaman yang ditunjukkan pada Gambar 3-8. Di sini, Anda perlu memilih kata-kata tersebut satu per satu. Ini adalah pengingat kecil yang baik dari MetaMask untuk memastikan Anda menyimpannya!
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.8.png" alt="gambar" width="580"/>
+</p>
+
+Setelah Anda menyelesaikan penyiapan, Anda akan diarahkan ke halaman pada Gambar 3-9.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.9.png" alt="gambar" width="580"/>
+</p>
+
+Sekarang, jika Anda memilih ekstensi MetaMask di peramban (*browser*) Anda, Anda akan dapat melihat dompet (*wallet*) dan alamat baru Anda, seperti yang ditunjukkan pada Gambar 3-10.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.10.png" alt="gambar" width="580"/>
+</p>
+
+Dengan MetaMask terinstal, kini Anda dapat mulai berinteraksi dengan **aplikasi terdesentralisasi** (*decentralized applications* atau DApps) yang sudah ada langsung dari peramban Anda. Jika Anda ingin menjelajahi beberapa *game* atau aplikasi lain, pastikan untuk mampir ke [State of the DApps](https://www.stateofthedapps.com/).
+
+Setelah Anda selesai menjelajahi beberapa pilihan, saatnya menginstal Node.js untuk alat-alat berbasis JavaScript yang akan kita butuhkan dalam pengembangan *smart contract*.
+
+## Menginstal Node.js
+
+Suka atau tidak, bahasa kecil dari web ini telah menjadi salah satu bahasa yang paling ada di mana-mana (*ubiquitous*) dalam dunia perangkat lunak, dan Ethereum pun tidak luput dari jangkauannya. Faktanya, alat pengembangan utama yang akan kita gunakan untuk mengembangkan *smart contract* atau berinteraksi dengan jaringan Ethereum telah dibangun menggunakan JavaScript, yang berarti kita memerlukan **Node.js** untuk menyediakan lingkungan *runtime* JavaScript.
+
+### Instalasi Ubuntu (Termasuk Windows WSL Ubuntu)
+
+Pengguna Ubuntu, termasuk yang menggunakan Windows WSL, dapat menggunakan perintah berikut untuk menginstal Node.js:
+
+```bash
+$ curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+$ sudo apt-get install -y nodejs
+```
+
+Perintah `curl` akan mulai menjalankan skrip yang akan mempersiapkan segalanya bagi manajer paket (*package manager*) untuk menginstal Node.js, dan akan memiliki output yang dimulai dengan contoh berikut:
+
+```
+## Installing the NodeSource Node.js 10.x repo...
+## Populating apt-get cache...
++ apt-get update
+Hit:1 http://security.ubuntu.com/ubuntu bionic-security InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu bionic InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu bionic-updates InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu bionic-backports InRelease
+Reading package lists... Done
+...
+```
+
+Perintah `apt-get` kemudian akan menginstal paket tersebut beserta dependensinya ke sistem Anda. Setelah ini selesai, jalankan perintah berikut:
+
+```bash
+$ node -v
+```
+
+Ini akan memverifikasi bahwa Anda sudah siap dengan Node.js 10.16.2.
+
+> Perintah instalasi di atas mengasumsikan bahwa paket-paket berikut telah terinstal sebelumnya di sistem:
+>
+>   * `curl`
+>   * `gcc`
+>   * `g++`
+>   * `make`
+
+## Menginstal Truffle Suite
+
+Kita berada di tahap akhir dalam menyiapkan mesin kita untuk pengembangan *smart contract*. Dua hal berikutnya yang akan kita instal adalah bagian dari **Truffle Suite**: Truffle dan Ganache.
+
+### Truffle
+
+Meskipun Truffle sering disebut sebagai sebuah *framework*, ia sebenarnya lebih mirip seperti **sabuk utilitas *blockchain***. Truffle menyediakan alat yang membuat proses mengompilasi, menguji, menerapkan (*deploy*), dan mengemas aplikasi Anda menjadi semudah mungkin. Utilitas ini bergantung pada struktur direktori yang dihasilkan—di sinilah aspek *framework* berperan—dan CLI Truffle.
+
+Truffle didistribusikan sebagai paket npm. Untuk menginstalnya, jalankan perintah berikut:
+
+```bash
+$ npm install -g truffle
+```
+
+Setelah menjalankan perintah ini, Anda akan melihat output berikut:
+
+```
+/usr/local/bin/truffle -> /usr/local/lib/node_modules/truffle/build/cli.bundled.js
+> truffle@5.0.31 postinstall /usr/local/lib/node_modules/truffle
+> node ./scripts/postinstall.js
+- Fetching solc version list from solc-bin. Attempt #1
+- Downloading compiler. Attempt #1
++ truffle@5.0.31
+added 27 packages from 439 contributors in 22.559s
+```
+
+Karena kita menggunakan *flag* `-g` saat menjalankan perintah instalasi, output tersebut memberi tahu kita di mana menemukan *symlink* yang membuat *executable* ini tersedia secara global.
+
+Untuk memastikan semuanya berfungsi, jalankan perintah berikut:
+
+```bash
+$ truffle -v
+```
+
+Ini seharusnya menunjukkan bahwa Anda menggunakan versi 5.0.31 dan akan menampilkan daftar perintah yang tersedia.
+
+Dengan Truffle terinstal, hal terakhir yang perlu kita lakukan adalah menambahkan Ganache.
+
+### Ganache
+
+Ganache adalah **\*blockchain\* pribadi Anda**. Dalam banyak hal, Ganache sangat mirip dengan klien Ethereum yang kita unduh sebelumnya. Ia menyediakan alat untuk membuat akun dan menjalankan *server* API JSON RPC agar Anda dapat terhubung dan membaca/menulis ke *blockchain*.
+
+Perbedaan utamanya adalah Ganache tidak benar-benar terhubung ke jaringan Ethereum; bahkan, versi lama akan menghapus semua data saat Anda mematikannya sehingga Anda memulai dengan lembaran baru yang bersih saat menyalakannya kembali.
+
+Versi lengkap Ganache dilengkapi dengan GUI (*Graphical User Interface*) yang menyediakan kontrol untuk memperbarui pengaturan konfigurasi dan untuk menjelajahi blok, transaksi, dan *log*. Anda juga dapat menginstal versi Ganache khusus CLI melalui npm, tetapi untuk saat ini kita akan menginstal versi lengkapnya.
+
+Buka halaman [Ganache](https://trufflesuite.com/ganache/) dan akan ada tombol untuk mengunduh versi yang sesuai untuk OS Anda, seperti yang terlihat pada Gambar 3-11.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.11.png" alt="gambar" width="580"/>
+</p>
+
+Setelah instalasi selesai, jalankan aplikasinya dan Anda akan melihat **tampilan awal** seperti pada Gambar 3-12.
+
+Dengan terpasangnya komponen terakhir ini, kita memiliki semua yang dibutuhkan untuk mulai mengembangkan ***smart contract***.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-3.12.png" alt="gambar" width="580"/>
+</p>
+
+## Ringkasan
+
+Dalam bab ini, kita telah menyiapkan **lingkungan lokal** untuk pengembangan *blockchain*. Ini mencakup penyiapan klien Ethereum penuh dengan **Parity**, yang termasuk menyinkronkan jaringan uji (*test network*) **Goerli**. Kita juga menginstal *plug-in* Chrome **MetaMask** untuk berinteraksi dengan DApps dari peramban kita. Kemudian, kita menginstal lingkungan JavaScript yang dibutuhkan untuk alat-alat *smart contract* kita dengan menggunakan **Node.js**. Terakhir, kita menginstal **Truffle** dan **Ganache** dari **Truffle Suite**, yang memberi kita semua yang dibutuhkan untuk pengembangan *smart contract*.
+
+Di bab berikutnya, kita akan mengembangkan sebuah aplikasi kecil untuk menjelajahi perangkat (*toolset*) **Truffle** dan bahasa pemrograman **Solidity**.
+
+---
 
