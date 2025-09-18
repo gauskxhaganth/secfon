@@ -2918,4 +2918,1081 @@ Selanjutnya, kita akan bekerja dengan kontrak pintar secara lebih detail dan bel
 
 ---
 
+# BAB 7
+## Kontrak Pintar (Smart Contracts) dan Solidity
+
+Seperti yang telah kita bahas di Bab 2, ada dua jenis akun yang berbeda di Ethereum: **akun milik eksternal (EOA)** dan **akun kontrak**. EOA dikendalikan oleh pengguna, seringkali melalui perangkat lunak seperti aplikasi dompet yang berada di luar platform Ethereum. Sebaliknya, akun kontrak dikendalikan oleh kode program (juga biasa disebut sebagai “kontrak pintar” atau *“smart contracts”*) yang dieksekusi oleh Ethereum Virtual Machine. Singkatnya, EOA adalah akun sederhana tanpa kode atau penyimpanan data terkait, sedangkan akun kontrak memiliki kode dan penyimpanan data terkait. EOA dikendalikan oleh transaksi yang dibuat dan ditandatangani secara kriptografis dengan kunci privat di "dunia nyata" yang eksternal dan independen dari protokol, sedangkan akun kontrak tidak memiliki kunci privat sehingga "mengendalikan diri mereka sendiri" dengan cara yang telah ditentukan sebelumnya oleh kode kontrak pintar mereka. Kedua jenis akun diidentifikasi oleh alamat Ethereum. Dalam bab ini, kita akan membahas akun kontrak dan kode program yang mengendalikannya.
+
+### Apa Itu Kontrak Pintar?
+
+Istilah *smart contract* atau kontrak pintar telah digunakan selama bertahun-tahun untuk mendeskripsikan berbagai hal yang berbeda. Pada tahun 1990-an, kriptografer Nick Szabo menciptakan istilah tersebut dan mendefinisikannya sebagai “seperangkat janji, yang ditentukan dalam bentuk digital, termasuk protokol di mana para pihak melakukan janji-janji lainnya.” Sejak itu, konsep kontrak pintar telah berevolusi, terutama setelah pengenalan platform blockchain terdesentralisasi dengan penemuan Bitcoin pada tahun 2009. Dalam konteks Ethereum, istilah ini sebenarnya sedikit **salah kaprah**, mengingat kontrak pintar Ethereum bukanlah kontrak yang pintar maupun kontrak hukum, tetapi istilah tersebut telah melekat. Dalam buku ini, kami menggunakan istilah “kontrak pintar” untuk merujuk pada **program komputer yang tidak dapat diubah yang berjalan secara deterministik dalam konteks Ethereum Virtual Machine sebagai bagian dari protokol jaringan Ethereum**—yaitu, di komputer dunia Ethereum yang terdesentralisasi.
+
+Mari kita urai definisi tersebut:
+
+  * **Program komputer**
+    Kontrak pintar hanyalah program komputer. Kata “kontrak” tidak memiliki arti hukum dalam konteks ini.
+  * **Tidak dapat diubah (*Immutable*)**
+    Setelah diterapkan, kode kontrak pintar tidak dapat diubah. Berbeda dengan perangkat lunak tradisional, satu-satunya cara untuk memodifikasi kontrak pintar adalah dengan menerapkan instansi baru.
+  * **Deterministik**
+    Hasil dari eksekusi kontrak pintar adalah sama untuk semua orang yang menjalankannya, dengan konteks transaksi yang memulai eksekusinya dan keadaan blockchain Ethereum pada saat eksekusi.
+  * **Konteks EVM**
+    Kontrak pintar beroperasi dengan konteks eksekusi yang sangat terbatas. Mereka dapat mengakses keadaan mereka sendiri, konteks transaksi yang memanggil mereka, dan beberapa informasi tentang blok terbaru.
+  * **Komputer dunia terdesentralisasi**
+    EVM berjalan sebagai instansi lokal di setiap *node* Ethereum, tetapi karena semua instansi EVM beroperasi pada keadaan awal yang sama dan menghasilkan keadaan akhir yang sama, sistem secara keseluruhan beroperasi sebagai satu “komputer dunia.”
+
+### Siklus Hidup Kontrak Pintar
+
+Kontrak pintar biasanya ditulis dalam bahasa tingkat tinggi, seperti Solidity. Tetapi untuk dapat berjalan, mereka harus dikompilasi ke *bytecode* tingkat rendah yang berjalan di EVM. Setelah dikompilasi, mereka diterapkan di platform Ethereum menggunakan transaksi pembuatan kontrak khusus, yang diidentifikasi dengan dikirim ke alamat pembuatan kontrak khusus, yaitu `0x0` (lihat “Transaksi Khusus: Pembuatan Kontrak” di halaman 112). Setiap kontrak diidentifikasi oleh alamat Ethereum, yang diturunkan dari transaksi pembuatan kontrak sebagai fungsi dari akun asal dan nonce. Alamat Ethereum sebuah kontrak dapat digunakan dalam transaksi sebagai penerima, mengirim dana ke kontrak atau memanggil salah satu fungsi kontrak. Perhatikan bahwa, tidak seperti EOA, tidak ada kunci yang terkait dengan akun yang dibuat untuk kontrak pintar baru.
+
+Sebagai pembuat kontrak, Anda tidak mendapatkan hak istimewa khusus di tingkat protokol (meskipun Anda dapat secara eksplisit mengkodekannya ke dalam kontrak pintar). Anda tentu tidak menerima kunci privat untuk akun kontrak, yang pada kenyataannya tidak ada—kita dapat mengatakan bahwa **akun kontrak pintar memiliki diri mereka sendiri**.
+
+Pentingnya, kontrak hanya berjalan jika dipanggil oleh sebuah transaksi. Semua kontrak pintar di Ethereum dieksekusi, pada akhirnya, karena transaksi yang dimulai dari EOA. Sebuah kontrak dapat memanggil kontrak lain yang dapat memanggil kontrak lain, dan seterusnya, tetapi kontrak pertama dalam rantai eksekusi seperti itu akan selalu dipanggil oleh transaksi dari EOA. Kontrak tidak pernah berjalan “sendiri” atau “di latar belakang.” Kontrak secara efektif tidak aktif sampai sebuah transaksi memicu eksekusi, baik secara langsung maupun tidak langsung sebagai bagian dari rantai panggilan kontrak. Perlu juga dicatat bahwa kontrak pintar tidak dieksekusi “secara paralel” dalam arti apa pun—komputer dunia Ethereum dapat dianggap sebagai mesin berulir tunggal (*single-threaded*).
+
+Transaksi bersifat **atomik**, terlepas dari berapa banyak kontrak yang mereka panggil atau apa yang dilakukan kontrak-kontrak tersebut saat dipanggil. Transaksi dieksekusi secara keseluruhan, dengan setiap perubahan dalam keadaan global (kontrak, akun, dll.) hanya dicatat jika semua eksekusi berakhir dengan sukses. Pengakhiran yang sukses berarti program dieksekusi tanpa kesalahan dan mencapai akhir eksekusi. Jika eksekusi gagal karena kesalahan, semua efeknya (perubahan keadaan) akan **dibatalkan (*rolled back*)** seolah-olah transaksi tidak pernah berjalan. Transaksi yang gagal masih dicatat sebagai telah dicoba, dan ether yang dihabiskan untuk gas untuk eksekusi dikurangkan dari akun asal, tetapi sebaliknya tidak memiliki efek lain pada keadaan kontrak atau akun.
+
+Seperti yang disebutkan sebelumnya, penting untuk diingat bahwa kode kontrak tidak dapat diubah. Namun, sebuah kontrak dapat “dihapus,” menghilangkan kode dan keadaan internalnya (penyimpanan) dari alamatnya, meninggalkan akun kosong. Setiap transaksi yang dikirim ke alamat akun tersebut setelah kontrak dihapus tidak menghasilkan eksekusi kode apa pun, karena tidak ada lagi kode di sana untuk dieksekusi. Untuk menghapus kontrak, Anda mengeksekusi *opcode* EVM yang disebut `SELFDESTRUCT` (sebelumnya disebut `SUICIDE`). Operasi itu berharga **“gas negatif,”** sebuah pengembalian gas, sehingga memberi insentif pelepasan sumber daya klien jaringan dari penghapusan keadaan yang tersimpan. Menghapus kontrak dengan cara ini tidak menghilangkan riwayat transaksi (masa lalu) kontrak, karena blockchain itu sendiri tidak dapat diubah. Penting juga untuk dicatat bahwa kemampuan `SELFDESTRUCT` hanya akan tersedia jika pembuat kontrak memprogram kontrak pintar untuk memiliki fungsionalitas tersebut. Jika kode kontrak tidak memiliki *opcode* `SELFDESTRUCT`, atau tidak dapat diakses, kontrak pintar tidak dapat dihapus.
+
+### Pengenalan Bahasa Tingkat Tinggi Ethereum
+
+EVM adalah mesin virtual yang menjalankan bentuk kode khusus yang disebut *bytecode* EVM, analog dengan CPU komputer Anda, yang menjalankan kode mesin seperti x86\_64. Kita akan memeriksa operasi dan bahasa EVM secara lebih detail di Bab 13. Di bagian ini kita akan melihat bagaimana kontrak pintar ditulis untuk berjalan di EVM.
+
+Meskipun dimungkinkan untuk memprogram kontrak pintar secara langsung dalam *bytecode*, *bytecode* EVM agak merepotkan dan sangat sulit bagi pemrogram untuk dibaca dan dipahami. Sebaliknya, sebagian besar pengembang Ethereum menggunakan bahasa tingkat tinggi untuk menulis program, dan kompiler untuk mengubahnya menjadi *bytecode*.
+
+Meskipun bahasa tingkat tinggi apa pun dapat diadaptasi untuk menulis kontrak pintar, mengadaptasi bahasa sewenang-wenang agar dapat dikompilasi menjadi *bytecode* EVM adalah latihan yang cukup rumit dan secara umum akan menimbulkan kebingungan. Kontrak pintar beroperasi di lingkungan eksekusi yang sangat terbatas dan minimalis (EVM). Selain itu, seperangkat variabel dan fungsi sistem khusus EVM perlu tersedia. Dengan demikian, lebih mudah untuk membangun bahasa kontrak pintar dari awal daripada membuat bahasa tujuan umum cocok untuk menulis kontrak pintar. Akibatnya, sejumlah bahasa tujuan khusus telah muncul untuk memprogram kontrak pintar. Ethereum memiliki beberapa bahasa seperti itu, bersama dengan kompiler yang diperlukan untuk menghasilkan *bytecode* yang dapat dieksekusi EVM.
+
+Secara umum, bahasa pemrograman dapat diklasifikasikan ke dalam dua paradigma pemrograman besar: **deklaratif** dan **imperatif**, juga dikenal sebagai fungsional dan prosedural. Dalam pemrograman deklaratif, kita menulis fungsi yang mengekspresikan logika sebuah program, tetapi bukan alurnya. Pemrograman deklaratif digunakan untuk membuat program di mana tidak ada efek samping, yang berarti tidak ada perubahan keadaan di luar sebuah fungsi. Bahasa pemrograman deklaratif termasuk Haskell dan SQL. Pemrograman imperatif, sebaliknya, adalah di mana seorang pemrogram menulis seperangkat prosedur yang menggabungkan logika dan alur sebuah program. Bahasa pemrograman imperatif termasuk C++ dan Java. Beberapa bahasa bersifat “hibrida,” artinya mereka mendorong pemrograman deklaratif tetapi juga dapat digunakan untuk mengekspresikan paradigma pemrograman imperatif. Hibrida semacam itu termasuk Lisp, JavaScript, dan Python. Secara umum, setiap bahasa imperatif dapat digunakan untuk menulis dalam paradigma deklaratif, tetapi seringkali menghasilkan kode yang tidak elegan. Sebagai perbandingan, bahasa deklaratif murni tidak dapat digunakan untuk menulis dalam paradigma imperatif. Dalam bahasa deklaratif murni, tidak ada “variabel.”
+
+Meskipun pemrograman imperatif lebih umum digunakan oleh pemrogram, bisa sangat sulit untuk menulis program yang dieksekusi persis seperti yang diharapkan. Kemampuan setiap bagian dari program untuk mengubah keadaan bagian lain membuatnya sulit untuk bernalar tentang eksekusi sebuah program dan memperkenalkan banyak peluang untuk *bug*. Pemrograman deklaratif, sebagai perbandingan, membuatnya lebih mudah untuk memahami bagaimana sebuah program akan berperilaku: karena tidak memiliki efek samping, setiap bagian dari program dapat dipahami secara terpisah.
+
+Dalam kontrak pintar, *bug* secara harfiah merugikan uang. Akibatnya, sangat penting untuk menulis kontrak pintar tanpa efek yang tidak diinginkan. Untuk melakukan itu, Anda harus dapat dengan jelas bernalar tentang perilaku yang diharapkan dari program tersebut. Jadi, bahasa deklaratif memainkan peran yang jauh lebih besar dalam kontrak pintar daripada dalam perangkat lunak tujuan umum. Namun demikian, seperti yang akan Anda lihat, bahasa yang paling banyak digunakan untuk kontrak pintar (Solidity) adalah imperatif. Pemrogram, seperti kebanyakan manusia, menolak perubahan\!
+
+Bahasa pemrograman tingkat tinggi yang saat ini didukung untuk kontrak pintar meliputi (diurutkan berdasarkan perkiraan usia):
+
+  * **LLL**
+    Bahasa pemrograman fungsional (deklaratif), dengan sintaksis seperti Lisp. Itu adalah bahasa tingkat tinggi pertama untuk kontrak pintar Ethereum tetapi jarang digunakan saat ini.
+  * **Serpent**
+    Bahasa pemrograman prosedural (imperatif) dengan sintaksis yang mirip dengan Python. Dapat juga digunakan untuk menulis kode fungsional (deklaratif), meskipun tidak sepenuhnya bebas dari efek samping.
+  * **Solidity**
+    Bahasa pemrograman prosedural (imperatif) dengan sintaksis yang mirip dengan JavaScript, C++, atau Java. Bahasa paling populer dan sering digunakan untuk kontrak pintar Ethereum.
+  * **Vyper**
+    Bahasa yang lebih baru dikembangkan, mirip dengan Serpent dan lagi dengan sintaksis seperti Python. Dimaksudkan untuk lebih dekat ke bahasa seperti Python yang murni fungsional daripada Serpent, tetapi bukan untuk menggantikan Serpent.
+  * **Bamboo**
+    Bahasa yang baru dikembangkan, dipengaruhi oleh Erlang, dengan transisi keadaan eksplisit dan tanpa alur berulang (loop). Dimaksudkan untuk mengurangi efek samping dan meningkatkan auditabilitas. Sangat baru dan belum diadopsi secara luas.
+
+Seperti yang Anda lihat, ada banyak bahasa untuk dipilih. Namun, dari semua ini, **Solidity** adalah yang paling populer, sampai-sampai menjadi bahasa tingkat tinggi de facto Ethereum dan bahkan blockchain lain yang mirip EVM. Kami akan menghabiskan sebagian besar waktu kami menggunakan Solidity, tetapi juga akan menjelajahi beberapa contoh dalam bahasa tingkat tinggi lainnya untuk mendapatkan pemahaman tentang filosofi mereka yang berbeda.
+### Membangun Kontrak Pintar dengan Solidity
+
+Solidity diciptakan oleh Dr. Gavin Wood (salah satu penulis buku ini) sebagai bahasa yang secara eksplisit untuk menulis kontrak pintar dengan fitur untuk secara langsung mendukung eksekusi di lingkungan terdesentralisasi dari komputer dunia Ethereum. Atribut yang dihasilkan cukup umum, sehingga akhirnya digunakan untuk mengkodekan kontrak pintar di beberapa platform blockchain lainnya. Ini dikembangkan oleh Christian Reitiwessner dan kemudian juga oleh Alex Beregszaszi, Liana Husikyan, Yoichi Hirai, dan beberapa mantan kontributor inti Ethereum. Solidity sekarang dikembangkan dan dipelihara sebagai proyek independen di GitHub.
+
+"Produk" utama dari proyek Solidity adalah kompiler Solidity, **solc**, yang mengubah program yang ditulis dalam bahasa Solidity menjadi *bytecode* EVM. Proyek ini juga mengelola standar **application binary interface (ABI)** yang penting untuk kontrak pintar Ethereum, yang akan kita jelajahi secara detail dalam bab ini. Setiap versi kompiler Solidity sesuai dengan dan mengkompilasi versi spesifik dari bahasa Solidity.
+
+Untuk memulai, kita akan mengunduh biner yang dapat dieksekusi dari kompiler Solidity. Kemudian kita akan mengembangkan dan mengkompilasi kontrak sederhana, melanjutkan dari contoh yang kita mulai di Bab 2.
+
+#### Memilih Versi Solidity
+
+Solidity mengikuti model versioning yang disebut *semantic versioning*, yang menetapkan nomor versi yang terstruktur sebagai tiga angka yang dipisahkan oleh titik: `MAJOR.MINOR.PATCH`. Angka “major” dinaikkan untuk perubahan besar dan tidak kompatibel ke belakang, angka “minor” dinaikkan saat fitur yang kompatibel ke belakang ditambahkan di antara rilis besar, dan angka “patch” dinaikkan untuk perbaikan *bug* yang kompatibel ke belakang.
+
+Pada saat penulisan, Solidity berada di versi 0.4.24. Aturan untuk versi utama 0, yang untuk pengembangan awal sebuah proyek, berbeda: apa pun dapat berubah kapan saja. Dalam praktiknya, Solidity memperlakukan angka “minor” seolah-olah itu adalah versi utama dan angka “patch” seolah-olah itu adalah versi minor. Oleh karena itu, dalam 0.4.24, 4 dianggap sebagai versi utama dan 24 sebagai versi minor.
+
+Rilis versi utama 0.5 dari Solidity diantisipasi akan segera terjadi.
+
+Seperti yang Anda lihat di Bab 2, program Solidity Anda dapat berisi direktif `pragma` yang menentukan versi minimum dan maksimum Solidity yang kompatibel dengannya, dan dapat digunakan untuk mengkompilasi kontrak Anda.
+
+Karena Solidity berkembang pesat, seringkali lebih baik untuk menginstal rilis terbaru.
+
+#### Unduh dan Instal
+
+Ada sejumlah metode yang dapat Anda gunakan untuk mengunduh dan menginstal Solidity, baik sebagai rilis biner atau dengan mengkompilasi dari kode sumber. Anda dapat menemukan instruksi terperinci di dokumentasi Solidity.
+
+Berikut cara menginstal rilis biner terbaru Solidity pada sistem operasi Ubuntu/Debian, menggunakan manajer paket `apt`:
+
+```bash
+$ sudo add-apt-repository ppa:ethereum/ethereum
+$ sudo apt update
+$ sudo apt install solc
+```
+
+Setelah Anda menginstal `solc`, periksa versinya dengan menjalankan:
+
+```bash
+$ solc --version
+solc, the solidity compiler commandline interface
+Version: 0.4.24+commit.e67f0147.Linux.g++
+```
+
+Ada sejumlah cara lain untuk menginstal Solidity, tergantung pada sistem operasi dan persyaratan Anda, termasuk mengkompilasi langsung dari kode sumber. Untuk informasi lebih lanjut lihat [https://github.com/ethereum/solidity](https://github.com/ethereum/solidity).
+
+#### Lingkungan Pengembangan
+
+Untuk mengembangkan di Solidity, Anda dapat menggunakan editor teks apa pun dan `solc` di baris perintah. Namun, Anda mungkin menemukan bahwa beberapa editor teks yang dirancang untuk pengembangan, seperti Emacs, Vim, dan Atom, menawarkan fitur tambahan seperti penyorotan sintaksis dan makro yang membuat pengembangan Solidity lebih mudah.
+
+Ada juga lingkungan pengembangan berbasis web, seperti **Remix IDE** dan **EthFiddle**.
+
+Gunakan alat yang membuat Anda produktif. Pada akhirnya, program Solidity hanyalah file teks biasa. Meskipun editor dan lingkungan pengembangan yang canggih dapat membuat segalanya lebih mudah, Anda tidak memerlukan lebih dari editor teks sederhana, seperti nano (Linux/Unix), TextEdit (macOS), atau bahkan NotePad (Windows). Cukup simpan kode sumber program Anda dengan ekstensi `.sol` dan itu akan dikenali oleh kompiler Solidity sebagai program Solidity.
+
+#### Menulis Program Solidity Sederhana
+
+Di Bab 2, kita menulis program Solidity pertama kita. Saat kita pertama kali membangun kontrak `Faucet`, kita menggunakan Remix IDE untuk mengkompilasi dan menerapkan kontrak tersebut. Di bagian ini, kita akan meninjau kembali, meningkatkan, dan memperindahnya.
+
+Upaya pertama kita terlihat seperti Contoh 7-1.
+
+**Contoh 7-1. Faucet.sol: Kontrak Solidity yang mengimplementasikan sebuah faucet**
+
+```solidity
+1 // Kontrak pertama kita adalah sebuah faucet!
+2 contract Faucet {
+3
+4   // Memberikan ether kepada siapa saja yang meminta
+5   function withdraw(uint withdraw_amount) public {
+6
+7     // Batasi jumlah penarikan
+8     require(withdraw_amount <= 100000000000000000);
+9
+10    // Kirim jumlah tersebut ke alamat yang memintanya
+11    msg.sender.transfer(withdraw_amount);
+12  }
+13
+14  // Menerima jumlah yang masuk
+15  function () public payable {}
+16
+17 }
+```
+
+#### Mengkompilasi dengan Kompiler Solidity (solc)
+
+Sekarang, kita akan menggunakan kompiler Solidity di baris perintah untuk mengkompilasi kontrak kita secara langsung. Kompiler Solidity `solc` menawarkan berbagai opsi, yang dapat Anda lihat dengan memberikan argumen `--help`.
+
+Kita menggunakan argumen `--bin` dan `--optimize` dari `solc` untuk menghasilkan biner yang dioptimalkan dari kontrak contoh kita:
+
+```bash
+$ solc --optimize --bin Faucet.sol
+
+======= Faucet.sol:Faucet =======
+Binary:
+6060604052341561000f57600080fd5b60cf8061001d6000396000f300606060405260043610603e5
+763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416
+632e1a7d4d81146040575b005b3415604a57600080fd5b603e60043567016345785d8a00008111156
+06357600080fd5b73ffffffffffffffffffffffffffffffffffffffff331681156108fc0282604051
+600060405180830381858888f19350505050151560a057600080fd5b505600a165627a7a723058203
+556d79355f2da19e773a9551e95f1ca7457f2b5fbbf4eacf7748ab59d2532130029
+```
+
+Hasil yang dihasilkan `solc` adalah biner yang diserialisasi heksadesimal yang dapat dikirimkan ke blockchain Ethereum.
+
+#### Application Binary Interface (ABI) Kontrak Ethereum
+
+Dalam perangkat lunak komputer, **application binary interface (ABI)** adalah antarmuka antara dua modul program; seringkali, antara sistem operasi dan program pengguna. ABI mendefinisikan bagaimana struktur data dan fungsi diakses dalam kode mesin; ini tidak boleh disamakan dengan API, yang mendefinisikan akses ini dalam format tingkat tinggi, seringkali dapat dibaca manusia sebagai kode sumber. Dengan demikian, ABI adalah cara utama untuk mengkodekan dan mendekode data ke dalam dan dari kode mesin.
+
+Di Ethereum, ABI digunakan untuk mengkodekan panggilan kontrak untuk EVM dan untuk membaca data dari transaksi. Tujuan dari ABI adalah untuk mendefinisikan fungsi-fungsi dalam kontrak yang dapat dipanggil dan menjelaskan bagaimana setiap fungsi akan menerima argumen dan mengembalikan hasilnya.
+
+ABI sebuah kontrak ditentukan sebagai larik JSON dari deskripsi fungsi (lihat “Fungsi” di halaman 141) dan *event* (lihat “Events” di halaman 149). Deskripsi fungsi adalah objek JSON dengan bidang `type`, `name`, `inputs`, `outputs`, `constant`, dan `payable`. Objek deskripsi *event* memiliki bidang `type`, `name`, `inputs`, dan `anonymous`.
+
+Kita menggunakan kompiler Solidity baris perintah `solc` untuk menghasilkan ABI untuk kontrak contoh `Faucet.sol` kita:
+
+```bash
+$ solc --abi Faucet.sol
+
+======= Faucet.sol:Faucet =======
+Contract JSON ABI
+[{"constant":false,"inputs":[{"name":"withdraw_amount","type":"uint256"}], "name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable", "type":"function"},{"payable":true,"stateMutability":"payable", "type":"fallback"}]
+```
+
+Seperti yang Anda lihat, kompiler menghasilkan larik JSON yang menjelaskan dua fungsi yang didefinisikan oleh `Faucet.sol`. JSON ini dapat digunakan oleh aplikasi apa pun yang ingin mengakses kontrak `Faucet` setelah diterapkan. Menggunakan ABI, aplikasi seperti dompet atau browser DApp dapat membuat transaksi yang memanggil fungsi di `Faucet` dengan argumen dan tipe argumen yang benar. Misalnya, dompet akan tahu bahwa untuk memanggil fungsi `withdraw` ia harus menyediakan argumen `uint256` bernama `withdraw_amount`. Dompet dapat meminta pengguna untuk memberikan nilai itu, lalu membuat transaksi yang mengkodekannya dan mengeksekusi fungsi `withdraw`.
+
+Yang dibutuhkan oleh aplikasi untuk berinteraksi dengan kontrak hanyalah ABI dan alamat tempat kontrak tersebut telah diterapkan.
+
+#### Memilih Kompiler Solidity dan Versi Bahasa
+
+Seperti yang kita lihat di kode sebelumnya, kontrak `Faucet` kita berhasil dikompilasi dengan Solidity versi 0.4.21. Tapi bagaimana jika kita menggunakan versi kompiler Solidity yang berbeda? Bahasa ini masih terus berubah dan hal-hal bisa berubah dengan cara yang tidak terduga. Kontrak kita cukup sederhana, tetapi bagaimana jika program kita menggunakan fitur yang baru ditambahkan di Solidity versi 0.4.19 dan kita mencoba mengkompilasinya dengan 0.4.18?
+
+Untuk mengatasi masalah seperti itu, Solidity menawarkan direktif kompiler yang dikenal sebagai **version pragma** yang menginstruksikan kompiler bahwa program mengharapkan versi kompiler (dan bahasa) tertentu. Mari kita lihat sebuah contoh:
+
+```solidity
+pragma solidity ^0.4.19;
+```
+
+Kompiler Solidity membaca *version pragma* dan akan menghasilkan kesalahan jika versi kompiler tidak kompatibel dengan *version pragma*. Dalam kasus ini, *version pragma* kita mengatakan bahwa program ini dapat dikompilasi oleh kompiler Solidity dengan versi minimum 0.4.19. Simbol `^` menyatakan, bagaimanapun, bahwa kita mengizinkan kompilasi dengan revisi minor apa pun di atas 0.4.19; mis., 0.4.20, tetapi tidak 0.5.0 (yang merupakan revisi utama, bukan revisi minor). Direktif *pragma* tidak dikompilasi menjadi *bytecode* EVM. Mereka hanya digunakan oleh kompiler untuk memeriksa kompatibilitas.
+
+Mari kita tambahkan direktif *pragma* ke kontrak `Faucet` kita. Kita akan menamai file baru `Faucet2.sol`, untuk melacak perubahan kita saat kita melanjutkan contoh-contoh ini mulai dari Contoh 7-2.
+
+**Contoh 7-2. Faucet2.sol: Menambahkan version pragma ke Faucet**
+
+```solidity
+1 // Versi kompiler Solidity yang digunakan untuk menulis program ini
+2 pragma solidity ^0.4.19;
+3
+4 // Kontrak pertama kita adalah sebuah faucet!
+5 contract Faucet {
+6
+7   // Memberikan ether kepada siapa saja yang meminta
+8   function withdraw(uint withdraw_amount) public {
+9
+10    // Batasi jumlah penarikan
+11    require(withdraw_amount <= 100000000000000000);
+12
+13    // Kirim jumlah tersebut ke alamat yang memintanya
+14    msg.sender.transfer(withdraw_amount);
+15  }
+16
+17  // Menerima jumlah yang masuk
+18  function () public payable {}
+19
+20 }
+```
+
+Menambahkan *version pragma* adalah praktik terbaik, karena menghindari masalah dengan ketidakcocokan versi kompiler dan bahasa. Kami akan menjelajahi praktik terbaik lainnya dan terus meningkatkan kontrak `Faucet` di sepanjang bab ini.
+
+### Memprogram dengan Solidity
+
+Di bagian ini, kita akan melihat beberapa kemampuan bahasa Solidity. Seperti yang kami sebutkan di Bab 2, contoh kontrak pertama kami sangat sederhana dan juga cacat dalam berbagai cara. Kami akan secara bertahap memperbaikinya di sini, sambil menjelajahi cara menggunakan Solidity. Namun, ini tidak akan menjadi tutorial Solidity yang komprehensif, karena Solidity cukup kompleks dan berkembang pesat. Kami akan membahas dasar-dasarnya dan memberi Anda cukup fondasi untuk dapat menjelajahi sisanya sendiri. Dokumentasi untuk Solidity dapat ditemukan di situs web proyek.
+
+#### Tipe Data
+
+Pertama, mari kita lihat beberapa tipe data dasar yang ditawarkan di Solidity:
+
+  * **Boolean (bool)**
+    Nilai boolean, `true` atau `false`, dengan operator logika `!` (tidak), `&&` (dan), `||` (atau), `==` (sama dengan), dan `!=` (tidak sama dengan).
+  * **Integer (int, uint)**
+    Integer bertanda (`int`) dan tidak bertanda (`uint`), dideklarasikan dalam kelipatan 8 bit dari `int8` hingga `uint256`. Tanpa akhiran ukuran, kuantitas 256-bit digunakan, untuk mencocokkan ukuran kata EVM.
+  * **Titik tetap (fixed, ufixed)**
+    Angka titik tetap, dideklarasikan dengan `(u)fixedMxN` di mana `M` adalah ukuran dalam bit (kelipatan 8 hingga 256) dan `N` adalah jumlah desimal setelah titik (hingga 18); mis., `ufixed32x2`.
+  * **Address**
+    Alamat Ethereum 20-byte. Objek alamat memiliki banyak fungsi anggota yang membantu, yang utama adalah `balance` (mengembalikan saldo akun) dan `transfer` (mentransfer ether ke akun).
+  * **Larik byte (tetap)**
+    Larik byte berukuran tetap, dideklarasikan dengan `bytes1` hingga `bytes32`.
+  * **Larik byte (dinamis)**
+    Larik byte berukuran variabel, dideklarasikan dengan `bytes` atau `string`.
+  * **Enum**
+    Tipe yang ditentukan pengguna untuk menghitung nilai-nilai diskrit: `enum NAME {LABEL1, LABEL2, ...}`.
+  * **Larik (Arrays)**
+    Larik dari tipe apa pun, baik tetap atau dinamis: `uint32[][5]` adalah larik berukuran tetap dari lima larik dinamis integer tak bertanda.
+  * **Struct**
+    Wadah data yang ditentukan pengguna untuk mengelompokkan variabel: `struct NAME {TYPE1 VARIABLE1; TYPE2 VARIABLE2; ...}`.
+  * **Mapping**
+    Tabel pencarian hash untuk pasangan kunci ⇒ nilai: `mapping(KEY_TYPE ⇒ VALUE_TYPE) NAME`.
+
+Selain tipe data ini, Solidity juga menawarkan berbagai literal nilai yang dapat digunakan untuk menghitung unit yang berbeda:
+
+  * **Unit waktu**
+    Unit `seconds`, `minutes`, `hours`, dan `days` dapat digunakan sebagai akhiran, dikonversi menjadi kelipatan unit dasar detik.
+  * **Unit ether**
+    Unit `wei`, `finney`, `szabo`, dan `ether` dapat digunakan sebagai akhiran, dikonversi menjadi kelipatan unit dasar wei.
+
+Dalam contoh kontrak `Faucet` kami, kami menggunakan `uint` (yang merupakan alias untuk `uint256`) untuk variabel `withdraw_amount`. Kami juga secara tidak langsung menggunakan variabel `address`, yang kami atur dengan `msg.sender`. Kami akan menggunakan lebih banyak tipe data ini dalam contoh kami di sisa bab ini.
+
+Mari kita gunakan salah satu pengali unit untuk meningkatkan keterbacaan kontrak contoh kita. Dalam fungsi `withdraw` kita membatasi penarikan maksimum, menyatakan batas dalam wei, unit dasar ether:
+
+```solidity
+require(withdraw_amount <= 100000000000000000);
+```
+
+Itu tidak terlalu mudah dibaca. Kita dapat meningkatkan kode kita dengan menggunakan pengali unit `ether`, untuk menyatakan nilai dalam ether alih-alih wei:
+
+```solidity
+require(withdraw_amount <= 0.1 ether);
+```
+
+#### Variabel dan Fungsi Global yang Telah Ditentukan
+
+Ketika sebuah kontrak dieksekusi di EVM, ia memiliki akses ke seperangkat kecil objek global. Ini termasuk objek `block`, `msg`, dan `tx`. Selain itu, Solidity mengekspos sejumlah *opcode* EVM sebagai fungsi yang telah ditentukan sebelumnya. Di bagian ini kita akan memeriksa variabel dan fungsi yang dapat Anda akses dari dalam kontrak pintar di Solidity.
+
+##### Konteks panggilan transaksi/pesan
+
+Objek **`msg`** adalah panggilan transaksi (berasal dari EOA) atau panggilan pesan (berasal dari kontrak) yang meluncurkan eksekusi kontrak ini. Ia berisi sejumlah atribut yang berguna:
+
+  * **`msg.sender`**
+    Kami sudah menggunakan yang ini. Ini mewakili alamat yang memulai panggilan kontrak ini, belum tentu EOA asal yang mengirim transaksi. Jika kontrak kami dipanggil langsung oleh transaksi EOA, maka ini adalah alamat yang menandatangani transaksi, tetapi sebaliknya itu akan menjadi alamat kontrak.
+  * **`msg.value`**
+    Nilai ether yang dikirim dengan panggilan ini (dalam wei).
+  * **`msg.gas`**
+    Jumlah gas yang tersisa dalam pasokan gas dari lingkungan eksekusi ini. Ini sudah usang di Solidity v0.4.21 dan digantikan oleh fungsi `gasleft`.
+  * **`msg.data`**
+    Muatan data dari panggilan ini ke kontrak kita.
+  * **`msg.sig`**
+    Empat byte pertama dari muatan data, yang merupakan selektor fungsi.
+
+> Setiap kali sebuah kontrak memanggil kontrak lain, nilai semua atribut `msg` berubah untuk mencerminkan informasi pemanggil baru. Satu-satunya pengecualian untuk ini adalah fungsi `delegatecall`, yang menjalankan kode dari kontrak/pustaka lain dalam konteks `msg` asli.
+
+##### Konteks transaksi
+
+Objek **`tx`** menyediakan sarana untuk mengakses informasi terkait transaksi:
+
+  * **`tx.gasprice`**
+    Harga gas dalam transaksi panggilan.
+  * **`tx.origin`**
+    Alamat EOA asal untuk transaksi ini. **PERINGATAN: tidak aman\!**
+
+##### Konteks blok
+
+Objek **`block`** berisi informasi tentang blok saat ini:
+
+  * **`block.blockhash(blockNumber)`**
+    Hash blok dari nomor blok yang ditentukan, hingga 256 blok di masa lalu. Sudah usang dan digantikan oleh fungsi `blockhash` di Solidity v0.4.22.
+  * **`block.coinbase`**
+    Alamat penerima biaya blok saat ini dan hadiah blok.
+  * **`block.difficulty`**
+    Kesulitan (*proof of work*) dari blok saat ini.
+  * **`block.gaslimit`**
+    Jumlah maksimum gas yang dapat dihabiskan di semua transaksi yang termasuk dalam blok saat ini.
+  * **`block.number`**
+    Nomor blok saat ini (ketinggian blockchain).
+  * **`block.timestamp`**
+    Stempel waktu yang ditempatkan di blok saat ini oleh penambang (jumlah detik sejak zaman Unix).
+
+##### Objek `address`
+
+Setiap alamat, baik yang diteruskan sebagai input atau di-cast dari objek kontrak, memiliki sejumlah atribut dan metode:
+
+  * **`address.balance`**
+    Saldo alamat, dalam wei. Misalnya, saldo kontrak saat ini adalah `address(this).balance`.
+  * **`address.transfer(amount)`**
+    Mentransfer jumlah (dalam wei) ke alamat ini, melemparkan pengecualian pada setiap kesalahan. Kami menggunakan fungsi ini dalam contoh `Faucet` kami sebagai metode pada alamat `msg.sender`, sebagai `msg.sender.transfer`.
+  * **`address.send(amount)`**
+    Mirip dengan `transfer`, hanya saja alih-alih melemparkan pengecualian, ia mengembalikan `false` jika terjadi kesalahan. **PERINGATAN: selalu periksa nilai kembali dari `send`**.
+  * **`address.call(payload)`**
+    Fungsi `CALL` tingkat rendah—dapat membuat panggilan pesan sewenang-wenang dengan muatan data. Mengembalikan `false` jika terjadi kesalahan. **PERINGATAN: tidak aman**—penerima dapat (secara tidak sengaja atau sengaja) menghabiskan semua gas Anda, menyebabkan kontrak Anda berhenti dengan pengecualian OOG; selalu periksa nilai kembali dari `call`.
+  * **`address.callcode(payload)`**
+    Fungsi `CALLCODE` tingkat rendah, seperti `address(this).call(...)` tetapi dengan kode kontrak ini diganti dengan kode dari `address`. Mengembalikan `false` jika terjadi kesalahan. **PERINGATAN: penggunaan tingkat lanjut saja\!**
+  * **`address.delegatecall()`**
+    Fungsi `DELEGATECALL` tingkat rendah, seperti `callcode(...)` tetapi dengan konteks `msg` penuh yang dilihat oleh kontrak saat ini. Mengembalikan `false` jika terjadi kesalahan. **PERINGATAN: penggunaan tingkat lanjut saja\!**
+
+##### Fungsi bawaan
+
+Fungsi lain yang perlu diperhatikan adalah:
+
+  * **`addmod`, `mulmod`**
+    Untuk penjumlahan dan perkalian modulo. Misalnya, `addmod(x,y,k)` menghitung `(x + y) % k`.
+  * **`keccak256`, `sha256`, `sha3`, `ripemd160`**
+    Fungsi untuk menghitung hash dengan berbagai algoritma hash standar.
+  * **`ecrecover`**
+    Memulihkan alamat yang digunakan untuk menandatangani pesan dari tanda tangan.
+  * **`selfdestruct(recipient_address)`**
+    Menghapus kontrak saat ini, mengirim sisa ether di akun ke alamat penerima.
+  * **`this`**
+    Alamat dari akun kontrak yang sedang dieksekusi.
+
+#### Definisi Kontrak
+
+Tipe data utama Solidity adalah **`contract`**; contoh `Faucet` kita hanya mendefinisikan objek kontrak. Mirip dengan objek apa pun dalam bahasa berorientasi objek, kontrak adalah wadah yang mencakup data dan metode.
+
+Solidity menawarkan dua tipe objek lain yang mirip dengan kontrak:
+
+  * **`interface`**
+    Definisi antarmuka terstruktur persis seperti kontrak, kecuali tidak ada fungsi yang didefinisikan, mereka hanya dideklarasikan. Jenis deklarasi ini sering disebut *stub*; ini memberitahu Anda argumen dan tipe kembalian fungsi tanpa implementasi apa pun. Antarmuka menentukan “bentuk” sebuah kontrak; ketika diwarisi, setiap fungsi yang dideklarasikan oleh antarmuka harus didefinisikan oleh anak.
+  * **`library`**
+    Kontrak pustaka adalah kontrak yang dimaksudkan untuk diterapkan hanya sekali dan digunakan oleh kontrak lain, menggunakan metode `delegatecall` (lihat “Objek `address`” di halaman 139).
+
+#### Fungsi
+
+Di dalam sebuah kontrak, kita mendefinisikan fungsi yang dapat dipanggil oleh transaksi EOA atau kontrak lain. Dalam contoh `Faucet` kami, kami memiliki dua fungsi: `withdraw` dan fungsi *fallback* (tanpa nama).
+
+Sintaksis yang kami gunakan untuk mendeklarasikan fungsi di Solidity adalah sebagai berikut:
+`function FunctionName([parameters]) {public|private|internal|external} [pure|constant|view|payable] [modifiers] [returns (return types)]`
+
+Mari kita lihat setiap komponen ini:
+
+  * **`FunctionName`**
+    Nama fungsi, yang digunakan untuk memanggil fungsi dalam transaksi (dari EOA), dari kontrak lain, atau bahkan dari dalam kontrak yang sama. Satu fungsi di setiap kontrak dapat didefinisikan tanpa nama, dalam hal ini itu adalah **fungsi *fallback***, yang dipanggil ketika tidak ada fungsi lain yang disebutkan. Fungsi *fallback* tidak dapat memiliki argumen apa pun atau mengembalikan apa pun.
+  * **`parameters`**
+    Setelah nama, kami menentukan argumen yang harus diteruskan ke fungsi, dengan nama dan tipenya. Dalam contoh `Faucet` kami, kami mendefinisikan `uint withdraw_amount` sebagai satu-satunya argumen untuk fungsi `withdraw`.
+
+Kumpulan kata kunci berikutnya (`public`, `private`, `internal`, `external`) menentukan **visibilitas** fungsi:
+
+  * **`public`**
+    *Public* adalah default; fungsi semacam itu dapat dipanggil oleh kontrak lain atau transaksi EOA, atau dari dalam kontrak. Dalam contoh `Faucet` kami, kedua fungsi didefinisikan sebagai *public*.
+  * **`external`**
+    Fungsi *external* seperti fungsi *public*, kecuali mereka tidak dapat dipanggil dari dalam kontrak kecuali secara eksplisit diawali dengan kata kunci `this`.
+  * **`internal`**
+    Fungsi *internal* hanya dapat diakses dari dalam kontrak—mereka не dapat dipanggil oleh kontrak lain или transaksi EOA. Mereka dapat dipanggil oleh kontrak turunan (yang mewarisi yang ini).
+  * **`private`**
+    Fungsi *private* seperti fungsi *internal* tetapi не dapat dipanggil oleh kontrak turunan.
+
+Perlu diingat bahwa istilah `internal` dan `private` agak menyesatkan. Setiap fungsi atau data di dalam kontrak selalu **terlihat di blockchain publik**, artinya siapa pun dapat melihat kode atau data tersebut. Kata kunci yang dijelaskan di sini hanya memengaruhi bagaimana dan kapan sebuah fungsi dapat dipanggil.
+
+Kumpulan kata kunci kedua (`pure`, `constant`, `view`, `payable`) memengaruhi **perilaku** fungsi:
+
+  * **`constant` atau `view`**
+    Sebuah fungsi yang ditandai sebagai `view` berjanji untuk tidak memodifikasi keadaan apa pun. Istilah `constant` adalah alias untuk `view` yang akan usang di rilis mendatang. Saat ini, kompiler tidak memberlakukan pengubah `view`, hanya menghasilkan peringatan, tetapi ini diharapkan menjadi kata kunci yang diberlakukan di v0.5 Solidity.
+  * **`pure`**
+    Fungsi `pure` adalah fungsi yang tidak membaca maupun menulis variabel apa pun di penyimpanan. Ia hanya dapat beroperasi pada argumen dan mengembalikan data, tanpa referensi ke data yang tersimpan. Fungsi `pure` dimaksudkan untuk mendorong pemrograman gaya deklaratif tanpa efek samping atau keadaan.
+  * **`payable`**
+    Fungsi `payable` adalah fungsi yang dapat menerima pembayaran masuk. Fungsi yang tidak dideklarasikan sebagai `payable` akan menolak pembayaran masuk. Ada dua pengecualian, karena keputusan desain di EVM: pembayaran *coinbase* dan warisan `SELFDESTRUCT` akan dibayarkan bahkan jika fungsi *fallback* не dideklarasikan sebagai `payable`, tetapi ini masuk akal karena eksekusi kode bukan bagian dari pembayaran tersebut.
+
+Seperti yang Anda lihat di contoh `Faucet` kami, kami memiliki satu fungsi `payable` (fungsi *fallback*), yang merupakan satu-satunya fungsi yang dapat menerima pembayaran masuk.
+
+#### Konstruktor Kontrak dan `selfdestruct`
+
+Ada fungsi khusus yang hanya digunakan sekali. Saat sebuah kontrak dibuat, ia juga menjalankan **fungsi konstruktor** jika ada, untuk menginisialisasi keadaan kontrak. Konstruktor dijalankan dalam transaksi yang sama dengan pembuatan kontrak. Fungsi konstruktor bersifat opsional; Anda akan melihat contoh `Faucet` kami tidak memilikinya.
+
+Konstruktor dapat ditentukan dengan dua cara. Hingga dan termasuk di Solidity v0.4.21, konstruktor adalah fungsi yang namanya cocok dengan nama kontrak, seperti yang dapat Anda lihat di sini:
+
+```solidity
+contract MEContract {
+  function MEContract() {
+    // Ini adalah konstruktor
+  }
+}
+```
+
+Kesulitan dengan format ini adalah jika nama kontrak diubah dan nama fungsi konstruktor tidak diubah, itu bukan lagi konstruktor. Demikian juga, jika ada kesalahan ketik yang tidak disengaja dalam penamaan kontrak dan/atau konstruktor, fungsi tersebut lagi-lagi bukan lagi konstruktor. Ini dapat menyebabkan beberapa *bug* yang cukup buruk, tidak terduga, dan sulit ditemukan. Bayangkan misalnya jika konstruktor mengatur pemilik kontrak untuk tujuan kontrol. Jika fungsi tersebut sebenarnya bukan konstruktor karena kesalahan penamaan, tidak hanya pemilik akan dibiarkan tidak diatur pada saat pembuatan kontrak, tetapi fungsi tersebut juga dapat diterapkan sebagai bagian permanen dan "dapat dipanggil" dari kontrak, seperti fungsi normal, memungkinkan pihak ketiga mana pun untuk membajak kontrak dan menjadi "pemilik" setelah pembuatan kontrak.
+
+Untuk mengatasi masalah potensial dengan fungsi konstruktor yang didasarkan pada memiliki nama yang identik dengan kontrak, Solidity v0.4.22 memperkenalkan kata kunci **`constructor`** yang beroperasi seperti fungsi konstruktor tetapi tidak memiliki nama. Mengganti nama kontrak tidak memengaruhi konstruktor sama sekali. Juga, lebih mudah untuk mengidentifikasi fungsi mana yang merupakan konstruktor. Terlihat seperti ini:
+
+```solidity
+pragma ^0.4.22
+contract MEContract {
+  constructor () {
+    // Ini adalah konstruktor
+  }
+}
+```
+
+Singkatnya, siklus hidup kontrak dimulai dengan transaksi pembuatan dari EOA atau akun kontrak. Jika ada konstruktor, itu dieksekusi sebagai bagian dari pembuatan kontrak, untuk menginisialisasi keadaan kontrak saat sedang dibuat, dan kemudian dibuang.
+
+Ujung lain dari siklus hidup kontrak adalah penghancuran kontrak. Kontrak dihancurkan oleh *opcode* EVM khusus yang disebut **`SELFDESTRUCT`**. Dulu disebut `SUICIDE`, tetapi nama itu usang karena asosiasi negatif dari kata tersebut. Di Solidity, *opcode* ini diekspos sebagai fungsi bawaan tingkat tinggi yang disebut `selfdestruct`, yang mengambil satu argumen: alamat untuk menerima sisa saldo ether di akun kontrak. Terlihat seperti ini:
+
+```solidity
+selfdestruct(address recipient);
+```
+
+Perhatikan bahwa Anda harus secara eksplisit menambahkan perintah ini ke kontrak Anda jika Anda ingin dapat dihapus—ini adalah satu-satunya cara kontrak dapat dihapus, dan tidak ada secara default. Dengan cara ini, pengguna kontrak yang mungkin mengandalkan kontrak yang ada selamanya dapat yakin bahwa kontrak tidak dapat dihapus jika tidak berisi *opcode* `SELFDESTRUCT`.
+
+##### Menambahkan Konstruktor dan `selfdestruct` ke Contoh Faucet Kami
+
+Kontrak contoh `Faucet` yang kami perkenalkan di Bab 2 tidak memiliki fungsi konstruktor atau `selfdestruct`. Ini adalah kontrak abadi yang tidak dapat dihapus. Mari kita ubah itu, dengan menambahkan fungsi konstruktor dan `selfdestruct`. Kami mungkin ingin `selfdestruct` hanya dapat dipanggil oleh EOA yang awalnya membuat kontrak. Berdasarkan konvensi, ini biasanya disimpan dalam variabel alamat yang disebut `owner`. Konstruktor kami mengatur variabel `owner`, dan fungsi `selfdestruct` akan terlebih dahulu memeriksa bahwa `owner` yang memanggilnya secara langsung.
+
+Pertama, konstruktor kami:
+
+```solidity
+// Versi kompiler Solidity yang digunakan untuk menulis program ini
+pragma solidity ^0.4.22;
+
+// Kontrak pertama kita adalah sebuah faucet!
+contract Faucet {
+  address owner;
+
+  // Inisialisasi kontrak Faucet: atur owner
+  constructor() {
+    owner = msg.sender;
+  }
+[...]
+```
+
+Kami telah mengubah direktif *pragma* untuk menentukan v0.4.22 sebagai versi minimum untuk contoh ini, karena kami menggunakan kata kunci `constructor` baru yang diperkenalkan di Solidity v0.4.22. Kontrak kami sekarang memiliki variabel tipe `address` bernama `owner`. Nama “owner” tidak istimewa sama sekali. Kita bisa menamai variabel alamat ini “kentang” dan masih menggunakannya dengan cara yang sama. Nama `owner` hanya membuat tujuannya jelas.
+
+Selanjutnya, konstruktor kami, yang berjalan sebagai bagian dari transaksi pembuatan kontrak, menetapkan alamat dari `msg.sender` ke variabel `owner`. Kami menggunakan `msg.sender` di fungsi `withdraw` untuk mengidentifikasi pemrakarsa permintaan penarikan. Namun, di konstruktor, `msg.sender` adalah EOA atau alamat kontrak yang memulai pembuatan kontrak. Kami tahu ini kasusnya karena ini adalah fungsi konstruktor: hanya berjalan sekali, selama pembuatan kontrak.
+
+Sekarang kita bisa menambahkan fungsi untuk menghancurkan kontrak. Kita perlu memastikan bahwa hanya `owner` yang dapat menjalankan fungsi ini, jadi kita akan menggunakan pernyataan `require` untuk mengontrol akses. Begini tampilannya:
+
+```solidity
+// Destruktor kontrak
+function destroy() public {
+  require(msg.sender == owner);
+  selfdestruct(owner);
+}
+```
+
+Jika ada yang memanggil fungsi `destroy` ini dari alamat selain `owner`, itu akan gagal. Tetapi jika alamat yang sama yang disimpan di `owner` oleh konstruktor memanggilnya, kontrak akan menghancurkan diri sendiri dan mengirim sisa saldo ke alamat `owner`. Perhatikan bahwa kami tidak menggunakan `tx.origin` yang tidak aman untuk menentukan apakah `owner` ingin menghancurkan kontrak—menggunakan `tx.origin` akan memungkinkan kontrak jahat untuk menghancurkan kontrak Anda tanpa izin Anda.
+
+#### Pengubah Fungsi (Function Modifiers)
+
+Solidity menawarkan jenis fungsi khusus yang disebut **pengubah fungsi (*function modifier*)**. Anda menerapkan pengubah ke fungsi dengan menambahkan nama pengubah di deklarasi fungsi. Pengubah paling sering digunakan untuk membuat kondisi yang berlaku untuk banyak fungsi dalam sebuah kontrak. Kami sudah memiliki pernyataan kontrol akses, di fungsi `destroy` kami. Mari kita buat pengubah fungsi yang mengekspresikan kondisi itu:
+
+```solidity
+modifier onlyOwner {
+  require(msg.sender == owner);
+  _;
+}
+```
+
+Pengubah fungsi ini, bernama `onlyOwner`, menetapkan kondisi pada setiap fungsi yang dimodifikasinya, mengharuskan alamat yang disimpan sebagai `owner` kontrak sama dengan alamat `msg.sender` transaksi. Ini adalah pola desain dasar untuk kontrol akses, hanya mengizinkan `owner` kontrak untuk mengeksekusi fungsi apa pun yang memiliki pengubah `onlyOwner`.
+
+Anda mungkin telah memperhatikan bahwa pengubah fungsi (*function modifier*) kami memiliki "penampung" sintaksis yang aneh di dalamnya, yaitu garis bawah diikuti oleh titik koma (`_;`). Penampung ini digantikan oleh kode dari fungsi yang sedang dimodifikasi. Pada dasarnya, pengubah "membungkus" fungsi yang dimodifikasi, menempatkan kodenya di lokasi yang diidentifikasi oleh karakter garis bawah.
+
+Untuk menerapkan sebuah pengubah, Anda menambahkan namanya ke dalam deklarasi fungsi. Lebih dari satu pengubah dapat diterapkan pada sebuah fungsi; mereka diterapkan dalam urutan deklarasi, sebagai daftar yang dipisahkan koma.
+
+Mari kita tulis ulang fungsi `destroy` kita untuk menggunakan pengubah `onlyOwner`:
+
+```solidity
+function destroy() public onlyOwner {
+  selfdestruct(owner);
+}
+```
+
+Nama pengubah fungsi (`onlyOwner`) berada setelah kata kunci `public` dan memberitahu kita bahwa fungsi `destroy` dimodifikasi oleh pengubah `onlyOwner`. Pada dasarnya, Anda dapat membaca ini sebagai “Hanya pemilik yang dapat menghancurkan kontrak ini.” Dalam praktiknya, kode yang dihasilkan setara dengan "membungkus" kode dari `onlyOwner` di sekitar `destroy`.
+
+Pengubah fungsi adalah alat yang sangat berguna karena memungkinkan kita untuk menulis prasyarat untuk fungsi dan menerapkannya secara konsisten, membuat kode lebih mudah dibaca dan, sebagai hasilnya, lebih mudah diaudit keamanannya. Mereka paling sering digunakan untuk kontrol akses, tetapi cukup serbaguna dan dapat digunakan untuk berbagai tujuan lain.
+
+Di dalam sebuah pengubah, Anda dapat mengakses semua nilai (variabel dan argumen) yang terlihat oleh fungsi yang dimodifikasi. Dalam kasus ini, kita dapat mengakses variabel `owner`, yang dideklarasikan di dalam kontrak. Namun, kebalikannya tidak berlaku: Anda tidak dapat mengakses variabel pengubah di dalam fungsi yang dimodifikasi.
+
+#### Pewarisan Kontrak (Contract Inheritance)
+
+Objek `contract` di Solidity mendukung pewarisan (*inheritance*), yang merupakan mekanisme untuk memperluas kontrak dasar dengan fungsionalitas tambahan. Untuk menggunakan pewarisan, tentukan kontrak induk dengan kata kunci `is`:
+
+```solidity
+contract Child is Parent {
+  ...
+}
+```
+
+Dengan konstruksi ini, kontrak `Child` mewarisi semua metode, fungsionalitas, dan variabel dari `Parent`. Solidity juga mendukung pewarisan ganda (*multiple inheritance*), yang dapat ditentukan dengan nama kontrak yang dipisahkan koma setelah kata kunci `is`:
+
+```solidity
+contract Child is Parent1, Parent2 {
+  ...
+}
+```
+
+Pewarisan kontrak memungkinkan kita untuk menulis kontrak kita sedemikian rupa untuk mencapai modularitas, ekstensibilitas, dan penggunaan kembali. Kita mulai dengan kontrak yang sederhana dan mengimplementasikan kapabilitas paling umum, kemudian memperluasnya dengan mewarisi kapabilitas tersebut di kontrak yang lebih terspesialisasi.
+
+Dalam kontrak `Faucet` kita, kita memperkenalkan konstruktor dan destruktor, bersama dengan kontrol akses untuk seorang `owner`, yang ditetapkan saat konstruksi. Kapabilitas tersebut cukup umum: banyak kontrak akan memilikinya. Kita dapat mendefinisikannya sebagai kontrak umum, lalu menggunakan pewarisan untuk memperluasnya ke kontrak `Faucet`.
+
+Kita mulai dengan mendefinisikan kontrak dasar `owned`, yang memiliki variabel `owner`, dan mengaturnya di konstruktor kontrak:
+
+```solidity
+contract owned {
+  address owner;
+
+  // Konstruktor kontrak: atur owner
+  constructor() {
+    owner = msg.sender;
+  }
+
+  // Pengubah kontrol akses
+  modifier onlyOwner {
+    require(msg.sender == owner);
+    _;
+  }
+}
+```
+
+Selanjutnya, kita mendefinisikan kontrak dasar `mortal`, yang mewarisi `owned`:
+
+```solidity
+contract mortal is owned {
+  // Destruktor kontrak
+  function destroy() public onlyOwner {
+    selfdestruct(owner);
+  }
+}
+```
+
+Seperti yang Anda lihat, kontrak `mortal` dapat menggunakan pengubah fungsi `onlyOwner`, yang didefinisikan di `owned`. Secara tidak langsung, ia juga menggunakan variabel alamat `owner` dan konstruktor yang didefinisikan di `owned`. Pewarisan membuat setiap kontrak lebih sederhana dan terfokus pada fungsionalitas spesifiknya, memungkinkan kita mengelola detail secara modular.
+
+Sekarang kita dapat memperluas kontrak `owned` lebih jauh, mewarisi kapabilitasnya di `Faucet`:
+
+```solidity
+contract Faucet is mortal {
+  // Memberikan ether kepada siapa saja yang meminta
+  function withdraw(uint withdraw_amount) public {
+    // Batasi jumlah penarikan
+    require(withdraw_amount <= 0.1 ether);
+
+    // Kirim jumlah tersebut ke alamat yang memintanya
+    msg.sender.transfer(withdraw_amount);
+  }
+
+  // Menerima jumlah yang masuk
+  function () public payable {}
+}
+```
+
+Dengan mewarisi `mortal`, yang pada gilirannya mewarisi `owned`, kontrak `Faucet` sekarang memiliki fungsi konstruktor dan `destroy`, serta `owner` yang terdefinisi. Fungsionalitasnya sama seperti ketika fungsi-fungsi tersebut berada di dalam `Faucet`, tetapi sekarang kita dapat menggunakan kembali fungsi-fungsi tersebut di kontrak lain tanpa menuliskannya lagi. Penggunaan kembali kode dan modularitas membuat kode kita lebih bersih, lebih mudah dibaca, dan lebih mudah diaudit.
+
+#### Penanganan Kesalahan (assert, require, revert)
+
+Panggilan kontrak dapat berakhir dan mengembalikan kesalahan. Penanganan kesalahan di Solidity ditangani oleh empat fungsi: `assert`, `require`, `revert`, dan `throw` (sekarang sudah usang).
+
+Ketika sebuah kontrak berakhir dengan kesalahan, semua perubahan keadaan (perubahan pada variabel, saldo, dll.) **dikembalikan (*reverted*)**, hingga ke atas rantai panggilan kontrak jika lebih dari satu kontrak dipanggil. Ini memastikan bahwa transaksi bersifat **atomik**, artinya mereka akan selesai dengan sukses atau tidak berpengaruh sama sekali pada keadaan dan dikembalikan sepenuhnya.
+
+Fungsi `assert` dan `require` beroperasi dengan cara yang sama, mengevaluasi suatu kondisi dan menghentikan eksekusi dengan kesalahan jika kondisi tersebut salah. Berdasarkan konvensi, **`assert`** digunakan ketika hasilnya diharapkan benar, artinya kita menggunakan `assert` untuk menguji **kondisi internal**. Sebagai perbandingan, **`require`** digunakan saat menguji **input** (seperti argumen fungsi atau bidang transaksi), menetapkan ekspektasi kita untuk kondisi tersebut.
+
+Kita telah menggunakan `require` di pengubah fungsi `onlyOwner` kita, untuk menguji bahwa pengirim pesan adalah pemilik kontrak:
+
+```solidity
+require(msg.sender == owner);
+```
+
+Fungsi `require` bertindak sebagai kondisi gerbang, mencegah eksekusi sisa fungsi dan menghasilkan kesalahan jika tidak terpenuhi.
+
+Mulai dari Solidity v0.4.22, `require` juga dapat menyertakan pesan teks yang membantu yang dapat digunakan untuk menunjukkan alasan kesalahan. Pesan kesalahan dicatat dalam log transaksi. Jadi, kita dapat meningkatkan kode kita dengan menambahkan pesan kesalahan di fungsi `require` kita:
+
+```solidity
+require(msg.sender == owner, "Only the contract owner can call this function");
+```
+
+Fungsi `revert` dan `throw` menghentikan eksekusi kontrak dan mengembalikan setiap perubahan keadaan. Fungsi `throw` sudah usang dan akan dihapus di versi Solidity mendatang; Anda harus menggunakan `revert` sebagai gantinya. Fungsi `revert` juga dapat mengambil pesan kesalahan sebagai satu-satunya argumen, yang dicatat dalam log transaksi.
+
+Kondisi tertentu dalam sebuah kontrak akan menghasilkan kesalahan terlepas dari apakah kita secara eksplisit memeriksanya. Misalnya, di kontrak `Faucet` kita, kita tidak memeriksa apakah ada cukup ether untuk memenuhi permintaan penarikan. Itu karena fungsi `transfer` akan gagal dengan kesalahan dan mengembalikan transaksi jika tidak ada saldo yang cukup untuk melakukan transfer:
+
+```solidity
+msg.sender.transfer(withdraw_amount);
+```
+
+Namun, mungkin lebih baik untuk memeriksa secara eksplisit dan memberikan pesan kesalahan yang jelas jika gagal. Kita bisa melakukan itu dengan menambahkan pernyataan `require` sebelum transfer:
+
+```solidity
+require(address(this).balance >= withdraw_amount, "Insufficient balance in faucet for withdrawal request");
+
+msg.sender.transfer(withdraw_amount);
+```
+
+Kode pemeriksaan kesalahan tambahan seperti ini akan sedikit meningkatkan konsumsi gas, tetapi menawarkan pelaporan kesalahan yang lebih baik daripada jika dihilangkan. Anda perlu menemukan keseimbangan yang tepat antara konsumsi gas dan pemeriksaan kesalahan yang detail berdasarkan penggunaan yang diharapkan dari kontrak Anda. Dalam kasus kontrak `Faucet` yang ditujukan untuk *testnet*, kami mungkin akan memilih pelaporan tambahan meskipun biayanya lebih mahal. Mungkin untuk kontrak *mainnet* kami akan memilih untuk hemat dalam penggunaan gas.
+
+#### Kejadian (Events)
+
+Ketika sebuah transaksi selesai (berhasil atau tidak), ia menghasilkan **resi transaksi (*transaction receipt*)**, seperti yang akan kita lihat di Bab 13. Resi transaksi berisi entri log yang memberikan informasi tentang tindakan yang terjadi selama eksekusi transaksi. **Events** adalah objek tingkat tinggi Solidity yang digunakan untuk membuat log ini.
+
+*Events* sangat berguna untuk klien ringan (*light clients*) dan layanan DApp, yang dapat "mengamati" *event* spesifik dan melaporkannya ke antarmuka pengguna, atau membuat perubahan pada keadaan aplikasi untuk mencerminkan *event* di kontrak yang mendasarinya.
+
+Objek *event* mengambil argumen yang diserialisasi dan dicatat dalam log transaksi, di blockchain. Anda dapat memberikan kata kunci `indexed` sebelum sebuah argumen, untuk membuat nilainya menjadi bagian dari tabel terindeks (tabel hash) yang dapat dicari atau difilter oleh aplikasi.
+
+Sejauh ini kami belum menambahkan *event* apa pun di contoh `Faucet` kami, jadi mari kita lakukan itu. Kami akan menambahkan dua *event*, satu untuk mencatat setiap penarikan dan satu untuk mencatat setiap setoran. Kami akan menamai *event* ini `Withdrawal` dan `Deposit`. Pertama, kami mendefinisikan *event* di dalam kontrak `Faucet`:
+
+```solidity
+contract Faucet is mortal {
+  event Withdrawal(address indexed to, uint amount);
+  event Deposit(address indexed from, uint amount);
+
+  [...]
+}
+```
+
+Kami memilih untuk membuat alamat menjadi `indexed`, untuk memungkinkan pencarian dan pemfilteran di setiap antarmuka pengguna yang dibangun untuk mengakses `Faucet` kami.
+
+Selanjutnya, kami menggunakan kata kunci `emit` untuk memasukkan data *event* ke dalam log transaksi:
+
+```solidity
+// Memberikan ether kepada siapa saja yang meminta
+function withdraw(uint withdraw_amount) public {
+  [...]
+  msg.sender.transfer(withdraw_amount);
+  emit Withdrawal(msg.sender, withdraw_amount);
+}
+
+// Menerima jumlah yang masuk
+function () public payable {
+  emit Deposit(msg.sender, msg.value);
+}
+```
+
+Kontrak `Faucet.sol` yang dihasilkan terlihat seperti Contoh 7-3.
+
+**Contoh 7-3. Faucet8.sol: Kontrak Faucet yang direvisi, dengan events**
+
+```solidity
+1 // Versi kompiler Solidity yang digunakan untuk menulis program ini
+2 pragma solidity ^0.4.22;
+3
+4 contract owned {
+5   address owner;
+6   // Konstruktor kontrak: atur owner
+7   constructor() public {
+8     owner = msg.sender;
+9   }
+10  // Pengubah kontrol akses
+11  modifier onlyOwner {
+12    require(msg.sender == owner,
+13      "Only the contract owner can call this function");
+14    _;
+15  }
+16 }
+17
+18 contract mortal is owned {
+19  // Destruktor kontrak
+20  function destroy() public onlyOwner {
+21    selfdestruct(owner);
+22  }
+23 }
+24
+25 contract Faucet is mortal {
+26  event Withdrawal(address indexed to, uint amount);
+27  event Deposit(address indexed from, uint amount);
+28
+29  // Memberikan ether kepada siapa saja yang meminta
+30  function withdraw(uint withdraw_amount) public {
+31    // Batasi jumlah penarikan
+32    require(withdraw_amount <= 0.1 ether);
+33
+34    require(address(this).balance >= withdraw_amount,
+35      "Insufficient balance in faucet for withdrawal request");
+36
+37    // Kirim jumlah tersebut ke alamat yang memintanya
+38    msg.sender.transfer(withdraw_amount);
+39    emit Withdrawal(msg.sender, withdraw_amount);
+40  }
+41  // Menerima jumlah yang masuk
+42  function () public payable {
+43    emit Deposit(msg.sender, msg.value);
+44  }
+45 }
+```
+
+##### Menangkap *events*
+
+Oke, jadi kita sudah mengatur kontrak kita untuk memancarkan *event*. Bagaimana kita melihat hasil dari sebuah transaksi dan "menangkap" *event* tersebut? Pustaka `web3.js` menyediakan struktur data yang berisi log transaksi. Di dalamnya kita bisa melihat *event* yang dihasilkan oleh transaksi tersebut.
+
+Mari kita gunakan Truffle untuk menjalankan transaksi uji pada kontrak `Faucet` yang telah direvisi. Ikuti petunjuk di “Truffle” di halaman 345 untuk menyiapkan direktori proyek dan mengkompilasi kode `Faucet`. Kode sumber dapat ditemukan di repositori GitHub buku ini di bawah `code/truffle/FaucetEvents`.
+
+```bash
+$ truffle develop
+truffle(develop)> compile
+truffle(develop)> migrate
+Using network 'develop'.
+
+Running migration: 1_initial_migration.js
+  Deploying Migrations...
+  ... 0xb77ceae7c3f5afb7fbe3a6c5974d352aa844f53f955ee7d707ef6f3f8e6b4e61
+  Migrations: 0x8cdaf0cd259887258bc13a92c0a6da92698644c0
+Saving successful migration to network...
+  ... 0xd7bc86d31bee32fa3988f1c1eabce403a1b5d570340a3a9cdba53a472ee8c956
+Saving artifacts...
+Running migration: 2_deploy_contracts.js
+  Deploying Faucet...
+  ... 0xfa850d754314c3fb83f43ca1fa6ee20bc9652d891c00a2f63fd43ab5bfb0d781
+  Faucet: 0x345ca3e014aaf5dca488057592ee47305d9b3e10
+Saving successful migration to network...
+  ... 0xf36163615f41ef7ed8f4a8f192149a0bf633fe1a2398ce001bf44c43dc7bdda0
+Saving artifacts...
+
+truffle(develop)> Faucet.deployed().then(i => {FaucetDeployed = i})
+truffle(develop)> FaucetDeployed.send(web3.utils.toWei("1", "ether")).then(res => { console.log(res.logs[0].event, res.logs[0].args) })
+Deposit {
+  from: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+  amount: BigNumber { s: 1, e: 18, c: [ 10000 ] }
+}
+truffle(develop)> FaucetDeployed.withdraw(web3.utils.toWei("0.1", "ether")).then(res => { console.log(res.logs[0].event, res.logs[0].args) })
+Withdrawal {
+  to: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+  amount: BigNumber { s: 1, e: 17, c: [ 1000 ] }
+}
+```
+
+Setelah menerapkan kontrak menggunakan fungsi `deployed`, kami menjalankan dua transaksi. Transaksi pertama adalah setoran (menggunakan `send`), yang memancarkan *event* `Deposit` di log transaksi:
+
+```
+Deposit { from: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+amount: BigNumber { s: 1, e: 18, c: [ 10000 ] } }
+```
+
+Selanjutnya, kami menggunakan fungsi `withdraw` untuk melakukan penarikan. Ini memancarkan *event* `Withdrawal`:
+
+```
+Withdrawal { to: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+amount: BigNumber { s: 1, e: 17, c: [ 1000 ] } }
+```
+
+Untuk mendapatkan *event* ini, kami melihat larik `logs` yang dikembalikan sebagai hasil (`res`) dari transaksi. Entri log pertama (`logs[0]`) berisi nama *event* di `logs[0].event` dan argumen *event* di `logs[0].args`. Dengan menampilkannya di konsol, kita bisa melihat nama *event* yang dipancarkan dan argumennya.
+
+*Events* adalah mekanisme yang sangat berguna, tidak hanya untuk komunikasi antar-kontrak, tetapi juga untuk *debugging* selama pengembangan.
+
+#### Memanggil Kontrak Lain (send, call, callcode, delegatecall)
+
+Memanggil kontrak lain dari dalam kontrak Anda adalah operasi yang sangat berguna tetapi berpotensi berbahaya. Kami akan memeriksa berbagai cara Anda dapat mencapainya dan mengevaluasi risiko dari setiap metode. Singkatnya, risiko muncul dari fakta bahwa Anda mungkin tidak tahu banyak tentang kontrak yang Anda panggil atau yang memanggil kontrak Anda. Saat menulis kontrak pintar, Anda harus ingat bahwa meskipun Anda mungkin sebagian besar berharap berurusan dengan EOA, tidak ada yang menghentikan kontrak yang sewenang-wenang kompleks dan mungkin jahat untuk memanggil dan dipanggil oleh kode Anda.
+
+##### Membuat instansi baru
+
+Cara paling aman untuk memanggil kontrak lain adalah jika Anda membuat kontrak lain itu sendiri. Dengan begitu, Anda yakin akan antarmuka dan perilakunya. Untuk melakukan ini, Anda cukup membuat instansinya, menggunakan kata kunci `new`, seperti di bahasa berorientasi objek lainnya. Di Solidity, kata kunci `new` akan membuat kontrak di blockchain dan mengembalikan objek yang dapat Anda gunakan untuk merujuknya. Katakanlah Anda ingin membuat dan memanggil kontrak `Faucet` dari dalam kontrak lain bernama `Token`:
+
+```solidity
+contract Token is mortal {
+  Faucet _faucet;
+  constructor() public {
+    _faucet = new Faucet();
+  }
+}
+```
+
+Mekanisme pembuatan kontrak ini memastikan bahwa Anda mengetahui jenis kontrak yang tepat dan antarmukanya. Kontrak `Faucet` harus didefinisikan dalam lingkup `Token`, yang dapat Anda lakukan dengan pernyataan `import` jika definisinya ada di file lain:
+
+```solidity
+import "Faucet.sol";
+
+contract Token is mortal {
+  Faucet _faucet;
+  constructor() public {
+    _faucet = new Faucet();
+  }
+}
+```
+
+Anda dapat secara opsional menentukan nilai transfer ether saat pembuatan, dan meneruskan argumen ke konstruktor kontrak baru:
+
+```solidity
+import "Faucet.sol";
+
+contract Token is mortal {
+  Faucet _faucet;
+  constructor() public {
+    _faucet = (new Faucet).value(0.5 ether)();
+  }
+}
+```
+
+Anda kemudian juga dapat memanggil fungsi `Faucet`. Dalam contoh ini, kami memanggil fungsi `destroy` dari `Faucet` dari dalam fungsi `destroy` dari `Token`:
+
+```solidity
+import "Faucet.sol";
+
+contract Token is mortal {
+  Faucet _faucet;
+  constructor() public {
+    _faucet = (new Faucet).value(0.5 ether)();
+  }
+
+  function destroy() public ownerOnly {
+    _faucet.destroy();
+  }
+}
+```
+
+Perhatikan bahwa meskipun Anda adalah pemilik kontrak `Token`, kontrak `Token` itu sendiri yang memiliki kontrak `Faucet` baru, jadi hanya kontrak `Token` yang dapat menghancurkannya.
+
+##### Mengalamatkan instansi yang ada
+
+Cara lain Anda dapat memanggil kontrak adalah dengan melakukan *casting* alamat dari instansi kontrak yang ada. Dengan metode ini, Anda menerapkan antarmuka yang diketahui ke instansi yang ada. Oleh karena itu, sangat penting bagi Anda untuk mengetahui, dengan pasti, bahwa instansi yang Anda alamatkan sebenarnya adalah tipe yang Anda asumsikan. Mari kita lihat sebuah contoh:
+
+```solidity
+import "Faucet.sol";
+
+contract Token is mortal {
+  Faucet _faucet;
+  constructor(address _f) public {
+    _faucet = Faucet(_f);
+    _faucet.withdraw(0.1 ether);
+  }
+}
+```
+
+Di sini, kami mengambil alamat yang diberikan sebagai argumen ke konstruktor, `_f`, dan kami melakukan *casting* menjadi objek `Faucet`. Ini jauh lebih berisiko daripada mekanisme sebelumnya, karena kami tidak tahu pasti apakah alamat itu sebenarnya adalah objek `Faucet`. Ketika kami memanggil `withdraw`, kami mengasumsikan bahwa ia menerima argumen yang sama dan menjalankan kode yang sama seperti deklarasi `Faucet` kami, tetapi kami tidak bisa yakin. Sejauh yang kami tahu, fungsi `withdraw` di alamat ini dapat mengeksekusi sesuatu yang sama sekali berbeda dari yang kami harapkan, bahkan jika namanya sama. Menggunakan alamat yang diteruskan sebagai input dan melakukan *casting* menjadi objek tertentu oleh karena itu jauh lebih berbahaya daripada membuat kontrak sendiri.
+
+##### Panggilan mentah, `call`, `delegatecall`
+
+Solidity menawarkan beberapa fungsi tingkat lebih "rendah" untuk memanggil kontrak lain. Ini sesuai langsung dengan *opcode* EVM dengan nama yang sama dan memungkinkan kita untuk membuat panggilan kontrak-ke-kontrak secara manual. Dengan demikian, mereka mewakili mekanisme yang paling fleksibel dan paling berbahaya untuk memanggil kontrak lain.
+
+Berikut adalah contoh yang sama, menggunakan metode `call`:
+
+```solidity
+contract Token is mortal {
+  constructor(address _faucet) public {
+    _faucet.call("withdraw", 0.1 ether);
+  }
+}
+```
+
+Seperti yang Anda lihat, jenis panggilan ini adalah panggilan buta ke sebuah fungsi, sangat mirip dengan membuat transaksi mentah, hanya dari dalam konteks kontrak. Ini dapat mengekspos kontrak Anda ke sejumlah risiko keamanan, yang paling penting adalah *reentrancy*, yang akan kita bahas lebih detail di “Reentrancy” di halaman 173. Fungsi `call` akan mengembalikan `false` jika ada masalah, jadi Anda dapat mengevaluasi nilai kembali untuk penanganan kesalahan:
+
+```solidity
+contract Token is mortal {
+  constructor(address _faucet) public {
+    if (!(_faucet.call("withdraw", 0.1 ether))) {
+      revert("Withdrawal from faucet failed");
+    }
+  }
+}
+```
+
+Varian lain dari `call` adalah `delegatecall`, yang menggantikan `callcode` yang lebih berbahaya. Metode `callcode` akan segera usang, jadi tidak boleh digunakan.
+
+Seperti yang disebutkan di “Objek `address`” di halaman 139, `delegatecall` berbeda dari `call` karena konteks `msg` tidak berubah. Misalnya, sementara `call` mengubah nilai `msg.sender` menjadi kontrak pemanggil, `delegatecall` menjaga `msg.sender` yang sama seperti di kontrak pemanggil. Pada dasarnya, `delegatecall` menjalankan kode dari kontrak lain di dalam konteks eksekusi dari kontrak saat ini. Ini paling sering digunakan untuk memanggil kode dari sebuah pustaka. Ini juga memungkinkan Anda untuk memanfaatkan pola penggunaan fungsi pustaka yang disimpan di tempat lain, tetapi membuat kode itu bekerja dengan data penyimpanan dari kontrak Anda.
+
+`delegatecall` harus digunakan dengan sangat hati-hati. Ini dapat memiliki beberapa efek tak terduga, terutama jika kontrak yang Anda panggil tidak dirancang sebagai pustaka.
+
+Mari kita gunakan kontrak contoh untuk mendemonstrasikan berbagai semantik panggilan yang digunakan oleh `call` dan `delegatecall` untuk memanggil pustaka dan kontrak. Dalam Contoh 7-4, kami menggunakan *event* untuk mencatat detail setiap panggilan dan melihat bagaimana konteks panggilan berubah tergantung pada jenis panggilan.
+
+**Contoh 7-4. CallExamples.sol: Contoh semantik panggilan yang berbeda**
+
+```solidity
+1 pragma solidity ^0.4.22;
+2
+3 contract calledContract {
+4   event callEvent(address sender, address origin, address from);
+5   function calledFunction() public {
+6     emit callEvent(msg.sender, tx.origin, address(this));
+7   }
+8 }
+9
+10 library calledLibrary {
+11  event callEvent(address sender, address origin, address from);
+12  function calledFunction() public {
+13    emit callEvent(msg.sender, tx.origin, address(this));
+14  }
+15 }
+16
+17 contract caller {
+18   function make_calls(calledContract _calledContract) public {
+19
+20    // Memanggil calledContract dan calledLibrary secara langsung
+21    _calledContract.calledFunction();
+22    calledLibrary.calledFunction();
+23
+24    // Panggilan tingkat rendah menggunakan objek alamat untuk calledContract
+25    require(address(_calledContract).
+26      call(bytes4(keccak256("calledFunction()"))));
+27    require(address(_calledContract).
+28      delegatecall(bytes4(keccak256("calledFunction()"))));
+29   }
+30 }
+```
+
+Seperti yang Anda lihat dalam contoh ini, kontrak utama kami adalah `caller`, yang memanggil pustaka `calledLibrary` dan kontrak `calledContract`. Baik pustaka maupun kontrak yang dipanggil memiliki fungsi `calledFunction` yang identik, yang memancarkan *event* `callEvent`. *Event* `callEvent` mencatat tiga potong data: `msg.sender`, `tx.origin`, dan `this`. Setiap kali `calledFunction` dipanggil, ia mungkin memiliki konteks eksekusi yang berbeda (dengan nilai yang berpotensi berbeda untuk semua variabel konteks), tergantung pada apakah ia dipanggil secara langsung atau melalui `delegatecall`.
+
+Di `caller`, kami pertama-tama memanggil kontrak dan pustaka secara langsung, dengan memanggil `calledFunction` di masing-masing. Kemudian, kami secara eksplisit menggunakan fungsi tingkat rendah `call` dan `delegatecall` untuk memanggil `calledContract.calledFunction`. Dengan cara ini kita bisa melihat bagaimana berbagai mekanisme panggilan berperilaku.
+
+Mari kita jalankan ini di lingkungan pengembangan Truffle dan tangkap *event*-nya, untuk melihat seperti apa:
+
+```bash
+truffle(develop)> migrate
+Using network 'develop'.
+[...]
+Saving artifacts...
+truffle(develop)> web3.eth.getAccounts().then(a => { EOA = a[0] })
+'0x627306090abab3a6e1400e9345bc60c78a8bef57'
+truffle(develop)> caller.address
+'0x8f0483125fcb9aaaefa9209d8e9d7b9c8b9fb90f'
+truffle(develop)> calledContract.address
+'0x345ca3e014aaf5dca488057592ee47305d9b3e10'
+truffle(develop)> calledLibrary.address
+'0xf25186b5081ff5ce73482ad761db0eb0d25abfbf'
+truffle(develop)> caller.deployed().then( i => { callerDeployed = i })
+truffle(develop)> callerDeployed.make_calls(calledContract.address).then(res => { res.logs.forEach( log => { console.log(log.args) })})
+
+{ sender: '0x8f0483125fcb9aaaefa9209d8e9d7b9c8b9fb90f',
+  origin: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+  from: '0x345ca3e014aaf5dca488057592ee47305d9b3e10' }
+
+{ sender: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+  origin: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+  from: '0x8f0483125fcb9aaaefa9209d8e9d7b9c8b9fb90f' }
+
+{ sender: '0x8f0483125fcb9aaaefa9209d8e9d7b9c8b9fb90f',
+  origin: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+  from: '0x345ca3e014aaf5dca488057592ee47305d9b3e10' }
+
+{ sender: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+  origin: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+  from: '0x8f0483125fcb9aaaefa9209d8e9d7b9c8b9fb90f' }
+```
+
+Mari kita lihat apa yang terjadi di sini. Kami memanggil fungsi `Phones` dan meneruskan alamat `calledContract`, lalu menangkap empat *event* yang dipancarkan oleh masing-masing panggilan yang berbeda. Mari kita lihat fungsi `Phones` dan telusuri setiap langkahnya.
+
+Panggilan pertama adalah:
+`_calledContract.calledFunction();`
+
+Di sini, kami memanggil `calledContract.calledFunction` secara langsung, menggunakan ABI tingkat tinggi untuk `calledFunction`. *Event* yang dipancarkan adalah:
+
+```
+sender: '0x8f0483125fcb9aaaefa9209d8e9d7b9c8b9fb90f',
+origin: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+from: '0x345ca3e014aaf5dca488057592ee47305d9b3e10'
+```
+
+Seperti yang Anda lihat, `msg.sender` adalah alamat dari kontrak `caller`. `tx.origin` adalah alamat akun kami, yang mengirim transaksi ke `caller`. *Event* tersebut dipancarkan oleh `calledContract`, seperti yang bisa kita lihat dari argumen terakhir dalam *event*.
+
+Panggilan berikutnya di `Phones` adalah ke pustaka:
+`calledLibrary.calledFunction();`
+
+Ini terlihat identik dengan cara kita memanggil kontrak, tetapi berperilaku sangat berbeda. Mari kita lihat *event* kedua yang dipancarkan:
+
+```
+sender: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+origin: '0x627306090abab3a6e1400e9345bc60c78a8bef57',
+from: '0x8f0483125fcb9aaaefa9209d8e9d7b9c8b9fb90f'
+```
+
+Kali ini, `msg.sender` bukanlah alamat dari `caller`. Sebaliknya, itu adalah alamat akun kami, dan sama dengan asal transaksi. Itu karena ketika Anda memanggil pustaka, panggilannya selalu `delegatecall` dan berjalan dalam konteks pemanggil. Jadi, ketika kode `calledLibrary` berjalan, ia mewarisi konteks eksekusi dari `caller`, seolah-olah kodenya berjalan di dalam `caller`. Variabel `this` (ditampilkan sebagai `from` dalam *event* yang dipancarkan) adalah alamat dari `caller`, meskipun diakses dari dalam `calledLibrary`.
+
+Dua panggilan berikutnya, menggunakan `call` dan `delegatecall` tingkat rendah, memverifikasi ekspektasi kita, memancarkan *event* yang mencerminkan apa yang baru saja kita lihat.
+
+#### Pertimbangan Gas
+
+Gas, yang dijelaskan lebih detail di “Gas” di halaman 314, adalah pertimbangan yang sangat penting dalam pemrograman kontrak pintar. Gas adalah sumber daya yang membatasi jumlah maksimum komputasi yang diizinkan Ethereum untuk dikonsumsi oleh sebuah transaksi. Jika batas gas terlampaui selama komputasi, serangkaian peristiwa berikut terjadi:
+
+  * Pengecualian “kehabisan gas” (*out of gas*) dilemparkan.
+  * Keadaan kontrak sebelum eksekusi dipulihkan (dikembalikan).
+  * Semua ether yang digunakan untuk membayar gas diambil sebagai biaya transaksi; tidak dikembalikan.
+
+Karena gas dibayar oleh pengguna yang memulai transaksi, pengguna tidak dianjurkan untuk memanggil fungsi yang memiliki biaya gas tinggi. Oleh karena itu, demi kepentingan terbaik pemrogram untuk meminimalkan biaya gas dari fungsi-fungsi sebuah kontrak. Untuk tujuan ini, ada praktik-praktik tertentu yang direkomendasikan saat membuat kontrak pintar, untuk meminimalkan biaya gas dari panggilan fungsi.
+
+##### Hindari Larik Berukuran Dinamis
+
+Setiap *loop* melalui larik berukuran dinamis di mana sebuah fungsi melakukan operasi pada setiap elemen atau mencari elemen tertentu memperkenalkan risiko penggunaan terlalu banyak gas. Memang, kontrak dapat kehabisan gas sebelum menemukan hasil yang diinginkan, atau sebelum bertindak pada setiap elemen, sehingga membuang-buang waktu dan ether tanpa memberikan hasil sama sekali.
+
+##### Hindari Panggilan ke Kontrak Lain
+
+Memanggil kontrak lain, terutama ketika biaya gas dari fungsi-fungsi mereka tidak diketahui, memperkenalkan risiko kehabisan gas. Hindari menggunakan pustaka yang tidak diuji dengan baik dan digunakan secara luas. Semakin sedikit pengawasan yang diterima sebuah pustaka dari pemrogram lain, semakin besar risiko menggunakannya.
+
+##### Memperkirakan Biaya Gas
+
+Jika Anda perlu memperkirakan gas yang diperlukan untuk mengeksekusi metode tertentu dari sebuah kontrak dengan mempertimbangkan argumennya, Anda dapat menggunakan prosedur berikut:
+
+```javascript
+var contract = web3.eth.contract(abi).at(address);
+var gasEstimate = contract.myAweSomeMethod.estimateGas(arg1, arg2, {from: account});
+```
+
+`gasEstimate` akan memberi tahu Anda jumlah unit gas yang dibutuhkan untuk eksekusinya. Ini adalah perkiraan karena kelengkapan Turing dari EVM—relatif sepele untuk membuat fungsi yang akan mengambil jumlah gas yang sangat berbeda untuk mengeksekusi panggilan yang berbeda. Bahkan kode produksi dapat mengubah jalur eksekusi dengan cara yang halus, menghasilkan biaya gas yang sangat berbeda dari satu panggilan ke panggilan berikutnya. Namun, sebagian besar fungsi masuk akal dan `estimateGas` akan memberikan perkiraan yang baik sebagian besar waktu.
+
+Untuk mendapatkan harga gas dari jaringan, Anda dapat menggunakan:
+
+```javascript
+var gasPrice = web3.eth.getGasPrice();
+```
+
+Dan dari sana Anda dapat memperkirakan biaya gas:
+
+```javascript
+var gasCostInEther = web3.utils.fromWei((gasEstimate * gasPrice), 'ether');
+```
+
+Mari kita terapkan fungsi estimasi gas kita untuk memperkirakan biaya gas dari contoh `Faucet` kita, menggunakan kode dari repositori buku.
+
+Mulai Truffle dalam mode pengembangan dan jalankan file JavaScript di Contoh 7-5, `gas_estimates.js`.
+
+**Contoh 7-5. gas\_estimates.js: Menggunakan fungsi `estimateGas`**
+
+```javascript
+var FaucetContract = artifacts.require("./Faucet.sol");
+
+FaucetContract.web3.eth.getGasPrice(function(error, result) {
+  var gasPrice = Number(result);
+  console.log("Harga Gas adalah " + gasPrice + " wei"); // "20000000000"
+
+  // Dapatkan instansi kontrak
+  FaucetContract.deployed().then(function(FaucetContractInstance) {
+    // Gunakan kata kunci 'estimateGas' setelah nama fungsi untuk mendapatkan
+    // estimasi gas untuk fungsi khusus ini
+    FaucetContractInstance.send(web3.utils.toWei("1", "ether"));
+    return FaucetContractInstance.withdraw.estimateGas(web3.utils.toWei("0.1", "ether"));
+  }).then(function(result) {
+    var gas = Number(result);
+
+    console.log("estimasi gas = " + gas + " unit");
+    console.log("estimasi biaya gas = " + (gas * gasPrice) + " wei");
+    console.log("estimasi biaya gas = " +
+      FaucetContract.web3.utils.fromWei((gas * gasPrice).toString(), 'ether') + " ether");
+  });
+});
+```
+
+Berikut tampilannya di konsol pengembangan Truffle:
+
+```bash
+$ truffle develop
+truffle(develop)> exec gas_estimates.js
+Using network 'develop'.
+Harga Gas adalah 20000000000 wei
+estimasi gas = 31397 unit
+estimasi biaya gas = 62794000000000 wei
+estimasi biaya gas = 0.000062794 ether
+```
+
+Direkomendasikan agar Anda mengevaluasi biaya gas dari fungsi sebagai bagian dari alur kerja pengembangan Anda, untuk menghindari kejutan saat menerapkan kontrak ke *mainnet*.
+
+### Kesimpulan
+
+Dalam bab ini kita mulai bekerja dengan kontrak pintar secara detail dan menjelajahi bahasa pemrograman kontrak Solidity. Kami mengambil contoh kontrak sederhana, `Faucet.sol`, dan secara bertahap memperbaikinya dan membuatnya lebih kompleks, menggunakannya untuk menjelajahi berbagai aspek bahasa Solidity. Di Bab 8 kita akan bekerja dengan Vyper, bahasa pemrograman berorientasi kontrak lainnya. Kami akan membandingkan Vyper dengan Solidity, menunjukkan beberapa perbedaan dalam desain kedua bahasa ini dan memperdalam pemahaman kita tentang pemrograman kontrak pintar.
+
+---
+
 
