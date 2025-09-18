@@ -1092,3 +1092,338 @@ Selanjutnya, Anda menulis kontrak *faucet* di Solidity. Anda menggunakan Remix I
 Mungkin tidak tampak seperti hal besar, tetapi Anda baru saja berhasil berinteraksi dengan perangkat lunak yang mengendalikan uang di atas sebuah komputer dunia yang terdesentralisasi.
 
 Kita akan melakukan lebih banyak lagi pemrograman *smart contract* di Bab 7 dan belajar tentang praktik terbaik serta pertimbangan keamanan di Bab 9.
+
+---
+
+Tentu, ini adalah terjemahan dari teks yang Anda berikan, telah dirapikan formatnya.
+
+-----
+
+## BAB 3
+
+## Klien Ethereum
+
+Sebuah **klien Ethereum** adalah aplikasi perangkat lunak yang mengimplementasikan spesifikasi Ethereum dan berkomunikasi melalui jaringan *peer-to-peer* dengan klien Ethereum lainnya. Klien Ethereum yang berbeda dapat saling beroperasi jika mereka mematuhi spesifikasi referensi dan protokol komunikasi yang terstandarisasi. Meskipun klien-klien yang berbeda ini diimplementasikan oleh tim yang berbeda dan dalam bahasa pemrograman yang berbeda, mereka semua "berbicara" dengan protokol yang sama dan mengikuti aturan yang sama. Dengan demikian, mereka semua dapat digunakan untuk mengoperasikan dan berinteraksi dengan jaringan Ethereum yang sama.
+
+Ethereum adalah proyek **sumber terbuka** (*open source*), dan kode sumber untuk semua klien utama tersedia di bawah lisensi sumber terbuka (misalnya, LGPL v3.0), gratis untuk diunduh dan digunakan untuk tujuan apa pun. Namun, sumber terbuka lebih dari sekadar gratis untuk digunakan. Ini juga berarti bahwa Ethereum dikembangkan oleh komunitas sukarelawan yang terbuka dan dapat dimodifikasi oleh siapa saja. Lebih banyak mata yang melihat berarti kode yang lebih dapat dipercaya.
+
+Ethereum didefinisikan oleh spesifikasi formal yang disebut **“Yellow Paper”** (lihat “Bacaan Lebih Lanjut” di halaman 7).
+Ini berbeda dengan, misalnya, Bitcoin, yang tidak didefinisikan secara formal. Jika "spesifikasi" Bitcoin adalah implementasi referensi Bitcoin Core, spesifikasi Ethereum didokumentasikan dalam sebuah makalah yang menggabungkan spesifikasi bahasa Inggris dan matematis (formal). Spesifikasi formal ini, selain berbagai *Ethereum Improvement Proposals*, mendefinisikan perilaku standar dari sebuah klien Ethereum. Yellow Paper diperbarui secara berkala seiring dengan perubahan besar yang dibuat pada Ethereum.
+
+Sebagai hasil dari spesifikasi formal Ethereum yang jelas, ada sejumlah implementasi perangkat lunak klien Ethereum yang dikembangkan secara independen namun dapat saling beroperasi. Ethereum memiliki keragaman implementasi yang berjalan di jaringan lebih banyak daripada *blockchain* lainnya, yang secara umum dianggap sebagai hal yang baik. Memang, hal ini telah terbukti menjadi cara yang sangat baik untuk bertahan dari serangan di jaringan, karena eksploitasi terhadap strategi implementasi klien tertentu hanya akan merepotkan para pengembang saat mereka menambal eksploitasi tersebut, sementara klien lain menjaga jaringan tetap berjalan hampir tanpa terpengaruh.
+
+-----
+
+### Jaringan Ethereum
+
+Terdapat berbagai jaringan berbasis Ethereum yang sebagian besar sesuai dengan spesifikasi formal yang didefinisikan dalam Ethereum Yellow Paper, tetapi mungkin atau mungkin tidak dapat saling beroperasi satu sama lain.
+
+Di antara jaringan-jaringan berbasis Ethereum ini adalah Ethereum, Ethereum Classic, Ella, Expanse, Ubiq, Musicoin, dan banyak lainnya. Meskipun sebagian besar kompatibel pada tingkat protokol, jaringan-jaringan ini sering kali memiliki fitur atau atribut yang mengharuskan pengelola perangkat lunak klien Ethereum untuk membuat perubahan kecil agar dapat mendukung setiap jaringan. Karena itu, tidak setiap versi perangkat lunak klien Ethereum dapat menjalankan setiap *blockchain* berbasis Ethereum.
+
+Saat ini, ada enam implementasi utama dari protokol Ethereum, yang ditulis dalam enam bahasa yang berbeda:
+
+  * **Parity**, ditulis dalam Rust
+  * **Geth**, ditulis dalam Go
+  * **cpp-ethereum**, ditulis dalam C++
+  * **pyethereum**, ditulis dalam Python
+  * **Mantis**, ditulis dalam Scala
+  * **Harmony**, ditulis dalam Java
+
+Di bagian ini, kita akan melihat dua klien yang paling umum, Parity dan Geth. Kami akan menunjukkan cara menyiapkan *node* menggunakan setiap klien, dan menjelajahi beberapa opsi baris perintah (*command-line*) dan antarmuka pemrograman aplikasi (API) mereka.
+
+-----
+
+### Haruskah Saya Menjalankan Full Node?
+
+Kesehatan, ketahanan, dan resistensi terhadap sensor dari *blockchain* bergantung pada banyaknya ***full node*** yang dioperasikan secara independen dan tersebar secara geografis. Setiap *full node* dapat membantu *node* baru lainnya mendapatkan data blok untuk memulai operasi mereka, serta menawarkan operator verifikasi yang otoritatif dan independen dari semua transaksi dan kontrak.
+
+Namun, menjalankan *full node* akan menimbulkan biaya dalam sumber daya perangkat keras dan *bandwidth*. *Full node* harus mengunduh 80–100 GB data (per September 2018, tergantung pada konfigurasi klien) dan menyimpannya di *hard drive* lokal. Beban data ini meningkat cukup pesat setiap hari seiring dengan penambahan transaksi dan blok baru. Kita akan membahas topik ini lebih detail di “Kebutuhan Perangkat Keras untuk Full Node” di halaman 45.
+
+*Full node* yang berjalan di jaringan utama (*mainnet*) tidak diperlukan untuk pengembangan Ethereum. Anda dapat melakukan hampir semua yang perlu Anda lakukan dengan *node testnet* (yang menghubungkan Anda ke salah satu *blockchain* uji publik yang lebih kecil), dengan *blockchain* pribadi lokal seperti Ganache, atau dengan klien Ethereum berbasis *cloud* yang ditawarkan oleh penyedia layanan seperti Infura.
+
+Anda juga memiliki opsi untuk menjalankan **klien jarak jauh** (*remote client*), yang tidak menyimpan salinan lokal dari *blockchain* atau memvalidasi blok dan transaksi. Klien ini menawarkan fungsionalitas dompet (*wallet*) dan dapat membuat serta menyiarkan transaksi. Klien jarak jauh dapat digunakan untuk terhubung ke jaringan yang ada, seperti *full node* Anda sendiri, *blockchain* publik, *testnet* publik atau berizin (*proof-of-authority*), atau *blockchain* pribadi lokal. Dalam praktiknya, Anda kemungkinan akan menggunakan klien jarak jauh seperti MetaMask, Emerald Wallet, MyEtherWallet, atau MyCrypto sebagai cara yang mudah untuk beralih di antara semua opsi *node* yang berbeda.
+
+Istilah "klien jarak jauh" dan "dompet" digunakan secara bergantian, meskipun ada beberapa perbedaan. Biasanya, klien jarak jauh menawarkan API (seperti web3.js API) selain fungsionalitas transaksi dari sebuah dompet.
+
+Jangan bingung antara konsep dompet jarak jauh di Ethereum dengan ***light client*** (yang analog dengan klien *Simplified Payment Verification* di Bitcoin). *Light client* memvalidasi *header* blok dan menggunakan bukti Merkle (*Merkle proofs*) untuk memvalidasi penyertaan transaksi di dalam *blockchain* dan menentukan dampaknya, memberikan mereka tingkat keamanan yang serupa dengan *full node*. Sebaliknya, klien jarak jauh Ethereum не memvalidasi *header* blok atau transaksi. Mereka sepenuhnya mempercayai *full client* untuk memberi mereka akses ke *blockchain*, dan karenanya kehilangan jaminan keamanan dan anonimitas yang signifikan. Anda dapat mengurangi masalah ini dengan menggunakan *full client* yang Anda jalankan sendiri.
+
+-----
+
+### Kelebihan dan Kekurangan Full Node
+
+Memilih untuk menjalankan *full node* membantu operasi jaringan yang Anda hubungkan, tetapi juga menimbulkan beberapa biaya ringan hingga sedang bagi Anda. Mari kita lihat beberapa kelebihan dan kekurangannya.
+
+**Kelebihan:**
+
+  * Mendukung ketahanan dan resistensi sensor dari jaringan berbasis Ethereum.
+  * Memvalidasi semua transaksi secara otoritatif.
+  * Dapat berinteraksi dengan kontrak apa pun di *blockchain* publik tanpa perantara.
+  * Dapat secara langsung menerapkan kontrak ke dalam *blockchain* publik tanpa perantara.
+  * Dapat menanyakan (hanya-baca) status *blockchain* (akun, kontrak, dll.) secara *offline*.
+  * Dapat menanyakan *blockchain* tanpa memberi tahu pihak ketiga informasi yang Anda baca.
+
+**Kekurangan:**
+
+  * Membutuhkan sumber daya perangkat keras dan *bandwidth* yang signifikan dan terus bertambah.
+  * Mungkin memerlukan beberapa hari untuk sinkronisasi penuh saat pertama kali dimulai.
+  * Harus dipelihara, ditingkatkan, dan dijaga agar tetap *online* untuk tetap tersinkronisasi.
+
+-----
+
+### Kelebihan dan Kekurangan Testnet Publik
+
+Baik Anda memilih untuk menjalankan *full node* atau tidak, Anda mungkin ingin menjalankan *node testnet* publik. Mari kita lihat beberapa kelebihan dan kekurangan menggunakan *testnet* publik.
+
+**Kelebihan:**
+
+  * *Node testnet* perlu menyinkronkan dan menyimpan data yang jauh lebih sedikit—sekitar 10 GB tergantung pada jaringan (per April 2018).
+  * *Node testnet* dapat sinkronisasi penuh dalam beberapa jam.
+  * Menyebarkan kontrak atau melakukan transaksi memerlukan *test ether*, yang tidak memiliki nilai dan dapat diperoleh secara gratis dari beberapa “*faucet*” (keran).
+  * *Testnet* adalah *blockchain* publik dengan banyak pengguna dan kontrak lain, yang berjalan secara “*live*”.
+
+**Kekurangan:**
+
+  * Anda не dapat menggunakan uang “nyata” di *testnet*; ia berjalan dengan *test ether*. Akibatnya, Anda не dapat menguji keamanan terhadap musuh nyata, karena tidak ada yang dipertaruhkan.
+  * Ada beberapa aspek dari *blockchain* publik yang tidak dapat Anda uji secara realistis di *testnet*. Misalnya, biaya transaksi, meskipun diperlukan untuk mengirim transaksi, tidak menjadi pertimbangan di *testnet*, karena gas gratis. Lebih lanjut, *testnet* tidak mengalami kemacetan jaringan seperti yang terkadang terjadi pada *mainnet* publik.
+
+-----
+
+### Kelebihan dan Kekurangan Simulasi Blockchain Lokal
+
+Untuk banyak tujuan pengujian, opsi terbaik adalah meluncurkan *blockchain* pribadi satu instans. **Ganache** (sebelumnya bernama testrpc) adalah salah satu simulasi *blockchain* lokal paling populer yang dapat Anda gunakan untuk berinteraksi, tanpa peserta lain. Ini memiliki banyak kelebihan dan kekurangan yang sama dengan *testnet* publik, tetapi juga memiliki beberapa perbedaan.
+
+**Kelebihan:**
+
+  * Tidak ada sinkronisasi dan hampir tidak ada data di disk; Anda menambang blok pertama sendiri.
+  * Tidak perlu mendapatkan *test ether*; Anda "memberi hadiah" pada diri sendiri berupa imbalan penambangan yang dapat Anda gunakan untuk pengujian.
+  * Tidak ada pengguna lain, hanya Anda.
+  * Tidak ada kontrak lain, hanya yang Anda sebarkan setelah Anda meluncurkannya.
+
+**Kekurangan:**
+
+  * Tidak adanya pengguna lain berarti perilakunya tidak sama dengan *blockchain* publik. Tidak ada persaingan untuk ruang transaksi atau urutan transaksi.
+  * Tidak ada penambang selain Anda berarti penambangan lebih dapat diprediksi; oleh karena itu, Anda tidak dapat menguji beberapa skenario yang terjadi di *blockchain* publik.
+  * Tidak adanya kontrak lain berarti Anda harus menyebarkan semua yang ingin Anda uji, termasuk dependensi dan pustaka kontrak.
+  * Anda tidak dapat menciptakan kembali beberapa kontrak publik dan alamatnya untuk menguji beberapa skenario (misalnya, kontrak DAO).
+
+-----
+
+### Menjalankan Klien Ethereum
+
+Jika Anda memiliki waktu dan sumber daya, Anda harus mencoba menjalankan *full node*, meskipun hanya untuk mempelajari lebih lanjut tentang prosesnya. Di bagian ini kami membahas cara mengunduh, mengompilasi, dan menjalankan klien Ethereum Parity dan Geth. Ini memerlukan beberapa keakraban dengan penggunaan antarmuka baris perintah (*command-line interface*) pada sistem operasi Anda. Layak untuk menginstal klien-klien ini, baik Anda memilih untuk menjalankannya sebagai *full node*, sebagai *node testnet*, atau sebagai klien untuk *blockchain* pribadi lokal.
+
+#### Kebutuhan Perangkat Keras untuk Full Node
+
+Sebelum kita mulai, Anda harus memastikan Anda memiliki komputer dengan sumber daya yang cukup untuk menjalankan *full node* Ethereum. Anda akan memerlukan setidaknya **80 GB** ruang disk untuk menyimpan salinan penuh dari *blockchain* Ethereum. Jika Anda juga ingin menjalankan *full node* di *testnet* Ethereum, Anda akan memerlukan tambahan setidaknya **15 GB**. Mengunduh 80 GB data *blockchain* bisa memakan waktu lama, jadi disarankan agar Anda bekerja dengan koneksi internet yang cepat.
+
+Sinkronisasi *blockchain* Ethereum sangat intensif dalam hal *input/output* (I/O). Sebaiknya Anda memiliki ***solid-state drive* (SSD)**. Jika Anda memiliki *hard disk drive* (HDD) mekanis, Anda akan memerlukan setidaknya **8 GB RAM** untuk digunakan sebagai *cache*. Jika tidak, Anda mungkin akan menemukan bahwa sistem Anda terlalu lambat untuk mengimbangi dan melakukan sinkronisasi penuh.
+
+**Kebutuhan minimum:**
+
+  * CPU dengan 2+ *core*
+  * Ruang penyimpanan kosong setidaknya 80 GB
+  * RAM minimal 4 GB dengan SSD, 8 GB+ jika Anda memiliki HDD
+  * Layanan internet dengan kecepatan unduh 8 MBit/detik
+
+Ini adalah persyaratan minimum untuk menyinkronkan salinan penuh (namun telah dipangkas/*pruned*) dari *blockchain* berbasis Ethereum.
+
+Pada saat penulisan ini, basis kode Parity lebih ringan dalam penggunaan sumber daya, jadi jika Anda berjalan dengan perangkat keras terbatas, Anda kemungkinan akan melihat hasil yang lebih baik menggunakan Parity.
+
+Jika Anda ingin melakukan sinkronisasi dalam waktu yang wajar dan menyimpan semua alat pengembangan, pustaka, klien, dan *blockchain* yang kita bahas dalam buku ini, Anda akan menginginkan komputer yang lebih mumpuni.
+
+**Spesifikasi yang direkomendasikan:**
+
+  * CPU cepat dengan 4+ *core*
+  * RAM 16 GB+
+  * SSD cepat dengan setidaknya 500 GB ruang kosong
+  * Layanan internet dengan kecepatan unduh 25+ MBit/detik
+
+Sulit untuk memprediksi seberapa cepat ukuran *blockchain* akan bertambah dan kapan ruang disk lebih banyak akan diperlukan, jadi disarankan untuk memeriksa ukuran terbaru *blockchain* sebelum Anda mulai melakukan sinkronisasi.
+
+> Kebutuhan ukuran disk yang tercantum di sini mengasumsikan Anda akan menjalankan *node* dengan pengaturan default, di mana *blockchain* "dipangkas" (*pruned*) dari data *state* lama. Jika Anda menjalankan *node* "arsip" (*archival*) penuh, di mana semua *state* disimpan di disk, kemungkinan akan memerlukan lebih dari 1 TB ruang disk.
+
+Tautan-tautan ini memberikan perkiraan terkini tentang ukuran *blockchain*:
+
+  * Ethereum [https://bitinfocharts.com/ethereum/](https://bitinfocharts.com/ethereum/)
+  * Ethereum Classic [https://bitinfocharts.com/ethereum%20classic/](https://bitinfocharts.com/ethereum%20classic/)
+
+#### Kebutuhan Perangkat Lunak untuk Membangun dan Menjalankan Klien (Node)
+
+Bagian ini membahas perangkat lunak klien Parity dan Geth. Ini juga mengasumsikan Anda menggunakan lingkungan baris perintah mirip Unix. Contoh-contoh menunjukkan perintah dan output seperti yang muncul pada sistem operasi Ubuntu GNU/Linux yang menjalankan *shell* bash (lingkungan eksekusi baris perintah).
+
+Biasanya setiap *blockchain* akan memiliki versi Geth-nya sendiri, sementara Parity memberikan dukungan untuk beberapa *blockchain* berbasis Ethereum (Ethereum, Ethereum Classic, Ellaism, Expanse, Musicoin) dengan unduhan klien yang sama.
+
+> Dalam banyak contoh di bab ini, kita akan menggunakan antarmuka baris perintah sistem operasi (juga dikenal sebagai "*shell*"), yang diakses melalui aplikasi "terminal". *Shell* akan menampilkan sebuah *prompt*; Anda mengetikkan perintah, dan *shell* merespons dengan beberapa teks dan *prompt* baru untuk perintah Anda berikutnya. *Prompt* mungkin terlihat berbeda di sistem Anda, tetapi dalam contoh berikut, itu ditandai dengan simbol **$**. Dalam contoh, ketika Anda melihat teks setelah simbol **$**, jangan ketik simbol **$** tetapi ketik perintah yang langsung mengikutinya (ditampilkan dalam **teks tebal**), lalu tekan Enter untuk menjalankan perintah tersebut. Dalam contoh, baris-baris di bawah setiap perintah adalah respons sistem operasi terhadap perintah itu. Ketika Anda melihat awalan **$** berikutnya, Anda akan tahu itu adalah perintah baru dan Anda harus mengulangi prosesnya.
+
+Sebelum kita mulai, Anda mungkin perlu menginstal beberapa perangkat lunak. Jika Anda belum pernah melakukan pengembangan perangkat lunak di komputer yang sedang Anda gunakan, Anda mungkin perlu menginstal beberapa alat dasar. Untuk contoh-contoh berikut, Anda perlu menginstal **git**, sistem manajemen kode sumber; **golang**, bahasa pemrograman Go dan pustaka standarnya; dan **Rust**, sebuah bahasa pemrograman sistem.
+
+Git dapat diinstal dengan mengikuti instruksi di [https://git-scm.com](https://git-scm.com).
+Go dapat diinstal dengan mengikuti instruksi di [https://golang.org](https://golang.org).
+
+> Persyaratan Geth bervariasi, tetapi jika Anda menggunakan Go versi 1.10 atau lebih tinggi, Anda seharusnya dapat mengompilasi versi Geth apa pun yang Anda inginkan. Tentu saja, Anda harus selalu merujuk pada dokumentasi untuk jenis Geth pilihan Anda.
+
+> Versi golang yang terinstal di sistem operasi Anda atau tersedia dari manajer paket sistem Anda mungkin jauh lebih tua dari 1.10. Jika demikian, hapus dan instal versi terbaru dari [https://golang.org/](https://golang.org/).
+
+Rust dapat diinstal dengan mengikuti instruksi di [https://www.rustup.rs/](https://www.rustup.rs/).
+
+> Parity memerlukan Rust versi 1.27 atau lebih tinggi.
+
+Parity juga memerlukan beberapa pustaka perangkat lunak, seperti OpenSSL dan libudev. Untuk menginstalnya pada sistem yang kompatibel dengan Ubuntu atau Debian GNU/Linux, gunakan perintah berikut:
+
+`$ sudo apt-get install openssl libssl-dev libudev-dev cmake`
+
+Untuk sistem operasi lain, gunakan manajer paket OS Anda atau ikuti instruksi Wiki untuk menginstal pustaka yang diperlukan.
+
+Sekarang setelah Anda menginstal git, golang, Rust, dan pustaka yang diperlukan, mari kita mulai bekerja\!
+
+-----
+
+### Parity
+
+Parity adalah implementasi dari klien Ethereum *full-node* dan peramban DApp. Ini ditulis "dari awal" dalam Rust, sebuah bahasa pemrograman sistem, dengan tujuan membangun klien Ethereum yang modular, aman, dan dapat diskalakan. Parity dikembangkan oleh Parity Tech, sebuah perusahaan Inggris, dan dirilis di bawah lisensi perangkat lunak bebas GPLv3.
+
+> Pengungkapan: Salah satu penulis buku ini, Dr. Gavin Wood, adalah pendiri Parity Tech dan menulis sebagian besar klien Parity. Parity mewakili sekitar 25% dari basis klien Ethereum yang terpasang.
+
+Untuk menginstal Parity, Anda dapat menggunakan manajer paket Rust `cargo` atau mengunduh kode sumber dari GitHub. Manajer paket juga mengunduh kode sumber, jadi tidak banyak perbedaan antara kedua opsi tersebut. Di bagian selanjutnya, kami akan menunjukkan cara mengunduh dan mengompilasi Parity sendiri.
+
+#### Menginstal Parity
+
+Wiki Parity menawarkan instruksi untuk membangun Parity di berbagai lingkungan dan *container*. Kami akan menunjukkan cara membangun Parity dari sumber. Ini mengasumsikan Anda telah menginstal Rust menggunakan `rustup` (lihat “Kebutuhan Perangkat Lunak untuk Membangun dan Menjalankan Klien (Node)” di halaman 47).
+
+Pertama, dapatkan kode sumber dari GitHub:
+
+`$ git clone https://github.com/paritytech/parity`
+
+Kemudian pindah ke direktori `parity` dan gunakan `cargo` untuk membangun file *executable*:
+
+`$ cd parity`
+`$ cargo install`
+
+Jika semuanya berjalan lancar, Anda akan melihat sesuatu seperti:
+
+```
+$ cargo install
+Updating git repository `https://github.com/paritytech/js-precompiled.git`
+Downloading log v0.3.7
+Downloading isatty v0.1.1
+Downloading regex v0.2.1
+[...]
+Compiling parity-ipfs-api v1.7.0
+Compiling parity-rpc v1.7.0
+Compiling parity-rpc-client v1.4.0
+Compiling rpc-cli v1.4.0 (file:///home/aantonop/Dev/parity/rpc_cli)
+Finished dev [unoptimized + debuginfo] target(s) in 479.12 secs
+$
+```
+
+Coba jalankan `parity` untuk melihat apakah sudah terinstal, dengan memanggil opsi `--version`:
+
+```
+$ parity --version
+Parity
+version Parity/v1.7.0-unstable-02edc95-20170623/x86_64-linux-gnu/rustc1.18.0
+Copyright 2015, 2016, 2017 Parity Technologies (UK) Ltd
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+By Wood/Paronyan/Kotewicz/Drwięga/Volf
+Habermeier/Czaban/Greeff/Gotchac/Redmann
+$
+```
+
+Bagus\! Sekarang Parity sudah terinstal, Anda dapat menyinkronkan *blockchain* dan memulai dengan beberapa opsi baris perintah dasar.
+
+-----
+
+### Go-Ethereum (Geth)
+
+Geth adalah implementasi bahasa Go yang dikembangkan secara aktif oleh Ethereum Foundation, sehingga dianggap sebagai implementasi "resmi" dari klien Ethereum. Biasanya, setiap *blockchain* berbasis Ethereum akan memiliki implementasi Geth-nya sendiri. Jika Anda menjalankan Geth, maka Anda harus memastikan Anda mengambil versi yang benar untuk *blockchain* Anda menggunakan salah satu tautan repositori berikut:
+
+  * Ethereum [https://github.com/ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) atau [https://geth.ethereum.org/](https://geth.ethereum.org/)
+  * Ethereum Classic [https://github.com/ethereumproject/go-ethereum](https://github.com/ethereumproject/go-ethereum)
+  * Ellaism [https://github.com/ellaism/go-ellaism](https://github.com/ellaism/go-ellaism)
+  * Expanse [https://github.com/expanse-org/go-expanse](https://github.com/expanse-org/go-expanse)
+  * Musicoin [https://github.com/Musicoin/go-musicoin](https://github.com/Musicoin/go-musicoin)
+  * Ubiq [https://github.com/ubiq/go-ubiq](https://github.com/ubiq/go-ubiq)
+
+> Anda juga dapat melewati instruksi ini dan menginstal biner yang sudah dikompilasi (*precompiled binary*) untuk platform pilihan Anda. Rilisan yang sudah dikompilasi jauh lebih mudah untuk diinstal dan dapat ditemukan di bagian "releases" dari salah satu repositori yang tercantum di sini. Namun, Anda mungkin belajar lebih banyak dengan mengunduh dan mengompilasi perangkat lunak sendiri.
+
+#### Melakukan Kloning Repositori
+
+Langkah pertama adalah melakukan kloning repositori Git, untuk mendapatkan salinan kode sumber.
+
+Untuk membuat klon lokal dari repositori pilihan Anda, gunakan perintah `git` sebagai berikut, di direktori *home* Anda atau di bawah direktori mana pun yang Anda gunakan untuk pengembangan:
+
+`$ git clone <Tautan Repositori>`
+
+Anda akan melihat laporan kemajuan saat repositori disalin ke sistem lokal Anda:
+
+```
+Cloning into 'go-ethereum'...
+remote: Counting objects: 62587, done.
+remote: Compressing objects: 100% (26/26), done.
+remote: Total 62587 (delta 10), reused 13 (delta 4), pack-reused 62557
+Receiving objects: 100% (62587/62587), 84.51 MiB | 1.40 MiB/s, done.
+Resolving deltas: 100% (41554/41554), done.
+Checking connectivity... done.
+```
+
+Bagus\! Sekarang Anda memiliki salinan lokal Geth, Anda dapat mengompilasi *executable* untuk platform Anda.
+
+#### Membangun Geth dari Kode Sumber
+
+Untuk membangun Geth, pindah ke direktori tempat kode sumber diunduh dan gunakan perintah `make`:
+
+`$ cd go-ethereum`
+`$ make geth`
+
+Jika semuanya berjalan lancar, Anda akan melihat kompiler Go membangun setiap komponen hingga menghasilkan *executable* `geth`:
+
+```
+build/env.sh go run build/ci.go install ./cmd/geth
+>>> /usr/local/go/bin/go install -ldflags -X main.gitCommit=58a1e13e6dd7f52a1d...
+github.com/ethereum/go-ethereum/common/hexutil
+github.com/ethereum/go-ethereum/common/math
+github.com/ethereum/go-ethereum/crypto/sha3
+github.com/ethereum/go-ethereum/rlp
+github.com/ethereum/go-ethereum/crypto/secp256k1
+github.com/ethereum/go-ethereum/common
+[...]
+github.com/ethereum/go-ethereum/cmd/utils
+github.com/ethereum/go-ethereum/cmd/geth
+Done building.
+Run "build/bin/geth" to launch geth.
+$
+```
+
+Mari kita pastikan `geth` berfungsi tanpa benar-benar menjalankannya:
+
+```
+$ ./build/bin/geth version
+Geth
+Version: 1.6.6-unstable
+Git Commit: 58a1e13e6dd7f52a1d5e67bee47d23fd6cfdee5c
+Architecture: amd64
+Protocol Versions: [63 62]
+Network Id: 1
+Go Version: go1.8.3
+Operating System: linux
+[...]
+```
+
+Perintah `geth version` Anda mungkin menampilkan informasi yang sedikit berbeda, tetapi Anda akan melihat laporan versi yang mirip dengan yang terlihat di sini.
+
+Jangan jalankan `geth` dulu, karena itu akan mulai menyinkronkan *blockchain* dengan “cara lambat” dan itu akan memakan waktu terlalu lama (berminggu-minggu). Bagian selanjutnya menjelaskan tantangan dengan sinkronisasi awal *blockchain* Ethereum.
+
+-----
+
+### Sinkronisasi Pertama Blockchain Berbasis Ethereum
+
+Biasanya, saat menyinkronkan *blockchain* Ethereum, klien Anda akan mengunduh dan memvalidasi setiap blok dan setiap transaksi sejak awal—yaitu, dari blok genesis.
+
+Meskipun dimungkinkan untuk menyinkronkan *blockchain* sepenuhnya dengan cara ini, sinkronisasi akan memakan waktu sangat lama dan memiliki persyaratan sumber daya yang tinggi (akan membutuhkan lebih banyak RAM, dan akan memakan waktu sangat lama jika Anda tidak memiliki penyimpanan cepat).
+
+Banyak *blockchain* berbasis Ethereum menjadi korban serangan *denial-of-service* (DoS) pada akhir tahun 2016. *Blockchain* yang terpengaruh akan cenderung sinkronisasi dengan lambat saat melakukan sinkronisasi penuh.
+
+Misalnya, di Ethereum, klien baru akan membuat kemajuan pesat hingga mencapai blok 2.283.397. Blok ini ditambang pada 18 September 2016, dan menandai awal dari serangan DoS. Dari blok ini hingga blok 2.700.031 (26 November 2016), validasi transaksi menjadi sangat lambat, intensif memori, dan intensif I/O. Ini menghasilkan waktu validasi yang melebihi 1 menit per blok. Ethereum mengimplementasikan serangkaian peningkatan, menggunakan *hard fork*, untuk mengatasi kerentanan mendasar yang dieksploitasi dalam serangan DoS. Peningkatan ini juga membersihkan blockchain dengan menghapus sekitar 20 juta akun kosong yang dibuat oleh transaksi spam.
+
