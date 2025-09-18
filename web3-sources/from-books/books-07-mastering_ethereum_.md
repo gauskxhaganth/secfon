@@ -8679,13 +8679,7 @@ Karena kita menggunakan node lokal untuk terhubung ke jaringan Ethereum dan meng
   <img src="images/books-07-mastering_ethereum/figure-d.1.png" alt="gambar" width="580"/>
 </p>
 
-Tentu, ini adalah terjemahan dan format yang telah dirapikan untuk bagian terakhir dari lampiran.
-
------
-
 Meskipun saat ini masih dalam pengembangan, **ZeppelinOS** bertujuan untuk menyediakan serangkaian fitur tambahan yang luas, seperti alat pengembang, **penjadwal (*scheduler*)** yang mengotomatiskan operasi latar belakang di dalam kontrak, **sayembara (*bounties*)** pengembangan, **pasar (*marketplace*)** yang memfasilitasi komunikasi dan pertukaran nilai antar aplikasi, dan masih banyak lagi. Semua ini dijelaskan dalam *whitepaper* ZeppelinOS.
-
------
 
 ## Utilitas
 
@@ -8745,8 +8739,6 @@ Opsi:
 ### SputnikVM
 
 **SputnikVM** adalah mesin virtual *pluggable* mandiri untuk berbagai *blockchain* berbasis Ethereum. Ditulis dalam Rust dan dapat digunakan sebagai biner, *cargo crate*, atau pustaka bersama, atau diintegrasikan melalui antarmuka FFI, Protobuf, dan JSON. Ia memiliki biner terpisah, `sputnikvm-dev`, yang ditujukan untuk tujuan pengujian, yang meniru sebagian besar API JSON-RPC dan penambangan blok.
-
------
 
 ## Pustaka (*Libraries*)
 
@@ -8809,8 +8801,6 @@ Pustaka **ethers.js** adalah pustaka Ethereum berlisensi MIT yang ringkas, lengk
 
   * **GitHub**: [https://github.com/etcdevteam/emerald-platform](https://github.com/etcdevteam/emerald-platform)
   * **Dokumentasi**: [https://docs.etcdevteam.com](https://docs.etcdevteam.com)
-
------
 
 ## Menguji Smart Contract
 
@@ -8893,8 +8883,6 @@ Terakhir, perintah ini mendapatkan penyimpanan yang terletak di `address` dengan
 eth.getStorageAt(address, position)
 ```
 
------
-
 ## Ganache: Blockchain Uji Lokal
 
 **Ganache** adalah *blockchain* uji lokal yang dapat Anda gunakan untuk men-*deploy* kontrak, mengembangkan aplikasi, dan menjalankan pengujian. Tersedia sebagai aplikasi desktop (dengan antarmuka pengguna grafis) untuk Windows, macOS, dan Linux. Juga tersedia sebagai utilitas baris perintah bernama `ganache-cli`. Untuk detail lebih lanjut dan instruksi instalasi aplikasi desktop Ganache, lihat [https://truffleframework.com/ganache](https://truffleframework.com/ganache).
@@ -8926,3 +8914,218 @@ Beberapa catatan tentang baris perintah ini:
   
 ---
 
+# Appendix E
+## Tutorial web3.js
+
+### Deskripsi
+
+Tutorial ini didasarkan pada `web3.js` versi `web3@1.0.0-beta.29`. Tutorial ini dimaksudkan sebagai pengantar untuk **web3.js**.
+
+Pustaka JavaScript **web3.js** adalah kumpulan modul yang berisi fungsionalitas spesifik untuk ekosistem Ethereum, bersama dengan API JavaScript yang kompatibel dengan Ethereum yang mengimplementasikan spesifikasi Generic JSON RPC.
+
+Untuk menjalankan skrip ini, Anda tidak perlu menjalankan node lokal Anda sendiri, karena skrip ini menggunakan layanan **Infura**.
+
+## Interaksi Dasar Kontrak web3.js Secara Tidak Memblokir (Asinkron)
+
+Periksa apakah Anda memiliki versi `npm` yang valid:
+
+```sh
+$ npm -v
+5.6.0
+```
+
+Jika belum, inisialisasi `npm`:
+
+```sh
+$ npm init
+```
+
+Instal dependensi dasar:
+
+```sh
+$ npm i command-line-args
+$ npm i web3
+$ npm i node-rest-client-promise
+```
+
+Ini akan memperbarui file konfigurasi `package.json` Anda dengan dependensi baru Anda.
+
+### Eksekusi Skrip Node.js
+
+Eksekusi dasar:
+
+```sh
+$ node code/web3js/web3-contract-basic-interaction.js
+```
+
+Gunakan token Infura Anda sendiri (daftar di [https://infura.io/](https://infura.io/) dan simpan *api-key* di file lokal bernama `infura_token`):
+
+```sh
+$ node code/web3js/web3-contract-basic-interaction.js \
+--infuraFileToken /path/to/file/with/infura_token
+```
+
+atau:
+
+```sh
+$ node code/web3js/web3-contract-basic-interaction.js \
+/path/to/file/with/infura_token
+```
+
+Perintah ini akan membaca file dengan token Anda sendiri dan meneruskannya sebagai argumen baris perintah ke perintah yang sebenarnya.
+
+### Meninjau Skrip Demo
+
+Selanjutnya, mari kita tinjau skrip demo kita, `web3-contract-basic-interaction`.
+
+Kita menggunakan objek `Web3` untuk mendapatkan *provider* web3 dasar:
+
+```javascript
+var web3 = new Web3(infura_host);
+```
+
+Kita kemudian dapat berinteraksi dengan `web3` dan mencoba beberapa fungsi dasar. Mari kita lihat versi protokol:
+
+```javascript
+web3.eth.getProtocolVersion().then(function(protocolVersion) {
+    console.log(`Protocol Version: ${protocolVersion}`);
+})
+```
+
+Sekarang mari kita lihat harga gas saat ini:
+
+```javascript
+web3.eth.getGasPrice().then(function(gasPrice) {
+    console.log(`Gas Price: ${gasPrice}`);
+})
+```
+
+Berapa blok terakhir yang ditambang di rantai saat ini?
+
+```javascript
+web3.eth.getBlockNumber().then(function(blockNumber) {
+    console.log(`Block Number: ${blockNumber}`);
+})
+```
+
+### Interaksi Kontrak
+
+Sekarang mari kita coba beberapa interaksi dasar dengan sebuah kontrak. Untuk contoh-contoh ini, kita akan menggunakan kontrak WETH9 di *testnet* Kovan.
+
+Pertama, mari kita inisialisasi alamat kontrak kita:
+
+```javascript
+var our_contract_address = "0xd0A1E359811322d97991E03f863a0C30C2cF029C";
+```
+
+Kita kemudian dapat melihat saldonya:
+
+```javascript
+web3.eth.getBalance(our_contract_address).then(function(balance) {
+    console.log(`Balance of ${our_contract_address}: ${balance}`);
+})
+```
+
+dan melihat *bytecode*-nya:
+
+```javascript
+web3.eth.getCode(our_contract_address).then(function(code) {
+    console.log(code);
+})
+```
+
+Selanjutnya, kita akan menyiapkan lingkungan kita untuk berinteraksi dengan API penjelajah Etherscan.
+
+Mari kita inisialisasi URL kontrak kita di API penjelajah Etherscan untuk rantai Kovan:
+
+```javascript
+var etherscan_url =
+"https://kovan.etherscan.io/api?module=contract&action=getabi&address=${our_contract_address}"
+```
+
+Dan mari kita inisialisasi klien REST untuk berinteraksi dengan API Etherscan:
+
+```javascript
+var client = require('node-rest-client-promise').Client();
+```
+
+dan dapatkan *client promise*:
+
+```javascript
+client.getPromise(etherscan_url)
+```
+
+Setelah kita mendapatkan *client promise* yang valid, kita bisa mendapatkan ABI kontrak kita dari API Etherscan:
+
+```javascript
+.then((client_promise) => {
+    our_contract_abi = JSON.parse(client_promise.data.result);
+```
+
+Dan sekarang kita dapat membuat objek kontrak kita sebagai sebuah **Promise** untuk digunakan nanti:
+
+```javascript
+    return new Promise((resolve, reject) => {
+        var our_contract = new web3.eth.Contract(our_contract_abi, our_contract_address);
+        try {
+            // Jika semua berjalan lancar
+            resolve(our_contract);
+        } catch (ex) {
+            // Jika terjadi kesalahan
+            reject(ex);
+        }
+    });
+})
+```
+
+Jika *promise* kontrak kita berhasil dikembalikan, kita bisa mulai berinteraksi dengannya:
+
+```javascript
+.then((our_contract) => {
+```
+
+Mari kita lihat alamat kontrak kita:
+
+```javascript
+    console.log(`Our Contract address: ${our_contract._address}`);
+```
+
+atau alternatifnya:
+
+```javascript
+    console.log(`Our Contract address in another way: ${our_contract.options.address}`);
+```
+
+Sekarang mari kita kueri ABI kontrak kita:
+
+```javascript
+    console.log("Our contract abi: " + JSON.stringify(our_contract.options.jsonInterface));
+```
+
+Kita dapat melihat total pasokan (*total supply*) kontrak kita menggunakan sebuah ***callback***:
+
+```javascript
+    our_contract.methods.totalSupply().call(function(err, totalSupply) {
+        if (!err) {
+            console.log(`Total Supply with a callback: ${totalSupply}`);
+        } else {
+            console.log(err);
+        }
+    });
+```
+
+Atau kita bisa menggunakan **Promise** yang dikembalikan alih-alih memberikan *callback*:
+
+```javascript
+    our_contract.methods.totalSupply().call().then(function(totalSupply){
+        console.log(`Total Supply with a promise: ${totalSupply}`);
+    }).catch(function(err) {
+        console.log(err);
+    });
+```
+
+## Operasi Asinkron dengan Await
+
+Sekarang setelah Anda melihat tutorial dasar, Anda dapat mencoba interaksi yang sama menggunakan konstruksi **asynchronous await**. Tinjau skrip `web3-contract-basic-interaction-async-await.js` di `code/web3js` dan bandingkan dengan tutorial ini untuk melihat perbedaannya.
+
+**Async-await** lebih mudah dibaca, karena membuat interaksi asinkron berperilaku lebih seperti urutan panggilan yang memblokir (*blocking calls*).
