@@ -7614,3 +7614,651 @@ Ada juga seperangkat variabel lingkungan dan data yang tersedia selama eksekusi.
 <p align="center">
   <img src="images/books-07-mastering_ethereum/figure-13.1.png" alt="gambar" width="580"/>
 </p>
+
+### Perbandingan dengan Teknologi yang Ada
+
+Istilah “mesin virtual” sering kali diterapkan pada virtualisasi komputer nyata, biasanya oleh sebuah “***hypervisor***” seperti VirtualBox atau QEMU, atau dari sebuah instansi sistem operasi secara keseluruhan, seperti KVM pada Linux. Mesin-mesin virtual ini harus menyediakan abstraksi perangkat lunak, masing-masing, dari perangkat keras aktual, dan dari *system calls* (panggilan sistem) serta fungsionalitas kernel lainnya.
+
+EVM beroperasi dalam domain yang jauh lebih terbatas: ia hanyalah sebuah mesin komputasi, dan dengan demikian menyediakan abstraksi hanya untuk **komputasi dan penyimpanan**, mirip dengan spesifikasi Java Virtual Machine (JVM), sebagai contoh. Dari sudut pandang tingkat tinggi, JVM dirancang untuk menyediakan lingkungan *runtime* yang agnostik terhadap OS atau perangkat keras *host* yang mendasarinya, memungkinkan kompatibilitas di berbagai macam sistem. Bahasa pemrograman tingkat tinggi seperti Java atau Scala (yang menggunakan JVM) atau C\# (yang menggunakan .NET) dikompilasi ke dalam set instruksi *bytecode* dari mesin virtual masing-masing. Dengan cara yang sama, EVM mengeksekusi set instruksi *bytecode*-nya sendiri (dijelaskan di bagian berikutnya), yang menjadi tujuan kompilasi dari bahasa pemrograman *smart contract* tingkat tinggi seperti LLL, Serpent, Mutan, atau Solidity.
+
+Oleh karena itu, EVM **tidak memiliki kemampuan penjadwalan**, karena urutan eksekusi diatur secara eksternal—klien Ethereum menjalankan transaksi blok yang telah diverifikasi untuk menentukan *smart contract* mana yang perlu dieksekusi dan dalam urutan apa. Dalam hal ini, komputer dunia Ethereum bersifat *single-threaded*, seperti JavaScript. EVM juga tidak memiliki penanganan “antarmuka sistem” atau “dukungan perangkat keras”—tidak ada mesin fisik untuk berinteraksi. Komputer dunia Ethereum sepenuhnya virtual.
+
+### Set Instruksi EVM (Operasi Bytecode)
+
+Set instruksi EVM menawarkan sebagian besar operasi yang mungkin Anda harapkan, termasuk:
+
+  * Operasi aritmetika dan logika *bitwise*
+  * Pertanyaan konteks eksekusi
+  * Akses ke *stack*, memori, dan penyimpanan
+  * Operasi alur kontrol (*control flow*)
+  * *Logging*, pemanggilan (*calling*), dan operator lainnya
+
+Selain operasi *bytecode* yang umum, EVM juga memiliki akses ke informasi akun (misalnya, alamat dan saldo) dan informasi blok (misalnya, nomor blok dan harga *gas* saat ini).
+
+Mari kita mulai eksplorasi EVM kita secara lebih rinci dengan melihat *opcode* yang tersedia dan apa yang mereka lakukan. Seperti yang mungkin Anda duga, semua operan diambil dari *stack*, dan hasilnya (jika ada) sering kali diletakkan kembali di atas *stack*.
+
+> Daftar lengkap *opcode* dan biaya *gas* yang sesuai dapat ditemukan di Lampiran C.
+
+*Opcode* yang tersedia dapat dibagi ke dalam kategori-kategori berikut:
+
+#### Operasi Aritmetika
+
+Instruksi *opcode* aritmetika:
+
+  * `ADD` // Menambahkan dua item teratas di *stack*
+  * `MUL` // Mengalikan dua item teratas di *stack*
+  * `SUB` // Mengurangkan dua item teratas di *stack*
+  * `DIV` // Pembagian integer
+  * `SDIV` // Pembagian integer bertanda (*signed*)
+  * `MOD` // Operasi modulo (sisa bagi)
+  * `SMOD` // Operasi modulo bertanda (*signed*)
+  * `ADDMOD` // Penjumlahan modulo dengan bilangan apa pun
+  * `MULMOD` // Perkalian modulo dengan bilangan apa pun
+  * `EXP` // Operasi eksponensial
+  * `SIGNEXTEND` // Memperpanjang panjang integer bertanda komplemen dua (*two's complement*)
+  * `SHA3` // Menghitung hash Keccak-256 dari sebuah blok memori
+
+Perhatikan bahwa semua aritmetika dilakukan dengan **modulo $2^{256}$** (kecuali dinyatakan lain), dan bahwa pangkat nol dari nol, $0^0$, dianggap sebagai 1.
+
+#### Operasi Stack
+
+Instruksi manajemen *stack*, memori, dan penyimpanan:
+
+  * `POP` // Menghapus item teratas dari *stack*
+  * `MLOAD` // Memuat sebuah *word* dari memori
+  * `MSTORE` // Menyimpan sebuah *word* ke memori
+  * `MSTORE8` // Menyimpan sebuah *byte* ke memori
+  * `SLOAD` // Memuat sebuah *word* dari penyimpanan
+  * `SSTORE` // Menyimpan sebuah *word* ke penyimpanan
+  * `MSIZE` // Mendapatkan ukuran memori aktif dalam *byte*
+  * `PUSHx` // Menempatkan item `x` *byte* ke *stack*, di mana `x` bisa berupa integer dari 1 hingga 32 (satu *word* penuh)
+  * `DUPx` // Menduplikasi item *stack* ke-`x`, di mana `x` bisa berupa integer dari 1 hingga 16
+  * `SWAPx` // Menukar item *stack* ke-1 dan ke-(`x`+1), di mana `x` bisa berupa integer dari 1 hingga 16
+
+#### Operasi Alur Proses
+
+Instruksi untuk alur kontrol:
+
+  * `STOP` // Menghentikan eksekusi
+  * `JUMP` // Mengatur *program counter* ke nilai apa pun
+  * `JUMPI` // Mengubah *program counter* secara kondisional
+  * `PC` // Mendapatkan nilai *program counter* (sebelum penambahan yang terkait dengan instruksi ini)
+  * `JUMPDEST` // Menandai tujuan yang valid untuk *jump*
+
+#### Operasi Sistem
+
+*Opcode* untuk sistem yang mengeksekusi program:
+
+  * `LOGx` // Menambahkan catatan log dengan `x` topik, di mana `x` adalah integer dari 0 hingga 4
+  * `CREATE` // Membuat akun baru dengan kode terkait
+  * `CALL` // Melakukan *message-call* ke akun lain, yaitu menjalankan kode akun lain
+  * `CALLCODE` // Melakukan *message-call* ke akun ini dengan kode akun lain
+  * `RETURN` // Menghentikan eksekusi dan mengembalikan data output
+  * `DELEGATECALL` // Melakukan *message-call* ke akun ini dengan kode akun alternatif, tetapi mempertahankan nilai *sender* dan *value* saat ini
+  * `STATICCALL` // Melakukan *static message-call* ke sebuah akun
+  * `REVERT` // Menghentikan eksekusi, mengembalikan perubahan *state*, tetapi mengembalikan data dan sisa *gas*
+  * `INVALID` // Instruksi tidak valid yang ditunjuk
+  * `SELFDESTRUCT` // Menghentikan eksekusi dan mendaftarkan akun untuk dihapus
+
+#### Operasi Logika
+
+*Opcode* untuk perbandingan dan logika *bitwise*:
+
+  * `LT` // Perbandingan kurang dari (\<)
+  * `GT` // Perbandingan lebih dari (\>)
+  * `SLT` // Perbandingan kurang dari bertanda (*signed*)
+  * `SGT` // Perbandingan lebih dari bertanda (*signed*)
+  * `EQ` // Perbandingan sama dengan (==)
+  * `ISZERO` // Operator NOT sederhana
+  * `AND` // Operasi AND *bitwise*
+  * `OR` // Operasi OR *bitwise*
+  * `XOR` // Operasi XOR *bitwise*
+  * `NOT` // Operasi NOT *bitwise*
+  * `BYTE` // Mengambil satu *byte* dari sebuah *word* 256-bit penuh
+
+#### Operasi Lingkungan
+
+*Opcode* yang berhubungan dengan informasi lingkungan eksekusi:
+
+  * `GAS` // Mendapatkan jumlah *gas* yang tersedia (setelah pengurangan untuk instruksi ini)
+  * `ADDRESS` // Mendapatkan alamat akun yang sedang dieksekusi
+  * `BALANCE` // Mendapatkan saldo akun dari akun mana pun
+  * `ORIGIN` // Mendapatkan alamat EOA yang memulai eksekusi EVM ini
+  * `CALLER` // Mendapatkan alamat pemanggil yang bertanggung jawab langsung atas eksekusi ini
+  * `CALLVALUE` // Mendapatkan jumlah ether yang didepositkan oleh pemanggil yang bertanggung jawab atas eksekusi ini
+  * `CALLDATALOAD` // Mendapatkan data input yang dikirim oleh pemanggil yang bertanggung jawab atas eksekusi ini
+  * `CALLDATASIZE` // Mendapatkan ukuran data input
+  * `CALLDATACOPY` // Menyalin data input ke memori
+  * `CODESIZE` // Mendapatkan ukuran kode yang berjalan di lingkungan saat ini
+  * `CODECOPY` // Menyalin kode yang berjalan di lingkungan saat ini ke memori
+  * `GASPRICE` // Mendapatkan harga *gas* yang ditentukan oleh transaksi asal
+  * `EXTCODESIZE` // Mendapatkan ukuran kode dari akun mana pun
+  * `EXTCODECOPY` // Menyalin kode dari akun mana pun ke memori
+  * `RETURNDATASIZE` // Mendapatkan ukuran data output dari pemanggilan sebelumnya di lingkungan saat ini
+  * `RETURNDATACOPY` // Menyalin data output dari pemanggilan sebelumnya ke memori
+
+#### Operasi Blok
+
+*Opcode* untuk mengakses informasi pada blok saat ini:
+
+  * `BLOCKHASH` // Mendapatkan *hash* dari salah satu dari 256 blok yang paling baru diselesaikan
+  * `COINBASE` // Mendapatkan alamat penerima manfaat blok untuk hadiah blok
+  * `TIMESTAMP` // Mendapatkan *timestamp* blok
+  * `NUMBER` // Mendapatkan nomor blok
+  * `DIFFICULTY` // Mendapatkan tingkat kesulitan (*difficulty*) blok
+  * `GASLIMIT` // Mendapatkan batas *gas* blok
+
+### State Ethereum
+
+Tugas EVM adalah memperbarui *state* Ethereum dengan menghitung transisi *state* yang valid sebagai hasil dari eksekusi kode *smart contract*, sebagaimana didefinisikan oleh protokol Ethereum. Aspek ini mengarah pada deskripsi Ethereum sebagai **mesin *state* berbasis transaksi**\*, yang mencerminkan fakta bahwa aktor eksternal (yaitu, pemegang akun dan penambang) memulai transisi *state* dengan membuat, menerima, dan mengurutkan transaksi. Penting pada titik ini untuk mempertimbangkan apa yang membentuk *state* Ethereum.
+
+Di tingkat teratas, kita memiliki ***world state*** **Ethereum**. *World state* adalah pemetaan alamat Ethereum (nilai 160-bit) ke akun. Di tingkat yang lebih rendah, setiap alamat Ethereum mewakili sebuah akun yang terdiri dari saldo ether (disimpan sebagai jumlah wei yang dimiliki oleh akun), sebuah ***nonce*** (mewakili jumlah transaksi yang berhasil dikirim dari akun ini jika itu adalah EOA, atau jumlah kontrak yang dibuat olehnya jika itu adalah akun kontrak), **penyimpanan** akun (yang merupakan penyimpanan data permanen, hanya digunakan oleh *smart contract*), dan **kode program** akun (lagi-lagi, hanya jika akun tersebut adalah akun *smart contract*). Sebuah EOA akan selalu tidak memiliki kode dan penyimpanan yang kosong.
+
+Ketika sebuah transaksi menghasilkan eksekusi kode *smart contract*, sebuah EVM diinisiasi dengan semua informasi yang diperlukan sehubungan dengan blok saat ini yang sedang dibuat dan transaksi spesifik yang sedang diproses. Secara khusus, ROM kode program EVM dimuat dengan kode dari akun kontrak yang dipanggil, *program counter* diatur ke nol, penyimpanan dimuat dari penyimpanan akun kontrak, memori diatur menjadi semua nol, dan semua variabel blok dan lingkungan diatur. Variabel kunci adalah **pasokan *gas*** untuk eksekusi ini, yang diatur ke jumlah *gas* yang dibayar oleh pengirim di awal transaksi. Seiring berjalannya eksekusi kode, pasokan *gas* berkurang sesuai dengan biaya *gas* dari operasi yang dieksekusi. Jika pada suatu titik pasokan *gas* berkurang menjadi nol, kita mendapatkan pengecualian **“Out of Gas” (OOG)**; eksekusi segera berhenti dan transaksi dibatalkan. Tidak ada perubahan pada *state* Ethereum yang diterapkan, kecuali *nonce* pengirim yang ditambah satu dan saldo ether mereka berkurang untuk membayar penerima manfaat blok atas sumber daya yang digunakan untuk mengeksekusi kode hingga titik penghentian. Pada titik ini, Anda dapat membayangkan EVM berjalan pada salinan *world state* Ethereum yang terisolasi (*sandboxed*), di mana versi terisolasi ini akan dibuang sepenuhnya jika eksekusi tidak dapat selesai karena alasan apa pun. Namun, jika eksekusi berhasil diselesaikan, maka *world state* yang sebenarnya diperbarui agar sesuai dengan versi terisolasi, termasuk perubahan apa pun pada data penyimpanan kontrak yang dipanggil, kontrak baru yang dibuat, dan transfer saldo ether yang diinisiasi.
+
+Perhatikan bahwa karena sebuah *smart contract* itu sendiri dapat secara efektif memulai transaksi, eksekusi kode adalah proses rekursif. Sebuah kontrak dapat memanggil kontrak lain, dengan setiap panggilan menghasilkan EVM lain yang diinisiasi di sekitar target baru panggilan tersebut. Setiap instansiasi memiliki *world state* terisolasinya yang diinisialisasi dari *sandbox* EVM di tingkat atas. Setiap instansiasi juga diberi jumlah *gas* tertentu untuk pasokan *gas*-nya (tentu saja tidak melebihi jumlah *gas* yang tersisa di tingkat atas), dan karenanya mungkin juga berhenti dengan pengecualian karena diberi terlalu sedikit *gas* untuk menyelesaikan eksekusinya. Sekali lagi, dalam kasus seperti itu, *state sandbox* dibuang, dan eksekusi kembali ke EVM di tingkat atas.
+
+### Mengompilasi Solidity ke Bytecode EVM
+
+Mengompilasi file sumber Solidity ke *bytecode* EVM dapat dicapai melalui beberapa metode. Di Bab 2 kita menggunakan kompiler Remix *online*. Di bab ini, kita akan menggunakan *executable* `solc` di baris perintah. Untuk daftar opsi, jalankan perintah berikut:
+
+```sh
+$ solc --help
+```
+
+Menghasilkan aliran *opcode* mentah dari file sumber Solidity mudah dicapai dengan opsi baris perintah `--opcodes`. Aliran *opcode* ini menghilangkan beberapa informasi (opsi `--asm` menghasilkan informasi lengkap), tetapi cukup untuk diskusi ini. Sebagai contoh, mengompilasi file Solidity contoh, `Example.sol`, dan mengirimkan output *opcode* ke direktori bernama `BytecodeDir` dilakukan dengan perintah berikut:
+
+```sh
+$ solc -o BytecodeDir --opcodes Example.sol
+```
+
+atau:
+
+```sh
+$ solc -o BytecodeDir --asm Example.sol
+```
+
+Perintah berikut akan menghasilkan biner *bytecode* untuk program contoh kita:
+
+```sh
+$ solc -o BytecodeDir --bin Example.sol
+```
+
+File *opcode* output yang dihasilkan akan bergantung pada kontrak spesifik yang terkandung dalam file sumber Solidity. File Solidity sederhana kita `Example.sol` hanya memiliki satu kontrak, bernama `example`:
+
+```solidity
+pragma solidity ^0.4.19;
+
+contract example {
+    address contractOwner;
+
+    function example() {
+        contractOwner = msg.sender;
+    }
+}
+```
+
+Seperti yang Anda lihat, yang dilakukan kontrak ini hanyalah menyimpan satu variabel *state* persisten, yang diatur sebagai alamat akun terakhir yang menjalankan kontrak ini.
+
+Jika Anda melihat di dalam direktori `BytecodeDir`, Anda akan melihat file *opcode* `example.opcode`, yang berisi instruksi *opcode* EVM dari kontrak `example`. Membuka file `example.opcode` di editor teks akan menunjukkan hal berikut:
+
+```
+PUSH1 0x60 PUSH1 0x40 MSTORE CALLVALUE ISZERO PUSH1 0xE JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST CALLER PUSH1 0x0 DUP1 PUSH2 0x100 EXP DUP2 SLOAD DUP2 PUSH20 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF MUL NOT AND SWAP1 DUP4 PUSH20 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF AND MUL OR SWAP1 SSTORE POP PUSH1 0x35 DUP1 PUSH1 0x5B PUSH1 0x0 CODECOPY PUSH1 0x0 RETURN STOP PUSH1 0x60 PUSH1 0x40 MSTORE PUSH1 0x0 DUP1 REVERT STOP LOG1 PUSH6 0x627A7A723058 KECCAK256 JUMP 0xb9 SWAP14 0xcb 0x1e 0xdd RETURNDATACOPY 0xec 0xe0 0x1f 0x27 0xc9 PUSH5 0x9C5ABCC14A NUMBER 0x5e INVALID EXTCODESIZE 0xdb 0xcf EXTCODESIZE 0x27 EXTCODESIZE 0xe2 0xb8 SWAP10 0xed 0x
+```
+
+Mengompilasi contoh dengan opsi `--asm` menghasilkan file bernama `example.evm` di direktori `BytecodeDir` kita. Ini berisi deskripsi tingkat yang sedikit lebih tinggi dari instruksi *bytecode* EVM, bersama dengan beberapa anotasi yang membantu:
+
+```asm
+/* "Example.sol":26:132 contract example {... */
+mstore(0x40, 0x60)
+/* "Example.sol":74:130 function example() {... */
+jumpi(tag_1, iszero(callvalue))
+0x0
+dup1
+revert
+tag_1:
+/* "Example.sol":115:125 msg.sender */
+caller
+/* "Example.sol":99:112 contractOwner */
+0x0
+dup1
+/* "Example.sol":99:125 contractOwner = msg.sender */
+0x100
+exp
+dup2
+sload
+dup2
+0xffffffffffffffffffffffffffffffffffffffff
+mul
+not
+and
+swap1
+dup4
+0xffffffffffffffffffffffffffffffffffffffff
+and
+mul
+or
+swap1
+sstore
+pop
+/* "Example.sol":26:132 contract example {... */
+dataSize(sub_0)
+dup1
+dataOffset(sub_0)
+0x0
+codecopy
+0x0
+return
+stop
+sub_0: assembly {
+    /* "Example.sol":26:132
+    mstore(0x40, 0x60)
+    0x0
+    dup1
+    revert
+    contract example {... */
+    auxdata: 0xa165627a7a7230582056b99dcb1edd3eece01f27c9649c5abcc14a435efe3b...
+}
+```
+
+Opsi `--bin-runtime` menghasilkan *bytecode* heksadesimal yang dapat dibaca mesin:
+
+```
+60606040523415600e57600080fd5b336000806101000a81548173
+ffffffffffffffffffffffffffffffffffffffff
+021916908373
+ffffffffffffffffffffffffffffffffffffffff
+160217905550603580605b6000396000f3006060604052600080fd00a165627a7a7230582056b...
+```
+
+Anda dapat menyelidiki apa yang terjadi di sini secara detail menggunakan daftar *opcode* yang diberikan di “Set Instruksi EVM (Operasi Bytecode)”. Namun, itu adalah tugas yang cukup besar, jadi mari kita mulai dengan memeriksa empat instruksi pertama:
+
+`PUSH1 0x60 PUSH1 0x40 MSTORE CALLVALUE`
+
+Di sini kita memiliki `PUSH1` diikuti oleh satu *byte* mentah dengan nilai `0x60`. Instruksi EVM ini mengambil satu *byte* yang mengikuti *opcode* dalam kode program (sebagai nilai literal) dan mendorongnya ke atas *stack*. Dimungkinkan untuk mendorong nilai berukuran hingga 32 *byte* ke *stack*, seperti pada:
+`PUSH32 0x436f6e67726174756c6174696f6e732120536f6f6e20746f206d617374657221`
+
+*Opcode* `PUSH1` kedua dari `example.opcode` menyimpan `0x40` ke atas *stack* (mendorong `0x60` yang sudah ada di sana turun satu slot).
+
+Berikutnya adalah `MSTORE`, yang merupakan operasi penyimpanan memori yang menyimpan nilai ke memori EVM. Ini mengambil dua argumen dan, seperti kebanyakan operasi EVM, memperolehnya dari *stack*. Untuk setiap argumen, *stack* di-"pop"; yaitu, nilai teratas di *stack* diambil dan semua nilai lain di *stack* digeser satu posisi ke atas. Argumen pertama untuk `MSTORE` adalah alamat *word* di memori tempat nilai yang akan disimpan akan diletakkan. Untuk program ini kita memiliki `0x40` di atas *stack*, jadi itu dihapus dari *stack* dan digunakan sebagai alamat memori. Argumen kedua adalah nilai yang akan disimpan, yaitu `0x60` di sini. Setelah operasi `MSTORE` dieksekusi, *stack* kita kosong lagi, tetapi kita memiliki nilai `0x60` (96 dalam desimal) di lokasi memori `0x40`.
+
+*Opcode* berikutnya adalah `CALLVALUE`, yang merupakan *opcode* lingkungan yang mendorong jumlah ether (diukur dalam wei) yang dikirim dengan panggilan pesan yang memulai eksekusi ini ke atas *stack*.
+
+Kita bisa terus melangkah melalui program ini dengan cara ini sampai kita memiliki pemahaman penuh tentang perubahan *state* tingkat rendah yang disebabkan oleh kode ini, tetapi itu tidak akan membantu kita pada tahap ini. Kita akan kembali lagi nanti di bab ini.
+
+### Kode Penempatan (*Deployment*) Kontrak
+
+Ada perbedaan penting namun halus antara kode yang digunakan saat membuat dan menempatkan kontrak baru di platform Ethereum dan kode dari kontrak itu sendiri. Untuk membuat kontrak baru, diperlukan transaksi khusus yang memiliki kolom `to` diatur ke alamat khusus `0x0` dan kolom `data`-nya diatur ke kode inisiasi kontrak. Ketika transaksi pembuatan kontrak seperti itu diproses, kode untuk akun kontrak baru **bukanlah** kode di kolom `data` dari transaksi tersebut. Sebaliknya, EVM diinisiasi dengan kode di kolom `data` transaksi yang dimuat ke dalam ROM kode programnya, dan kemudian **output dari eksekusi kode penempatan itu** diambil sebagai kode untuk akun kontrak baru. Ini dilakukan agar kontrak baru dapat diinisialisasi secara terprogram menggunakan *world state* Ethereum pada saat penempatan, mengatur nilai-nilai dalam penyimpanan kontrak dan bahkan mengirim ether atau membuat kontrak baru lebih lanjut.
+
+Saat mengompilasi kontrak secara *offline*, misalnya, menggunakan `solc` pada baris perintah, Anda bisa mendapatkan ***bytecode deployment*** atau ***bytecode runtime***.
+
+***Bytecode deployment*** digunakan untuk setiap aspek inisialisasi akun kontrak baru, termasuk *bytecode* yang pada akhirnya akan dieksekusi ketika transaksi memanggil kontrak baru ini (yaitu, *bytecode runtime*) dan kode untuk menginisialisasi semuanya berdasarkan *constructor* kontrak.
+
+***Bytecode runtime***, di sisi lain, adalah persis *bytecode* yang akhirnya dieksekusi ketika kontrak baru dipanggil, dan tidak lebih; itu tidak termasuk *bytecode* yang diperlukan untuk menginisialisasi kontrak selama penempatan.
+
+Mari kita ambil kontrak sederhana `Faucet.sol` yang kita buat sebelumnya sebagai contoh:
+
+```solidity
+// Versi kompiler Solidity yang digunakan untuk menulis program ini
+pragma solidity ^0.4.19;
+
+// Kontrak pertama kita adalah sebuah faucet!
+contract Faucet {
+
+    // Memberikan ether kepada siapa saja yang meminta
+    function withdraw(uint withdraw_amount) public {
+        // Batasi jumlah penarikan
+        require(withdraw_amount <= 100000000000000000);
+
+        // Kirim jumlah tersebut ke alamat yang memintanya
+        msg.sender.transfer(withdraw_amount);
+    }
+
+    // Menerima jumlah yang masuk
+    function () public payable {}
+}
+```
+
+Untuk mendapatkan *bytecode deployment*, kita akan menjalankan `solc --bin Faucet.sol`. Jika kita hanya menginginkan *bytecode runtime*, kita akan menjalankan `solc --bin-runtime Faucet.sol`.
+
+Jika Anda membandingkan output dari perintah-perintah ini, Anda akan melihat bahwa *bytecode runtime* adalah **subset** dari *bytecode deployment*. Dengan kata lain, *bytecode runtime* sepenuhnya terkandung di dalam *bytecode deployment*.
+
+### Membongkar (*Disassembling*) Bytecode
+
+Membongkar *bytecode* EVM adalah cara yang bagus untuk memahami bagaimana Solidity tingkat tinggi bertindak di dalam EVM. Ada beberapa *disassembler* yang bisa Anda gunakan untuk melakukan ini:
+
+  * **Porosity** adalah *decompiler open source* yang populer.
+  * **Ethersplay** adalah *plug-in* EVM untuk Binary Ninja, sebuah *disassembler*.
+  * **IDA-Evm** adalah *plug-in* EVM untuk IDA, *disassembler* lain.
+
+Di bagian ini, kita akan menggunakan *plug-in* Ethersplay untuk Binary Ninja dan untuk memulai Gambar 13-2. Setelah mendapatkan *bytecode runtime* dari `Faucet.sol`, kita bisa memasukkannya ke Binary Ninja (setelah memuat *plug-in* Ethersplay) untuk melihat seperti apa instruksi EVM-nya.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-13.2.png" alt="gambar" width="580"/>
+</p>
+
+Saat Anda mengirim transaksi ke *smart contract* yang kompatibel dengan **ABI** (*Application Binary Interface*), yang mana dapat Anda asumsikan berlaku untuk semua kontrak, transaksi tersebut pertama kali berinteraksi dengan **dispatcher** *smart contract* tersebut. *Dispatcher* membaca kolom `data` dari transaksi dan mengirimkan bagian yang relevan ke fungsi yang sesuai. Kita bisa melihat contoh *dispatcher* di awal *bytecode runtime* `Faucet.sol` yang telah kita bongkar. Setelah instruksi `MSTORE` yang sudah kita kenal, kita melihat instruksi-instruksi berikut:
+
+```
+PUSH1 0x4
+CALLDATASIZE
+LT
+PUSH1 0x3f
+JUMPI
+```
+
+Seperti yang telah kita lihat, `PUSH1 0x4` menempatkan `0x4` ke atas *stack*, yang sebelumnya kosong. `CALLDATASIZE` mendapatkan ukuran dalam *byte* dari data yang dikirim bersama transaksi (dikenal sebagai **calldata**) dan mendorong angka tersebut ke atas *stack*. Setelah operasi-operasi ini dieksekusi, *stack* akan terlihat seperti ini:
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-13.1.png" alt="gambar" width="580"/>
+</p>
+
+Instruksi berikutnya adalah `LT`, singkatan dari “*less than*” (kurang dari). Instruksi `LT` memeriksa apakah item teratas di *stack* lebih kecil dari item berikutnya di *stack*. Dalam kasus kita, instruksi ini memeriksa apakah hasil `CALLDATASIZE` kurang dari 4 *byte*.
+
+## Penanda Fungsi (*Function Identifier*)
+
+Mengapa EVM perlu memeriksa bahwa *calldata* dari transaksi setidaknya berukuran 4 *byte*? 🧐
+
+Jawabannya terletak pada cara kerja **penanda fungsi**. Setiap fungsi dalam sebuah kontrak diidentifikasi oleh **4 *byte* pertama dari *hash* Keccak-256** tanda tangannya (*signature*). Dengan memasukkan nama fungsi beserta tipe argumennya ke dalam fungsi *hash* `keccak256`, kita dapat memperoleh penanda fungsinya. Dalam kasus kita:
+
+```
+keccak256("withdraw(uint256)") = 0x2e1a7d4d...
+```
+
+Jadi, penanda fungsi untuk fungsi `withdraw(uint256)` adalah `0x2e1a7d4d`, karena ini adalah 4 *byte* pertama dari *hash* yang dihasilkan.
+
+Sebuah penanda fungsi **selalu memiliki panjang 4 *byte***. Oleh karena itu, jika seluruh kolom `data` dari transaksi yang dikirim ke kontrak berukuran kurang dari 4 *byte*, maka tidak mungkin transaksi tersebut berkomunikasi dengan fungsi mana pun, kecuali jika sebuah **fungsi *fallback*** telah didefinisikan. Karena kita mengimplementasikan fungsi *fallback* di `Faucet.sol`, EVM akan melompat ke fungsi tersebut ketika panjang *calldata* kurang dari 4 *byte*.
+
+`LT` akan mengambil (melakukan *pop*) dua nilai teratas dari *stack*. Jika kolom `data` transaksi kurang dari 4 *byte*, `LT` akan mendorong nilai `1` (yang berarti `true`) ke atas *stack*. Jika tidak, ia akan mendorong `0` (`false`). Dalam contoh kita, mari kita asumsikan kolom `data` dari transaksi yang dikirim ke kontrak kita memang kurang dari 4 *byte*.
+
+Instruksi `PUSH1 0x3f` kemudian mendorong *byte* `0x3f` ke atas *stack*. Setelah instruksi ini, *stack* akan terlihat seperti ini:
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-13.2.png" alt="gambar" width="580"/>
+</p>
+
+Instruksi berikutnya adalah `JUMPI`, yang merupakan singkatan dari “***jump if***” (lompat jika). Cara kerjanya seperti ini:
+
+```
+jumpi(label, cond) // Lompat ke "label" jika "cond" bernilai benar (true)
+```
+
+Dalam kasus kita, `label` adalah `0x3f`, yaitu lokasi di mana fungsi *fallback* kita berada di dalam *smart contract*. Argumen `cond` adalah `1`, yang merupakan hasil dari instruksi `LT` sebelumnya.
+
+Untuk merangkum seluruh urutan ini dengan kata-kata: **kontrak akan melompat ke fungsi *fallback* jika data transaksi berukuran kurang dari 4 *byte***.
+
+Di lokasi `0x3f`, hanya ada instruksi `STOP` yang mengikutinya, karena meskipun kita mendeklarasikan fungsi *fallback*, kita membiarkannya kosong. Seperti yang dapat Anda lihat pada Gambar 13-3, seandainya kita tidak mengimplementasikan fungsi *fallback*, kontrak akan malah melemparkan *exception* (pengecualian).
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-13.3.png" alt="gambar" width="580"/>
+</p>
+
+## Blok Pusat Dispatcher
+
+Mari kita periksa blok pusat dari *dispatcher*. Dengan asumsi kita menerima *calldata* yang panjangnya lebih dari 4 *byte*, instruksi `JUMPI` **tidak akan** melompat ke fungsi *fallback*. Sebaliknya, eksekusi kode akan berlanjut ke instruksi-instruksi berikut:
+
+```
+PUSH1 0x0
+CALLDATALOAD
+PUSH29 0x1000000...
+SWAP1
+DIV
+PUSH4 0xffffffff
+AND
+DUP1
+PUSH4 0x2e1a7d4d
+EQ
+PUSH1 0x41
+JUMPI
+```
+
+Instruksi `PUSH1 0x0` mendorong `0` ke atas *stack*, yang kini kembali kosong. Selanjutnya, `CALLDATALOAD` menerima argumen berupa indeks di dalam *calldata* yang dikirim ke *smart contract* dan membaca 32 *byte* dari indeks tersebut, seperti ini:
+
+```
+calldataload(p) // memuat 32 byte calldata dimulai dari posisi byte p
+```
+
+Karena `0` adalah indeks yang diberikan dari perintah `PUSH1 0x0`, `CALLDATALOAD` membaca **32 *byte*** *calldata* dimulai dari *byte* ke-0, lalu mendorongnya ke atas *stack* (setelah melakukan *pop* pada nilai `0x0` yang asli). Setelah instruksi `PUSH29 0x1000000…`, *stack* kemudian menjadi:
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-13.3.png" alt="gambar" width="580"/>
+</p>
+
+Instruksi `SWAP1` menukar elemen teratas di *stack* dengan elemen tepat di bawahnya. Dalam kasus ini, instruksi ini menukar `0x1000000…` dengan *calldata*. *Stack* yang baru adalah:
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-13.4.png" alt="gambar" width="580"/>
+</p>
+
+## Mengekstrak Penanda Fungsi dengan `DIV`
+
+Instruksi berikutnya adalah `DIV`, yang bekerja sebagai berikut:
+
+```
+div(x, y) // pembagian integer x / y
+```
+
+Dalam kasus ini, `x` = 32 *byte calldata* yang dimulai dari *byte* 0, dan `y` = `0x100000000…` (total 29 *byte*). Bisakah Anda menebak mengapa *dispatcher* melakukan pembagian ini? 🤔 Berikut petunjuknya: kita sebelumnya membaca 32 *byte* dari *calldata*, dimulai dari indeks 0. **Empat *byte* pertama** dari *calldata* tersebut adalah **penanda fungsi**.
+
+Nilai `0x100000000…` yang kita dorong sebelumnya memiliki panjang 29 *byte*, terdiri dari angka 1 di awal, diikuti oleh angka 0. Membagi 32 *byte calldata* kita dengan nilai ini secara efektif akan **menggeser bit ke kanan**, sehingga menyisakan **hanya 4 *byte* paling atas** dari *calldata* yang kita muat (dimulai dari indeks 0). Keempat *byte* ini—yaitu 4 *byte* pertama dalam *calldata*—adalah **penanda fungsi**, dan inilah cara EVM mengekstraknya.
+
+Jika bagian ini belum jelas, coba bayangkan seperti ini: dalam basis 10 (desimal), `1234000 / 1000 = 1234`. Dalam basis 16 (heksadesimal), caranya tidak berbeda. Bedanya, setiap posisi angka merupakan kelipatan 16, bukan 10. Sama seperti membagi dengan $10^3$ (1000) dalam contoh kita yang lebih kecil hanya menyisakan digit-digit teratas, membagi nilai basis 16 kita yang berukuran 32-*byte* dengan nilai besar yang setara akan melakukan hal yang sama untuk mengisolasi 4 *byte* teratas.
+
+Hasil dari operasi `DIV` (yaitu penanda fungsi) akan didorong ke atas *stack*, dan *stack* kita sekarang menjadi:
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-13.5.png" alt="gambar" width="580"/>
+</p>
+
+Karena instruksi `PUSH4 0xffffffff` dan `AND` bersifat redundan (berlebihan) dalam konteks ini, kita dapat mengabaikannya sepenuhnya, karena *stack* akan tetap sama setelah keduanya selesai dieksekusi.
+
+Instruksi `DUP1` menduplikasi item pertama di *stack*, yaitu **penanda fungsi**. Instruksi berikutnya, `PUSH4 0x2e1a7d4d`, mendorong penanda fungsi yang telah dihitung sebelumnya dari fungsi `withdraw(uint256)` ke atas *stack*. *Stack* sekarang menjadi:
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-13.6.png" alt="gambar" width="580"/>
+</p>
+
+## Membandingkan Penanda Fungsi dengan `EQ`
+
+Instruksi berikutnya, `EQ`, mengambil (*pop*) dua item teratas dari *stack* dan membandingkannya.
+
+Di sinilah **dispatcher** melakukan tugas utamanya 🎯: ia membandingkan apakah **penanda fungsi** yang dikirim dalam kolom `msg.data` dari transaksi cocok dengan penanda fungsi dari `withdraw(uint256)`.
+
+* Jika keduanya **sama**, `EQ` akan mendorong `1` (yang berarti `true`) ke atas *stack*. Nilai ini nantinya akan digunakan untuk melompat ke fungsi `withdraw`.
+* Jika **berbeda**, `EQ` akan mendorong `0` (`false`) ke atas *stack*.
+
+Dengan asumsi transaksi yang dikirim ke kontrak kita memang diawali dengan penanda fungsi untuk `withdraw(uint256)`, *stack* kita menjadi:
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-13.7.png" alt="gambar" width="580"/>
+</p>
+
+Berikutnya, kita memiliki `PUSH1 0x41`, yang merupakan alamat lokasi fungsi `withdraw(uint256)` berada di dalam kontrak. Setelah instruksi ini, *stack* akan terlihat seperti ini:
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-13.8.png" alt="gambar" width="580"/>
+</p>
+
+Instruksi `JUMPI` adalah yang berikutnya, dan sekali lagi ia menerima dua elemen teratas di *stack* sebagai argumen. Dalam kasus ini, kita memiliki `jumpi(0x41, 1)`, yang memberitahu EVM untuk mengeksekusi lompatan ke lokasi fungsi `withdraw(uint256)`, dan eksekusi kode fungsi tersebut pun dapat dilanjutkan.
+
+## Kelengkapan Turing dan Gas
+
+Seperti yang telah kita singgung sebelumnya, secara sederhana, sebuah sistem atau bahasa pemrograman dikatakan **Lengkap secara Turing (*Turing complete*)** jika ia dapat menjalankan program apa pun. Akan tetapi, kemampuan ini datang dengan sebuah peringatan yang sangat penting: beberapa program membutuhkan waktu selamanya untuk berjalan. Aspek penting dari hal ini adalah kita tidak dapat mengetahui, hanya dengan melihat sebuah program, apakah program tersebut akan berjalan selamanya atau tidak. Kita harus benar-benar menjalankan program tersebut dan menunggunya selesai untuk mengetahuinya. Tentu saja, jika program itu akan berjalan selamanya, kita harus menunggu selamanya untuk mengetahuinya. Ini disebut **masalah penghentian (*halting problem*)** dan akan menjadi masalah besar bagi Ethereum jika tidak diatasi.
+
+Karena *halting problem*, komputer dunia Ethereum berisiko diminta untuk mengeksekusi program yang tidak pernah berhenti. Ini bisa terjadi karena ketidaksengajaan atau niat jahat. Kita telah membahas bahwa Ethereum bertindak seperti mesin *single-threaded*, tanpa penjadwal apa pun, sehingga jika terjebak dalam *loop* tak terbatas, ini berarti Ethereum akan menjadi tidak dapat digunakan.
+
+Namun, dengan **gas**, ada solusinya: jika setelah jumlah komputasi maksimum yang telah ditentukan sebelumnya telah dilakukan dan eksekusi belum berakhir, eksekusi program akan **dihentikan oleh EVM**. Hal ini menjadikan EVM sebagai mesin yang **kuasi-Lengkap secara Turing (*quasi–Turing-complete*)**: ia dapat menjalankan program apa pun yang Anda masukkan, tetapi hanya jika program tersebut berhenti dalam jumlah komputasi tertentu. Batas itu tidak tetap di Ethereum—Anda dapat membayar untuk meningkatkannya hingga batas maksimum (disebut “**batas gas blok**” atau “***block gas limit***”), dan semua orang dapat setuju untuk meningkatkan maksimum itu seiring waktu. Meskipun demikian, pada satu waktu tertentu, ada batas yang berlaku, dan transaksi yang menghabiskan terlalu banyak gas saat dieksekusi akan dihentikan.
+
+Di bagian-bagian berikut, kita akan membahas gas dan memeriksa cara kerjanya secara detail.
+
+## Gas
+
+**Gas** adalah unit Ethereum untuk mengukur sumber daya komputasi dan penyimpanan yang diperlukan untuk melakukan tindakan di *blockchain* Ethereum. Berbeda dengan Bitcoin, yang biaya transaksinya hanya memperhitungkan ukuran transaksi dalam kilobyte, Ethereum harus memperhitungkan setiap langkah komputasi yang dilakukan oleh transaksi dan eksekusi kode *smart contract*.
+
+Setiap operasi yang dilakukan oleh transaksi atau kontrak memerlukan biaya sejumlah gas yang tetap. Beberapa contoh, dari Ethereum *Yellow Paper*:
+* Menambahkan dua angka berbiaya **3 gas**
+* Menghitung *hash* Keccak-256 berbiaya **30 gas + 6 gas** untuk setiap 256 bit data yang di-*hash*
+* Mengirim sebuah transaksi berbiaya **21.000 gas**
+
+Gas adalah komponen krusial dari Ethereum dan memiliki peran ganda: sebagai penyangga antara harga Ethereum (yang fluktuatif) dan imbalan bagi para penambang atas pekerjaan yang mereka lakukan, serta sebagai pertahanan terhadap serangan *denial-of-service* (DoS). Untuk mencegah *loop* tak terbatas yang tidak disengaja atau berbahaya atau pemborosan komputasi lainnya di jaringan, inisiator setiap transaksi diharuskan menetapkan batas jumlah komputasi yang bersedia mereka bayar. Dengan demikian, sistem gas memberikan disinsentif bagi penyerang untuk mengirimkan transaksi “spam”, karena mereka harus membayar secara proporsional untuk sumber daya komputasi, *bandwidth*, dan penyimpanan yang mereka konsumsi.
+
+### Akuntansi Gas Selama Eksekusi
+
+Ketika EVM dibutuhkan untuk menyelesaikan sebuah transaksi, pada awalnya ia diberikan **pasokan gas** yang sama dengan jumlah yang ditentukan oleh **batas gas (*gas limit*)** dalam transaksi tersebut. Setiap *opcode* yang dieksekusi memiliki biaya dalam gas, sehingga pasokan gas EVM berkurang seiring EVM melangkah melalui program. Sebelum setiap operasi, EVM memeriksa apakah ada cukup gas untuk membayar eksekusi operasi tersebut. Jika tidak ada cukup gas, eksekusi dihentikan dan transaksi dikembalikan (*reverted*).
+
+Jika EVM mencapai akhir eksekusi dengan sukses, tanpa kehabisan gas, biaya gas yang digunakan dibayarkan kepada penambang sebagai biaya transaksi, yang dikonversi ke ether berdasarkan **harga gas (*gas price*)** yang ditentukan dalam transaksi:
+
+`biaya penambang = biaya gas * harga gas`
+
+Gas yang tersisa dalam pasokan gas dikembalikan kepada pengirim, sekali lagi dikonversi ke ether berdasarkan harga gas yang ditentukan dalam transaksi:
+
+`sisa gas = batas gas - biaya gas`
+`ether yang dikembalikan = sisa gas * harga gas`
+
+Jika transaksi “kehabisan gas” selama eksekusi, operasi segera dihentikan, memunculkan pengecualian “*out of gas*”. Transaksi tersebut dikembalikan (*reverted*) dan semua perubahan pada *state* dibatalkan.
+
+Meskipun transaksi tidak berhasil, pengirim akan tetap dikenakan biaya transaksi, karena penambang telah melakukan pekerjaan komputasi hingga titik tersebut dan harus diberi kompensasi untuk itu.
+
+### Pertimbangan Akuntansi Gas
+
+Biaya gas relatif dari berbagai operasi yang dapat dilakukan oleh EVM telah dipilih dengan cermat untuk melindungi *blockchain* Ethereum dari serangan dengan sebaik-baiknya. Anda dapat melihat tabel detail biaya gas untuk berbagai *opcode* EVM di Tabel C-1.
+
+Operasi yang lebih intensif secara komputasi membutuhkan lebih banyak gas. Misalnya, mengeksekusi fungsi `SHA3` 10 kali lebih mahal (30 gas) daripada operasi `ADD` (3 gas). Lebih penting lagi, beberapa operasi, seperti `EXP`, memerlukan pembayaran tambahan berdasarkan ukuran operan. Ada juga biaya gas untuk menggunakan memori EVM dan untuk menyimpan data dalam penyimpanan *on-chain* sebuah kontrak.
+
+Pentingnya mencocokkan biaya gas dengan biaya sumber daya di dunia nyata ditunjukkan pada tahun 2016 ketika seorang penyerang menemukan dan mengeksploitasi ketidaksesuaian biaya. Serangan tersebut menghasilkan transaksi yang sangat mahal secara komputasi, dan membuat *mainnet* Ethereum hampir berhenti total. Ketidaksesuaian ini diselesaikan melalui sebuah ***hard fork*** (dengan nama kode “Tangerine Whistle”) yang menyesuaikan biaya gas relatif.
+
+### Biaya Gas vs. Harga Gas
+
+Meskipun **biaya gas (*gas cost*)** adalah ukuran komputasi dan penyimpanan yang digunakan di EVM, gas itu sendiri juga memiliki **harga gas (*gas price*)** yang diukur dalam ether. Saat melakukan transaksi, pengirim menentukan harga gas yang bersedia mereka bayar (dalam ether) untuk setiap unit gas, memungkinkan pasar untuk memutuskan hubungan antara harga ether dan biaya operasi komputasi (seperti yang diukur dalam gas):
+
+`biaya transaksi (dalam ether) = total gas yang digunakan * harga gas yang dibayar`
+
+Saat membuat blok baru, penambang di jaringan Ethereum dapat memilih di antara transaksi yang tertunda dengan memilih transaksi yang menawarkan harga gas lebih tinggi. Menawarkan harga gas yang lebih tinggi akan memberi insentif kepada penambang untuk memasukkan transaksi Anda dan membuatnya dikonfirmasi lebih cepat.
+
+Dalam praktiknya, pengirim transaksi akan menetapkan batas gas yang lebih tinggi dari atau sama dengan jumlah gas yang diperkirakan akan digunakan. Jika batas gas ditetapkan lebih tinggi dari jumlah gas yang dikonsumsi, pengirim akan menerima pengembalian dana dari jumlah berlebih, karena penambang hanya diberi kompensasi untuk pekerjaan yang benar-benar mereka lakukan.
+
+Penting untuk memperjelas perbedaan antara **biaya gas** dan **harga gas**. Sebagai rekap:
+* **Biaya Gas** adalah jumlah unit gas yang diperlukan untuk melakukan operasi tertentu.
+* **Harga Gas** adalah jumlah ether yang bersedia Anda bayarkan per unit gas saat Anda mengirimkan transaksi Anda ke jaringan Ethereum.
+
+> Meskipun gas memiliki harga, ia tidak dapat “dimiliki” atau “dibelanjakan”. Gas hanya ada di dalam EVM, sebagai hitungan seberapa banyak pekerjaan komputasi yang sedang dilakukan. Pengirim dikenakan biaya transaksi dalam ether, yang kemudian dikonversi menjadi gas untuk akuntansi EVM dan kemudian kembali menjadi ether sebagai biaya transaksi yang dibayarkan kepada penambang.
+
+### Biaya Gas Negatif
+
+Ethereum mendorong penghapusan variabel penyimpanan dan akun yang telah digunakan dengan mengembalikan sebagian gas yang digunakan selama eksekusi kontrak.
+
+Ada dua operasi di EVM dengan biaya gas negatif:
+* Menghapus kontrak (`SELFDESTRUCT`) bernilai pengembalian dana sebesar **24.000 gas**.
+* Mengubah alamat penyimpanan dari nilai bukan nol menjadi nol (`SSTORE[x] = 0`) bernilai pengembalian dana sebesar **15.000 gas**.
+
+Untuk menghindari eksploitasi mekanisme pengembalian dana, pengembalian dana maksimum untuk sebuah transaksi ditetapkan setengah dari jumlah total gas yang digunakan (dibulatkan ke bawah).
+
+### Batas Gas Blok (*Block Gas Limit*)
+
+**Batas gas blok** adalah jumlah maksimum gas yang dapat dikonsumsi oleh semua transaksi dalam satu blok, dan membatasi berapa banyak transaksi yang bisa muat dalam satu blok.
+
+Sebagai contoh, katakanlah kita memiliki 5 transaksi yang batas gasnya telah ditetapkan menjadi 30.000, 30.000, 40.000, 50.000, dan 50.000. Jika batas gas blok adalah 180.000, maka empat dari transaksi tersebut dapat muat dalam satu blok, sementara yang kelima harus menunggu blok berikutnya.
+
+Seperti yang telah dibahas sebelumnya, penambang memutuskan transaksi mana yang akan dimasukkan ke dalam blok. Penambang yang berbeda kemungkinan akan memilih kombinasi yang berbeda, terutama karena mereka menerima transaksi dari jaringan dalam urutan yang berbeda.
+
+Jika seorang penambang mencoba memasukkan transaksi yang membutuhkan lebih banyak gas daripada batas gas blok saat ini, blok tersebut akan ditolak oleh jaringan. Sebagian besar klien Ethereum akan menghentikan Anda dari mengeluarkan transaksi semacam itu dengan memberikan peringatan seperti “transaksi melebihi batas gas blok.” Batas gas blok di *mainnet* Ethereum adalah 8 juta gas pada saat penulisan menurut [https://etherscan.io](https://etherscan.io), yang berarti sekitar 380 transaksi dasar (masing-masing menghabiskan 21.000 gas) dapat muat dalam satu blok.
+
+#### Siapa yang memutuskan batas gas blok?
+
+Para penambang di jaringan secara kolektif memutuskan batas gas blok. Individu yang ingin menambang di jaringan Ethereum menggunakan program penambangan, seperti Ethminer, yang terhubung ke klien Geth atau Parity Ethereum. Protokol Ethereum memiliki mekanisme bawaan di mana penambang dapat memberikan suara pada batas gas sehingga kapasitas dapat ditingkatkan atau diturunkan di blok-blok berikutnya. Penambang sebuah blok dapat memberikan suara untuk menyesuaikan batas gas blok dengan faktor 1/1.024 (0,0976%) ke arah mana pun. Hasilnya adalah ukuran blok yang dapat disesuaikan berdasarkan kebutuhan jaringan pada saat itu. Mekanisme ini digabungkan dengan strategi penambangan default di mana penambang memberikan suara pada batas gas yang setidaknya 4,7 juta gas, tetapi menargetkan nilai 150% dari rata-rata total penggunaan gas per blok baru-baru ini (menggunakan rata-rata bergerak eksponensial 1.024 blok).
+
+## Kesimpulan
+
+Dalam bab ini kita telah menjelajahi Mesin Virtual Ethereum, menelusuri eksekusi berbagai *smart contract* dan melihat bagaimana EVM mengeksekusi *bytecode*. Kita juga telah membahas gas, mekanisme akuntansi EVM, dan melihat bagaimana ia memecahkan *halting problem* serta melindungi Ethereum dari serangan *denial-of-service*. Selanjutnya, di Bab 14, kita akan melihat mekanisme yang digunakan oleh Ethereum untuk mencapai konsensus terdesentralisasi.
+
+---
+
+# BAB 14
+## Konsensus
+
+Sepanjang buku ini kita telah membicarakan tentang “**aturan konsensus**”—aturan yang harus disetujui oleh semua orang agar sistem dapat beroperasi secara terdesentralisasi, namun tetap deterministik. Dalam ilmu komputer, istilah **konsensus** sudah ada sebelum *blockchain* dan berkaitan dengan masalah yang lebih luas tentang sinkronisasi *state* dalam sistem terdistribusi, sehingga para peserta yang berbeda dalam sistem terdistribusi semuanya (pada akhirnya) menyetujui satu *state* tunggal di seluruh sistem. Proses ini disebut “mencapai konsensus.”
+
+Ketika menyangkut fungsi inti dari pencatatan dan verifikasi yang terdesentralisasi, akan menjadi masalah jika hanya mengandalkan kepercayaan untuk memastikan bahwa informasi yang berasal dari pembaruan *state* adalah benar. Tantangan yang cukup umum ini menjadi sangat menonjol dalam jaringan terdesentralisasi karena **tidak ada entitas pusat** untuk memutuskan apa yang benar.
+
+Tidak adanya entitas pusat pengambilan keputusan adalah salah satu daya tarik utama platform *blockchain*, karena menghasilkan kapasitas untuk menahan sensor dan tidak adanya ketergantungan pada otoritas untuk mendapatkan izin mengakses informasi. Namun, manfaat ini ada harganya: tanpa arbiter tepercaya, setiap perselisihan, penipuan, atau perbedaan perlu diselesaikan dengan cara lain. **Algoritma konsensus** adalah mekanisme yang digunakan untuk mendamaikan keamanan dan desentralisasi.
+
+Dalam *blockchain*, konsensus adalah properti kritis dari sistem. Sederhananya, ada uang yang dipertaruhkan! Jadi, dalam konteks *blockchain*, konsensus adalah tentang kemampuan untuk mencapai *state* bersama, sambil mempertahankan desentralisasi. Dengan kata lain, konsensus dimaksudkan untuk menghasilkan sistem **aturan yang ketat tanpa penguasa**. Tidak ada satu orang, organisasi, atau kelompok yang “bertanggung jawab”; sebaliknya, kekuasaan dan kontrol disebarkan ke seluruh jaringan peserta yang luas, yang kepentingannya akan terpenuhi dengan mengikuti aturan dan berperilaku jujur.
+
+Kemampuan untuk mencapai konsensus di seluruh jaringan terdistribusi, dalam kondisi yang penuh permusuhan (*adversarial*), tanpa memusatkan kontrol adalah prinsip inti dari semua *blockchain* publik yang terbuka. Untuk mengatasi tantangan ini dan mempertahankan properti desentralisasi yang berharga, komunitas terus bereksperimen dengan berbagai model konsensus. Bab ini akan menjelajahi model-model konsensus tersebut dan dampaknya yang diharapkan pada *blockchain smart contract* seperti Ethereum.
+
+> Meskipun algoritma konsensus adalah bagian penting dari cara kerja *blockchain*, mereka beroperasi pada lapisan fundamental, jauh di bawah abstraksi *smart contract*. Dengan kata lain, sebagian besar detail konsensus tersembunyi dari para penulis *smart contract*. Anda tidak perlu tahu cara kerjanya untuk menggunakan Ethereum, sama seperti Anda tidak perlu tahu cara kerja *routing* untuk menggunakan internet.
+
+## Konsensus melalui Proof of Work (PoW)
+
+Pencipta *blockchain* asli, Bitcoin, menemukan algoritma konsensus yang disebut **proof of work (PoW)**. Dapat dikatakan, PoW adalah penemuan paling penting yang menopang Bitcoin. Istilah sehari-hari untuk PoW adalah “**penambangan**” (*mining*), yang seringkali menimbulkan kesalahpahaman tentang tujuan utama konsensus. Orang sering menganggap bahwa tujuan penambangan adalah penciptaan mata uang baru, karena tujuan penambangan di dunia nyata adalah ekstraksi logam mulia atau sumber daya lainnya. Sebaliknya, tujuan sebenarnya dari penambangan (dan semua model konsensus lainnya) adalah untuk **mengamankan *blockchain***, sambil menjaga agar kontrol atas sistem tetap terdesentralisasi dan tersebar di sebanyak mungkin peserta.
+
+Hadiah berupa mata uang yang baru dicetak adalah **insentif** bagi mereka yang berkontribusi pada keamanan sistem: sebuah sarana untuk mencapai tujuan. Dalam hal ini, hadiah adalah sarana dan keamanan terdesentralisasi adalah tujuannya. Dalam konsensus PoW, ada juga “**hukuman**” yang sesuai, yaitu biaya energi yang diperlukan untuk berpartisipasi dalam penambangan. Jika peserta tidak mengikuti aturan dan tidak mendapatkan hadiah, mereka berisiko kehilangan dana yang telah mereka habiskan untuk listrik menambang. Dengan demikian, konsensus PoW adalah keseimbangan yang cermat antara risiko dan imbalan yang mendorong peserta untuk berperilaku jujur demi kepentingan diri sendiri.
+
+Ethereum saat ini adalah *blockchain* PoW, karena menggunakan algoritma PoW dengan sistem insentif dasar yang sama untuk tujuan dasar yang sama: mengamankan *blockchain* sambil mendesentralisasi kontrol. Algoritma PoW Ethereum sedikit berbeda dari Bitcoin dan disebut **Ethash**. Kita akan memeriksa fungsi dan karakteristik desain algoritma ini di bagian selanjutnya.
+
+## Konsensus melalui Proof of Stake (PoS)
+
+Secara historis, *proof of work* bukanlah algoritma konsensus pertama yang diusulkan. Sebelum pengenalan *proof of work*, banyak peneliti telah mengusulkan variasi algoritma konsensus berdasarkan saham finansial, yang sekarang disebut **proof of stake (PoS)**. Dalam beberapa hal, *proof of work* ditemukan sebagai alternatif dari *proof of stake*. Mengikuti kesuksesan Bitcoin, banyak *blockchain* telah meniru *proof of work*. Namun ledakan penelitian tentang algoritma konsensus juga telah membangkitkan kembali *proof of stake*, secara signifikan memajukan teknologi tersebut. Sejak awal, para pendiri Ethereum berharap untuk pada akhirnya memigrasikan algoritma konsensusnya ke *proof of stake*. Faktanya, ada sebuah rintangan yang disengaja pada *proof of work* Ethereum yang disebut **bom kesulitan (*difficulty bomb*)**, yang dimaksudkan untuk secara bertahap membuat penambangan *proof-of-work* Ethereum menjadi semakin sulit, sehingga memaksa transisi ke *proof of stake*.
+
+Pada saat buku ini diterbitkan, Ethereum masih menggunakan *proof of work*, tetapi penelitian yang sedang berlangsung menuju alternatif *proof-of-stake* hampir selesai. Algoritma PoS yang direncanakan Ethereum disebut **Casper**. Pengenalan Casper sebagai pengganti Ethash telah ditunda beberapa kali selama dua tahun terakhir, yang memerlukan intervensi untuk meredakan *difficulty bomb* dan menunda keusangan paksa dari *proof of work*.
+
+Secara umum, algoritma PoS bekerja sebagai berikut. *Blockchain* melacak satu set **validator**, dan siapa pun yang memegang mata uang kripto dasar *blockchain* (dalam kasus Ethereum, ether) dapat menjadi validator dengan mengirimkan jenis transaksi khusus yang mengunci ether mereka ke dalam sebuah deposit. Para validator bergiliran mengusulkan dan memberikan suara pada blok valid berikutnya, dan bobot suara setiap validator bergantung pada ukuran depositnya (yaitu, **saham** atau ***stake***). Yang penting, seorang validator berisiko kehilangan depositnya jika blok yang mereka pertaruhkan ditolak oleh mayoritas validator. Sebaliknya, validator mendapatkan imbalan kecil, sebanding dengan saham yang mereka depositkan, untuk setiap blok yang diterima oleh mayoritas. Dengan demikian, PoS memaksa validator untuk bertindak jujur dan mengikuti aturan konsensus, melalui sistem imbalan dan hukuman. Perbedaan utama antara PoS dan PoW adalah bahwa hukuman di PoS bersifat **intrinsik** terhadap *blockchain* (misalnya, kehilangan ether yang dipertaruhkan), sedangkan di PoW hukumannya bersifat **ekstrinsik** (misalnya, kehilangan dana yang dihabiskan untuk listrik).
+
+## Ethash: Algoritma Proof-of-Work Ethereum
+
+**Ethash** adalah algoritma PoW Ethereum. Ia menggunakan evolusi dari algoritma Dagger-Hashimoto, yang merupakan kombinasi dari algoritma Dagger Vitalik Buterin dan algoritma Hashimoto Thaddeus Dryja. Ethash bergantung pada pembuatan dan analisis dataset besar, yang dikenal sebagai **grafik asiklik terarah** (*directed acyclic graph* atau, lebih sederhana, “**DAG**”). DAG memiliki ukuran awal sekitar 1 GB dan akan terus tumbuh secara perlahan dan linear, diperbarui sekali setiap *epoch* (30.000 blok, atau sekitar 125 jam).
+
+Tujuan dari DAG adalah untuk membuat algoritma PoW Ethash bergantung pada pemeliharaan struktur data yang besar dan sering diakses. Hal ini pada gilirannya dimaksudkan untuk membuat Ethash “**tahan-ASIC**” (*ASIC resistant*), yang berarti lebih sulit untuk membuat peralatan penambangan sirkuit terpadu khusus aplikasi (ASIC) yang berkali-kali lipat lebih cepat daripada unit pemrosesan grafis (GPU) yang cepat. Para pendiri Ethereum ingin menghindari sentralisasi dalam penambangan PoW, di mana mereka yang memiliki akses ke pabrik fabrikasi silikon khusus dan anggaran besar dapat mendominasi infrastruktur penambangan dan merusak keamanan algoritma konsensus.
+
+Penggunaan GPU tingkat konsumen untuk melakukan PoW di jaringan Ethereum berarti lebih banyak orang di seluruh dunia dapat berpartisipasi dalam proses penambangan. Semakin banyak penambang independen, semakin terdesentralisasi kekuatan penambangan, yang berarti kita dapat menghindari situasi seperti di Bitcoin, di mana sebagian besar kekuatan penambangan terkonsentrasi di tangan beberapa operasi penambangan industri besar. Kelemahan dari penggunaan GPU untuk menambang adalah bahwa hal itu memicu kekurangan GPU di seluruh dunia pada tahun 2017, menyebabkan harganya meroket dan menuai protes dari para *gamer*. Hal ini menyebabkan pembatasan pembelian di pengecer, membatasi pembeli hanya satu atau dua GPU per pelanggan.
+
+Hingga saat ini, ancaman penambang ASIC di jaringan Ethereum sebagian besar tidak ada. Menggunakan ASIC untuk Ethereum memerlukan desain, manufaktur, dan distribusi perangkat keras yang sangat disesuaikan. Memproduksinya membutuhkan investasi waktu dan uang yang cukup besar. Rencana yang telah lama diungkapkan oleh para pengembang Ethereum untuk pindah ke algoritma konsensus PoS kemungkinan besar membuat pemasok ASIC menjauh dari menargetkan jaringan Ethereum untuk waktu yang lama. Begitu Ethereum pindah ke PoS, ASIC yang dirancang untuk algoritma PoW akan menjadi tidak berguna—kecuali jika penambang dapat menggunakannya untuk menambang mata uang kripto lain. Kemungkinan terakhir ini sekarang menjadi kenyataan dengan berbagai koin berbasis konsensus Ethash lainnya yang tersedia, seperti PIRL dan Ubiq, dan Ethereum Classic telah berjanji untuk tetap menjadi *blockchain* PoW di masa mendatang. Ini berarti kita kemungkinan akan mulai melihat penambangan ASIC menjadi kekuatan di jaringan Ethereum selagi masih beroperasi dengan konsensus PoW.
+
+## Casper: Algoritma Proof-of-Stake Ethereum
+
+**Casper** adalah nama yang diusulkan untuk algoritma konsensus PoS Ethereum. Ia masih dalam penelitian dan pengembangan aktif dan belum diimplementasikan di *blockchain* Ethereum pada saat buku ini diterbitkan. Casper sedang dikembangkan dalam dua “rasa” yang bersaing:
+* **Casper FFG**: “*The Friendly Finality Gadget*”
+* **Casper CBC**: “*The Friendly GHOST/Correct-by-Construction*”
+
+Awalnya, Casper FFG diusulkan sebagai algoritma hibrida PoW/PoS untuk diimplementasikan sebagai transisi ke algoritma “PoS murni” yang lebih permanen. Tetapi pada Juni 2018, Vitalik Buterin, yang memimpin pekerjaan penelitian tentang Casper FFG, memutuskan untuk “membatalkan” model hibrida dan beralih ke algoritma PoS murni. Sekarang, Casper FFG dan Casper CBC keduanya dikembangkan secara paralel. Seperti yang dijelaskan Vitalik:
+
+> *Tradeoff* utama antara FFG dan CBC adalah bahwa CBC tampaknya memiliki properti teoretis yang lebih baik, tetapi FFG tampaknya lebih mudah untuk diimplementasikan.
+
+Informasi lebih lanjut tentang sejarah Casper, penelitian yang sedang berlangsung, dan rencana masa depan dapat ditemukan di tautan berikut:
+* [Ethereum Casper (Proof of Stake)](http://bit.ly/2RO5HAl)
+* [History of Casper, Part 1](http://bit.ly/2FlBojb)
+* [History of Casper, Part 2](http://bit.ly/2QyHiic)
+* [History of Casper, Part 3](http://bit.ly/2JWWFyt)
+* [History of Casper, Part 4](http://bit.ly/2FsaExI)
+* [History of Casper, Part 5](http://bit.ly/2PPhhOv)
+
+## Prinsip-Prinsip Konsensus
+
+Prinsip dan asumsi dari algoritma konsensus dapat dipahami dengan lebih jelas dengan mengajukan beberapa pertanyaan kunci:
+
+* Siapa yang dapat mengubah masa lalu, dan bagaimana caranya? (Ini juga dikenal sebagai **kekekalan** atau ***immutability***.)
+* Siapa yang dapat mengubah masa depan, dan bagaimana caranya? (Ini juga dikenal sebagai **finalitas** atau ***finality***.)
+* Berapa biaya untuk melakukan perubahan tersebut?
+* Seberapa terdesentralisasi kekuasaan untuk melakukan perubahan tersebut?
+* Siapa yang akan tahu jika sesuatu telah berubah, dan bagaimana mereka akan mengetahuinya?
+
+Algoritma konsensus berkembang dengan pesat, mencoba menjawab pertanyaan-pertanyaan ini dengan cara yang semakin inovatif.
+
+## Kontroversi dan Kompetisi
+
+Pada titik ini Anda mungkin bertanya-tanya: Mengapa kita memerlukan begitu banyak algoritma konsensus yang berbeda? Mana yang bekerja lebih baik? Jawaban untuk pertanyaan terakhir ini berada di pusat area penelitian paling menarik dalam sistem terdistribusi selama dekade terakhir. Semuanya bermuara pada apa yang Anda anggap “lebih baik”—yang dalam konteks ilmu komputer adalah tentang asumsi, tujuan, dan *trade-off* yang tidak dapat dihindari.
+
+Kemungkinan besar tidak ada algoritma yang dapat mengoptimalkan semua dimensi masalah konsensus terdesentralisasi. Ketika seseorang menyarankan bahwa satu algoritma konsensus “lebih baik” dari yang lain, Anda harus mulai mengajukan pertanyaan yang mengklarifikasi: **Lebih baik dalam hal apa? Kekekalan, finalitas, desentralisasi, biaya?** Tidak ada jawaban yang jelas untuk pertanyaan-pertanyaan ini, setidaknya belum.
+
+Selain itu, desain algoritma konsensus berada di pusat industri multi-miliar dolar dan menghasilkan kontroversi yang sangat besar serta perdebatan yang panas. Pada akhirnya, mungkin tidak ada jawaban yang “benar”, sama seperti mungkin ada jawaban yang berbeda untuk aplikasi yang berbeda.
+
+Seluruh industri *blockchain* adalah satu eksperimen raksasa di mana pertanyaan-pertanyaan ini akan diuji dalam kondisi yang penuh permusuhan, dengan nilai moneter yang sangat besar dipertaruhkan. Pada akhirnya, sejarah yang akan menjawab kontroversi ini.
+
+## Kesimpulan
+
+Algoritma konsensus Ethereum masih terus berubah pada saat buku ini selesai ditulis. Di edisi mendatang, kami kemungkinan akan menambahkan lebih banyak detail tentang Casper dan teknologi terkait lainnya seiring dengan semakin matangnya teknologi tersebut dan diterapkannya di Ethereum.
+
+Bab ini menandai akhir dari perjalanan kita, menyelesaikan *Mastering Ethereum*. Materi referensi tambahan mengikuti di bagian lampiran. Terima kasih telah membaca buku ini, dan selamat telah mencapai akhir!
+
+---
+
