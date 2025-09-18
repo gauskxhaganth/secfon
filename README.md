@@ -4,13 +4,15 @@ Repo ini berisi materi belajar seputar dunia keamanan siber, berdasarkan pemaham
 ## Web3
 #### From-Books:
 
-[01. Grokking Bitcoin](web3-sources/from-books/books-01-grokking_bitcoin.md)<br>
-[02. Mastering Bitcoin](web3-sources/from-books/books-02-mastering_bitcoin.md)<br>
-[03. Mastering Blockchain](web3-sources/from-books/books-03_mastering_blockchain.md)<br>
-[05. Beginning solidity](web3-sources/from-books/books-05_beginning_solidity.md)<br>
+[Grokking Bitcoin](web3-sources/from-books/books-01-grokking_bitcoin.md)<br>
+[Mastering Bitcoin](web3-sources/from-books/books-02-mastering_bitcoin.md)<br>
+[Mastering Blockchain](web3-sources/from-books/books-03_mastering_blockchain.md)<br>
+[Masteringethereum](web3-sources/from-books/books-07-mastering_ethereum_.md)<br>
+[Hands-on smart contrac development](web3-sources/from-books/books-06-hands-on_smart_contract_development.md)<br>
 
 
 ## Web2
 #### From-Books:
-[01. linux notes professional](web2-sources/from-books/professional_notes/books-01-linux_notes_professional.md)<br>
-[02. bash notes professional](web2-sources/from-books/professional_notes/books-02-bash_notes_professional.md)<br>
+[linux notes professional](web2-sources/from-books/professional_notes/books-01-linux_notes_professional.md)<br>
+[bash notes professional](web2-sources/from-books/professional_notes/books-02-bash_notes_professional.md)<br>
+[sql notes professional](web2-sources/from-books/professional_notes/books-03-sql_notes_professional.md)<br>
