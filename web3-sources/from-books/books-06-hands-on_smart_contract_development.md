@@ -94,3 +94,329 @@ Jika akun yang sama memiliki dua transaksi di dalam *mempool*, para pembuat blok
   <img src="images/books-06-hands-on_smart_contract_development/figure-1.3.png" alt="gambar" width="580"/>
 </p>
 
+Terlepas dari apakah sebuah transaksi tertunda karena sifat protokol atau karena **kepadatan jaringan**, sebagai seorang pengembang, Anda perlu mempertimbangkan **sifat yang tidak dapat diprediksi dan asinkron** dari pengalaman pengguna dengan sistem perangkat lunak Anda. Di dunia di mana perangkat lunak keuangan, perdagangan, dan media sosial telah disesuaikan untuk menerima transaksi dalam waktu kurang dari satu detik, sistem yang didukung oleh *smart contract* memiliki **tantangan pengalaman pengguna (UX)** yang signifikan. Bagian selanjutnya akan menggali lebih dalam mengenai tantangan-tantangan ini.
+
+## Finalitas Transaksi ✅
+
+Ketika Anda berhasil mengeksekusi sebuah transaksi di basis data biasa, para pengembang mengasumsikan bahwa efeknya tidak akan pernah dibatalkan (*rolled back*). Namun, dalam kasus *blockchain*, ada kemungkinan seorang pengguna dapat melihat transaksi yang berhasil dimasukkan ke dalam sebuah blok, hanya untuk kemudian melihat blok tersebut segera **di-orphan** (menjadi yatim piatu) dan digantikan dengan blok yang berbeda. Blok baru ini mungkin tidak menyertakan transaksi yang sebelumnya berhasil!
+
+Kurangnya **finalitas** pada transaksi *blockchain* ini disebabkan oleh sifat jaringan yang terdesentralisasi. Ada kemungkinan dua node yang berbeda membuat blok hampir secara bersamaan, dan rekan-rekan mereka masing-masing berada di “*fork*” *blockchain* yang berbeda, seperti yang disebutkan sebelumnya. Rantai mana pun yang membuat blok berikutnya lebih dulu akan mengalahkan *fork* yang lain, dan transaksi yang sebelumnya berhasil dapat menghilang dalam prosesnya. Dari sudut pandang pengguna, tampaknya transaksi mereka yang tadinya berhasil menjadi **di-revert** (dibatalkan). Gambar 1-4 hingga 1-6 mengilustrasikan masalah ini.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-1.4.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-1.5.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-1.6.png" alt="gambar" width="580"/>
+</p>
+
+Masalah ini dapat diselesaikan dengan menunggu blok-blok tambahan ditambahkan ke dalam rantai sebelum menganggap transaksi tersebut selesai (*settled*). Setiap aplikasi perlu memiliki ambang batasnya sendiri untuk menganggap sebuah transaksi bersifat final. Bursa *cryptocurrency* populer akan menunggu hingga 50 blok agar sebuah transaksi dianggap "**terkonfirmasi**" di jaringan Ethereum. Ketika taruhannya lebih rendah, tidak perlu menunggu selama itu. Setiap aplikasi harus mempertimbangkan berapa lama ia ingin menunggu untuk menganggap transaksi bersifat final. Dalam beberapa kasus, "konfirmasi" ini akan dibangun ke dalam pengalaman pengguna, dan dalam kasus lain, mungkin hanya berupa peringatan umum bahwa tidak semua transaksi bersifat final.
+
+Sekarang setelah kita membahas *fork* sementara, mari kita bicarakan tentang saudaranya yang lebih permanen.
+
+## Hard Fork ⛓️
+
+Setiap node dalam jaringan *blockchain* harus menjalankan perangkat lunak yang kompatibel dengan protokol agar dapat berpartisipasi dalam penyebaran blok dan transaksi serta pembuatan blok baru. Komunitas pengembang node *blockchain*, pengembang protokol, pembuat blok, bursa, dan pengembang aplikasi semuanya memberikan masukan tentang bagaimana protokol sebaiknya berevolusi untuk memenuhi kebutuhan komunitas. Pada akhirnya, evolusi ini terjadi melalui pengembang yang mengubah perangkat lunak node *blockchain*, dan orang-orang yang menjalankan perangkat lunak node tersebut (yang kita sebut "**operator node**") memilih apakah akan menggunakan versi baru atau tidak. Terkadang, perubahan yang dibuat pada protokol sangat signifikan sehingga versi baru tidak kompatibel dengan versi perangkat lunak sebelumnya. Situasi ini disebut "**hard fork**" karena sebuah *blockchain* baru akan muncul dari yang lama, menciptakan sebuah persimpangan jalan bagi para operator node, yang harus memutuskan sendiri *fork* mana yang akan mereka dukung.
+
+*Hard fork* bisa bersifat **kontroversial** atau **non-kontroversial**. *Hard fork* non-kontroversial terjadi ketika seluruh komunitas melakukan pembaruan, secara efektif meninggalkan *fork* lama untuk yang baru. Ini tipikal terjadi ketika ada cacat serius yang ditemukan dalam protokol. *Hard fork* kontroversial terjadi ketika sejumlah besar operator node memutuskan untuk terus menggunakan *fork* yang ada dan mengembangkan protokol lama secara terpisah dari versi baru. **Ethereum (ETH)** mengalami *hard fork* kontroversial pada tahun 2016 yang mengakibatkan *blockchain* sebelumnya bertahan dan menamakan dirinya **Ethereum Classic (ETC)**. Mungkin akan ada *hard fork* kontroversial tambahan saat komunitas mengimplementasikan berbagai komponen dari rilis Serenity.
+
+Kita telah berfokus terutama pada aspek-aspek umum *blockchain*; sekarang, mari kita fokus secara spesifik pada Ethereum.
+
+## Dasar-Dasar Ethereum 📖
+
+Kita telah mendeskripsikan karakteristik *blockchain* yang relatif umum, dengan beberapa contoh spesifik Ethereum. Sekarang kita akan menggali dasar-dasar Ethereum, dan membahas bagaimana bagian-bagian ini saling terhubung untuk memungkinkan pengembangan *smart contract*. Penting untuk memahami biaya transaksi, bagaimana akun dan kontrak diidentifikasi, dan bagaimana transaksi dieksekusi di dalam blok. Dasar-dasar Ethereum ini membentuk fondasi untuk memahami cara merancang dan mengembangkan aplikasi terdesentralisasi.
+
+### Ether dan Gas ⛽
+
+Protokol Ethereum memiliki mata uangnya sendiri, yang disebut **ether**. Penggunaan fundamental dari mata uang ini adalah untuk membayar pembuat blok agar menyertakan transaksi di dalam blok. Sama seperti dolar AS, ether dapat dibagi, meskipun menjadi pecahan yang jauh lebih kecil dari satu sen. Unit terkecil dari ether disebut **wei**, yang merupakan seper-kuintiliun dari satu ether (sebagai perbandingan, satu kuintiliun adalah satu miliar miliar, atau $10^{18}$). Karena ukuran wei yang kecil proporsinya terhadap ether, Anda akan sering melihat ether didenominasikan dengan **Gwei**, terutama ketika menyangkut harga gas. Satu Gwei adalah satu miliar wei, dan satu miliar Gwei adalah satu ether.
+
+Meskipun hanya ada satu protokol Ethereum, ada lebih dari satu jaringan yang menjalankan protokol tersebut. Dimungkinkan untuk membuat jaringan pribadi yang menjalankan Ethereum, mirip dengan bagaimana "internet" pribadi disebut "intranet". Jaringan pribadi ini masih menggunakan ether seperti jaringan Ethereum publik, tetapi ether mereka tidak bernilai apa pun di pasar terbuka. Ether di jaringan Ethereum publik dikenal sebagai **ETH** dan memiliki nilai di dunia nyata. Jaringan Ethereum publik disebut sebagai "**mainnet**" oleh para pengembang. Ada juga jaringan tes publik atau "**testnet**" yang digunakan komunitas sebagai lingkungan pementasan (*staging*). Jaringan tes ini biasanya memiliki "**faucet**", atau mekanisme untuk memberikan ether gratis kepada pengembang untuk menguji *smart contract* mereka. Setiap jaringan yang menjalankan protokol Ethereum memiliki ether, tetapi ETH dari *mainnet*-lah yang memiliki nilai sebenarnya. Untuk men-*deploy* dan mengeksekusi *smart contract* di *mainnet*, kita memerlukan akun yang memiliki ETH. Untuk memperoleh ETH, Anda perlu membelinya melalui bursa, menerimanya dari teman, mendapatkannya dari bisnis, atau menambangnya sendiri.
+
+Kode *smart contract*, seperti Solidity, dikompilasi menjadi ***bytecode***, yang menyediakan serangkaian ***opcode*** ke EVM. Sebuah *opcode* adalah instruksi seperti `PUSH1` atau `MLOAD` yang diinterpretasikan oleh EVM. Masing-masing *opcode* ini memiliki "**biaya gas**" (*gas cost*) yang terkait.² Mari kita lihat sebuah *smart contract* sederhana, dan periksa *bytecode* serta *opcode*-nya. Untungnya, sebagai pengembang *smart contract*, kita tidak perlu memahami isi dari *bytecode* atau *opcode* karena kita dapat memahami Solidity dengan cukup mudah. Meskipun begitu, seiring kemajuan Anda sebagai pengembang *smart contract*, menggali konsep-konsep tingkat rendah ini akan memberi Anda pemahaman yang lebih dalam tentang apa yang mungkin dilakukan.
+
+```solidity
+pragma solidity ^0.4.25;
+
+contract Incrementer {
+  uint256 public count;
+  function addOne() public {
+    count++;
+  }
+}
+```
+
+Mengompilasi kontrak ini menggunakan `solc` menghasilkan *bytecode* berikut:
+
+```
+6060604052341561000f57600080fd5b60cb8061001d6000396000f300606060405260043610604
+9576000357c0100000000000000000000000000000000000000000000000000000000900463ffff
+ffff168063a7916fac14604e578063febb0f7e146060575b600080fd5b3415605857600080fd5b6
+05e6086565b005b3415606a57600080fd5b60706099565b60405180828152602001915050604051
+80910390f35b6000808154809291906001019190505550565b600054815600a165627a7a7230582
+08e9afbffafd387e67b7c38d8239aaa70fde96a805cebfb6f30517dd68e8664be0029
+```
+
+Dan *opcode* yang dilaporkan oleh `solc` terlihat seperti ini:
+
+```
+PUSH1 0x60 PUSH1 0x40 MSTORE CALLVALUE ISZERO PUSH2 0xF JUMPI PUSH1 0x0 DUP1
+REVERT JUMPDEST PUSH1 0xCB DUP1 PUSH2 0x1D PUSH1 0x0 CODECOPY PUSH1 0x0 RETURN
+STOP PUSH1 0x60 PUSH1 0x40 MSTORE PUSH1 0x4 CALLDATASIZE LT PUSH1 0x49 JUMPI
+PUSH1 0x0 CALLDATALOAD PUSH29 0x100000000000000000000000000000000000000000000000
+000000000 SWAP1 DIV PUSH4 0xFFFFFFFF AND DUP1 PUSH4 0xA7916FAC EQ PUSH1 0x4E
+JUMPI DUP1 PUSH4 0xFEBB0F7E EQ PUSH1 0x60 JUMPI JUMPDEST PUSH1 0x0 DUP1 REVERT
+JUMPDEST CALLVALUE ISZERO PUSH1 0x58 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH1
+0x5E PUSH1 0x86 JUMP JUMPDEST STOP JUMPDEST CALLVALUE ISZERO PUSH1 0x6A JUMPI
+PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH1 0x70 PUSH1 0x99 JUMP JUMPDEST PUSH1 0x40
+MLOAD DUP1 DUP3 DUP2 MSTORE PUSH1 0x20 ADD SWAP2 POP POP PUSH1 0x40 MLOAD DUP1
+SWAP2 SUB SWAP1 RETURN JUMPDEST PUSH1 0x0 DUP1 DUP2 SLOAD DUP1 SWAP3 SWAP2 SWAP1
+PUSH1 0x1 ADD SWAP2 SWAP1 POP SSTORE POP JUMP JUMPDEST PUSH1 0x0 SLOAD DUP2 JUMP
+STOP LOG1 PUSH6 0x627A7A723058 KECCAK256 DUP15 SWAP11 CREATE2 SELFDESTRUCT 0xaf
+0xd3 DUP8 0xe6 PUSH28 0x7C38D8239AAA70FDE96A805CEBFB6F30517DD68E8664BE0029000000
+```
+
+Konsep "**gas**" ada untuk memisahkan harga ether dari biaya transaksi Ethereum. Tanpa pemisahan ini, biaya transaksi Ethereum akan dipatok pada harga ether, yang akan berdampak negatif pada ekosistem karena volatilitas nilai ETH. Untuk memisahkan nilai tukar antara gas dan ether, setiap transaksi Ethereum menetapkan `gasprice`-nya sendiri untuk menentukan berapa banyak wei yang harus dibayar untuk satu unit gas. Saat pembuat blok memutuskan transaksi mana yang akan dimasukkan ke dalam blok, mereka terinsentif untuk menyertakan transaksi yang akan memberi mereka `gasprice` paling besar untuk komputasi mereka. Pada saat tertentu, ada harga pasar yang dipahami secara implisit untuk gas. Membayar di bawah harga pasar akan berarti menunggu lebih lama dari sebagian besar transaksi lain agar transaksi Anda dieksekusi, sementara membayar di atas harga pasar akan memungkinkan Anda meninggalkan *mempool* lebih cepat dari sebagian besar.
+
+Pembuat transaksi Ethereum perlu mempertimbangkan biaya versus manfaat dari menetapkan harga gas mereka di atas atau di bawah harga pasar saat ini. Beberapa transaksi tidak sensitif terhadap waktu dan dapat menunggu berjam-jam untuk dieksekusi. Dalam kasus ini, masuk akal untuk membayar ether yang relatif sedikit untuk eksekusi transaksi. Pembuat blok akhirnya menyertakan transaksi dengan harga gas rendah ketika *mempool* sedang dangkal dan tidak ada cukup banyak transaksi dengan `gasprice` yang besar. Sebaliknya, beberapa transaksi sangat sensitif terhadap waktu, dan sangat berharga sehingga masuk akal untuk membayar jauh di atas harga pasar untuk penyertaan blok yang cepat. Bahkan ada orang yang menjalankan perangkat lunak untuk mengamati *mempool* secara *real-time* dan mencoba untuk "**front-running**" transaksi perdagangan keuangan tertentu dengan melihat perdagangan yang tertunda dan mendahuluinya dengan menetapkan `gasprice` yang lebih tinggi.
+
+Setiap transaksi Ethereum harus menyertakan atribut `gas` dan `gasprice`, yang bila dikalikan akan menetapkan biaya transaksi maksimum untuk transaksi tersebut, didenominasikan dalam wei. Atribut `gas` ini menetapkan batas berapa banyak komputasi yang dapat dilakukan oleh transaksi. Jika batas itu tercapai, eksekusi *smart contract* akan di-*revert* (dibatalkan), tetapi transaksi tersebut tetap ditulis ke *blockchain*, dan biayanya dikonsumsi oleh pembuat blok. Jika panggilan *smart contract* selesai dengan sisa gas, gas tersebut dikembalikan kepada pembuat transaksi. Jumlah gas yang digunakan di semua transaksi dalam sebuah blok tidak dapat melebihi `gaslimit` yang ditentukan blok tersebut. Ini juga berarti bahwa penggunaan gas dari satu transaksi pun tidak dapat melebihi `gaslimit` blok.
+
+Bagian selanjutnya akan membahas detail para pemain dalam sebuah transaksi dan bagaimana mereka diidentifikasi.
+
+² Pemetaan *opcode* ke biaya gas dapat ditemukan di Lampiran G dari *yellow paper* Ethereum di [https://ethereum.github.io/yellowpaper/paper.pdf](https://ethereum.github.io/yellowpaper/paper.pdf).
+
+## Akun 👤
+
+Transaksi Ethereum paling dasar hanyalah **Alamat Milik Eksternal (*Externally Owned Addresses* atau EOA)** yang saling mengirim ether. Selain itu, transaksi Ethereum dapat dikirim dari EOA ke *smart contract*. Baik EOA maupun *smart contract* diidentifikasi oleh alamat Ethereum seperti berikut:
+
+> `0x52bc44d5378309ee2abf1539bf71de1b7d7be3b5`
+
+Sebuah alamat direpresentasikan oleh angka **heksadesimal**. Mengingat besarnya angka yang terlibat dalam pembuatan sebuah alamat, secara praktis tidak mungkin untuk menghasilkan dua alamat yang identik. Tidak ada cara untuk membedakan alamat untuk *smart contract* dari EOA tanpa memeriksa *blockchain*. Meskipun akun dan kontrak memiliki alamat yang tidak dapat dibedakan, mereka memiliki beberapa perbedaan penting.
+
+Setiap transaksi di *blockchain* Ethereum diinisiasi oleh sebuah **EOA**. *Smart contract* tidak dapat secara spontan melakukan suatu tindakan. Mereka dapat memanggil *smart contract* lain, tetapi setiap transaksi berasal dari EOA. Ketika kontrak dipanggil, mereka dapat memancarkan *event*, menyimpan data, menerima ether, mengirim ether ke EOA, atau mengirim data atau ether ke kontrak lain. Di sisi lain, selain menginisiasi transaksi, EOA hanya dapat menerima ether. Mereka tidak dapat bereaksi terhadap transaksi apa pun yang melibatkan mereka seperti yang dilakukan *smart contract*.
+
+## Kontrak 📜
+
+Kontrak dalam Solidity diorganisir dalam gaya berorientasi objek yang mirip dengan bahasa pemrograman Java. Dalam istilah berorientasi objek, sebuah kontrak sebenarnya adalah sebuah kelas, atau kumpulan variabel keadaan (*state variables*) dan fungsi. Untuk menggunakan kembali fungsionalitas umum, bahasa berorientasi objek memungkinkan sebuah kelas untuk mewarisi dari kelas lain (atau kontrak, dalam kasus ini). Karena Solidity menggunakan `function` sebagai kata kunci, kita akan menyebut "fungsi" sebagai apa yang sebagian besar bahasa berorientasi objek sebut sebagai "metode". Fungsi Solidity dapat dipisahkan menjadi dua jenis yang berbeda: **hanya-tulis (*write-only*)** dan **hanya-baca (*read-only*)**.
+
+Fungsi Solidity **hanya-baca** ditandai dengan kata kunci `pure` dan `view`. Fungsi-fungsi ini dapat menerima data input, membaca data kontrak, beroperasi pada data tersebut, dan mengembalikan data. Fungsi hanya-baca tidak dapat mengubah keadaan kontrak atau memancarkan *event*. Karena tidak ada pembaruan yang diperlukan di rantai (*on-chain*), fungsi hanya-baca bersifat instan—mereka sangat mirip dengan panggilan API web, terutama permintaan GET. Penting untuk dicatat bahwa kemampuan untuk melewati pembaruan *on-chain* berarti fungsi hanya-baca dapat dipanggil tanpa membayar biaya gas apa pun, dan tidak akan ada transaksi yang dibuat.
+
+Fungsi **hanya-tulis** adalah *default* di Solidity sehingga tidak memerlukan kata kunci tambahan. Meskipun "hanya-tulis", mereka sebenarnya dapat mengembalikan data, tetapi karena sifat asinkron Ethereum, data yang dikembalikan praktis tidak berguna, oleh karena itu disebut "hanya-tulis". Fungsi-fungsi ini adalah pekerja keras Ethereum, dan datanya harus dikirim melalui transaksi dan dimasukkan ke dalam blok agar fungsi tersebut dapat dieksekusi. Metode hanya-tulis yang tidak berhasil akan di-*revert*, baik karena kehabisan gas atau mencapai keadaan EVM yang tidak valid, atau karena pernyataan eksplisit dalam kontrak, seperti gagal pada pernyataan `require`. Metode hanya-tulis yang berhasil sebenarnya tidak harus mengubah apa pun, tetapi biasanya mengubah sesuatu dan seringkali memancarkan satu atau lebih *event* dalam prosesnya.
+
+Tujuan dari ***event*** di Ethereum umumnya ada dua: untuk menyediakan log historis kustom tentang apa yang telah terjadi dalam kontrak, dan untuk memungkinkan pengamat berlangganan pembaruan *real-time*. Karena sifat *blockchain*, kita sudah memiliki buku besar historis dari semua yang pernah terjadi, tetapi *event* adalah cara yang nyaman untuk menyediakan pencatatan dan pembaruan yang lebih spesifik domain sehingga pengguna tidak perlu membuat interpretasi mereka sendiri terhadap transaksi dan transisi keadaan.
+
+Untuk lebih memahami mekanisme *smart contract* Ethereum, mari kita sekarang fokus pada kendaraan modifikasinya.
+
+## Blok dan Transaksi 🧱
+
+Hanya pembuat blok Ethereum yang menentukan atribut sebuah blok, seperti transaksi mana yang disertakan. Demikian pula, hanya pengguna Ethereum yang menentukan atribut sebuah transaksi, seperti ke kontrak mana data akan dikirim. Sebagai pengembang *smart contract*, kita sering kali perlu menyadari keadaan blok serta keadaan transaksi yang sedang dieksekusi.
+
+Solidity mengekspos atribut transaksi (`tx`) berikut:
+
+  * `gasprice`
+    Harga gas (dalam wei) yang ditetapkan oleh EOA yang membuat transaksi.
+  * `origin`
+    Alamat EOA yang membuat transaksi. Anehnya, alamat ini jarang berguna dan seringkali tidak aman.
+
+Sebuah transaksi dapat melibatkan sejumlah kontrak yang arbitrer dalam eksekusinya, asalkan eksekusinya sesuai dengan batasan `gaslimit` blok. Solidity mengekspos sejumlah atribut terkait transaksi lainnya, tetapi mengelompokkannya ke dalam abstraksi pesan (`msg`). Pesan merujuk pada komunikasi antara kontrak dan apa pun yang dapat memanggilnya, seperti kontrak lain. Misalnya, panggilan fungsi kontrak akan selalu memiliki `msg.sender`. `msg.sender` tersebut bisa sama dengan `tx.origin` atau pembuat transaksi, atau bisa juga alamat dari kontrak perantara.
+
+Atribut pesan (`msg`) Solidity adalah sebagai berikut:
+
+  * `data`
+    *Byte* mentah dari data yang dikirim ke fungsi eksternal atau publik yang sedang dieksekusi. Ini juga disebut sebagai `calldata`.
+  * `sender`
+    Alamat pemanggil dari fungsi eksternal atau publik yang sedang dieksekusi.
+  * `sig`
+    Empat *byte* pertama dari `calldata` menentukan fungsi mana yang sedang dipanggil. Ini juga disebut sebagai pengidentifikasi fungsi.
+  * `value`
+    Jumlah wei yang dikirim ke fungsi ini.
+
+Solidity mengekspos atribut blok berikut:
+
+  * `number`
+    Setiap blok menambah nomor ini. Blok genesis adalah blok 0.
+  * `timestamp`
+    Waktu dalam detik sejak *epoch* saat blok dibuat. Anda mungkin juga melihat kode yang menggunakan aliasnya, `now`.
+  * `blockhash`
+    Selain nomor blok berurutannya, setiap blok diidentifikasi secara unik oleh *hash*-nya. Sebuah *hash* adalah angka heksadesimal seperti `0x88e96d4537bea4d9c05d12549907b32561d3bf31f45aae734cdc119f13406cb6`. *Hash* dari blok saat ini tidak tersedia, tetapi dengan memberikan nomor blok, Anda bisa mendapatkan *hash* dari blok mana pun dalam 256 blok terakhir.
+  * `difficulty`
+    Tingkat kesulitan penambangan dari blok saat ini.
+  * `gaslimit`
+    Jumlah maksimum gas yang dapat dikonsumsi oleh blok ini. Ini ditetapkan oleh pembuat blok.
+  * `coinbase`
+    Alamat pembuat blok.
+
+Selanjutnya, kita akan membahas aspek unik tentang cara kerja waktu dalam *smart contract*.
+
+## Jam Berapa Sekarang? ⏰
+
+Sebagian besar bahasa pemrograman memungkinkan pengembang untuk memeriksa waktu, yang biasanya menggunakan waktu yang dilaporkan oleh komputer tempat program berjalan. Misalnya, program JavaScript yang berjalan di Node.js ini melaporkan waktu saat ini saat dieksekusi:
+
+```javascript
+for (let i = 0; i < 10; i++) {
+  console.log(new Date());
+}
+```
+
+Output dari program ini akan menjadi sesuatu seperti ini:
+
+```
+2019-10-05T05:08:45.058Z
+2019-10-05T05:08:45.059Z
+2019-10-05T05:08:45.060Z
+2019-10-05T05:08:45.060Z
+2019-10-05T05:08:45.060Z
+2019-10-05T05:08:45.060Z
+2019-10-05T05:08:45.060Z
+2019-10-05T05:08:45.060Z
+2019-10-05T05:08:45.060Z
+2019-10-05T05:08:45.060Z
+```
+
+Tidak mengherankan, Anda dapat melihat waktu berubah saat program dieksekusi. Berikut adalah kode yang setara dalam Solidity:
+
+```solidity
+pragma solidity ^0.5.0;
+
+contract TimeReporter {
+  event TimeLog(uint256 time);
+
+  function reportTime() public {
+    for (uint8 i = 0; i < 10; i++) {
+      emit TimeLog(block.timestamp);
+    }
+  }
+}
+```
+
+*Event* yang dipancarkan oleh fungsi ini semuanya akan memiliki atribut waktu yang sama persis. Atribut waktu tersebut, yang ditetapkan oleh `block.timestamp`, adalah waktu saat blok ditambahkan ke *blockchain*. Untuk setiap transaksi dalam blok tersebut, atribut `block.timestamp` akan identik. Sementara jam di komputer berdetak setidaknya sekali setiap milidetik, "jam" di *blockchain* hanya berdetak sesering blok ditambahkan ke rantai. Karena "jam" *blockchain* beresolusi rendah, kita tidak pernah bisa mengharapkan detik yang tepat terjadi. Saat Anda menulis kode yang memeriksa waktu, perbandingan harus selalu melibatkan lebih besar dari atau kurang dari, daripada sama dengan persis.
+
+Saat merancang *smart contract*, penting juga untuk diingat bahwa pembuat blok dapat memanipulasi waktu pembuatan blok serta urutan transaksi untuk keuntungan mereka. Misalnya, jika sebuah *smart contract* memiliki tenggat waktu bawaan, dan akan sangat menguntungkan sebagian besar pembuat blok jika tenggat waktu itu terlewat, maka mereka dapat memilih untuk menunda transaksi apa pun yang akan memenuhi tenggat waktu.
+
+Pembuat blok yang memanipulasi urutan transaksi untuk keuntungan mereka bisa datang dalam bentuk "*front-running*" perdagangan token. Misalnya, seseorang mengirimkan transaksi untuk membeli 5 token ABC seharga 1 ETH, karena ada informasi baru tentang token ABC. Seorang pembuat blok dengan kekuatan *hash* yang signifikan dapat menunda transaksi 5 ABC / 1 ETH tersebut dan menambahkan transaksi mereka sendiri ke dalam blok dengan jumlah yang lebih kecil dan merebut token ABC itu untuk diri mereka sendiri. Ini hanya mungkin jika pembuat blok benar-benar berhasil membuat blok, yang sangat kompetitif. Jadi kekhawatiran ini bukanlah kerentanan yang signifikan dari *smart contract*, tetapi penting untuk diingat saat Anda mempertimbangkan desain dan insentif Anda.
+
+Akhirnya, mari kita pertimbangkan beberapa aspek "kripto" dalam *cryptocurrency*.
+
+## Menandatangani Transaksi ✍️
+
+Kita perlu menghargai alasan mengapa ketika kita "menandatangani" sebuah transaksi, kita dapat yakin bahwa tanda tangan itu dibuat oleh kunci privat tertentu. Ini bermuara pada **kriptografi kunci-publik** yang sudah dikenal. Sebuah **kunci privat** adalah pasangan rahasia dari sebuah **kunci publik**. Alamat sebuah EOA adalah pemotongan dari *hash* kunci publiknya.³
+
+Syukurlah, dalam proses pengembangan *smart contract* dan aplikasi terdesentralisasi (DApps), kita tidak sering bekerja langsung dengan kunci privat. Kami sangat menyarankan untuk menyerahkan manajemen kunci privat dan tanda tangan kriptografis ke perangkat lunak dompet (*wallet*) seperti MetaMask. Mengetahui kunci privat sebuah EOA sama dengan memiliki akun tersebut karena kunci privat adalah yang digunakan untuk menandatangani transaksi. Tanpa tanda tangan kriptografis ini, tidak ada cara untuk mengotentikasi apakah sebuah transaksi benar-benar dikirim oleh EOA yang ditentukannya.
+
+Ketika kita mengirim transaksi Ethereum menggunakan salah satu *library* Web3, tanda tangan kriptografis terjadi di latar belakang. Atribut transaksi berikut digabungkan, di-*encode*, dan kemudian ditandatangani dengan kunci privat yang dikonfigurasi:
+
+  * `nonce`
+    Nomor urut transaksi ini untuk EOA ini.
+  * `gasPrice`
+    Jumlah wei yang dibayarkan transaksi ini per unit gas.
+  * `gas`
+    Jumlah gas yang bersedia dihabiskan oleh transaksi ini.
+  * `to`
+    Alamat penerima transaksi ini. Bisa berupa EOA atau kontrak.
+  * `value`
+    Jumlah wei (jika ada) yang dikirimkan transaksi ini ke penerima.
+  * `data`
+    Dalam kasus panggilan kontrak, ini berisi nama fungsi dan semua parameter. Dalam kasus *deployment* kontrak, ini berisi *bytecode* kontrak. Jika tidak ada kontrak yang terlibat, ini umumnya kosong.
+  * `chainId`
+    Setiap jaringan Ethereum publik memiliki `chainId`. Mainnet adalah 1, testnet Kovan adalah 42, dst.
+
+Setelah atribut-atribut tersebut ditandatangani, tanda tangan itu sendiri disertakan dalam transaksi sehingga node Ethereum dapat memvalidasi bahwa pengirimnya sah. Untuk memvalidasi ini, node menggunakan alamat pengirim untuk memvalidasi tanda tangan. Jika seseorang mencoba mengirim transaksi dengan tanda tangan yang buruk, node akan menolaknya.
+
+³ Untuk penyelaman mendalam tentang kriptografi, baca *Applied Cryptography* oleh Bruce Schneier (John Wiley & Sons).
+
+## Ringkasan
+
+Kita telah menyentuh secara ringan banyak aspek *blockchain* dan Ethereum dalam bab ini. Kami harap kami telah membangkitkan selera Anda dan Anda bersemangat untuk menggali lebih dalam ke pengembangan aplikasi terdesentralisasi melalui bab kami berikutnya. Sisa bab di Bagian I buku ini adalah persiapan yang semakin pragmatis untuk Bagian II, di mana kita akan mulai mengembangkan *smart contract* dan DApps dengan sungguh-sungguh.
+
+---
+
+# BAB 2
+## Aplikasi Terdesentralisasi
+
+Dalam bab ini kita akan melihat beberapa contoh kasus penggunaan untuk membangun aplikasi di *blockchain* Ethereum. Untuk setiap kasus, kita akan melihat karakteristik *blockchain* apa yang cocok untuk mendukung aplikasi-aplikasi ini dan, jika memungkinkan, kita akan melihat beberapa contoh yang sudah ada di produksi. Kita kemudian akan menutup bab ini dengan beberapa pertanyaan untuk Anda tanyakan pada diri sendiri saat memulai proyek berikutnya untuk memastikan *blockchain* adalah teknologi yang tepat untuk digunakan.
+
+Mari kita langsung masuk ke penggunaan pertama dan yang mungkin paling umum, yaitu token.
+
+## Token 🎟️
+
+**Token** adalah sebuah abstraksi yang merepresentasikan **kepemilikan**. Kepemilikan menyiratkan hak-hak istimewa tertentu seperti hak untuk menggunakan atau menjual suatu barang seperti kendaraan atau rumah. Dalam kasus ini, token, atau bukti kepemilikan, direpresentasikan oleh sebuah sertifikat atau akta. Token juga dapat memberikan hak untuk mengakses sesuatu seperti perangkat lunak atau film. Di sini, token dapat direpresentasikan oleh kunci lisensi atau tiket fisik. Mengingat kepemilikan adalah sesuatu yang dapat sering berubah, melacak perubahan-perubahan ini pada platform yang diamankan secara kriptografis sangatlah masuk akal.
+
+Untuk membantu para pengembang dalam pembuatan token, komunitas Ethereum telah mengembangkan beberapa jenis standar token yang berbeda melalui proses [Ethereum Improvement Proposal atau EIP](https://eips.ethereum.org/). Mari kita lihat dua dari standar ini, [ERC-20](https://eips.ethereum.org/EIPS/eip-20) dan [ERC-721](https://eips.ethereum.org/EIPS/eip-721).
+
+### ERC-20
+
+Standar **ERC-20** digunakan saat membuat token yang ***fungible***, atau dapat saling dipertukarkan. Token-token ini akan menjadi pengganti yang ideal untuk hal-hal seperti poin hadiah dari peritel, mil dari maskapai penerbangan, atau sebuah mata uang. Semua token yang dibuat dari kontrak ERC-20 dianggap memiliki nilai yang sama dan secara efektif tidak dapat dibedakan satu sama lain. Karena semua token dianggap identik, tanggung jawab utama dari kontrak ERC-20 adalah melacak saldo.
+
+Standar ini memiliki beberapa kolom opsional seperti nama dan simbol, tetapi memerlukan implementasi dari fungsi-fungsi berikut:
+
+* `totalSupply()`
+    Mengembalikan jumlah token yang beredar.
+* `balanceOf(address owner)`
+    Mengembalikan saldo untuk alamat yang diberikan.
+* `transfer(address to, uint value)`
+    Mengembalikan `true` atau `false` berdasarkan keberhasilan atau kegagalan transfer.
+* `transferFrom(address from, address to, uint value)`
+    Mengembalikan `true` atau `false` berdasarkan keberhasilan atau kegagalan transfer. Dalam kasus ini, transfer diinisiasi oleh alamat lain yang bukan pemilik, dan harus sudah disetujui sebelumnya untuk membelanjakan dana ini atas nama pemilik.
+* `approve(address spender, uint value)`
+    Mengembalikan `true` atau `false` jika berhasil. Metode ini digunakan untuk menetapkan jumlah yang dapat dibelanjakan oleh alamat lain atas nama pemilik.
+* `allowance(address owner, address spender)`
+    Mengembalikan jumlah yang masih tersedia untuk ditarik oleh pembelanja (*spender*).
+
+Jika Anda suatu saat bekerja pada aplikasi yang memerlukan implementasi ERC-20, Anda dapat membuat token ERC-20 dengan mendefinisikan fungsi-fungsi ini; namun, kami merekomendasikan penggunaan kontrak [OpenZeppelin](https://oreil.ly/ElzWd) sebagai dasar untuk memulai. Kontrak-kontrak ini semuanya telah diaudit secara menyeluruh dan didokumentasikan dengan baik, menjadikannya tempat awal yang bagus untuk merancang token Anda sendiri.
+
+Token ERC-20 telah digunakan untuk banyak tujuan yang berbeda, tetapi salah satu yang mungkin menarik perhatian Anda adalah **Initial Coin Offering (ICO)**. Dalam sebuah ICO, sebuah organisasi akan menjual token sebagai sarana untuk menggalang dana. Dalam beberapa hal, ini mirip dengan apa yang dilakukan [Kickstarter](https://www.kickstarter.com/) untuk organisasi atau proyek baru tetapi dengan cara yang terdesentralisasi.
+
+Jika token tersebut diharapkan akan bertambah nilainya berdasarkan kinerja organisasi penerbit, token tersebut dapat dianggap sebagai **sekuritas**. Jika demikian, kemungkinan akan ada beberapa persyaratan peraturan yang perlu dipertimbangkan saat mengembangkan *smart contract* ini. Untuk token yang mungkin masuk dalam kategori ini, ada [draf proposal](https://eips.ethereum.org/EIPS/eip-1462) yang sedang dikerjakan yang dapat membantu menjaga token tetap patuh pada aturan.
+
+Untuk contoh di dunia nyata, Anda dapat memeriksa daftar token yang telah di-*deploy* di [Etherscan](https://etherscan.io/tokens).
+
+Sekarang mari kita bicara tentang token yang tidak dapat saling dipertukarkan, atau dengan kata lain, ***non-fungible***.
+
+### Token Non-Fungible (ERC-721)
+
+**ERC-721** menyediakan standar untuk token *non-fungible*. Token-token ini berbeda—atau setidaknya memiliki kemampuan untuk menjadi berbeda—satu sama lain. Karena token-token ini berbeda, kontrak tidak bisa hanya melacak saldo token tetapi harus melacak setiap token individual yang diterbitkannya.
+
+Seperti ERC-20, kontrak ERC-721 secara opsional dapat mengimplementasikan kolom untuk nama dan simbol, dan mereka juga dapat secara opsional menyertakan **URI token (*Uniform Resource Identifier*)**, tetapi mereka harus mengimplementasikan fungsi-fungsi berikut:
+
+* `balanceOf(address owner)`
+    Mengembalikan jumlah token non-fungible (NFT) untuk pemilik yang dimasukkan.
+* `ownerOf(uint256 tokenId)`
+    Mengembalikan alamat pemilik untuk ID token tertentu. Ingat, setiap token unik dan kontrak harus memelihara struktur data yang melacak kepemilikan.
+* `setTransferFrom(address from, address to, uint256 tokenId, bytes data)`
+    Mentransfer kepemilikan token. Dalam kasus di mana alamat `to` adalah sebuah kontrak, ia akan memanggil fungsi `onERC721Received` untuk memastikan ia dapat menerima token.
+* `setTransferFrom(address from, address to, uint256 tokenId)`
+    Sama seperti fungsi sebelumnya, tetapi mengatur `data` menjadi string kosong. Ini juga menunjukkan bahwa bahasa pemrograman Solidity mendukung ***method overloading***, atau dua metode dengan nama yang sama tetapi parameter yang berbeda.
+* `transferFrom(address from, address to, uint256 tokenId)`
+    Mentransfer kepemilikan token. Berbeda dengan metode `safeTransferFrom`, metode ini tidak memeriksa untuk memastikan penerima mampu menerima token ERC-721. Jika penerima tidak dapat menerima token ERC-721, dan metode ini digunakan, token tersebut mungkin hilang secara permanen. Jika ada keraguan, gunakan metode `safeTransferFrom` sebagai gantinya.
+* `approve(address approved, uint256 tokenId)`
+    Mengizinkan alamat lain untuk mentransfer token atas nama pemilik. Ini sangat mirip dengan metode `approve` untuk ERC-20, tetapi alih-alih jumlah, kita menentukan token mana yang dapat ditransfer oleh alamat yang disetujui.
+* `setApprovalForAll(address operator, bool approve)`
+    Ketika `approve` diatur ke `true`, ini menyetujui semua token dari kontrak yang dimiliki oleh pemilik saat ini (pengirim pesan) untuk alamat operator. Ketika `approve` diatur ke `false`, ini menghapus akses dari semua token yang dimiliki oleh pemilik saat ini (pengirim pesan) untuk alamat operator.
+* `getApproved(uint256 tokenId)`
+    Mengembalikan alamat yang disetujui untuk ID token yang diberikan.
+
+Sama seperti ERC-20, **OpenZeppelin** telah membuat kontrak yang dapat digunakan sebagai dasar untuk implementasi [ERC-721](https://oreil.ly/fQ_FY) Anda sendiri.
+
+Sebagai contoh bagaimana ERC-721 telah digunakan, mari kita lihat [CryptoKitties](https://www.cryptokitties.co/). CryptoKitties adalah sebuah permainan yang memungkinkan pengguna untuk mengoleksi kucing virtual, di mana setiap kucing memiliki serangkaian *cattributes* (atribut kucing) yang unik, yang direpresentasikan oleh genom 256-bit. Pengguna kemudian mengembangbiakkan kucing mereka untuk menghasilkan yang baru, yang mewarisi campuran sifat dari genom induknya.
+
+Ini mungkin terdengar konyol, tetapi pada saat penulisan ini, orang-orang telah menghabiskan lebih dari $27 juta USD untuk membeli kucing-kucing ini, dengan satu kucing terjual lebih dari $172.625 USD. Jika Anda ingin melihat angka terkini, lihat situs web [Kitty Sales](https://kittysales.herokuapp.com/).
+
+Token ERC-721 dapat merepresentasikan hampir semua barang unik yang dapat ditransfer. Ini menjadikannya token yang ideal untuk mengelola barang koleksi digital atau kunci lisensi, atau bahkan untuk registri barang fisik di dunia nyata.
+
+Berbicara tentang barang dunia nyata, mari kita beralih ke kasus penggunaan utama berikutnya, yaitu rantai pasok.
+
+## Rantai Pasok (Supply Chain) 📦
+
+Secara umum, **rantai pasok** terdiri dari organisasi, orang, dan proses yang membantu produk berpindah dari pemasok ke pelanggan. Untuk mengilustrasikan sebuah rantai pasok, mari kita bicara tentang kopi.
+
+Kopi biasanya ditanam di wilayah yang disebut sebagai **Sabuk Kopi (*Bean Belt*)**. Ini adalah area di dekat khatulistiwa yang dibatasi oleh Garis Balik Selatan (*Tropic of Capricorn*) dan Garis Balik Utara (*Tropic of Cancer*). Di sini Anda memiliki petani yang menanam dan memanen kopi, yang pada akhirnya menjual hasil panen mereka ke **eksportir**. Eksportir akan mengangkut kopi ke luar negeri, di mana mereka akan menjual kiriman mereka ke **distributor** lokal. Distributor lokal kemudian akan mengangkut biji kopi ke para **penyangrai (*roasters*)**. Para penyangrai kemudian akan menyangrai, mencampur, dan mengemas kopi yang kemudian dapat dijual ke kedai-kedai kopi untuk dinikmati oleh pelanggan. Rantai ini diilustrasikan pada Gambar 2-1.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-2.1.png" alt="gambar" width="580"/>
+</p>
+
+
