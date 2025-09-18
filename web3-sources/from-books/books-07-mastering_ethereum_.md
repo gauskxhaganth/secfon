@@ -3995,4 +3995,302 @@ Dalam bab ini kita mulai bekerja dengan kontrak pintar secara detail dan menjela
 
 ---
 
+# BAB 8
+## Kontrak Pintar (Smart Contracts) dan Vyper
+
+**Vyper** adalah bahasa pemrograman eksperimental berorientasi kontrak untuk Ethereum Virtual Machine yang berupaya memberikan **auditabilitas** yang unggul, dengan mempermudah pengembang untuk menghasilkan kode yang dapat dipahami. Faktanya, salah satu prinsip Vyper adalah membuatnya hampir tidak mungkin bagi pengembang untuk menulis kode yang menyesatkan.
+
+Dalam bab ini kita akan melihat masalah umum pada kontrak pintar, memperkenalkan bahasa pemrograman kontrak Vyper, dan membandingkannya dengan Solidity, serta menunjukkan perbedaannya.
+
+### Kerentanan (Vulnerabilities) dan Vyper
+
+Sebuah studi terbaru menganalisis hampir satu juta kontrak pintar Ethereum yang telah diterapkan dan menemukan bahwa banyak dari kontrak-kontrak ini mengandung kerentanan serius. Selama analisis mereka, para peneliti menguraikan tiga kategori dasar kerentanan jejak (*trace vulnerabilities*):
+
+  * **Kontrak bunuh diri (*Suicidal contracts*)**
+    Kontrak pintar yang dapat dimatikan oleh alamat sewenang-wenang.
+  * **Kontrak serakah (*Greedy contracts*)**
+    Kontrak pintar yang dapat mencapai keadaan di mana mereka tidak dapat melepaskan ether.
+  * **Kontrak boros (*Prodigal contracts*)**
+    Kontrak pintar yang dapat dibuat untuk melepaskan ether ke alamat sewenang-wenang.
+
+Kerentanan dimasukkan ke dalam kontrak pintar melalui kode. Dapat diperdebatkan dengan kuat bahwa kerentanan ini dan lainnya tidak sengaja diperkenalkan, tetapi bagaimanapun juga, kode kontrak pintar yang tidak diinginkan terbukti mengakibatkan hilangnya dana yang tidak terduga bagi pengguna Ethereum, dan ini tidak ideal. Vyper dirancang untuk mempermudah penulisan kode yang aman, atau sama halnya untuk mempersulit penulisan kode yang menyesatkan atau rentan secara tidak sengaja.
+
+### Perbandingan dengan Solidity
+
+Salah satu cara Vyper mencoba mempersulit penulisan kode yang tidak aman adalah dengan sengaja menghilangkan beberapa fitur Solidity. Penting bagi mereka yang mempertimbangkan untuk mengembangkan kontrak pintar di Vyper untuk memahami fitur apa yang tidak dimiliki Vyper, dan mengapa. Oleh karena itu, di bagian ini, kami akan menjelajahi fitur-fitur tersebut dan memberikan justifikasi mengapa fitur-fitur tersebut dihilangkan.
+
+#### Pengubah (Modifiers)
+
+Seperti yang kita lihat di bab sebelumnya, di Solidity Anda dapat menulis sebuah fungsi menggunakan pengubah (*modifiers*). Misalnya, fungsi berikut, `changeOwner`, akan menjalankan kode dalam pengubah bernama `onlyBy` sebagai bagian dari eksekusinya:
+
+```solidity
+function changeOwner(address _newOwner)
+  public
+  onlyBy(owner)
+{
+  owner = _newOwner;
+}
+```
+
+Pengubah ini memberlakukan aturan terkait kepemilikan. Seperti yang Anda lihat, pengubah khusus ini bertindak sebagai mekanisme untuk melakukan pemeriksaan awal atas nama fungsi `changeOwner`:
+
+```solidity
+modifier onlyBy(address _account)
+{
+  require(msg.sender == _account);
+  _;
+}
+```
+
+Tetapi pengubah tidak hanya ada untuk melakukan pemeriksaan, seperti yang ditunjukkan di sini. Faktanya, sebagai pengubah, mereka dapat secara signifikan mengubah lingkungan kontrak pintar, dalam konteks fungsi pemanggil. Sederhananya, pengubah bersifat pervasif.
+
+Mari kita lihat contoh gaya Solidity lainnya:
+
+```solidity
+enum Stages {
+  SafeStage
+  DangerStage,
+  FinalStage
+}
+
+uint public creationTime = now;
+Stages public stage = Stages.SafeStage;
+
+function nextStage() internal {
+  stage = Stages(uint(stage) + 1);
+}
+
+modifier stageTimeConfirmation() {
+  if (stage == Stages.SafeStage && now >= creationTime + 10 days)
+    nextStage();
+  _;
+}
+
+function a()
+  public
+  stageTimeConfirmation
+{
+  // Kode lebih lanjut di sini
+}
+```
+
+Di satu sisi, pengembang harus selalu memeriksa kode lain yang dipanggil oleh kode mereka sendiri. Namun, ada kemungkinan bahwa dalam situasi tertentu (seperti ketika kendala waktu atau kelelahan mengakibatkan kurangnya konsentrasi) seorang pengembang mungkin mengabaikan satu baris kode. Ini bahkan lebih mungkin terjadi jika pengembang harus melompat-lompat di dalam file besar sambil secara mental melacak hierarki panggilan fungsi dan mengingat keadaan variabel kontrak pintar.
+
+Mari kita lihat contoh sebelumnya lebih dalam. Bayangkan seorang pengembang sedang menulis fungsi publik bernama `a`. Pengembang tersebut baru mengenal kontrak ini dan memanfaatkan pengubah yang ditulis oleh orang lain. Sekilas, tampaknya pengubah `stageTimeConfirmation` hanya melakukan beberapa pemeriksaan terkait usia kontrak dalam kaitannya dengan fungsi pemanggil. Apa yang mungkin tidak disadari oleh pengembang adalah bahwa pengubah tersebut juga memanggil fungsi lain, `nextStage`. Dalam skenario demonstrasi sederhana ini, hanya dengan memanggil fungsi publik `a` mengakibatkan variabel `stage` kontrak pintar berpindah dari `SafeStage` ke `DangerStage`.
+
+**Vyper telah menghilangkan pengubah sama sekali.** Rekomendasi dari Vyper adalah sebagai berikut: jika hanya melakukan asersi dengan pengubah, maka cukup gunakan pemeriksaan dan `assert` sebaris (*inline*) sebagai bagian dari fungsi; jika memodifikasi keadaan kontrak pintar dan sebagainya, sekali lagi buat perubahan ini secara eksplisit menjadi bagian dari fungsi. Melakukan ini meningkatkan auditabilitas dan keterbacaan, karena pembaca tidak perlu secara mental (atau manual) "membungkus" kode pengubah di sekitar fungsi untuk melihat apa yang dilakukannya.
+
+#### Pewarisan Kelas (Class Inheritance)
+
+Pewarisan memungkinkan pemrogram untuk memanfaatkan kekuatan kode yang telah ditulis sebelumnya dengan memperoleh fungsionalitas, properti, dan perilaku yang sudah ada dari pustaka perangkat lunak yang ada. Pewarisan sangat kuat dan mendorong penggunaan kembali kode. Solidity mendukung pewarisan ganda serta polimorfisme, tetapi meskipun ini adalah fitur utama dari pemrograman berorientasi objek, **Vyper tidak mendukungnya.** Vyper berpendapat bahwa implementasi pewarisan mengharuskan pembuat kode dan auditor untuk melompat di antara beberapa file untuk memahami apa yang dilakukan program. Vyper juga berpandangan bahwa pewarisan ganda dapat membuat kode terlalu rumit untuk dipahami—pandangan yang secara diam-diam diakui oleh dokumentasi Solidity, yang memberikan contoh bagaimana pewarisan ganda dapat menjadi masalah.
+
+#### Assembly Sebaris (Inline Assembly)
+
+*Inline assembly* memberi pengembang akses tingkat rendah ke Ethereum Virtual Machine, memungkinkan program Solidity untuk melakukan operasi dengan langsung mengakses instruksi EVM. Misalnya, kode *inline assembly* berikut menambahkan 3 ke lokasi memori 0x80:
+
+```
+3 0x80 mload add 0x80 mstore
+```
+
+Vyper menganggap hilangnya keterbacaan adalah harga yang terlalu tinggi untuk dibayar demi kekuatan ekstra, dan dengan demikian **tidak mendukung *inline assembly*.**
+
+#### Pembebanan Berlebih Fungsi (Function Overloading)
+
+*Function overloading* memungkinkan pengembang untuk menulis beberapa fungsi dengan nama yang sama. Fungsi mana yang digunakan pada kesempatan tertentu tergantung pada jenis argumen yang diberikan. Ambil dua fungsi berikut sebagai contoh:
+
+```solidity
+function f(uint _in) public pure returns (uint out) {
+  out = 1;
+}
+
+function f(uint _in, bytes32 _key) public pure returns (uint out) {
+  out = 2;
+}
+```
+
+Fungsi pertama (bernama `f`) menerima argumen input bertipe `uint`; fungsi kedua (juga bernama `f`) menerima dua argumen, satu bertipe `uint` dan satu bertipe `bytes32`. Memiliki beberapa definisi fungsi dengan nama yang sama yang mengambil argumen yang berbeda dapat membingungkan, jadi **Vyper tidak mendukung *function overloading*.**
+
+#### Typecasting Variabel
+
+Ada dua macam *typecasting*: implisit dan eksplisit.
+
+*Typecasting* implisit sering dilakukan pada saat kompilasi. Misalnya, jika konversi tipe secara semantik benar dan tidak ada informasi yang mungkin hilang, kompiler dapat melakukan konversi implisit, seperti mengubah variabel tipe `uint8` menjadi `uint16`. Versi paling awal Vyper mengizinkan *typecasting* implisit variabel, tetapi versi terbaru tidak.
+
+*Typecast* eksplisit dapat disisipkan di Solidity. Sayangnya, mereka dapat menyebabkan perilaku tak terduga. Misalnya, melakukan *casting* `uint32` ke tipe yang lebih kecil `uint16` hanya menghilangkan bit orde tinggi, seperti yang ditunjukkan di sini:
+
+```solidity
+uint32 a = 0x12345678;
+uint16 b = uint16(a); // Variabel b sekarang 0x5678
+```
+
+**Vyper sebagai gantinya memiliki fungsi `convert` untuk melakukan *cast* eksplisit.** Fungsi `convert` (ditemukan di baris 82 `convert.py`):
+
+```python
+def convert(expr, context):
+  output_type = expr.args[1].s
+  if output_type in conversion_table:
+    return conversion_table[output_type](expr, context)
+  else:
+    raise Exception("Conversion to {} is invalid.".format(output_type))
+```
+
+Perhatikan penggunaan `conversion_table` (ditemukan di baris 90 file yang sama), yang terlihat seperti ini:
+
+```python
+conversion_table = {
+  'int128': to_int128,
+  'uint256': to_unint256,
+  'decimal': to_decimal,
+  'bytes32': to_bytes32,
+}
+```
+
+Ketika seorang pengembang memanggil `convert`, ia mereferensikan `conversion_table`, yang memastikan bahwa konversi yang sesuai dilakukan. Sebagai contoh, jika seorang pengembang memberikan `int128` ke fungsi `convert`, fungsi `to_int128` di baris 26 dari file yang sama (`convert.py`) akan dieksekusi. Fungsi `to_int128` adalah sebagai berikut:
+
+```python
+@signature(('int128', 'uint256', 'bytes32', 'bytes'), 'str_literal')
+def to_int128(expr, args, kwargs, context):
+  in_node = args[0]
+  typ, len = get_type(in_node)
+  if typ in ('int128', 'uint256', 'bytes32'):
+    if in_node.typ.is_literal \
+       and not SizeLimits.MINNUM <= in_node.value <= SizeLimits.MAXNUM:
+      raise InvalidLiteralException(
+        "Number out of range: {}".format(in_node.value), expr
+      )
+    return LLLnode.from_list(
+      ['clamp', ['mload', MemoryPositions.MINNUM], in_node,
+      ['mload', MemoryPositions.MAXNUM]], typ=BaseType('int128'),
+      pos=getpos(expr)
+    )
+  else:
+    return byte_array_to_num(in_node, expr, 'int128')
+```
+
+Seperti yang Anda lihat, proses konversi memastikan bahwa tidak ada informasi yang bisa hilang; jika bisa, sebuah pengecualian akan dilemparkan. Kode konversi mencegah pemotongan (*truncation*) serta anomali lain yang biasanya diizinkan oleh *typecasting* implisit.
+
+Memilih *typecasting* eksplisit daripada implisit berarti pengembang bertanggung jawab untuk melakukan semua *cast*. Meskipun pendekatan ini menghasilkan kode yang lebih panjang (*verbose*), ini juga meningkatkan keamanan dan auditabilitas kontrak pintar.
+
+#### Prakondisi dan Pascakondisi
+
+Vyper menangani prakondisi, pascakondisi, dan perubahan keadaan secara eksplisit. Meskipun ini menghasilkan kode yang redundan, ini juga memungkinkan keterbacaan dan keamanan maksimal. Saat menulis kontrak pintar di Vyper, seorang pengembang harus mengamati tiga poin berikut:
+
+  * **Kondisi (*Condition*)**
+    Bagaimana keadaan/kondisi saat ini dari variabel keadaan Ethereum?
+  * **Efek (*Effects*)**
+    Efek apa yang akan dimiliki kode kontrak pintar ini pada kondisi variabel keadaan setelah eksekusi? Yaitu, apa yang akan terpengaruh, dan apa yang tidak akan terpengaruh? Apakah efek ini sesuai dengan niat kontrak pintar?
+  * **Interaksi (*Interaction*)**
+    Setelah dua pertimbangan pertama ditangani secara tuntas, saatnya menjalankan kode. Sebelum penerapan, telusuri kode secara logis dan pertimbangkan semua kemungkinan hasil, konsekuensi, dan skenario permanen dari eksekusi kode, termasuk interaksi dengan kontrak lain.
+
+Idealnya, setiap poin ini harus dipertimbangkan dengan cermat dan kemudian didokumentasikan secara menyeluruh dalam kode. Melakukan hal itu akan meningkatkan desain kode, yang pada akhirnya membuatnya lebih mudah dibaca dan diaudit.
+
+#### Dekorator (Decorators)
+
+Dekorator berikut dapat digunakan di awal setiap fungsi:
+
+  * **`@private`**
+    Dekorator `@private` membuat fungsi tidak dapat diakses dari luar kontrak.
+  * **`@public`**
+    Dekorator `@public` membuat fungsi terlihat dan dapat dieksekusi secara publik. Misalnya, bahkan dompet Ethereum akan menampilkan fungsi semacam itu saat melihat kontrak.
+  * **`@constant`**
+    Fungsi dengan dekorator `@constant` не diizinkan untuk mengubah variabel keadaan. Faktanya, kompiler akan menolak seluruh program (dengan kesalahan yang sesuai) jika fungsi mencoba mengubah variabel keadaan.
+  * **`@payable`**
+    Hanya fungsi dengan dekorator `@payable` yang diizinkan untuk mentransfer nilai.
+
+Vyper mengimplementasikan logika dekorator secara eksplisit. Misalnya, proses kompilasi Vyper akan gagal jika sebuah fungsi memiliki dekorator `@payable` dan `@constant`. Ini masuk akal karena fungsi yang mentransfer nilai secara definisi telah memperbarui keadaan, jadi tidak bisa `@constant`. Setiap fungsi Vyper harus dihiasi dengan `@public` atau `@private` (tetapi tidak keduanya\!).
+
+#### Urutan Fungsi dan Variabel
+
+Setiap kontrak pintar Vyper individual hanya terdiri dari satu file Vyper. Dengan kata lain, semua kode kontrak pintar Vyper tertentu, termasuk semua fungsi, variabel, dan sebagainya, ada di satu tempat. **Vyper mengharuskan deklarasi fungsi dan variabel setiap kontrak pintar ditulis secara fisik dalam urutan tertentu.** Solidity sama sekali tidak memiliki persyaratan ini. Mari kita lihat contoh Solidity singkat:
+
+```solidity
+pragma solidity ^0.4.0;
+contract ordering {
+  function topFunction()
+    external
+    returns (bool)
+  {
+    initiatizedBelowTopFunction = this.lowerFunction();
+    return initiatizedBelowTopFunction;
+  }
+  bool initiatizedBelowTopFunction;
+  bool lowerFunctionVar;
+  function lowerFunction()
+    external
+    returns (bool)
+  {
+    lowerFunctionVar = true;
+    return lowerFunctionVar;
+  }
+}
+```
+
+Dalam contoh ini, fungsi yang disebut `topFunction` memanggil fungsi lain, `lowerFunction`. `topFunction` juga menetapkan nilai ke variabel yang disebut `initiatizedBelowTopFunction`. Seperti yang Anda lihat, Solidity tidak mengharuskan fungsi dan variabel ini dideklarasikan secara fisik sebelum dipanggil oleh kode yang dieksekusi. Ini adalah kode Solidity yang valid yang akan berhasil dikompilasi.
+
+Persyaratan urutan Vyper bukanlah hal baru; faktanya, persyaratan urutan ini selalu ada dalam pemrograman Python. Urutan yang disyaratkan oleh Vyper lugas dan logis, seperti yang diilustrasikan dalam contoh berikutnya:
+
+```vyper
+# Deklarasikan variabel bernama theBool
+theBool: public(bool)
+
+# Deklarasikan fungsi bernama topFunction
+@public
+def topFunction() -> bool:
+  # Tetapkan nilai ke fungsi yang sudah dideklarasikan bernama theBool
+  self.theBool = True
+  return self.theBool
+
+# Deklarasikan fungsi bernama lowerFunction
+@public
+def lowerFunction():
+  # Panggil fungsi yang sudah dideklarasikan bernama topFunction
+  assert self.topFunction()
+```
+
+Ini menunjukkan urutan yang benar dari fungsi dan variabel dalam kontrak pintar Vyper. Perhatikan bagaimana variabel `theBool` dan fungsi `topFunction` dideklarasikan sebelum mereka diberi nilai dan dipanggil. Jika `theBool` dideklarasikan di bawah `topFunction` atau jika `topFunction` dideklarasikan di bawah `lowerFunction`, kontrak ini tidak akan dikompilasi.
+
+#### Kompilasi
+
+Vyper memiliki editor kode dan kompiler daring sendiri, yang memungkinkan Anda menulis dan kemudian mengkompilasi kontrak pintar Anda menjadi *bytecode*, ABI, dan LLL hanya dengan menggunakan browser web Anda. Kompiler daring Vyper memiliki berbagai kontrak pintar yang telah ditulis sebelumnya untuk kenyamanan Anda, termasuk kontrak untuk lelang terbuka sederhana, pembelian jarak jauh yang aman, token ERC20, dan banyak lagi.
+
+> Vyper mengimplementasikan ERC20 sebagai kontrak yang telah dikompilasi sebelumnya, memungkinkan kontrak pintar ini mudah digunakan secara langsung. Kontrak di Vyper harus dideklarasikan sebagai variabel global. Contoh untuk mendeklarasikan variabel ERC20 adalah sebagai berikut:
+> `token: address(ERC20)`
+
+Anda juga dapat mengkompilasi kontrak menggunakan baris perintah. Setiap kontrak Vyper disimpan dalam satu file dengan ekstensi `.vy`. Setelah terinstal, Anda dapat mengkompilasi kontrak dengan Vyper dengan menjalankan perintah berikut:
+
+```bash
+vyper ~/hello_world.vy
+```
+
+Deskripsi ABI yang dapat dibaca manusia (dalam format JSON) kemudian dapat diperoleh dengan menjalankan perintah berikut:
+
+```bash
+vyper -f json ~/hello_world.vy
+```
+
+#### Melindungi dari Kesalahan Overflow di Tingkat Kompiler
+
+Kesalahan *overflow* dalam perangkat lunak dapat menjadi bencana ketika berhadapan dengan nilai nyata. Misalnya, [satu transaksi](https://www.google.com/search?q=https://etherscan.io/tx/0xad89ff16fd1ebe3a0a7cf4ed282302c06626c1af142577029de0abaf6e5a1b3b) dari pertengahan April 2018 menunjukkan transfer berbahaya lebih dari 57,896,044,618,658,100,000,000,000,000,000,000,000,000,000,000,000,000,000,000 token BEC. Transaksi ini adalah hasil dari masalah *integer overflow* di kontrak token ERC20 BeautyChain (BecToken.sol). Pengembang Solidity memang memiliki akses ke pustaka seperti SafeMath serta alat analisis keamanan kontrak pintar Ethereum seperti Mythril OSS. Namun, pengembang tidak dipaksa untuk menggunakan alat keselamatan. Sederhananya, jika keselamatan tidak ditegakkan oleh bahasa, pengembang dapat menulis kode yang tidak aman yang akan berhasil dikompilasi dan kemudian "berhasil" dieksekusi.
+
+**Vyper memiliki perlindungan *overflow* bawaan**, yang diimplementasikan dalam pendekatan dua cabang. Pertama, Vyper menyediakan padanan SafeMath yang mencakup kasus-kasus pengecualian yang diperlukan untuk aritmetika integer. Kedua, Vyper menggunakan ***clamps*** setiap kali konstanta literal dimuat, nilai diteruskan ke fungsi, atau variabel ditetapkan. *Clamps* diimplementasikan melalui fungsi kustom di kompiler Low-level Lisp-like Language (LLL), dan tidak dapat dinonaktifkan. (Kompiler Vyper menghasilkan LLL daripada *bytecode* EVM; ini menyederhanakan pengembangan Vyper itu sendiri.)
+
+#### Membaca dan Menulis Data
+
+Meskipun mahal untuk menyimpan, membaca, dan memodifikasi data, operasi penyimpanan ini merupakan komponen yang diperlukan dari sebagian besar kontrak pintar. Kontrak pintar dapat menulis data ke dua tempat:
+
+  * **Keadaan global (*Global state*)**
+    Variabel keadaan dalam kontrak pintar tertentu disimpan dalam *global state trie* Ethereum; kontrak pintar hanya dapat menyimpan, membaca, dan memodifikasi data yang berkaitan dengan alamat kontrak tertentu itu (yaitu, kontrak pintar tidak dapat membaca atau menulis ke kontrak pintar lain).
+  * **Log**
+    Sebuah kontrak pintar juga dapat menulis ke data rantai Ethereum melalui *log events*.
+
+Meskipun Vyper pada awalnya menggunakan sintaksis `__log__` untuk mendeklarasikan *event-event* ini, pembaruan telah dibuat yang membuat deklarasi *event*-nya lebih sejalan dengan sintaksis asli Solidity. Misalnya, deklarasi Vyper untuk *event* bernama `MyLog` awalnya adalah `MyLog: __log__({arg1: indexed(bytes[3])})`. Sintaksisnya sekarang menjadi `MyLog: event({arg1: indexed(bytes[3])})`. Penting untuk dicatat bahwa eksekusi *log event* di Vyper dulu, dan masih, sebagai berikut: `log.MyLog("123")`.
+
+Meskipun kontrak pintar dapat menulis ke data rantai Ethereum (melalui *log events*), mereka tidak dapat membaca *log events* on-chain yang telah mereka buat. Meskipun demikian, salah satu keuntungan menulis ke data rantai Ethereum melalui *log events* adalah bahwa log dapat ditemukan dan dibaca, di rantai publik, oleh klien ringan (*light clients*). Misalnya, nilai `logsBloom` di blok yang ditambang dapat menunjukkan ada atau tidaknya *log event*. Setelah keberadaan *log events* telah ditetapkan, data log dapat diperoleh dari resi transaksi tertentu.
+
+### Kesimpulan
+
+Vyper adalah bahasa pemrograman berorientasi kontrak baru yang kuat dan menarik. Desainnya bias terhadap “kebenaran,” dengan mengorbankan beberapa fleksibilitas. Ini mungkin memungkinkan pemrogram untuk menulis kontrak pintar yang lebih baik dan menghindari perangkap tertentu yang menyebabkan kerentanan serius muncul. Selanjutnya, kita akan melihat keamanan kontrak pintar secara lebih detail. Beberapa nuansa desain Vyper mungkin menjadi lebih jelas setelah Anda membaca tentang semua kemungkinan masalah keamanan yang dapat muncul dalam kontrak pintar.
+
+---
+
 
