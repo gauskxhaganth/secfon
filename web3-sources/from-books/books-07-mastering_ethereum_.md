@@ -2467,3 +2467,158 @@ Ethereum tidak melakukan validasi lebih lanjut pada bidang ini. Nilai 20-byte ap
 
 Mengirim transaksi ke alamat yang salah kemungkinan besar akan membakar ether yang dikirim, membuatnya tidak dapat diakses selamanya (tidak dapat dibelanjakan), karena sebagian besar alamat tidak memiliki kunci privat yang diketahui dan oleh karena itu tidak ada tanda tangan yang dapat dihasilkan untuk membelanjakannya. Diasumsikan bahwa validasi alamat terjadi di tingkat antarmuka pengguna (lihat “Pengkodean Hex dengan Checksum dalam Kapitalisasi (EIP-55)” di halaman 76). Faktanya, ada sejumlah alasan yang valid untuk membakar ether—misalnya, sebagai disinsentif untuk berbuat curang di *payment channel* dan kontrak pintar lainnya—dan karena jumlah ether terbatas, membakar ether secara efektif mendistribusikan nilai yang dibakar ke semua pemegang ether (sebanding dengan jumlah ether yang mereka pegang).
 
+### Nilai dan Data Transaksi
+
+"Muatan" utama dari sebuah transaksi terkandung dalam dua bidang: `value` (nilai) dan `data`. Transaksi dapat memiliki keduanya, hanya nilai, hanya data, atau tidak keduanya. Keempat kombinasi tersebut valid.
+
+Sebuah transaksi yang hanya memiliki **nilai** adalah **pembayaran**. Sebuah transaksi yang hanya memiliki **data** adalah **pemanggilan (invocation)**. Sebuah transaksi yang memiliki **keduanya** adalah **pembayaran sekaligus pemanggilan**. Sebuah transaksi yang tidak memiliki **keduanya**—yah itu mungkin hanya pemborosan gas\! Tetapi itu tetap mungkin dilakukan.
+
+Mari kita coba semua kombinasi ini. Pertama, kita akan mengatur alamat sumber dan tujuan dari dompet kita, agar demo lebih mudah dibaca:
+
+```javascript
+src = web3.eth.accounts[0];
+dst = web3.eth.accounts[1];
+```
+
+Transaksi pertama kita hanya berisi nilai (pembayaran), dan tidak ada muatan data:
+
+```javascript
+web3.eth.sendTransaction({from: src, to: dst, value: web3.toWei(0.01, "ether"), data: ""});
+```
+
+Dompet kita menampilkan layar konfirmasi yang menunjukkan nilai yang akan dikirim, seperti yang ditunjukkan pada Gambar 6-1.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-6.1.png" alt="gambar" width="580"/>
+</p>
+
+Contoh berikutnya menentukan baik nilai maupun muatan data:
+
+```javascript
+web3.eth.sendTransaction({from: src, to: dst, value: web.toWei(0.01, "ether"), data: "0x1234"});
+```
+
+Dompet kita menampilkan layar konfirmasi yang menunjukkan nilai yang akan dikirim serta muatan datanya, seperti yang ditunjukkan pada Gambar 6-2.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-6.2.png" alt="gambar" width="580"/>
+</p>
+
+Transaksi berikutnya menyertakan muatan data tetapi menentukan nilai nol:
+
+```javascript
+web3.eth.sendTransaction({from: src, to: dst, value: 0, data: "0x1234"});
+```
+
+Dompet kita menampilkan layar konfirmasi yang menunjukkan nilai nol dan muatan data, seperti yang ditunjukkan pada Gambar 6-3.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-6.3.png" alt="gambar" width="580"/>
+</p>
+
+Terakhir, transaksi terakhir tidak menyertakan nilai untuk dikirim maupun muatan data:
+
+```javascript
+web3.eth.sendTransaction({from: src, to: dst, value: 0, data: ""});
+```
+
+Dompet kita menampilkan layar konfirmasi yang menunjukkan nilai nol, seperti yang ditunjukkan pada Gambar 6-4.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-6.4.png" alt="gambar" width="580"/>
+</p>
+
+### Mengirim Nilai ke EOA dan Kontrak
+
+Ketika Anda membuat transaksi Ethereum yang berisi nilai (*value*), itu setara dengan sebuah pembayaran. Transaksi semacam itu berperilaku berbeda tergantung pada apakah alamat tujuannya adalah sebuah kontrak atau bukan.
+
+Untuk alamat **EOA**, atau lebih tepatnya untuk alamat mana pun yang tidak ditandai sebagai kontrak di blockchain, Ethereum akan mencatat perubahan keadaan (*state change*), menambahkan nilai yang Anda kirim ke saldo alamat tersebut. Jika alamat tersebut belum pernah terlihat sebelumnya, ia akan ditambahkan ke representasi internal klien dari keadaan dan saldonya akan diinisialisasi dengan nilai pembayaran Anda.
+
+Jika alamat tujuan (`to`) adalah sebuah **kontrak**, maka EVM akan mengeksekusi kontrak tersebut dan akan mencoba memanggil fungsi yang disebutkan dalam muatan data (*data payload*) transaksi Anda. Jika tidak ada data dalam transaksi Anda, EVM akan memanggil **fungsi fallback** dan, jika fungsi tersebut bersifat **payable**, akan mengeksekusinya untuk menentukan apa yang harus dilakukan selanjutnya. Jika tidak ada fungsi fallback, maka efek dari transaksi tersebut adalah meningkatkan saldo kontrak, persis seperti pembayaran ke sebuah dompet.
+
+Sebuah kontrak dapat menolak pembayaran yang masuk dengan melemparkan pengecualian (*throwing an exception*) segera setelah sebuah fungsi dipanggil, atau sebagaimana ditentukan oleh kondisi yang dikodekan dalam sebuah fungsi. Jika fungsi berakhir dengan sukses (tanpa pengecualian), maka keadaan kontrak diperbarui untuk mencerminkan peningkatan saldo ether kontrak.
+
+### Mengirim Muatan Data ke EOA atau Kontrak
+
+Ketika transaksi Anda berisi data, kemungkinan besar transaksi itu ditujukan ke alamat kontrak. Itu tidak berarti Anda tidak dapat mengirim muatan data ke EOA—itu sepenuhnya valid dalam protokol Ethereum. Namun, dalam kasus itu, interpretasi data terserah pada dompet yang Anda gunakan untuk mengakses EOA tersebut. Hal ini **diabaikan oleh protokol Ethereum**. Sebagian besar dompet juga mengabaikan data apa pun yang diterima dalam transaksi ke EOA yang mereka kontrol. Di masa depan, mungkin saja standar akan muncul yang memungkinkan dompet untuk menginterpretasikan data seperti yang dilakukan kontrak, sehingga memungkinkan transaksi untuk memanggil fungsi yang berjalan di dalam dompet pengguna. Perbedaan kritisnya adalah bahwa setiap interpretasi muatan data oleh EOA **tidak tunduk pada aturan konsensus Ethereum**, tidak seperti eksekusi kontrak.
+
+Untuk saat ini, mari kita asumsikan transaksi Anda mengirimkan data ke alamat kontrak. Dalam kasus itu, data akan diinterpretasikan oleh EVM sebagai pemanggilan kontrak (*contract invocation*). Sebagian besar kontrak menggunakan data ini secara lebih spesifik sebagai **pemanggilan fungsi (*function invocation*)**, memanggil fungsi yang disebutkan dan meneruskan argumen yang dikodekan ke fungsi tersebut.
+
+Muatan data yang dikirim ke kontrak yang kompatibel dengan ABI (yang dapat Anda asumsikan dimiliki oleh semua kontrak) adalah pengkodean heksadesimal dari:
+
+  * **Selektor fungsi (*Function selector*)**
+    4 byte pertama dari hash Keccak-256 dari prototipe fungsi. Ini memungkinkan kontrak untuk secara tidak ambigu mengidentifikasi fungsi mana yang ingin Anda panggil.
+  * **Argumen fungsi (*The function arguments*)**
+    Argumen fungsi, yang dikodekan sesuai dengan aturan untuk berbagai tipe dasar yang didefinisikan dalam spesifikasi ABI.
+
+Dalam Contoh 2-1, kami mendefinisikan sebuah fungsi untuk penarikan:
+
+```solidity
+function withdraw(uint withdraw_amount) public {
+```
+
+**Prototipe** sebuah fungsi didefinisikan sebagai string yang berisi nama fungsi, diikuti oleh tipe data dari setiap argumennya, diapit dalam tanda kurung dan dipisahkan oleh koma. Nama fungsinya di sini adalah `withdraw` dan ia mengambil satu argumen yaitu `uint` (yang merupakan alias untuk `uint256`), jadi prototipe dari `withdraw` adalah:
+`withdraw(uint256)`
+
+Mari kita hitung hash Keccak-256 dari string ini:
+
+```javascript
+> web3.sha3("withdraw(uint256)");
+'0x2e1a7d4d13322e7b96f9a57413e1525c250fb7a9021cf91d1540d5b69f16a49f'
+```
+
+**4 byte pertama** dari hash adalah `0x2e1a7d4d`. Itulah nilai "selektor fungsi" kita, yang akan memberi tahu kontrak fungsi mana yang ingin kita panggil.
+
+Selanjutnya, mari kita hitung nilai untuk diteruskan sebagai argumen `withdraw_amount`. Kita ingin menarik 0,01 ether. Mari kita kodekan itu menjadi integer 256-bit tak bertanda *big-endian* yang diserialisasi dalam heksadesimal, dalam denominasi wei:
+
+```javascript
+> withdraw_amount = web3.toWei(0.01, "ether");
+'10000000000000000'
+> withdraw_amount_hex = web3.toHex(withdraw_amount);
+'0x2386f26fc10000'
+```
+
+Sekarang, kita tambahkan selektor fungsi ke jumlah tersebut (di-padding hingga 32 byte):
+`2e1a7d4d000000000000000000000000000000000000000000000000002386f26fc10000`
+
+Itulah muatan data untuk transaksi kita, memanggil fungsi `withdraw` dan meminta 0,01 ether sebagai `withdraw_amount`.
+
+### Transaksi Khusus: Pembuatan Kontrak
+
+Satu kasus khusus yang harus kita sebutkan adalah transaksi yang membuat kontrak baru di blockchain, menyebarkannya untuk penggunaan di masa depan. Transaksi pembuatan kontrak dikirim ke alamat tujuan khusus yang disebut **alamat nol (*zero address*)**; bidang `to` dalam transaksi pendaftaran kontrak berisi alamat `0x0`. Alamat ini tidak mewakili EOA (tidak ada pasangan kunci privat-publik yang sesuai) maupun kontrak. Alamat ini tidak akan pernah bisa membelanjakan ether atau memulai transaksi. Ia hanya digunakan sebagai tujuan, dengan makna khusus "buat kontrak ini."
+
+Meskipun alamat nol hanya ditujukan untuk pembuatan kontrak, terkadang ia menerima pembayaran dari berbagai alamat. Ada dua penjelasan untuk ini: entah karena kecelakaan, yang mengakibatkan hilangnya ether, atau itu adalah **pembakaran ether (*ether burn*)** yang disengaja (sengaja menghancurkan ether dengan mengirimkannya ke alamat dari mana ia tidak akan pernah bisa dibelanjakan). Namun, jika Anda ingin melakukan pembakaran ether yang disengaja, Anda harus menjelaskan niat Anda ke jaringan dan menggunakan alamat bakar yang ditunjuk secara khusus:
+`0x000000000000000000000000000000000000dEaD`
+
+> Ether apa pun yang dikirim ke alamat bakar yang ditunjuk akan menjadi tidak dapat dibelanjakan dan hilang selamanya.
+
+Transaksi pembuatan kontrak hanya perlu berisi muatan data yang berisi *bytecode* terkompilasi yang akan membuat kontrak. Satu-satunya efek dari transaksi ini adalah untuk membuat kontrak. Anda dapat menyertakan jumlah ether di bidang `value` jika Anda ingin mengatur kontrak baru dengan saldo awal, tetapi itu sepenuhnya opsional. Jika Anda mengirim nilai (ether) ke alamat pembuatan kontrak tanpa muatan data (tanpa kontrak), maka efeknya sama dengan mengirim ke alamat bakar—tidak ada kontrak untuk dikreditkan, jadi ether tersebut hilang.
+
+Sebagai contoh, kita dapat membuat kontrak `Faucet.sol` yang digunakan di Bab 2 dengan secara manual membuat transaksi ke alamat nol dengan kontrak di muatan data. Kontrak perlu dikompilasi menjadi representasi *bytecode*. Ini dapat dilakukan dengan kompiler Solidity:
+
+```bash
+$ solc --bin Faucet.sol
+
+Binary:
+6060604052341561000f57600080fd5b60e58061001d6000396000f30060606040526004361060...
+```
+
+Informasi yang sama juga dapat diperoleh dari kompiler daring Remix.
+
+Sekarang kita dapat membuat transaksinya:
+
+```javascript
+> src = web3.eth.accounts[0];
+> faucet_code = "0x6060604052341561000f57600080fd5b60e58061001d6000396000f300606...f0029";
+> web3.eth.sendTransaction({from: src, to: 0, data: faucet_code, gas: 113558, gasPrice: 200000000000});
+"0x7bcc327ae5d369f75b98c0d59037eec41d44dfae75447fd753d9f2db9439124b"
+```
+
+Merupakan praktik yang baik untuk selalu menentukan parameter `to`, bahkan dalam kasus pembuatan kontrak alamat-nol, karena biaya kehilangan ether Anda selamanya karena tidak sengaja mengirimkannya ke `0x0` terlalu besar. Anda juga harus menentukan `gasPrice` dan `gasLimit`.
+
+Setelah kontrak ditambang, kita dapat melihatnya di penjelajah blok Etherscan, seperti yang ditunjukkan pada Gambar 6-5.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-6.5.png" alt="gambar" width="580"/>
+</p>
+
