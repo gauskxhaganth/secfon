@@ -138,7 +138,7 @@ Sebuah sidik jari dengan panjang tetap dari input berukuran variabel, yang dihas
 Dompet yang menggunakan protokol pembuatan dan transfer kunci deterministik hierarkis (HD) (BIP-32).
 
 **HD wallet seed**
-Sebuah nilai yang digunakan untuk menghasilkan *master private key* dan *master chain code* untuk sebuah dompet HD. *Wallet seed* dapat direpresentasikan oleh kata-kata mnemonik, membuatnya lebih mudah bagi manusia untuk menyalin, mencadangkan, dan memulihkan *private key*.
+Sebuah nilai yang digunakan untuk menghasilkan *master private key* dan *master chain code* untuk sebuah dompet HD. *Wallet seed* dapat direpresentasikan oleh kata-kata mnemonic, membuatnya lebih mudah bagi manusia untuk menyalin, mencadangkan, dan memulihkan *private key*.
 
 **Homestead**
 Tahap pengembangan kedua Ethereum, diluncurkan pada Maret 2016 di blok \#1.150.000.
@@ -609,7 +609,7 @@ Dengan kontrol datanglah tanggung jawab besar. **Jika Anda kehilangan kunci priv
 * **Jangan pernah menyimpan kunci privat Anda dalam bentuk teks biasa**, terutama secara digital. Untungnya, sebagian besar antarmuka pengguna saat ini bahkan tidak akan membiarkan Anda melihat kunci privat mentahnya.
 * Kunci privat dapat disimpan dalam bentuk terenkripsi, sebagai file "*keystore*" digital. Karena dienkripsi, kunci tersebut memerlukan kata sandi untuk membukanya. Saat Anda diminta untuk memilih kata sandi, **buatlah yang kuat** (yaitu, panjang dan acak), cadangkan, dan jangan bagikan. Jika Anda tidak memiliki pengelola kata sandi, tuliskan dan simpan di tempat yang aman dan rahasia. Untuk mengakses akun Anda, Anda memerlukan file *keystore* dan kata sandinya.
 * **Jangan menyimpan kata sandi apa pun** dalam dokumen digital, foto digital, tangkapan layar, drive daring, PDF terenkripsi, dll. Sekali lagi, jangan mengimprovisasi keamanan. Gunakan pengelola kata sandi atau pena dan kertas.
-* Saat Anda diminta untuk mencadangkan kunci sebagai **urutan kata mnemonik**, gunakan pena dan kertas untuk membuat cadangan fisik. Jangan menunda tugas itu "untuk nanti"; Anda akan lupa. Cadangan ini dapat digunakan untuk membangun kembali kunci privat Anda jika Anda kehilangan semua data yang tersimpan di sistem Anda, atau jika Anda lupa atau kehilangan kata sandi. Namun, mereka juga dapat digunakan oleh penyerang untuk mendapatkan kunci privat Anda, jadi **jangan pernah menyimpannya secara digital**, dan simpan salinan fisiknya dengan aman di laci atau brankas yang terkunci.
+* Saat Anda diminta untuk mencadangkan kunci sebagai **urutan kata mnemonic**, gunakan pena dan kertas untuk membuat cadangan fisik. Jangan menunda tugas itu "untuk nanti"; Anda akan lupa. Cadangan ini dapat digunakan untuk membangun kembali kunci privat Anda jika Anda kehilangan semua data yang tersimpan di sistem Anda, atau jika Anda lupa atau kehilangan kata sandi. Namun, mereka juga dapat digunakan oleh penyerang untuk mendapatkan kunci privat Anda, jadi **jangan pernah menyimpannya secara digital**, dan simpan salinan fisiknya dengan aman di laci atau brankas yang terkunci.
 * Sebelum mentransfer jumlah besar (terutama ke alamat baru), **lakukan transaksi uji coba kecil terlebih dahulu** (misalnya, senilai kurang dari $1) dan tunggu konfirmasi penerimaan.
 * Saat Anda membuat akun baru, mulailah dengan hanya mengirim transaksi uji coba kecil ke alamat baru tersebut. Setelah Anda menerima transaksi uji coba, coba kirim kembali dari akun itu. Ada banyak alasan pembuatan akun bisa salah, dan jika salah, lebih baik mengetahuinya dengan kerugian kecil. Jika pengujian berhasil, semuanya baik-baik saja.
 * Penjelajah blok (*block explorer*) publik adalah cara mudah untuk melihat secara independen apakah sebuah transaksi telah diterima oleh jaringan. Namun, kemudahan ini berdampak negatif pada privasi Anda, karena Anda mengungkapkan alamat Anda ke penjelajah blok, yang dapat melacak Anda.
@@ -646,11 +646,11 @@ Setelah MetaMask terinstal, Anda akan melihat ikon baru (kepala rubah) di bilah 
 
 > Kata sandi ini mengontrol akses ke MetaMask, sehingga tidak dapat digunakan oleh siapa pun yang memiliki akses ke browser Anda.
 
-Setelah Anda mengatur kata sandi, MetaMask akan membuat dompet untuk Anda dan menunjukkan cadangan mnemonik yang terdiri dari 12 kata dalam bahasa Inggris (lihat Gambar 2-3). Kata-kata ini dapat digunakan di dompet kompatibel mana pun untuk memulihkan akses ke dana Anda jika terjadi sesuatu pada MetaMask atau komputer Anda. **Anda tidak memerlukan kata sandi untuk pemulihan ini; 12 kata tersebut sudah cukup.**
+Setelah Anda mengatur kata sandi, MetaMask akan membuat dompet untuk Anda dan menunjukkan cadangan mnemonic yang terdiri dari 12 kata dalam bahasa Inggris (lihat Gambar 2-3). Kata-kata ini dapat digunakan di dompet kompatibel mana pun untuk memulihkan akses ke dana Anda jika terjadi sesuatu pada MetaMask atau komputer Anda. **Anda tidak memerlukan kata sandi untuk pemulihan ini; 12 kata tersebut sudah cukup.**
 
 > **Peringatan Keamanan** ✍️
 >
-> Cadangkan mnemonik Anda (12 kata) **di atas kertas, sebanyak dua kali**. Simpan kedua cadangan kertas di dua lokasi aman yang terpisah, seperti brankas tahan api, laci terkunci, atau kotak deposit. Perlakukan cadangan kertas ini seperti uang tunai dengan nilai yang setara dengan apa yang Anda simpan di dompet Ethereum Anda. **Siapa pun yang memiliki akses ke kata-kata ini dapat memperoleh akses dan mencuri uang Anda.**
+> Cadangkan mnemonic Anda (12 kata) **di atas kertas, sebanyak dua kali**. Simpan kedua cadangan kertas di dua lokasi aman yang terpisah, seperti brankas tahan api, laci terkunci, atau kotak deposit. Perlakukan cadangan kertas ini seperti uang tunai dengan nilai yang setara dengan apa yang Anda simpan di dompet Ethereum Anda. **Siapa pun yang memiliki akses ke kata-kata ini dapat memperoleh akses dan mencuri uang Anda.**
 
 <p align="center">
   <img src="images/books-07-mastering_ethereum/figure-2.3.png" alt="gambar" width="580"/>
@@ -1660,8 +1660,6 @@ tern of dots on an unfathomably large grid.
   <img src="images/books-07-mastering_ethereum/figure-4.1.png" alt="gambar" width="580"/>
 </p>
 
-Tentu, ini adalah terjemahan dan perapian dari teks yang Anda berikan, dengan mempertahankan semua konten asli dan memformatnya agar sesuai untuk file Markdown (`.md`).
-
 Jadi, sebagai contoh, berikut ini adalah titik Q dengan koordinat (x,y) yang merupakan sebuah titik pada kurva `secp256k1`:
 $Q =$
 (49790390825249384486033144355916864607616083520101638681403973749255924539515,
@@ -1726,9 +1724,9 @@ $y = \\text{83b5c38e5e2b0c8529d7fa3f64d46daa1ece2d9ac14cab9477d042c84c32ccd0}$
 
 Di Ethereum, Anda mungkin melihat kunci publik direpresentasikan sebagai serialisasi dari 130 karakter heksadesimal (65 byte). Ini diadopsi dari format serialisasi standar yang diusulkan oleh konsorsium industri Standards for Efficient Cryptography Group (SECG), yang didokumentasikan dalam Standards for Efficient Cryptography (SEC1). Standar ini mendefinisikan empat kemungkinan awalan yang dapat digunakan untuk mengidentifikasi titik pada kurva eliptik, yang tercantum dalam Tabel 4-1.
 
-\<p align="center"\>
-  \<img src="images/books-07-mastering\_ethereum/tabel-4.1.png" alt="gambar" width="580"/\>
-\</p\>
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-4.1.png" alt="gambar" width="580"/>
+</p>
 
 Ethereum hanya menggunakan kunci publik yang tidak terkompresi; oleh karena itu satu-satunya awalan yang relevan adalah (hex) `04`. Serialisasi ini menggabungkan koordinat `x` dan `y` dari kunci publik:
 
@@ -1960,3 +1958,330 @@ Dalam bab ini kami memberikan survei singkat tentang kriptografi kunci publik da
 
 ---
 
+# BAB 5
+## Dompet (Wallets)
+
+Kata “dompet” atau *"wallet"* digunakan untuk mendeskripsikan beberapa hal yang berbeda di Ethereum.
+
+Pada tingkat tinggi, **dompet adalah aplikasi perangkat lunak yang berfungsi sebagai antarmuka pengguna utama ke Ethereum**. Dompet mengontrol akses ke uang pengguna, mengelola kunci dan alamat, melacak saldo, serta membuat dan menandatangani transaksi. Selain itu, beberapa dompet Ethereum juga dapat berinteraksi dengan kontrak, seperti token ERC20.
+
+Lebih sempit lagi, dari perspektif seorang pemrogram, kata dompet merujuk pada **sistem yang digunakan untuk menyimpan dan mengelola kunci pengguna**. Setiap dompet memiliki komponen manajemen kunci. Bagi beberapa dompet, hanya itu saja yang ada. Dompet lain adalah bagian dari kategori yang jauh lebih luas, yaitu *browser*, yang merupakan antarmuka untuk aplikasi terdesentralisasi berbasis Ethereum, atau DApps, yang akan kita periksa lebih detail di Bab 12. Tidak ada garis pemisah yang jelas antara berbagai kategori yang digabungkan di bawah istilah dompet.
+
+Dalam bab ini kita akan melihat dompet sebagai wadah untuk kunci privat, dan sebagai sistem untuk mengelola kunci-kunci ini.
+
+### Tinjauan Teknologi Dompet
+
+Di bagian ini kami merangkum berbagai teknologi yang digunakan untuk membangun dompet Ethereum yang ramah pengguna, aman, dan fleksibel.
+
+Salah satu pertimbangan utama dalam merancang dompet adalah menyeimbangkan **kenyamanan dan privasi**. Dompet Ethereum yang paling nyaman adalah yang memiliki satu kunci privat dan alamat yang Anda gunakan kembali untuk semuanya. Sayangnya, solusi seperti itu adalah mimpi buruk privasi, karena siapa pun dapat dengan mudah melacak dan menghubungkan semua transaksi Anda. Menggunakan kunci baru untuk setiap transaksi adalah yang terbaik untuk privasi, tetapi menjadi sangat sulit untuk dikelola. Keseimbangan yang tepat sulit dicapai, tetapi itulah mengapa desain dompet yang baik sangat penting.
+
+Kesalahpahaman umum tentang Ethereum adalah bahwa dompet Ethereum berisi ether atau token. Faktanya, secara tegas, **dompet hanya menyimpan kunci**. Ether atau token lainnya dicatat di blockchain Ethereum. Pengguna mengontrol token di jaringan dengan menandatangani transaksi menggunakan kunci di dompet mereka. Dalam arti tertentu, **dompet Ethereum adalah sebuah gantungan kunci**. Meskipun demikian, mengingat bahwa kunci yang dipegang oleh dompet adalah satu-satunya hal yang diperlukan untuk mentransfer ether atau token kepada orang lain, dalam praktiknya perbedaan ini tidak terlalu relevan. Perbedaan ini menjadi penting dalam mengubah pola pikir dari berurusan dengan sistem terpusat perbankan konvensional (di mana hanya Anda, dan bank, yang dapat melihat uang di rekening Anda, dan Anda hanya perlu meyakinkan bank bahwa Anda ingin memindahkan dana untuk melakukan transaksi) ke sistem terdesentralisasi platform blockchain (di mana semua orang dapat melihat saldo ether sebuah akun, meskipun mereka mungkin tidak tahu siapa pemilik akun tersebut, dan semua orang perlu diyakinkan bahwa pemilik ingin memindahkan dana agar transaksi dapat diberlakukan). Dalam praktiknya ini berarti ada cara independen untuk memeriksa saldo akun, tanpa memerlukan dompetnya. Selain itu, Anda dapat memindahkan penanganan akun Anda dari dompet saat ini ke dompet yang berbeda, jika Anda mulai tidak menyukai aplikasi dompet yang Anda gunakan pada awalnya.
+
+> Dompet Ethereum berisi kunci, bukan ether atau token. Dompet ibarat gantungan kunci yang berisi pasangan kunci privat dan publik. Pengguna menandatangani transaksi dengan kunci privat, dengan demikian membuktikan bahwa mereka memiliki ether tersebut. Ether disimpan di blockchain.
+
+Ada dua jenis utama dompet, dibedakan berdasarkan apakah kunci yang dikandungnya saling berhubungan atau tidak.
+
+Tipe pertama adalah **dompet non-deterministik**, di mana setiap kunci dibuat secara independen dari nomor acak yang berbeda. Kunci-kunci tersebut tidak saling berhubungan. Jenis dompet ini juga dikenal sebagai **dompet JBOK**, dari frasa “Just a Bunch of Keys” (Hanya Sekumpulan Kunci).
+
+Tipe kedua adalah **dompet deterministik**, di mana semua kunci diturunkan dari satu kunci utama tunggal, yang dikenal sebagai **seed**. Semua kunci dalam jenis dompet ini saling berhubungan dan dapat dibuat kembali jika seseorang memiliki *seed* asli. Ada sejumlah metode derivasi kunci yang berbeda yang digunakan dalam dompet deterministik. Metode derivasi yang paling umum digunakan menggunakan struktur seperti pohon, seperti yang dijelaskan dalam “Dompet Deterministik Hirarkis (BIP-32/BIP-44)” di halaman 82.
+
+Untuk membuat dompet deterministik sedikit lebih aman terhadap kecelakaan kehilangan data, seperti ponsel Anda dicuri atau jatuh ke toilet, *seed* sering dikodekan sebagai daftar kata (dalam bahasa Inggris atau bahasa lain) untuk Anda tulis dan gunakan jika terjadi kecelakaan. Ini dikenal sebagai **kata-kata kode mnemonic** dompet. Tentu saja, jika seseorang mendapatkan kata-kata kode mnemonic Anda, maka mereka juga dapat membuat ulang dompet Anda dan dengan demikian mendapatkan akses ke ether dan kontrak pintar Anda. Oleh karena itu, berhati-hatilah dengan daftar kata pemulihan Anda\! **Jangan pernah menyimpannya secara elektronik**, dalam sebuah file, di komputer atau ponsel Anda. Tuliskan di atas kertas dan simpan di tempat yang aman dan terlindungi.
+
+Beberapa bagian berikutnya memperkenalkan masing-masing teknologi ini pada tingkat tinggi.
+
+### Dompet Non-Deterministik (Acak)
+
+Di dompet Ethereum pertama (yang diproduksi untuk pra-penjualan Ethereum), setiap file dompet menyimpan satu kunci privat yang dibuat secara acak. Dompet semacam itu digantikan dengan dompet deterministik karena dompet "gaya lama" ini dalam banyak hal lebih rendah. Misalnya, dianggap praktik yang baik untuk menghindari penggunaan kembali alamat Ethereum sebagai bagian dari memaksimalkan privasi Anda saat menggunakan Ethereum—yaitu, menggunakan alamat baru (yang memerlukan kunci privat baru) setiap kali Anda menerima dana. Anda bisa melangkah lebih jauh dan menggunakan alamat baru untuk setiap transaksi, meskipun ini bisa menjadi mahal jika Anda banyak berurusan dengan token. Untuk mengikuti praktik ini, dompet non-deterministik perlu secara teratur menambah daftar kuncinya, yang berarti Anda perlu membuat cadangan secara teratur. Jika Anda kehilangan data (kegagalan disk, kecelakaan minuman, ponsel dicuri) sebelum Anda berhasil mencadangkan dompet Anda, Anda akan kehilangan akses ke dana dan kontrak pintar Anda. Dompet non-deterministik "tipe 0" adalah yang paling sulit untuk ditangani, karena mereka membuat file dompet baru untuk setiap alamat baru secara “just in time”.
+
+Meskipun demikian, banyak klien Ethereum (termasuk geth) menggunakan file **keystore**, yang merupakan file berenkode JSON yang berisi satu kunci privat (yang dibuat secara acak), dienkripsi dengan *passphrase* untuk keamanan ekstra. Isi file JSON terlihat seperti ini:
+
+```json
+{
+"address": "001d3f1ef827552ae1114027bd3ecf1f086ba0f9",
+"crypto": {
+"cipher": "aes-128-ctr",
+"ciphertext":
+"233a9f4d236ed0c13394b504b6da5df02587c8bf1ad8946f6f2b58f055507ece",
+"cipherparams": {
+"iv": "d10c6ec5bae81b6cb9144de81037fa15"
+},
+"kdf": "scrypt",
+"kdfparams": {
+"dklen": 32,
+"n": 262144,
+"p": 1,
+"r": 8,
+"salt":
+"99d37a47c7c9429c66976f643f386a61b78b97f3246adca89abe4245d2788407"
+},
+"mac": "594c8df1c8ee0ded8255a50caf07e8c12061fd859f4b7c76ab704b17c957e842"
+},
+"id": "4fcb2ba4-ccdb-424f-89d5-26cce304bf9c",
+"version": 3
+}
+```
+
+Format keystore menggunakan **key derivation function (KDF)**, juga dikenal sebagai algoritma peregangan kata sandi (*password stretching*), yang melindungi dari serangan *brute-force*, kamus, dan *rainbow table*. Secara sederhana, kunci privat tidak dienkripsi oleh *passphrase* secara langsung. Sebaliknya, *passphrase* diregangkan, dengan melakukan hashing berulang kali. Fungsi hashing diulang sebanyak 262.144 putaran, yang dapat dilihat di JSON keystore sebagai parameter `crypto.kdfparams.n`. Penyerang yang mencoba melakukan *brute-force* pada *passphrase* harus menerapkan 262.144 putaran hashing untuk setiap *passphrase* yang dicoba, yang memperlambat serangan secukupnya untuk membuatnya tidak mungkin dilakukan untuk *passphrase* dengan kompleksitas dan panjang yang memadai.
+
+Ada sejumlah pustaka perangkat lunak yang dapat membaca dan menulis format keystore, seperti pustaka JavaScript `keythereum`.
+
+> Penggunaan dompet non-deterministik tidak disarankan untuk apa pun selain tes sederhana. Dompet ini terlalu merepotkan untuk dicadangkan dan digunakan untuk situasi apa pun kecuali yang paling dasar. Sebaliknya, gunakan dompet HD berbasis standar industri dengan *seed* mnemonic untuk pencadangan.
+
+### Dompet Deterministik (Berbasis Seed)
+
+Dompet deterministik atau "berbasis *seed*" adalah dompet yang berisi kunci privat yang semuanya diturunkan dari satu kunci utama tunggal, atau **seed**. *Seed* adalah angka yang dihasilkan secara acak yang dikombinasikan dengan data lain, seperti nomor indeks atau “kode rantai” (*chain code*) (lihat “Kunci publik dan privat yang diperluas” di halaman 93), untuk mendapatkan sejumlah kunci privat.
+
+Dalam dompet deterministik, *seed* sudah cukup untuk memulihkan semua kunci yang diturunkan, dan oleh karena itu satu cadangan tunggal, pada saat pembuatan, sudah cukup untuk mengamankan semua dana dan kontrak pintar di dalam dompet. *Seed* juga cukup untuk ekspor atau impor dompet, memungkinkan migrasi yang mudah dari semua kunci di antara implementasi dompet yang berbeda. Desain ini membuat keamanan *seed* menjadi yang paling penting, karena hanya *seed* yang diperlukan untuk mendapatkan akses ke seluruh dompet. Di sisi lain, kemampuan untuk memfokuskan upaya keamanan pada satu bagian data dapat dilihat sebagai keuntungan.
+
+### Dompet Deterministik Hirarkis (BIP-32/BIP-44)
+
+Dompet deterministik dikembangkan untuk memudahkan penurunan banyak kunci dari satu *seed* tunggal. Saat ini, bentuk paling canggih dari dompet deterministik adalah **dompet deterministik hirarkis (HD)** yang didefinisikan oleh standar BIP-32 Bitcoin. Dompet HD berisi kunci yang diturunkan dalam struktur pohon, sedemikian rupa sehingga kunci induk dapat menurunkan urutan kunci anak, yang masing-masing dapat menurunkan urutan kunci cucu, dan seterusnya. Struktur pohon ini diilustrasikan pada Gambar 5-1.
+
+\<p align="center"\>
+  \<img src="images/books-07-mastering\_ethereum/figure-5.1.png" alt="gambar" width="580"/\>
+\</p\>
+
+Dompet HD menawarkan beberapa keuntungan utama dibandingkan dompet deterministik yang lebih sederhana. Pertama, **struktur pohon dapat digunakan untuk mengekspresikan makna organisasi tambahan**, seperti ketika cabang subkunci tertentu digunakan untuk menerima pembayaran masuk dan cabang yang berbeda digunakan untuk menerima kembalian dari pembayaran keluar. Cabang kunci juga dapat digunakan dalam pengaturan perusahaan, mengalokasikan cabang yang berbeda ke departemen, anak perusahaan, fungsi spesifik, atau kategori akuntansi.
+
+Keuntungan kedua dari dompet HD adalah bahwa **pengguna dapat membuat urutan kunci publik tanpa memiliki akses ke kunci privat yang sesuai**. Ini memungkinkan dompet HD digunakan di server yang tidak aman atau dalam kapasitas hanya-tonton (*watch-only*) atau hanya-terima (*receive-only*), di mana dompet tidak memiliki kunci privat yang dapat membelanjakan dana.
+
+### Seed dan Kode mnemonic (BIP-39)
+
+Ada banyak cara untuk mengkodekan kunci privat untuk pencadangan dan pemulihan yang aman. Metode yang saat ini lebih disukai adalah menggunakan **urutan kata** yang, bila diambil bersama-sama dalam urutan yang benar, dapat secara unik membuat ulang kunci privat. Ini kadang-kadang dikenal sebagai **mnemonic**, dan pendekatan ini telah distandarisasi oleh BIP-39. Saat ini, banyak dompet Ethereum (serta dompet untuk mata uang kripto lainnya) menggunakan standar ini, dan dapat mengimpor dan mengekspor *seed* untuk pencadangan dan pemulihan menggunakan mnemonic yang dapat dioperasikan.
+
+Untuk melihat mengapa pendekatan ini menjadi populer, mari kita lihat sebuah contoh:
+
+```
+FCCF1AB3329FD5DA3DA9577511F8F137
+
+wolf juice proud gown wool unfair
+wall cliff insect more detail hub
+```
+
+Secara praktis, kemungkinan kesalahan saat menulis urutan heksadesimal sangat tinggi. Sebaliknya, daftar kata yang diketahui cukup mudah untuk ditangani, terutama karena ada tingkat redundansi yang tinggi dalam penulisan kata (terutama kata-kata bahasa Inggris). Jika “inzect” tercatat secara tidak sengaja, dapat dengan cepat ditentukan, saat pemulihan dompet diperlukan, bahwa “inzect” bukan kata bahasa Inggris yang valid dan bahwa “insect” harus digunakan sebagai gantinya. Kita berbicara tentang menulis representasi *seed* karena itu adalah praktik yang baik saat mengelola dompet HD: *seed* diperlukan untuk memulihkan dompet jika terjadi kehilangan data (baik karena kecelakaan atau pencurian), jadi menyimpan cadangan sangat bijaksana. Namun, *seed* harus dijaga sangat privat, jadi cadangan digital harus dihindari dengan hati-hati; oleh karena itu saran sebelumnya untuk mencadangkan dengan pena dan kertas.
+
+Singkatnya, penggunaan daftar kata pemulihan untuk mengkodekan *seed* untuk dompet HD menjadi cara termudah untuk mengekspor, menyalin, mencatat di atas kertas, membaca tanpa kesalahan, dan mengimpor satu set kunci privat ke dompet lain dengan aman.
+
+### Praktik Terbaik Dompet (Wallet Best Practices)
+
+Seiring dengan matangnya teknologi dompet mata uang kripto, standar industri umum tertentu telah muncul yang membuat dompet dapat dioperasikan secara luas, mudah digunakan, aman, dan fleksibel. Standar-standar ini juga memungkinkan dompet untuk menurunkan kunci untuk berbagai mata uang kripto yang berbeda, semuanya dari satu mnemonic tunggal. Standar umum ini adalah:
+
+  * Kata-kata kode mnemonic, berdasarkan **BIP-39**
+  * Dompet HD, berdasarkan **BIP-32**
+  * Struktur dompet HD multiguna, berdasarkan **BIP-43**
+  * Dompet multikurensi dan multiakun, berdasarkan **BIP-44**
+
+Standar-standar ini mungkin berubah atau menjadi usang oleh perkembangan di masa depan, tetapi untuk saat ini mereka membentuk seperangkat teknologi yang saling terkait yang telah menjadi standar dompet de facto untuk sebagian besar platform blockchain dan mata uang kripto mereka.
+
+Standar-standar tersebut telah diadopsi oleh berbagai macam dompet perangkat lunak dan perangkat keras, membuat semua dompet ini dapat dioperasikan. Pengguna dapat mengekspor mnemonic yang dibuat di salah satu dompet ini dan mengimpornya ke dompet lain, memulihkan semua kunci dan alamat.
+
+Beberapa contoh dompet perangkat lunak yang mendukung standar ini termasuk (diurutkan berdasarkan abjad) **Jaxx, MetaMask, MyCrypto, dan MyEtherWallet (MEW)**. Contoh dompet perangkat keras yang mendukung standar ini termasuk **Keepkey, Ledger, dan Trezor**.
+
+Bagian-bagian berikut memeriksa masing-masing teknologi ini secara detail.
+
+> Jika Anda mengimplementasikan dompet Ethereum, dompet tersebut harus dibangun sebagai dompet HD, dengan *seed* yang dikodekan sebagai kata kode mnemonic untuk pencadangan, mengikuti standar BIP-32, BIP-39, BIP-43, dan BIP-44, seperti yang dijelaskan di bagian berikut.
+
+### Kata-Kata Kode mnemonic (BIP-39)
+
+Kata-kata kode mnemonic adalah urutan kata yang mengkodekan nomor acak yang digunakan sebagai *seed* untuk menurunkan dompet deterministik. Urutan kata sudah cukup untuk membuat ulang *seed*, dan dari sana membuat ulang dompet dan semua kunci yang diturunkan. Aplikasi dompet yang mengimplementasikan dompet deterministik dengan kata-kata mnemonic akan menunjukkan kepada pengguna urutan 12 hingga 24 kata saat pertama kali membuat dompet. Urutan kata itu adalah cadangan dompet, dan dapat digunakan untuk memulihkan dan membuat ulang semua kunci di aplikasi dompet yang sama atau yang kompatibel. Seperti yang kami jelaskan sebelumnya, daftar kata mnemonic memudahkan pengguna untuk mencadangkan dompet, karena mudah dibaca dan disalin dengan benar.
+
+> Kata-kata mnemonic sering disalahartikan dengan “brainwallets.” Keduanya tidak sama. Perbedaan utamanya adalah *brainwallet* terdiri dari kata-kata yang dipilih oleh pengguna, sedangkan kata-kata mnemonic dibuat secara acak oleh dompet dan disajikan kepada pengguna. Perbedaan penting ini membuat kata-kata mnemonic jauh lebih aman, karena manusia adalah sumber keacakan yang sangat buruk. Mungkin yang lebih penting, menggunakan istilah “brainwallet” menyiratkan bahwa kata-kata tersebut harus dihafal, yang merupakan ide yang buruk, dan resep untuk tidak memiliki cadangan Anda saat Anda membutuhkannya.
+
+Kode mnemonic didefinisikan dalam BIP-39. Perhatikan bahwa BIP-39 adalah salah satu implementasi dari standar kode mnemonic. Ada standar yang berbeda, dengan seperangkat kata yang berbeda, yang digunakan oleh dompet Bitcoin Electrum dan mendahului BIP-39. BIP-39 diusulkan oleh perusahaan di balik dompet perangkat keras Trezor dan tidak kompatibel dengan implementasi Electrum. Namun, BIP-39 kini telah mencapai dukungan industri yang luas di puluhan implementasi yang dapat dioperasikan dan harus dianggap sebagai standar industri de facto. Selanjutnya, BIP-39 dapat digunakan untuk menghasilkan dompet multikurensi yang mendukung Ethereum, sedangkan *seed* Electrum tidak bisa.
+
+BIP-39 mendefinisikan pembuatan kode mnemonic dan *seed*, yang kami jelaskan di sini dalam sembilan langkah. Untuk kejelasan, prosesnya dibagi menjadi dua bagian: langkah 1 hingga 6 ditunjukkan di “Menghasilkan kata-kata mnemonic” di halaman 86 dan langkah 7 hingga 9 ditunjukkan di “Dari mnemonic ke seed”.
+
+### Menghasilkan kata-kata mnemonic
+
+Kata-kata mnemonic dihasilkan secara otomatis oleh dompet menggunakan proses terstandarisasi yang didefinisikan dalam BIP-39. Dompet dimulai dari sumber entropi (sumber keacakan), menambahkan *checksum*, lalu memetakan entropi tersebut ke daftar kata:
+
+1.  Buat urutan acak secara kriptografis ($S$) dengan panjang 128 hingga 256 bit.
+2.  Buat *checksum* dari $S$ dengan mengambil bit-bit pertama dari hash SHA-256 dari $S$. Jumlah bit yang diambil adalah `(panjang S) / 32`.
+3.  Tambahkan *checksum* ke akhir urutan acak $S$.
+4.  Bagi gabungan urutan-dan-*checksum* menjadi beberapa bagian yang masing-masing panjangnya 11 bit.
+5.  Petakan setiap nilai 11-bit ke sebuah kata dari kamus yang telah ditentukan sebelumnya yang berisi 2.048 kata.
+6.  Buat kode mnemonic dari urutan kata-kata tersebut, dengan tetap mempertahankan urutannya.
+
+Gambar 5-2 menunjukkan bagaimana entropi digunakan untuk menghasilkan kata-kata mnemonic.
+
+Tabel 5-1 menunjukkan hubungan antara ukuran data entropi dan panjang kode mnemonic dalam jumlah kata.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-5.1.png" alt="gambar" width="580"/>
+</p>
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-5.2.png" alt="gambar" width="580"/>
+</p>
+
+### Dari mnemonic ke seed
+
+Kata-kata mnemonic merepresentasikan entropi dengan panjang 128 hingga 256 bit. Entropi tersebut kemudian digunakan untuk menurunkan *seed* yang lebih panjang (512-bit) melalui penggunaan **fungsi peregangan kunci (key-stretching function) PBKDF2**. *Seed* yang dihasilkan digunakan untuk membangun dompet deterministik dan menurunkan kunci-kuncinya.
+
+Fungsi peregangan kunci mengambil dua parameter: **mnemonic** dan **salt**. Tujuan dari *salt* dalam fungsi peregangan kunci adalah untuk menyulitkan pembuatan tabel pencarian (*lookup table*) yang memungkinkan serangan *brute-force*. Dalam standar BIP-39, *salt* memiliki tujuan lain: memungkinkan pengenalan *passphrase* yang berfungsi sebagai faktor keamanan tambahan yang melindungi *seed*, seperti yang akan kami jelaskan lebih detail di “Passphrase opsional dalam BIP-39” di halaman 90.
+
+Proses yang dijelaskan dalam langkah 7 hingga 9 berlanjut dari proses yang dijelaskan di bagian sebelumnya:
+
+7.  Parameter pertama untuk fungsi peregangan kunci PBKDF2 adalah mnemonic yang dihasilkan pada langkah 6.
+8.  Parameter kedua untuk fungsi peregangan kunci PBKDF2 adalah *salt*. *Salt* terdiri dari konstanta string `"mnemonic"` yang digabungkan dengan *passphrase* opsional yang disediakan pengguna.
+9.  PBKDF2 meregangkan parameter mnemonic dan *salt* menggunakan 2.048 putaran hashing dengan algoritma HMAC-SHA512, menghasilkan nilai 512-bit sebagai output akhirnya. Nilai 512-bit itulah yang menjadi **seed**.
+
+Gambar 5-3 menunjukkan bagaimana sebuah mnemonic digunakan untuk menghasilkan *seed*.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-5.3.png" alt="gambar" width="580"/>
+</p>
+
+> Fungsi peregangan kunci, dengan 2.048 putaran hashing-nya, merupakan perlindungan yang cukup efektif terhadap serangan *brute-force* terhadap mnemonic atau *passphrase*. Hal ini membuatnya mahal (secara komputasi) untuk mencoba lebih dari beberapa ribu kombinasi *passphrase* dan mnemonic, sementara jumlah kemungkinan *seed* yang diturunkan sangat besar ($2^{512}$, atau sekitar $10^{154}$)—jauh lebih besar dari jumlah atom di alam semesta yang terlihat (sekitar $10^{80}$).
+
+Tabel 5-2, 5-3, dan 5-4 menunjukkan beberapa contoh kode mnemonic dan *seed* yang dihasilkannya.
+
+**Tabel 5-2. Kode mnemonic entropi 128-bit, tanpa passphrase, menghasilkan seed**
+| | |
+|---|---|
+|**Input Entropi (128 bit)**|`0c1e24e5917779d297e14d45f14e1a1a`|
+|**mnemonic (12 kata)**|`army van defense carry jealous true garbage claim echo media make crunch`|
+|**Passphrase**| (tidak ada) |
+|**Seed (512 bit)**|`5b56c417303faa3fcba7e57400e120a0ca83ec5a4fc9ffba757fbe63fbd77a89a1a3be4c67196f57c39a88b76373733891bfaba16ed27a813ceed498804c0570`|
+
+**Tabel 5-3. Kode mnemonic entropi 128-bit, dengan passphrase, menghasilkan seed**
+| | |
+|---|---|
+|**Input Entropi (128 bit)**|`0c1e24e5917779d297e14d45f14e1a1a`|
+|**mnemonic (12 kata)**|`army van defense carry jealous true garbage claim echo media make crunch`|
+|**Passphrase**|`SuperDuperSecret`|
+|**Seed (512 bit)**|`3b5df16df2157104cfdd22830162a5e170c0161653e3afe6c88defeefb0818c793dbb28ab3ab091897d0715861dc8a18358f80b79d49acf64142ae57037d1d54`|
+
+**Tabel 5-4. Kode mnemonic entropi 256-bit, tanpa passphrase, menghasilkan seed**
+| | |
+|---|---|
+|**Input Entropi (256 bit)**|`2041546864449caff939d32d574753fe684d3c947c3346713dd8423e74abcf8c`|
+|**Mnemonic (24 kata)**|`cake apple borrow silk endorse fitness top denial coil riot stay wolf luggage oxygen faint major edit measure invite love trap field dilemma oblige`|
+|**Passphrase**| (tidak ada) |
+|**Seed (512 bit)**|`3269bce2674acbd188d4f120072b13b088a0ecf87c6e4cae41657a0bb78f5315b33b3a04356e53d062e55f1e0deaa082df8d487381379df848a6ad7e98798404`|
+
+### Passphrase opsional dalam BIP-39
+
+Standar BIP-39 memungkinkan penggunaan *passphrase* opsional dalam derivasi *seed*. Jika tidak ada *passphrase* yang digunakan, mnemonic diregangkan dengan *salt* yang terdiri dari string konstan `"mnemonic"`, menghasilkan *seed* 512-bit spesifik dari mnemonic tertentu. Jika *passphrase* digunakan, fungsi peregangan menghasilkan *seed* yang berbeda dari mnemonic yang sama. Faktanya, dengan satu mnemonic, setiap *passphrase* yang mungkin akan menghasilkan *seed* yang berbeda. Intinya, tidak ada *passphrase* yang “salah”. Semua *passphrase* valid dan semuanya mengarah ke *seed* yang berbeda, membentuk sekumpulan besar kemungkinan dompet yang belum diinisialisasi. Kumpulan dompet yang mungkin sangat besar ($2^{512}$) sehingga tidak ada kemungkinan praktis untuk melakukan *brute-forcing* atau menebak secara tidak sengaja salah satu yang sedang digunakan, selama *passphrase* memiliki kompleksitas dan panjang yang cukup.
+
+> Tidak ada *passphrase* yang “salah” dalam BIP-39. Setiap *passphrase* mengarah ke beberapa dompet, yang kecuali sebelumnya digunakan akan kosong.
+
+*Passphrase* opsional menciptakan dua fitur penting:
+
+  * **Faktor kedua** (sesuatu yang dihafal) yang membuat mnemonic tidak berguna jika berdiri sendiri, melindungi cadangan mnemonic dari kompromi oleh pencuri.
+  * Bentuk **penyangkalan yang masuk akal (*plausible deniability*)** atau “dompet paksaan (*duress wallet*)”, di mana *passphrase* yang dipilih mengarah ke dompet dengan sejumlah kecil dana, digunakan untuk mengalihkan perhatian penyerang dari dompet “asli” yang berisi sebagian besar dana.
+
+Namun, penting untuk dicatat bahwa penggunaan *passphrase* juga membawa risiko kehilangan:
+
+  * Jika pemilik dompet tidak mampu atau meninggal dan tidak ada orang lain yang tahu *passphrase*-nya, *seed* menjadi tidak berguna dan semua dana yang disimpan di dompet akan hilang selamanya.
+  * Sebaliknya, jika pemilik mencadangkan *passphrase* di tempat yang sama dengan *seed*, itu mengalahkan tujuan dari faktor kedua.
+
+Meskipun *passphrase* sangat berguna, mereka hanya boleh digunakan dalam kombinasi dengan proses yang direncanakan dengan cermat untuk pencadangan dan pemulihan, dengan mempertimbangkan kemungkinan ahli waris yang masih hidup dari pemilik dapat memulihkan mata uang kripto tersebut.
+
+### Bekerja dengan kode mnemonic
+
+BIP-39 diimplementasikan sebagai pustaka dalam banyak bahasa pemrograman yang berbeda. Sebagai contoh:
+
+  * **python-mnemonic**
+    Implementasi referensi standar oleh tim SatoshiLabs yang mengusulkan BIP-39, dalam Python.
+  * **ConsenSys/eth-lightwallet**
+    Dompet JS Ethereum ringan untuk *node* dan *browser* (dengan BIP-39).
+  * **npm/bip39**
+    Implementasi JavaScript dari Bitcoin BIP-39: Kode mnemonic untuk menghasilkan kunci deterministik.
+
+Ada juga generator BIP-39 yang diimplementasikan dalam halaman web mandiri (Gambar 5-4), yang sangat berguna untuk pengujian dan eksperimen. Mnemonic Code Converter menghasilkan mnemonic, *seed*, dan kunci privat yang diperluas. Ini dapat digunakan secara luring di browser, atau diakses secara daring.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/figure-5.4.png" alt="gambar" width="580"/>
+</p>
+
+### Membuat Dompet HD dari Seed
+
+Dompet HD dibuat dari satu **root seed**, yang merupakan angka acak 128-, 256-, atau 512-bit. Paling umum, *seed* ini dihasilkan dari mnemonic seperti yang dijelaskan di bagian sebelumnya.
+
+Setiap kunci di dompet HD diturunkan secara deterministik dari *root seed* ini, yang memungkinkan untuk membuat ulang seluruh dompet HD dari *seed* tersebut di dompet HD lain yang kompatibel. Hal ini memudahkan untuk mengekspor, mencadangkan, memulihkan, dan mengimpor dompet HD yang berisi ribuan atau bahkan jutaan kunci dengan hanya mentransfer mnemonic dari mana *root seed* diturunkan.
+
+### Dompet HD (BIP-32) dan Path (BIP-43/44)
+
+Sebagian besar dompet HD mengikuti standar BIP-32, yang telah menjadi standar industri de facto untuk pembuatan kunci deterministik.
+
+Kami не akan membahas semua detail BIP-32 di sini, hanya komponen yang diperlukan untuk memahami bagaimana ia digunakan di dompet. Aspek penting utama adalah hubungan hirarkis seperti pohon yang dapat dimiliki oleh kunci-kunci turunan, seperti yang dapat Anda lihat di Gambar 5-1. Penting juga untuk memahami gagasan tentang kunci yang diperluas (*extended keys*) dan kunci yang diperkeras (*hardened keys*), yang dijelaskan di bagian berikut.
+
+Ada puluhan implementasi BIP-32 yang dapat dioperasikan yang ditawarkan di banyak pustaka perangkat lunak. Sebagian besar dirancang untuk dompet Bitcoin, yang mengimplementasikan alamat dengan cara yang berbeda, tetapi berbagi implementasi derivasi kunci yang sama dengan dompet Ethereum yang kompatibel dengan BIP-32. Gunakan yang dirancang untuk Ethereum, atau adaptasi dari Bitcoin dengan menambahkan pustaka pengkodean alamat Ethereum.
+
+Ada juga generator BIP-32 yang diimplementasikan sebagai halaman web mandiri yang sangat berguna untuk pengujian dan eksperimen dengan BIP-32.
+
+> Generator BIP-32 mandiri bukanlah situs HTTPS. Itu untuk mengingatkan Anda bahwa penggunaan alat ini tidak aman. Ini hanya untuk pengujian. Anda tidak boleh menggunakan kunci yang dihasilkan oleh situs ini dengan dana nyata.
+
+#### Kunci publik dan privat yang diperluas (Extended)
+
+Dalam terminologi BIP-32, kunci dapat “diperluas” (*extended*). Dengan operasi matematika yang tepat, kunci “induk” yang diperluas ini dapat digunakan untuk menurunkan kunci “anak”, sehingga menghasilkan hirarki kunci dan alamat yang dijelaskan sebelumnya. Kunci induk tidak harus berada di puncak pohon. Ia dapat dipilih dari mana saja dalam hirarki pohon.
+
+Memperluas kunci melibatkan pengambilan kunci itu sendiri dan menambahkan **chain code** khusus padanya. *Chain code* adalah string biner 256-bit yang dicampur dengan setiap kunci untuk menghasilkan kunci anak.
+
+Jika kuncinya adalah kunci privat, ia menjadi **kunci privat yang diperluas** yang dibedakan dengan awalan `xprv`:
+`xprv9s21ZrQH143K2JF8RafpqtKiTbsbaxEeUaMnNHsm5o6wCW3z8ySyH4UxFVSfZ8n7ESu7fgir8i...`
+
+**Kunci publik yang diperluas** dibedakan dengan awalan `xpub`:
+`xpub661MyMwAqRbcEnKbXcCqD2GT1di5zQxVqoHPAgHNe8dv5JP8gWmDproS6kFHJnLZd23tWevhdn...`
+
+Karakteristik yang sangat berguna dari dompet HD adalah kemampuan untuk menurunkan kunci publik anak dari kunci publik induk, tanpa memiliki kunci privat. Ini memberi kita dua cara untuk menurunkan kunci publik anak: baik langsung dari kunci privat anak, atau dari kunci publik induk.
+
+Kunci publik yang diperluas dapat digunakan, oleh karena itu, untuk menurunkan semua kunci publik (dan hanya kunci publik) di cabang struktur dompet HD tersebut.
+
+Jalan pintas ini dapat digunakan untuk membuat penyebaran hanya-kunci-publik yang sangat aman, di mana server atau aplikasi memiliki salinan kunci publik yang diperluas, tetapi tidak ada kunci privat sama sekali. Jenis penyebaran seperti itu dapat menghasilkan jumlah kunci publik dan alamat Ethereum yang tak terbatas, tetapi tidak dapat membelanjakan uang apa pun yang dikirim ke alamat-alamat tersebut. Sementara itu, di server lain yang lebih aman, kunci privat yang diperluas dapat menurunkan semua kunci privat yang sesuai untuk menandatangani transaksi dan membelanjakan uang.
+
+Salah satu aplikasi umum dari metode ini adalah menginstal kunci publik yang diperluas di server web yang melayani aplikasi *e-commerce*. Server web dapat menggunakan fungsi derivasi kunci publik untuk membuat alamat Ethereum baru untuk setiap transaksi (misalnya, untuk keranjang belanja pelanggan), dan tidak akan memiliki kunci privat apa pun yang rentan terhadap pencurian. Tanpa dompet HD, satu-satunya cara untuk melakukan ini adalah dengan menghasilkan ribuan alamat Ethereum di server aman terpisah dan kemudian memuatnya di server *e-commerce*. Pendekatan itu merepotkan dan memerlukan pemeliharaan terus-menerus untuk memastikan bahwa server не kehabisan kunci, oleh karena itu preferensi untuk menggunakan kunci publik yang diperluas dari dompet HD.
+
+Aplikasi umum lain dari solusi ini adalah untuk *cold-storage* atau dompet perangkat keras. Dalam skenario itu, kunci privat yang diperluas dapat disimpan di dompet perangkat keras, sementara kunci publik yang diperluas dapat disimpan secara daring. Pengguna dapat membuat alamat “terima” sesuka hati, sementara kunci privat disimpan dengan aman secara luring. Untuk membelanjakan dana, pengguna dapat menggunakan kunci privat yang diperluas di klien Ethereum penandatangan luring, atau menandatangani transaksi di perangkat dompet perangkat keras.
+
+#### Derivasi kunci anak yang diperkeras (Hardened)
+
+Kemampuan untuk menurunkan cabang kunci publik dari kunci publik yang diperluas, atau `xpub`, sangat berguna, tetapi datang dengan risiko potensial. Akses ke `xpub` tidak memberikan akses ke kunci privat anak. Namun, karena `xpub` berisi *chain code* (digunakan untuk menurunkan kunci publik anak dari kunci publik induk), jika kunci privat anak diketahui, atau entah bagaimana bocor, ia dapat digunakan dengan *chain code* untuk menurunkan semua kunci privat anak lainnya. Satu kunci privat anak yang bocor, bersama dengan *chain code* induk, mengungkapkan semua kunci privat dari semua anak. Lebih buruk lagi, kunci privat anak bersama dengan *chain code* induk dapat digunakan untuk menyimpulkan kunci privat induk.
+
+Untuk mengatasi risiko ini, dompet HD menggunakan fungsi derivasi alternatif yang disebut **derivasi yang diperkeras (hardened derivation)**, yang “memutus” hubungan antara kunci publik induk dan *chain code* anak. Fungsi derivasi yang diperkeras menggunakan kunci privat induk untuk menurunkan *chain code* anak, alih-alih kunci publik induk. Ini menciptakan “firewall” dalam urutan induk/anak, dengan *chain code* yang tidak dapat digunakan untuk mengkompromikan kunci privat induk atau saudara.
+
+Secara sederhana, jika Anda ingin menggunakan kemudahan `xpub` untuk menurunkan cabang kunci publik tanpa mengekspos diri Anda pada risiko *chain code* yang bocor, Anda harus menurunkannya dari induk yang diperkeras, bukan induk normal. Praktik terbaik adalah memiliki anak-anak tingkat-1 dari kunci master selalu diturunkan dengan derivasi yang diperkeras, untuk mencegah kompromi kunci master.
+
+#### Nomor indeks untuk derivasi normal dan hardened
+
+Jelas diinginkan untuk dapat menurunkan lebih dari satu kunci anak dari kunci induk tertentu. Untuk mengelola ini, nomor indeks digunakan. Setiap nomor indeks, ketika dikombinasikan dengan kunci induk menggunakan fungsi derivasi anak khusus, memberikan kunci anak yang berbeda. Nomor indeks yang digunakan dalam fungsi derivasi induk-ke-anak BIP-32 adalah integer 32-bit. Untuk dengan mudah membedakan antara kunci yang diturunkan melalui fungsi derivasi normal (tidak diperkeras) versus kunci yang diturunkan melalui derivasi yang diperkeras, nomor indeks ini dibagi menjadi dua rentang. Nomor indeks antara 0 dan $2^{31}–1$ (0x0 hingga 0x7FFFFFFF) hanya digunakan untuk derivasi normal. Nomor indeks antara $2^{31}$ dan $2^{32}–1$ (0x80000000 hingga 0xFFFFFFFF) hanya digunakan untuk derivasi yang diperkeras. Oleh karena itu, jika nomor indeks kurang dari $2^{31}$, anaknya normal, sedangkan jika nomor indeks sama dengan atau di atas $2^{31}$, anaknya diperkeras.
+
+Untuk membuat nomor indeks lebih mudah dibaca dan ditampilkan, nomor indeks untuk anak yang diperkeras ditampilkan mulai dari nol, tetapi dengan simbol prima (apostrof). Kunci anak normal pertama oleh karena itu ditampilkan sebagai `0`, sedangkan anak yang diperkeras pertama (indeks 0x80000000) ditampilkan sebagai `0'`. Secara berurutan, maka, kunci yang diperkeras kedua akan memiliki indeks 0x80000001 dan akan ditampilkan sebagai `1'`, dan seterusnya. Ketika Anda melihat indeks dompet HD `i'`, itu berarti $2^{31} + i$.
+
+#### Pengidentifikasi kunci dompet HD (path)
+
+Kunci dalam dompet HD diidentifikasi menggunakan konvensi penamaan “path”, dengan setiap tingkat pohon dipisahkan oleh karakter garis miring (`/`) (lihat Tabel 5-5). Kunci privat yang diturunkan dari kunci privat master dimulai dengan `m`. Kunci publik yang diturunkan dari kunci publik master dimulai dengan `M`. Oleh karena itu, kunci privat anak pertama dari kunci privat master adalah `m/0`. Kunci publik anak pertama adalah `M/0`. Cucu kedua dari anak pertama adalah `m/0/1`, dan seterusnya.
+
+“Silsilah” sebuah kunci dibaca dari kanan ke kiri, hingga Anda mencapai kunci master dari mana ia diturunkan. Misalnya, pengidentifikasi `m/x/y/z` menjelaskan kunci yang merupakan anak ke-`z` dari kunci `m/x/y`, yang merupakan anak ke-`y` dari kunci `m/x`, yang merupakan anak ke-`x` dari `m`.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-5.5.png" alt="gambar" width="580"/>
+</p>
+
+#### Menavigasi struktur pohon dompet HD
+
+Struktur pohon dompet HD sangat fleksibel. Sisi lain dari ini adalah bahwa ia juga memungkinkan kompleksitas tanpa batas: setiap kunci yang diperluas induk dapat memiliki 4 miliar anak: 2 miliar anak normal dan 2 miliar anak yang diperkeras. Masing-masing anak tersebut dapat memiliki 4 miliar anak lagi, dan seterusnya. Pohon bisa sedalam yang Anda inginkan, dengan jumlah generasi yang berpotensi tak terbatas. Dengan semua potensi itu, bisa menjadi cukup sulit untuk menavigasi pohon-pohon yang sangat besar ini.
+
+Dua BIP menawarkan cara untuk mengelola kompleksitas potensial ini dengan menciptakan standar untuk struktur pohon dompet HD. **BIP-43** mengusulkan penggunaan indeks anak yang diperkeras pertama sebagai pengidentifikasi khusus yang menandakan “tujuan” (*purpose*) dari struktur pohon. Berdasarkan BIP-43, dompet HD harus menggunakan hanya satu cabang tingkat-1 dari pohon, dengan nomor indeks mendefinisikan tujuan dompet dengan mengidentifikasi struktur dan ruang nama dari sisa pohon. Lebih spesifik, dompet HD yang hanya menggunakan cabang `m/i'/…` dimaksudkan untuk menandakan tujuan tertentu dan tujuan itu diidentifikasi oleh nomor indeks `i`.
+
+Memperluas spesifikasi itu, **BIP-44** mengusulkan struktur multikurensi dan multiakun yang ditandai dengan menetapkan nomor “tujuan” ke `44'`. Semua dompet HD yang mengikuti struktur BIP-44 diidentifikasi oleh fakta bahwa mereka hanya menggunakan satu cabang pohon: `m/44'/*`.
+
+BIP-44 menetapkan struktur sebagai terdiri dari lima tingkat pohon yang telah ditentukan sebelumnya:
+`m / purpose' / coin_type' / account' / change / address_index`
+
+  * Tingkat pertama, **purpose'**, selalu diatur ke `44'`.
+  * Tingkat kedua, **coin\_type'**, menentukan jenis koin mata uang kripto, memungkinkan dompet HD multikurensi di mana setiap mata uang memiliki sub-pohonnya sendiri di bawah tingkat kedua. Ada beberapa mata uang yang didefinisikan dalam dokumen standar yang disebut SLIP0044; misalnya, Ethereum adalah `m/44'/60'`, Ethereum Classic adalah `m/44'/61'`, Bitcoin adalah `m/44'/0'`, dan Testnet untuk semua mata uang adalah `m/44'/1'`.
+  * Tingkat ketiga dari pohon adalah **account'**, yang memungkinkan pengguna untuk membagi dompet mereka menjadi sub-akun logis terpisah untuk tujuan akuntansi atau organisasi. Misalnya, dompet HD mungkin berisi dua “akun” Ethereum: `m/44'/60'/0'` dan `m/44'/60'/1'`. Setiap akun adalah akar dari sub-pohonnya sendiri.
+  * Karena BIP-44 awalnya dibuat untuk Bitcoin, ia berisi “keanehan” yang tidak relevan di dunia Ethereum. Pada tingkat keempat dari path, **change**, dompet HD memiliki dua sub-pohon: satu untuk membuat alamat penerima dan satu untuk membuat alamat kembalian. Hanya path “terima” yang digunakan di Ethereum, karena tidak ada keharusan untuk alamat kembalian seperti yang ada di Bitcoin. Perhatikan bahwa sementara tingkat sebelumnya menggunakan derivasi yang diperkeras, tingkat ini menggunakan derivasi normal. Ini untuk memungkinkan tingkat akun dari pohon mengekspor kunci publik yang diperluas untuk digunakan di lingkungan yang tidak aman.
+  * Alamat yang dapat digunakan diturunkan oleh dompet HD sebagai anak-anak dari tingkat keempat, menjadikan tingkat kelima dari pohon sebagai **address\_index**. Misalnya, alamat penerima ketiga untuk pembayaran Ethereum di akun utama akan menjadi `M/44'/60'/0'/0/2`.
+
+Tabel 5-6 menunjukkan beberapa contoh lagi.
+
+<p align="center">
+  <img src="images/books-07-mastering_ethereum/tabel-5.6.png" alt="gambar" width="580"/>
+</p>
+
+### Kesimpulan
+
+Dompet adalah fondasi dari setiap aplikasi blockchain yang menghadap pengguna. Mereka memungkinkan pengguna untuk mengelola koleksi kunci dan alamat. Dompet juga memungkinkan pengguna untuk menunjukkan kepemilikan mereka atas ether, dan mengotorisasi transaksi, dengan menerapkan tanda tangan digital, seperti yang akan kita lihat di Bab 6.
