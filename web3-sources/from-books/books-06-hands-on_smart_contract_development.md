@@ -1558,3 +1558,3380 @@ Di bab berikutnya, kita akan mendalami cara men-*deploy* kontrak kita secara lok
 
 ---
 
+# BAB 5
+## Melakukan Deploy dan Berinteraksi dengan Kontrak
+
+Sekarang setelah kita menyelesaikan pengembangan kontrak `Greeter` kita, saatnya untuk melihat bagaimana cara men-*deploy*-nya.
+
+Dalam bab ini, kita akan belajar cara men-*deploy* kontrak kita dengan tiga cara berbeda.
+Pertama, kita akan fokus pada *deployment* ke **Ganache**, sebuah *blockchain* lokal yang akan memungkinkan Anda bereksperimen dengan aplikasi Anda secara cepat.
+
+Kemudian, kita akan men-*deploy* kontrak kita ke jaringan tes **Goerli** menggunakan klien Ethereum **Parity**. Proses ini adalah cara Anda akan men-*deploy* aplikasi Anda langsung ke jaringan Ethereum utama dengan menggunakan *node* yang Anda kelola sendiri.
+
+Terakhir, kita akan men-*deploy* kontrak kita ke jaringan tes **Rinkeby** menggunakan **Infura**, penyedia pihak ketiga untuk *node* Ethereum yang terkelola. Menggunakan layanan seperti Infura dapat memberikan beberapa analisis tambahan yang mungkin membantu dalam memahami kinerja dan utilisasi aplikasi.
+
+Pada akhir bab ini, Anda akan dapat mulai membagikan aplikasi Anda dengan komunitas terdesentralisasi.
+
+### Kompilasi dan Deployment Kontrak
+
+Hingga saat ini, satu-satunya cara kita berinteraksi dengan kontrak kita adalah melalui tes. Saat kita menjalankan rangkaian tes, Truffle telah meng-kompilasi dan men-*deploy* kontrak kita ke jaringan tes dan mengeksekusi skrip tes kita. Ketika tes telah selesai berjalan, Truffle akan menghancurkan jaringan tes dan semua data terkait.
+
+Jika kita ingin menggunakan kontrak kita dengan sesuatu selain tes kita, kita perlu memasukkan kontrak kita ke jaringan yang berjalan di luar proses tes. Untuk melakukan ini, kita menggunakan perintah `truffle migrate`. Berbeda dengan `truffle test`, kita perlu menentukan jaringan mana yang akan kita gunakan untuk men-*deploy* kontrak kita menggunakan *flag* `--network`. Truffle kemudian akan mencari detail konfigurasi untuk jaringan yang sesuai di file `truffle-config.js` kita dan men-*deploy* kontrak kita berdasarkan pengaturan tersebut.
+
+Sebelum kita beralih ke konfigurasi dan *deployment* kontrak kita, mari kita luangkan waktu sejenak untuk membahas apa yang terjadi ketika kita men-*deploy* sebuah *smart contract*.
+
+#### Proses Deployment
+
+Langkah pertama dalam *deployment* dimulai dengan meng-kompilasi kontrak kita. Untuk kedua perintah `truffle test` dan `truffle migrate`, langkah ini terjadi secara otomatis untuk Anda. Namun, kita dapat meng-kompilasi kontrak kita kapan saja menggunakan `truffle compile`.
+
+Mari kita lanjutkan dan kompilasi kontrak kita. Kembali ke direktori `greeter` kita, buka terminal dan gunakan perintah berikut:
+
+```bash
+$ truffle compile
+```
+
+Kita seharusnya melihat output yang menunjukkan kontrak yang telah dikompilasi dan lokasi, relatif terhadap direktori proyek kita, di mana file-file tersebut telah disimpan.
+
+Outputnya terlihat seperti ini:
+
+```
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Greeter.sol
+> Compiling ./contracts/Migrations.sol
+> Compiling openzeppelin-solidity/contracts/ownership/Ownable.sol
+> Artifacts written to ./build/contracts
+> Compiled successfully using:
+   - solc: 0.5.8+commit.23d335f2.Emscripten.clang
+```
+
+Melihat direktori `build/contracts`, kita memiliki tiga file baru yang telah dibuat untuk kita:
+
+```
+build
+└── contracts
+    ├── Greeter.json
+    ├── Migrations.json
+    └── Ownable.json
+```
+
+Jika kita melihat file `build/contracts/Greeter.json`, kita akan melihat struktur data berformat JSON. *Field* pertama yang kita temui adalah *field* `contractName`. Tidak mengherankan, ini cocok dengan nama kontrak kita. Meskipun ada banyak data di sini, kita akan fokus pada dua *field*, yaitu *field* `abi` dan `bytecode`.
+
+**Application Binary Interface (ABI)** menjelaskan fungsi dan *event* (kita akan membahas *event* nanti) dari kontrak kita. ABI akan menjadi dasar untuk abstraksi di sisi klien yang digunakan untuk berinteraksi dengan kontrak kita, yang akan dibahas secara detail di Bagian III.
+
+*Field* `bytecode` berisi hasil kompilasi kontrak Anda. Ini adalah kode yang akan dieksekusi oleh jaringan Ethereum ketika kontrak kita dipanggil dari klien.
+
+Dengan kontrak yang telah dikompilasi di tangan, mari kita bicarakan tentang apa yang terjadi selama *deployment*.
+
+Ketika kita men-*deploy* sebuah kontrak, kita mengirimkan sebuah **transaksi** ke jaringan Ethereum. Berbeda dengan transaksi normal yang berisi alamat pengirim (`from`) dan penerima (`to`), transaksi *deployment* kita perlu mengatur alamat penerima ke alamat `0x0`. Transaksi *deployment* kita juga perlu menyertakan `bytecode` yang disebutkan sebelumnya, yang akan dikirim sebagai data transaksi. Karena kontrak kita dikirim sebagai transaksi, ia harus **ditambang** (*mined*) sebelum kita dapat berinteraksi dengannya. Ketika kontrak ditambang, ia akan mengeksekusi kode di dalam *constructor*, mengatur *state* awal untuk kontrak tersebut.
+
+Sebelum kita melakukan *deploy*, mari kita siapkan UI kita terlebih dahulu.
+
+> ⚠️ **Peringatan: Deployment Bisa Menjadi Mahal**
+>
+> Melakukan *deployment* membutuhkan **gas**. Tergantung pada nilai ether saat ini dan ukuran kontrak Anda, ini bisa menjadi operasi yang sangat mahal. Pastikan Anda menguji kontrak Anda secara lokal dan di jaringan tes publik sebelum men-*deploy* ke **mainnet**.
+
+### Menyiapkan UI
+
+Nanti di bagian buku ini kita akan mendalami pembangunan UI untuk aplikasi kita, dan kita akan meminjam beberapa kode dari bab-bab tersebut. Kode buku ini terletak di [GitHub](https://github.com/RedSquirrelTech/hoscdev), dan kita akan menyalin kode yang ditemukan di direktori `chapter-9` ke dalam proyek `Greeter` kita. Mari kita mulai dengan melakukan *clone* direktori tersebut. Perintah berikut mengasumsikan Anda berada di direktori root proyek `Greeter`:
+
+```bash
+# pergi ke direktori yang berisi proyek greeter kita
+$ cd ..
+
+# clone repo
+$ git clone git@github.com:RedSquirrelTech/hoscdev.git
+```
+
+Sekarang mari kita salin kode klien dari Bab 9 ke dalam proyek `Greeter` kita:
+
+```bash
+$ cp -r hoscdev/chapter-9/client greeter/client
+```
+
+Ini akan menyalin semua kode yang berhubungan dengan UI ke dalam proyek kita. Kode UI bergantung pada file-file `build` yang dihasilkan saat kita meng-kompilasi kontrak kita. Agar dapat diakses, kita akan memperbarui di mana Truffle menempatkan artefak kompilasi. Ini adalah pengaturan yang dapat disesuaikan di file `truffle-config.js` dengan menambahkan pengaturan berikut:
+
+```javascript
+module.exports = {
+  contracts_build_directory: "./client/src/contracts",
+  // ...sisa pengaturan...
+}
+```
+
+Kembali ke direktori `greeter` kita, mari kita kompilasi ulang kontrak untuk menempatkannya di rumah baru mereka:
+
+```bash
+$ truffle compile
+```
+
+Setelah kita memeriksa ulang semuanya berfungsi seperti yang diharapkan, direktori `/client/src/contracts/` kita seharusnya berisi file-file berikut:
+
+```
+client/src/contracts
+├── Greeter.json
+├── Migrations.json
+└── Ownable.json
+```
+
+Klien ditulis menggunakan React dan menggunakan beberapa dependensi JS lain yang belum kita unduh. Mari kita pindah ke direktori `client` dan instal semuanya:
+
+```bash
+$ cd greeter/client
+$ npm install
+```
+
+Setelah semua dependensi terinstal, Anda dapat mencoba menjalankan server web untuk memungkinkan browser Anda terhubung ke UI dengan perintah berikut:
+
+```bash
+# di dalam direktori greeter/client
+$ npm run start
+```
+
+Perintah ini akan meluncurkan tab baru di browser Anda dan mencoba terhubung ke akun Ethereum Anda melalui MetaMask. Pada titik ini, aplikasi akan *crash* karena kontrak belum di-*deploy* ke jaringan. Ini mungkin tampak aneh, tetapi kegagalan ini adalah sebuah kemenangan. Ini berarti bahwa UI kita berhasil dibangun dan mencoba berkomunikasi dengan kontrak kita, tetapi kontraknya tidak ada di sana. Mari kita perbaiki masalah itu dan lakukan *deployment* pertama kita dengan menggunakan *blockchain* tes lokal, **Ganache**.
+
+### Melakukan Deploy ke Ganache
+
+Sekarang setelah UI kita siap, mari kita siapkan kontrak kita di Ganache.
+
+Di file `truffle-config.js`, yang terletak di direktori root proyek `Greeter` kita, kita akan melihat objek konfigurasi yang memiliki konfigurasi jaringan seperti yang digambarkan dalam Contoh 5-1.
+
+**Contoh 5-1. Konfigurasi jaringan Truffle**
+
+```javascript
+networks: {
+  // Useful for testing. The `development` name is special - truffle
+  // uses it by default if it's defined here and no other network
+  // is specified at the command line.
+  // You should run a client (like ganache-cli, Geth, or Parity) in a separate
+  // terminal tab if you use this network and you must also set the `host`,
+  // `port` and `network_id` options below to some value.
+  //
+  // development: {
+  //   host: "127.0.0.1",     // Localhost (default: none)
+  //   port: 8545,            // Standard Ethereum port (default: none)
+  //   network_id: "*",       // Any network (default: none)
+  // },
+
+  // Another network with more advanced options...
+  // advanced: {
+  //   port: 8777,             // Custom port
+  //   network_id: 1342,       // Custom network
+  //   gas: 8500000,           // Gas sent with each transaction (default: ~6700000)
+  //   gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
+  //   from: <address>,        // Account to send txs from (default: accounts[0])
+  //   websockets: true        // Enable EventEmitter interface for web3
+  // },
+
+  // Useful for deploying to a public network.
+  // NB: It's important to wrap the provider as a function.
+  // ropsten: {
+  //   provider: () =>
+  //     new HDWalletProvider(mnemonic, `https://ropsten.infura.io/${infuraKey}`),
+  //   network_id: 3,       // Ropsten's id
+  //   gas: 5500000,        // Ropsten has a lower block limit than mainnet
+  //   confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+  //   timeoutBlocks: 200,  // # of blocks before a deployment times out (minimum/default: 50)
+  //   skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+  // },
+
+  // Useful for private networks
+  // private: {
+  //   provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
+  //   network_id: 2111,   // This network is yours, in the cloud.
+  //   production: true    // Treats this network as if it was a public net. (default: false)
+  // }
+},
+```
+
+> 💡 **Tip**: Jika Anda belum mengunduh Ganache, Anda dapat mengambil rilis terbaru dari [repositori GitHub Truffle Suite](https://github.com/trufflesuite/ganache/releases).
+
+Melihat file konfigurasi kita, Truffle membuat bagian yang dikomentari untuk jaringan `development`. Karena nilai-nilai yang dikomentari ini adalah yang kita inginkan, kita dapat melanjutkan dan menghapus komentar tersebut dengan menghapus `//` di awal setiap baris pada bagian `development`. Setelah itu, kita dapat membuka aplikasi Ganache, dan Anda akan melihat layar yang mirip dengan yang ada di Gambar 5-1.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-5.1.png" alt="gambar" width="580"/>
+</p>
+
+Klik tombol **New Workspace**, dan Anda akan dibawa ke layar konfigurasi yang menanyakan nama *workspace* dan proyek Truffle. Mari kita beri nama *workspace* tersebut `greeter-home`. Selanjutnya, klik tombol **Add Project** untuk menavigasi ke file `truffle-config.js` di dalam proyek. Setelah semuanya selesai, layar Anda akan terlihat mirip dengan Gambar 5-2.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-5.2.png" alt="gambar" width="580"/>
+</p>
+
+Mengklik **Save Workspace** akan menyiapkan *workspace* tersebut dan kemudian membawa Anda ke layar utama yang berisi semua informasi akun dan server, seperti yang ditunjukkan pada Gambar 5-3.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-5.3.png" alt="gambar" width="580"/>
+</p>
+
+Setelah **Ganache** berjalan, kita perlu mengimpor akun-akun tersebut ke **MetaMask** menggunakan *mnemonic* yang ditampilkan. Jika Anda sedang *login* di MetaMask dengan akun aman Anda, *log out* terlebih dahulu, lalu klik **“Import using account seed phrase”** untuk membuka kunci akun-akun yang dibuat oleh Ganache.
+
+Sebelum kita menjalankan perintah *migration*, mari kita luangkan waktu sejenak untuk membahas apa yang akan terjadi. Ketika kita membuat proyek kita menggunakan `truffle init`, sebuah kontrak `Migrations` dibuat untuk kita di dalam direktori `contracts/`. Kontrak ini menyimpan *migration* mana di dalam direktori `migrations/` yang telah dieksekusi, memungkinkan pemanggilan `truffle migrate` berikutnya untuk melewati *migration* yang sudah pernah dijalankan. Karena ini adalah *deployment* pertama kita, kita akan menjalankan kedua skrip *deployment* yang ada di direktori `migrations/`. Skrip pertama men-*deploy* kontrak `Migrations`, dan skrip kedua men-*deploy* kontrak `Greeter` kita.
+
+Tanpa basa-basi lagi, mari kita *deploy* kontrak kita ke jaringan *development*:
+
+```bash
+$ truffle migrate --network development
+```
+
+Setelah dieksekusi, kita akan melihat output yang mirip dengan contoh ini:
+
+```
+Compiling your contracts...
+===========================
+> Everything is up to date, there is nothing to compile.
+
+
+Starting migrations...
+======================
+> Network name:    'development'
+> Network id:      5777
+> Block gas limit: 0x6691b7
+
+
+1_initial_migration.js
+======================
+
+   Deploying 'Migrations'
+   ----------------------
+   > transaction hash:    0x297a3e1c371adc4c25376e0df5bdff024afd0ebd01c5db702...
+   > Blocks: 0            Seconds: 8
+   > contract address:    0x310C9d3709158d256DD0cD04958207aD772Df83e
+   > block number:        26
+   > block timestamp:     1565838314
+   > account:             0x0eF75E7c48bd3F0eC90731C6a69B62a00B5C87De
+   > balance:             99.99477214
+   > gas used:            261393
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.00522786 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.00522786 ETH
+
+
+2_deploy_greeter.js
+===================
+
+   Deploying 'Greeter'
+   -------------------
+   > transaction hash:    0x6bc7882ef6b7b0aa5cc532ba31ea1d665f211ba0024fe1f...
+   > Blocks: 0            Seconds: 12
+   > contract address:    0x81a0970E3c27C8CbEb85a01Fa3FB190197a1a3EC
+   > block number:        28
+   > block timestamp:     1565838344
+   > account:             0x0eF75E7c48bd3F0eC90731C6a69B62a00B5C87De
+   > balance:             99.98097166
+   > gas used:            648001
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.01296002 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.01296002 ETH
+
+
+Summary
+=======
+> Total deployments:   2
+> Final cost:          0.01818788 ETH
+```
+
+Melihat output ini, kita dapat mengonfirmasi bahwa kita pertama-tama men-*deploy* kontrak `Migrations` default dan melihat berapa banyak **gas** yang digunakan. Kemudian kita melihat *deployment* kontrak `Greeter` kita dan sekali lagi berapa banyak gas yang digunakan. Dengan kontrak kita yang telah di-*deploy* ke *blockchain* lokal, kini kontrak tersebut siap digunakan. ✅
+
+Mulai ulang *server web* yang sedang kita jalankan di direktori `client` dengan menggunakan **Control-C** untuk menghentikan *server* dan perintah berikut untuk memulainya kembali:
+
+```bash
+$ npm run start
+```
+
+Sekarang ketika kita mengunjungi `localhost:3000`, kita akan melihat UI Greeter kita dengan sapaan saat ini dan sebuah kotak input yang siap untuk kita ubah sapaannya, seperti yang ditunjukkan pada Gambar 5-4.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-5.4.png" alt="gambar" width="580"/>
+</p>
+
+Setelah **Ganache** berjalan, kita perlu mengimpor akun-akun tersebut ke **MetaMask** menggunakan *mnemonic* yang ditampilkan. Jika Anda sedang *login* di MetaMask dengan akun aman Anda, *log out* terlebih dahulu, lalu klik **“Import using account seed phrase”** untuk membuka kunci akun-akun yang dibuat oleh Ganache.
+
+Sebelum kita menjalankan perintah *migration*, mari kita luangkan waktu sejenak untuk membahas apa yang akan terjadi. Ketika kita membuat proyek kita menggunakan `truffle init`, sebuah kontrak `Migrations` dibuat untuk kita di dalam direktori `contracts/`. Kontrak ini menyimpan *migration* mana di dalam direktori `migrations/` yang telah dieksekusi, memungkinkan pemanggilan `truffle migrate` berikutnya untuk melewati *migration* yang sudah pernah dijalankan. Karena ini adalah *deployment* pertama kita, kita akan menjalankan kedua skrip *deployment* yang ada di direktori `migrations/`. Skrip pertama men-*deploy* kontrak `Migrations`, dan skrip kedua men-*deploy* kontrak `Greeter` kita.
+
+Tanpa basa-basi lagi, mari kita *deploy* kontrak kita ke jaringan *development*:
+
+```bash
+$ truffle migrate --network development
+```
+
+Setelah dieksekusi, kita akan melihat output yang mirip dengan contoh ini:
+
+```
+Compiling your contracts...
+===========================
+> Everything is up to date, there is nothing to compile.
+
+
+Starting migrations...
+======================
+> Network name:    'development'
+> Network id:      5777
+> Block gas limit: 0x6691b7
+
+
+1_initial_migration.js
+======================
+
+   Deploying 'Migrations'
+   ----------------------
+   > transaction hash:    0x297a3e1c371adc4c25376e0df5bdff024afd0ebd01c5db702...
+   > Blocks: 0            Seconds: 8
+   > contract address:    0x310C9d3709158d256DD0cD04958207aD772Df83e
+   > block number:        26
+   > block timestamp:     1565838314
+   > account:             0x0eF75E7c48bd3F0eC90731C6a69B62a00B5C87De
+   > balance:             99.99477214
+   > gas used:            261393
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.00522786 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.00522786 ETH
+
+
+2_deploy_greeter.js
+===================
+
+   Deploying 'Greeter'
+   -------------------
+   > transaction hash:    0x6bc7882ef6b7b0aa5cc532ba31ea1d665f211ba0024fe1f...
+   > Blocks: 0            Seconds: 12
+   > contract address:    0x81a0970E3c27C8CbEb85a01Fa3FB190197a1a3EC
+   > block number:        28
+   > block timestamp:     1565838344
+   > account:             0x0eF75E7c48bd3F0eC90731C6a69B62a00B5C87De
+   > balance:             99.98097166
+   > gas used:            648001
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.01296002 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.01296002 ETH
+
+
+Summary
+=======
+> Total deployments:   2
+> Final cost:          0.01818788 ETH
+```
+
+Melihat output ini, kita dapat mengonfirmasi bahwa kita pertama-tama men-*deploy* kontrak `Migrations` default dan melihat berapa banyak **gas** yang digunakan. Kemudian kita melihat *deployment* kontrak `Greeter` kita dan sekali lagi berapa banyak gas yang digunakan. Dengan kontrak kita yang telah di-*deploy* ke *blockchain* lokal, kini kontrak tersebut siap digunakan. ✅
+
+Mulai ulang *server web* yang sedang kita jalankan di direktori `client` dengan menggunakan **Control-C** untuk menghentikan *server* dan perintah berikut untuk memulainya kembali:
+
+```bash
+$ npm run start
+```
+
+Sekarang ketika kita mengunjungi `localhost:3000`, kita akan melihat UI Greeter kita dengan sapaan saat ini dan sebuah kotak input yang siap untuk kita ubah sapaannya, seperti yang ditunjukkan pada Gambar 5-4.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-5.4.png" alt="gambar" width="580"/>
+</p>
+
+Selama Anda menggunakan akun pertama, Anda dapat memperbaruinya, tetapi jika Anda beralih ke akun lain, transaksi seharusnya akan ditolak. Cobalah: ganti akun di MetaMask, lalu segarkan halaman dan coba ubah pesannya.
+
+**Ganache** sangat bagus untuk menguji aplikasi Anda secara lokal, tetapi ketika tiba saatnya orang lain bereksperimen dengan aplikasi Anda, kita perlu men-*deploy* ke salah satu jaringan tes. *Deployment* kita selanjutnya akan memandu kita men-*deploy* di jaringan tes **Goerli**, dan kita akan melakukannya menggunakan klien **Parity**.
+
+## Melakukan Deploy ke Goerli dengan Parity
+
+Sebelum kita mulai, mari kita bahas tentang *mnemonic* yang telah kita gunakan dan mengapa *mnemonic* sangat penting. Saat menggunakan Ganache, *mnemonic* dibuat untuk kita, dan kemudian kita mengimpornya ke MetaMask. Hanya itu yang perlu kita lakukan untuk mulai menandatangani transaksi, tetapi di Bab 1 kita membahas perlunya menandatangani transaksi dengan **kunci privat**, jadi apa yang sebenarnya terjadi?
+
+Pada tahun 2012, Pieter Wuille menciptakan *wallet* **hierarchical deterministic (HD)** dalam **BIP-32**. Ini menciptakan standar untuk menghasilkan pohon atau hierarki pasangan kunci privat/publik menggunakan sebuah *seed*. Kemudian pada tahun 2013, Satoshi Labs menciptakan cara menggunakan frasa *mnemonic* untuk menghasilkan *seed* bagi *wallet* HD dalam **BIP-39**. Menggunakan frasa-frasa ini membuat proses impor atau ekspor akun menjadi jauh lebih mudah daripada mengelola kunci privat satu per satu.
+
+Frasa *mnemonic* ini **harus dijaga kerahasiaannya**; yang digunakan dalam buku ini adalah frasa publik yang sudah dikenal dan tidak aman. Frasa tersebut tidak boleh digunakan untuk melakukan *deploy* di *mainnet* atau jaringan tes. ⚠️
+
+*Log out* dari akun Ganache dan *log in* kembali ke akun MetaMask yang Anda buat di Bab 3. Karena kita akan melakukan *deploy* di *testnet* Goerli, kita akan membutuhkan sejumlah ether Goerli. Sekadar mengingatkan dari Bab 3, Goerli adalah *testnet* yang kompatibel dengan Geth dan Parity. Untuk mendapatkan ether tes kita, kunjungi **Goerli Faucet** dan Anda akan melihat sesuatu yang mirip dengan Gambar 5-5.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-5.5.png" alt="gambar" width="580"/>
+</p>
+
+Klik *plug-in* **MetaMask**, lalu salin alamat akun Anda ke *clipboard* dan tempelkan ke kolom alamat. Pastikan untuk mengisi Captcha untuk membuktikan Anda bukan robot dan klik tombol **REQUEST**. Setelah transaksi selesai, deposit akan terlihat di MetaMask (pastikan Anda telah memilih jaringan **Goerli**). Agar memiliki **gas** yang cukup untuk *deployment*, ulangi proses ini tiga hingga empat kali.
+
+Selanjutnya, kita perlu memperbarui konfigurasi jaringan untuk terhubung ke Goerli. Proses ini akan membutuhkan *library* **Truffle HD wallet** untuk membuat *provider* yang dapat digunakan selama proses *deployment*. Sebuah **provider** adalah komponen dari Web3 yang mengelola cara terhubung ke jaringan Ethereum. Untuk dapat menandatangani transaksi yang akan kita buat dalam proses *deployment*, *provider* akan memerlukan akses ke *mnemonic* atau kunci privat Anda. Kita akan memberikan akses ini dengan menggunakan **variabel lingkungan** (*environment variable*).
+
+Mari kita instal `HDWalletProvider` dengan menggunakan perintah berikut:
+
+```bash
+$ npm install truffle-hdwallet-provider --save-dev
+```
+
+Sekarang kita akan mengatur variabel lingkungan `MNEMONIC`:
+
+```bash
+$ export MNEMONIC="_FRASA MNEMONIC ANDA DI SINI_"
+```
+
+Setelah itu terinstal, kita sekarang akan kembali ke file `truffle-config.js` dan menambahkan baris berikut di bagian atas file:
+
+```javascript
+const HDWalletProvider = require("truffle-hdwallet-provider");
+```
+
+Kemudian di bagian `network` pada objek konfigurasi kita, kita akan menambahkan konfigurasi Goerli, seperti yang ditunjukkan di sini:
+
+```javascript
+goerli: {
+  provider: () => {
+    const mnemonic = process.env["MNEMONIC"]
+    return new HDWalletProvider(mnemonic, "http://127.0.0.1:8545");
+  },
+  network_id: "*",
+}
+```
+
+Anda dapat melihat konfigurasi jaringan ini terlihat berbeda dari konfigurasi *development*. Alih-alih mengandalkan nilai *default*, kita mengatur properti `provider`, yang merupakan fungsi yang akan mengembalikan *provider* yang harus digunakan. *Provider* ini menerima *mnemonic* dan URL dari *node* JSON RPC yang akan kita hubungi. **Parity**, secara *default*, akan membuka JSON RPC pada port `8545`. Perhatikan bahwa kita mengakses *mnemonic* melalui variabel lingkungan; ini untuk mencegah *mnemonic* tidak sengaja ter-*commit* ke *repo* (jika Anda menggunakan *version control*).
+
+Setelah semuanya siap, buka terminal atau tab terminal baru dan jalankan **Parity** di jaringan Goerli.
+
+```bash
+$ parity --chain=goerli
+```
+
+Jika sudah lama sejak sinkronisasi terakhir Anda, mungkin perlu beberapa saat untuk mengejar ketinggalan, tetapi setelah kembali melacak blok-blok terbaru, kita dapat melakukan *deploy* ke Goerli menggunakan perintah berikut:
+
+```bash
+# dari direktori root greeter
+$ truffle migrate --network goerli
+```
+
+Sama seperti saat kita melakukan *deploy* ke Ganache, Anda akan melihat output yang memberitahukan bahwa transaksi telah dikirim dan ditambang:
+
+```
+Starting migrations...
+======================
+> Network name:    'goerli'
+> Network id:      5
+> Block gas limit: 0x7a1200
+
+
+1_initial_migration.js
+======================
+
+   Deploying 'Migrations'
+   ----------------------
+   > transaction hash:    0x6e57a078b7d9fdf6a1bc7c777951271220ae3b9f03a62c92...
+   > Blocks: 0            Seconds: 0
+   > contract address:    0x74c7382e11311530757beDb953D7F302cfAef417
+   > block number:        1149113
+   > block timestamp:     1566255037
+   > account:             0xcBe303aF8DF77602227A1a77dEF2983f915f2a12
+   > balance:             0.19477342
+   > gas used:            261329
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.00522658 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.00522658 ETH
+
+
+2_deploy_greeter.js
+===================
+
+   Deploying 'Greeter'
+   -------------------
+   > transaction hash:    0x94cc8f0ca97b2f4de8f1d33c47796d2f95b211e6b0470c2...
+   > Blocks: 1            Seconds: 28
+   > contract address:    0x321374D4CD736Ce5484BFb3aF59C290639b73eA4
+   > block number:        1149116
+   > block timestamp:     1566255082
+   > account:             0xcBe303aF8DF77602227A1a77dEF2983f915f2a12
+   > balance:             0.18097294
+   > gas used:            648001
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.01296002 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.01296002 ETH
+
+
+Summary
+=======
+> Total deployments:   2
+> Final cost:          0.0181866 ETH
+```
+
+Setelah itu selesai, Anda dapat menjalankan *server web*:
+
+```bash
+$ cd client
+$ npm run start
+```
+
+Ini sekali lagi akan membuka tab browser baru yang menghubungkan Anda ke aplikasi. Pastikan untuk memilih jaringan **Goerli** di MetaMask, dan Anda siap berinteraksi dengan kontrak Anda yang telah di-*deploy* ke *testnet*\! 🚀
+
+Kita akan membahas cara lain untuk melakukan *deploy* ke *testnet*—kali ini kita akan menggunakan jaringan **Rinkeby**, mengelola *deployment* melalui **Infura**.
+
+## Melakukan Deploy ke Rinkeby dengan Infura
+
+Pada *deployment* Ganache dan Goerli, kita harus menjalankan beberapa perangkat lunak lokal, tetapi sekarang kita akan melakukan *deployment* di mana Anda tidak perlu mengunduh *blockchain* pribadi atau klien Ethereum. Sebaliknya, *node* yang akan kita hubungi akan dikelola oleh **Infura**.
+
+**Infura** adalah penyedia layanan untuk *node* Ethereum yang terkelola. Ini menghemat waktu Anda untuk menyinkronkan klien lokal, yang (tergantung pada perangkat keras dan *bandwidth* Anda) bisa memakan waktu dari jam hingga hari untuk sepenuhnya tersinkronisasi. Infura memungkinkan *deployment* ke *mainnet* dan ke *testnet* Kovan, Rinkeby, Goerli, dan Ropsten. Untuk contoh ini, kita akan menggunakan Rinkeby untuk mencoba cara lain mendapatkan ether tes dari implementasi *faucet* yang berbeda, tetapi Anda dapat menggunakan *testnet* mana pun.
+
+Untuk memulai, kunjungi `https://infura.io/register` untuk membuat akun. Setelah Anda memverifikasi email Anda, Anda akan dibawa ke halaman di mana Anda dapat memilih paket Anda. Untuk keperluan kita, paket gratis sudah cukup.
+
+Ketika Anda sampai di *dashboard* Anda, Anda akan memiliki bagian proyek yang kosong dan sebuah tombol untuk membuat proyek baru seperti pada Gambar 5-6.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-5.6.png" alt="gambar" width="580"/>
+</p>
+
+Klik tombol **CREATE NEW PROJECT** dan berikan nama proyek Anda, misalnya `greeter`. Setelah proyek ini muncul di daftar proyek Anda, klik tombol **VIEW PROJECT** seperti yang ditunjukkan pada Gambar 5-7.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-5.7.png" alt="gambar" width="580"/>
+</p>
+
+Pada halaman **VIEW PROJECT**, ada bagian berlabel **Keys** yang menyertakan pilihan *endpoint*. Secara *default*, ini diatur ke *mainnet*, tetapi kita ingin menggunakan jaringan **Rinkeby**. Pilih opsi tersebut lalu salin URL-nya, yang akan terlihat seperti berikut:
+
+```
+rinkeby.infura.io/v3/<PROJECT_ID>
+```
+
+Sama seperti yang kita lakukan dengan *mnemonic* kita, mari kita tambahkan *project ID* kita ke variabel lingkungan:
+
+```bash
+$ export INFURA_PROJECT_ID=<PROJECT_ID>
+```
+
+Sekarang kita dapat memperbarui konfigurasi jaringan di file `truffle-config.js` kita untuk menyertakan bagian **Rinkeby**:
+
+```javascript
+rinkeby: {
+  provider: () => {
+    const mnemonic = process.env["MNEMONIC"]
+    const project_id = process.env["INFURA_PROJECT_ID"]
+    return new HDWalletProvider(
+      mnemonic,
+      `https://rinkeby.infura.io/v3/${project_id}`
+    );
+  },
+  network_id: "*"
+}
+```
+
+Setelah konfigurasi siap, sekarang kita perlu mendanai akun kita di jaringan Rinkeby dengan mengunjungi **Rinkeby Faucet**. Di sini, Anda diminta untuk membuat postingan media sosial di Twitter atau Facebook dan menyertakan URL akun Anda di dalam postingan tersebut. Setelah selesai, Anda akan memiliki dana yang dibutuhkan untuk *deployment*.
+
+Sekarang, mari jalankan *migration* kita:
+
+```bash
+# dari direktori root greeter
+$ truffle migrate --network rinkeby
+```
+
+Ketika skrip selesai berjalan, kontrak Anda akan ter-*deploy* ke *testnet* **Rinkeby**. Jalankan *server web* lalu pilih jaringan Rinkeby di MetaMask:
+
+```bash
+$ cd client
+$ npm run start
+```
+
+Ketika browser terbuka, kita akan mendapati kontrak baru yang menyambut kita dengan “Hello, World\!” Sekarang Anda dapat memperbaruinya di jaringan Rinkeby.
+
+## Ringkasan
+
+Dalam bab ini, kita telah men-*deploy* kontrak ke *blockchain* lokal untuk pengembangan menggunakan **Ganache**, dan kemudian men-*deploy* ke dua jaringan tes publik yang berbeda menggunakan dua metode yang berbeda: satu menggunakan klien Ethereum lokal (**Parity**) dan yang lainnya menggunakan solusi terkelola (**Infura**).
+
+Sekarang kita akan mengalihkan perhatian kita untuk membangun aplikasi yang lebih besar, sambil mempelajari fitur-fitur bahasa **Solidity** dan utilitas **Truffle** seiring berjalannya waktu.
+
+---
+
+# BAB 6
+## Aplikasi Penggalangan Dana (Fundraiser)
+
+Setelah kita berhasil membangun dan men-*deploy* aplikasi “Hello, World!” kita, mari kita lanjutkan perjalanan kita dalam membangun *smart contract* dengan membuat aplikasi yang memungkinkan **penerima manfaat** (*beneficiary*) untuk menerima donasi dalam bentuk **ether**. Aplikasi ini dipilih sebagai cara bagi kita untuk menjelajahi cara bekerja dengan ether di dalam kontrak kita dan bagaimana kita dapat menggunakan **struktur data** untuk melacak saldo seiring waktu, mirip dengan apa yang akan Anda temukan di kontrak token.
+
+Dengan membangun aplikasi ini, kita akan melihat lebih dekat pada **Solidity**, termasuk mempelajari lebih lanjut tentang *constructors*, metode *getter* dan *setter*, *structs* dan *events*, serta beberapa tips bermanfaat lainnya di sepanjang jalan.
+
+Sebelum kita mulai menulis kode, mari kita luangkan waktu sejenak untuk memahami aplikasi yang akan kita bangun. 📝
+
+### Tinjauan Aplikasi
+
+Aplikasi kita akan membantu seorang **penerima manfaat** (*beneficiary*), seperti organisasi nirlaba, atau entitas lain mana pun yang mungkin sedang mencari pendanaan. Penerima manfaat akan memiliki alamat yang diatur pada layanan seperti **Coinbase** sehingga mereka dapat dengan mudah menjual ether dan mengubahnya menjadi USD. Dengan alamat Ethereum yang dikelola oleh Coinbase, penerima manfaat tidak akan memiliki akses ke **kunci privat** dan oleh karena itu tidak dapat berinteraksi dengan **DApp** dari alamat tersebut. Di sinilah **alamat kustodian** (*custodian address*) dapat membantu.
+
+**Alamat kustodian** adalah alamat Ethereum lain yang dikontrol langsung oleh penerima manfaat atau dimiliki oleh seseorang yang bertindak atas nama penerima manfaat. Alamat ini dapat berinteraksi dengan DApp, dan alamat inilah yang akan diberi kemampuan untuk mengeluarkan transaksi yang akan mentransfer dana yang dikumpulkan oleh kontrak Fundraiser ke alamat penerima manfaat.
+
+Halaman beranda kita yang digambarkan pada Gambar 6-1 akan memiliki *call to action* untuk membuat penggalangan dana baru di bagian atas dan kemudian menampilkan daftar penggalangan dana yang telah dibuat sebelumnya.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-6.1.png" alt="gambar" width="580"/>
+</p>
+
+Dengan mengklik tombol **Create New Fundraiser**, Anda akan diarahkan ke halaman baru seperti yang ditunjukkan pada Gambar 6-2.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-6.2.png" alt="gambar" width="580"/>
+</p>
+
+Formulir ini adalah tempat kita mengumpulkan detail yang bisa kita bagikan tentang **penerima manfaat** (*beneficiary*) dan alamat tujuan transfer dana nantinya. Ini adalah alamat *exchange* yang telah kita sebutkan sebelumnya.
+
+Setelah dikirim, formulir ini akan mengirimkan **transaksi** ke *blockchain* untuk membuat penggalangan dana, dan menetapkan alamat pengirim sebagai **pemilik** (*owner*) dari penggalangan dana tersebut. Ketika transaksi selesai, kita akan diarahkan ke halaman detail (*show page*) yang diilustrasikan pada Gambar 6-3. Ini juga merupakan halaman yang akan dituju pengguna dari halaman beranda saat mengklik penggalangan dana yang sudah ada.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-6.3.png" alt="gambar" width="580"/>
+</p>
+
+Halaman detail adalah tempat Anda dapat memberikan donasi. Halaman ini menampilkan semua info tentang **penerima manfaat** (*beneficiary*), dan juga menampilkan data ringkasan tentang jumlah donasi yang telah dibuat serta total nilai donasi tersebut dalam dolar. Karena nilai **ether** sangat fluktuatif, kita akan menggunakan API pihak ketiga untuk mengambil nilai tukar saat menampilkan informasi ini.
+
+Terdapat juga bagian bagi pengguna untuk melihat riwayat donasi mereka. Dengan mengklik tombol **Request Receipt**, pengguna akan melihat tampilan tanda terima (*receipt*) dari donasi mereka yang dapat mereka cetak dan simpan untuk catatan mereka. Tampilan tanda terima diilustrasikan pada Gambar 6-4.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-6.4.png" alt="gambar" width="580"/>
+</p>
+
+Setelah kita mengetahui fitur-fiturnya dan memiliki gambaran umum tentang antarmuka yang perlu kita dukung, kita bisa mulai menguraikannya menjadi sesuatu yang bisa kita kodekan. Jadi, mari kita mulai.
+
+### Membuat Proyek
+
+Kita akan membuat proyek lain untuk aplikasi penggalangan dana kita. Kembali ke terminal Anda, navigasikan ke direktori tempat Anda ingin menyimpan aplikasi ini, lalu buat direktori `fundraiser`:
+
+```bash
+$ cd Projects # contoh direktori yang berisi aplikasi kita
+$ mkdir fundraiser
+```
+
+Sekarang kita akan membuat struktur direktori Truffle. Kali ini, alih-alih menggunakan `truffle init`, kita akan menggunakan salah satu **Truffle Box** resmi. Truffle Box adalah cara untuk memulai proyek baru yang sudah dikonfigurasi sebelumnya untuk integrasi dengan layanan atau *library* lain. Karena UI kita akan ditulis menggunakan React, kita akan mulai dengan *box* **React**. Jika React bukan *library* UI pilihan Anda, Anda dapat menemukan *box* lain yang sudah dikonfigurasi untuk hal-hal seperti Vue atau bahkan Drizzle, perangkat UI milik Truffle sendiri, di [halaman Truffle Boxes](https://trufflesuite.com/boxes).
+
+```bash
+$ truffle unbox react
+```
+
+Tidak termasuk direktori `node_modules`, struktur direktori kita sekarang akan terlihat seperti berikut:
+
+```
+fundraiser
+├── LICENSE
+├── client
+│   ├── README.md
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   ├── favicon.ico
+│   │   ├── index.html
+│   │   └── manifest.json
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.js
+│   │   ├── App.test.js
+│   │   ├── index.css
+│   │   ├── index.js
+│   │   ├── logo.svg
+│   │   ├── serviceWorker.js
+│   │   └── utils
+│   │       └── getWeb3.js
+│   └── yarn.lock
+├── contracts
+│   ├── Migrations.sol
+│   └── SimpleStorage.sol
+├── migrations
+│   ├── 1_initial_migration.js
+│   └── 2_deploy_contracts.js
+├── test
+│   ├── TestSimpleStorage.sol
+│   └── simplestorage.js
+└── truffle-config.js
+```
+
+Kali ini, alih-alih hanya memiliki direktori `contracts`, `migrations`, dan `test`, kita memiliki direktori `client` yang mencakup pengaturan untuk aplikasi React kita.
+
+*Box* ini menyertakan contoh kontrak, `SimpleStorage.sol`, beserta *migration* dan tes untuk kontrak tersebut. Mari kita hapus file-file tersebut, lalu kita akan membuat file kita untuk proyek penggalangan dana:
+
+```bash
+$ rm contracts/SimpleStorage.sol \
+migrations/2_deploy_contracts.js \
+test/*
+$ touch contracts/Fundraiser.sol test/fundraiser_test.js
+```
+
+Perhatikan bahwa kita melewatkan *migration*. Kita melakukan ini karena kita akan menulis kontrak lain, yaitu kontrak `FundraiserFactory`, yang akan menginisialisasi setiap penggalangan dana secara individual. Kita akan membangun kontrak pabrik (*factory*) tersebut di bab berikutnya, dan akan membahas *migrations* secara lebih detail pada saat itu.
+
+Dengan file tes dan file kontrak kita sudah siap, mari kita mulai menginisialisasi penggalangan dana kita\!
+
+### Menginisialisasi Fundraiser
+
+Fundraiser adalah inti dari aplikasi kita. Kita akan mulai dengan memodelkan atribut data dari penggalangan dana dan kemudian beralih ke perilakunya. Berdasarkan formulir pada Gambar 6-2, saat kita membuat penggalangan dana baru, kita akan memerlukan hal-hal berikut:
+
+  * Nama penerima manfaat
+  * Situs web tempat pengguna bisa mendapatkan informasi lebih lanjut
+  * Alamat penerima manfaat (ini adalah alamat yang dapat menerima dana)
+  * URL gambar yang digunakan untuk kartu di halaman indeks
+  * Deskripsi singkat tentang penerima manfaat
+  * Alamat kustodian atau pemilik
+
+Ini semua adalah variabel *state* yang harus diatur saat menginisialisasi kontrak. Untuk menguji bahwa semuanya diatur dengan benar, kita akan menulis beberapa kode tes yang akan membuat *instance* penggalangan dana baru, dan kemudian menguji setiap properti yang disebutkan sebelumnya untuk memastikan kita mendapatkan nilai yang ingin kita atur selama inisialisasi.
+
+Di file tes kita, mari kita mulai dengan kode pengaturan berikut yang diilustrasikan dalam Contoh 6-1.
+
+**Contoh 6-1. Pengaturan tes Fundraiser**
+
+```javascript
+const FundraiserContract = artifacts.require("Fundraiser");
+
+contract("Fundraiser", accounts => {
+  let fundraiser;
+  const name = "Beneficiary Name"
+
+  describe("initialization", () => {
+    beforeEach (async () => {
+      fundraiser = await FundraiserContract.new(name);
+    });
+  });
+});
+```
+
+Kita memulai file tes kita dengan memanggil `FundraiserContract` dari objek `artifacts`. Kemudian, menggunakan fungsi `contract`, kita memasuki *clean room* (*deployment* baru dari jaringan tes) dan menyiapkan beberapa variabel untuk menampung penggalangan dana dan nama penerima manfaat. Setelah itu, kita memasuki blok `describe` dengan `beforeEach` untuk mengatur `fundraiser` sebelum setiap contoh tes dijalankan. Ini adalah pertama kalinya kita menggunakan `beforeEach`, yang merupakan alat hebat untuk mengekstrak pengaturan berulang yang akan diperlukan di setiap tes, seperti pembuatan subjek yang diuji.
+
+Dengan pengaturan selesai, kita bisa fokus pada apa yang ingin kita uji. Karena kita tidak memiliki akses ke internal kontrak kita, kita perlu memeriksa apakah data diatur dengan benar menggunakan fungsi *getter*. Mari tambahkan tes tepat setelah penutupan blok `beforeEach`, seperti yang ditunjukkan di sini:
+
+```javascript
+it("gets the beneficiary name", async () => {
+  const actual = await fundraiser.name();
+  assert.equal(actual, name, "names should match");
+});
+```
+
+Di sini tes kita menegaskan bahwa nama penggalangan dana kita harus cocok dengan nama yang kita berikan ke *constructor*. Mari jalankan tes kita dan lihat apa yang terjadi:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+Error: Could not find /Users/ksolo/Projects/fundraiser/contracts/Fundraiser.sol from any sources
+```
+
+Kita pernah melihat kesalahan ini sebelumnya. Ini berarti kita belum memiliki kontrak `Fundraiser`. Kita telah membuat filenya, tetapi kita belum mendefinisikan apa pun di dalamnya. Mari kita coba melewati kesalahan ini dengan membuat kontrak kosong:
+
+```solidity
+pragma solidity >0.4.23 <0.7.0;
+
+contract Fundraiser {
+}
+```
+
+Menjalankan tes kita lagi, kita mendapatkan hasil berikut:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+
+Contract: Fundraiser
+  initialization
+    1) gets the beneficiary name
+    > No events were emitted
+
+
+  0 passing (115ms)
+  1 failing
+
+  1) Contract: Fundraiser
+       initialization
+         gets the beneficiary name:
+     TypeError: fundraiser.name is not a function
+      at Context.it (test/fundraiser_test.js:29:39)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Sekarang tes kita memberi tahu bahwa kita tidak memiliki fungsi `name` di kontrak kita. Fungsi `name` dimaksudkan untuk mengembalikan nilai yang disimpan yang berisi nama kontrak kita. Sepertinya `string` adalah tipe data yang masuk akal di sini. Mari kita tambahkan variabel *state* `string` ke kontrak kita dan minta fungsi *getter* mengembalikannya. Di kontrak `Greeter`, kita membuat variabel *state* menjadi `private` dan membuat fungsi *getter* `public` untuk membaca data tersebut. Untuk kontrak `Fundraiser` kita, kita akan mengambil pendekatan yang berbeda dan sebaliknya membuat variabel *state* menjadi `public`. Dengan membuat variabel *state* menjadi `public`, kita akan secara otomatis memiliki fungsi *getter* `public` dengan nama yang sama dengan variabel penyimpanan kita yang dibuat untuk kita tanpa harus menulis kode tambahan apa pun:
+
+```solidity
+pragma solidity >0.4.23 <0.7.0;
+
+contract Fundraiser {
+  string public name;
+}
+```
+
+Dengan pembaruan itu selesai, mari kita lihat apa yang terjadi saat kita menjalankan tes:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+
+Contract: Fundraiser
+  initialization
+    1) gets the beneficiary name
+    > No events were emitted
+
+
+  0 passing (143ms)
+  1 failing
+
+  1) Contract: Fundraiser
+       initialization
+         gets the beneficiary name:
+     names should match
+      + expected - actual
+
+      +Beneficiary Name
+
+      at Context.it (test/fundraiser_test.js:30:14)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Akhirnya, kita memiliki kegagalan yang mendorong kita untuk membangun *constructor*. Karena nilai ini dimaksudkan untuk diatur saat inisialisasi, kita perlu menulis *constructor* yang dapat menerima argumen dan mulai mengatur *state* kontrak. Mari tambahkan *constructor* berikut ke kontrak `Fundraiser`:
+
+```solidity
+constructor(string memory _name) public {
+  name = _name;
+}
+```
+
+Untuk mencegah referensi yang ambigu antara variabel penyimpanan `name` kita dan parameter yang dilewatkan, kita telah memberi awalan pada parameter dengan garis bawah. Ini adalah praktik yang cukup umum ketika Anda memiliki fungsi yang mengatur variabel penyimpanan `public`.
+
+Dengan *constructor* sudah ada, mari jalankan ulang tes kita:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+
+Contract: Fundraiser
+  initialization
+    ✓ gets the beneficiary name (38ms)
+
+  1 passing (143ms)
+```
+
+Bagus\! Tes pertama kita berhasil. Sekarang kita perlu menulis tes serupa untuk sisa variabel *state* yang ingin kita atur. Variabel *state* situs web, URL gambar, dan deskripsi semuanya akan direpresentasikan oleh `string`. Mari kita tambahkan tes untuk itu. Kemudian kita akan membahas variabel lain karena akan sedikit berbeda.
+
+Mari perbarui file tes agar terlihat seperti Contoh 6-2.
+
+**Contoh 6-2. Tes untuk field string Fundraiser**
+
+```javascript
+const FundraiserContract = artifacts.require("Fundraiser");
+
+contract("Fundraiser", accounts => {
+  let fundraiser;
+  const name = "Beneficiary Name";
+  const url = "beneficiaryname.org";
+  const imageURL = "https://placekitten.com/600/350";
+  const description = "Beneficiary description";
+
+  describe("initialization", () => {
+    beforeEach(async () => {
+      fundraiser = await FundraiserContract.new(
+        name,
+        url,
+        imageURL,
+        description
+      )
+    });
+
+    it("gets the beneficiary name", async () => {
+      const actual = await fundraiser.name();
+      assert.equal(actual, name, "names should match");
+    });
+
+    it("gets the beneficiary url", async () => {
+      const actual = await fundraiser.url();
+      assert.equal(actual, url, "url should match");
+    });
+
+    it("gets the beneficiary image url", async () => {
+      const actual = await fundraiser.imageURL();
+      assert.equal(actual, imageURL, "imageURL should match");
+    });
+
+    it("gets the beneficiary description", async () => {
+      const actual = await fundraiser.description();
+      assert.equal(actual, description, "description should match");
+    });
+  });
+});
+```
+
+Dengan menjalankan tes pada titik ini, kita akan mendapatkan kegagalan berikut:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+
+Contract: Fundraiser
+  initialization
+    1) "before each" hook for "gets the beneficiary name"
+
+  0 passing (30ms)
+  1 failing
+
+  1) Contract: Fundraiser
+       initialization
+         "before each" hook for "gets the beneficiary name":
+     Error: Invalid number of parameters for "undefined". Got 4 expected 1!
+```
+
+Ini memberi tahu kita bahwa *constructor* kita hanya diatur untuk menangani satu argumen. Mari tambahkan sisa parameter `string` ke fungsi *constructor* kita agar sesuai dengan Contoh 6-3.
+
+**Contoh 6-3. Menambahkan parameter string ke constructor**
+
+```solidity
+constructor(
+  string memory _name,
+  string memory _url,
+  string memory _imageURL,
+  string memory _description
+)
+public
+{
+  name = _name;
+}
+```
+
+Menjalankan tes kita sekarang akan memberi kita output berikut:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+> compilation warnings encountered:
+  /Users/ksolo/Projects/fundraiser/contracts/Fundraiser.sol:10:9: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    string memory _url,
+    ^---------------^
+  ,/Users/ksolo/Projects/fundraiser/contracts/Fundraiser.sol:11:9: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    string memory _imageURL,
+    ^--------------------^
+  ,/Users/ksolo/Projects/fundraiser/contracts/Fundraiser.sol:12:9: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    string memory _description
+    ^---------------------^
+
+
+Contract: Fundraiser
+  initialization
+    ✓ gets the beneficiary name (40ms)
+    1) gets the beneficiary url
+    > No events were emitted
+    2) gets the beneficiary image url
+    > No events were emitted
+    3) gets the beneficiary description
+    > No events were emitted
+
+  1 passing (465ms)
+  3 failing
+
+  1) Contract: Fundraiser
+       initialization
+         gets the beneficiary url:
+     TypeError: fundraiser.url is not a function
+      at Context.it (test/fundraiser_test.js:26:39)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+
+  2) Contract: Fundraiser
+       initialization
+         gets the beneficiary image url:
+     TypeError: fundraiser.imageURL is not a function
+      at Context.it (test/fundraiser_test.js:31:39)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+
+  3) Contract: Fundraiser
+       initialization
+         gets the beneficiary description:
+     TypeError: fundraiser.description is not a function
+      at Context.it (test/fundraiser_test.js:36:39)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Output ini menunjukkan peringatan *compiler* tentang variabel yang tidak digunakan dan kemudian tes yang gagal. Setiap tes gagal karena alasan yang sama: fungsi *getter* untuk nilai yang sesuai tidak ada.
+
+Untuk memperbaiki peringatan, kita perlu menambahkan variabel *state* ke kontrak dan menetapkannya di *constructor* seperti yang kita lakukan dengan `name`. Perubahan ini diilustrasikan dalam Contoh 6-4.
+
+**Contoh 6-4. Variabel state dan constructor Fundraiser**
+
+```solidity
+pragma solidity >0.4.23 <0.7.0;
+
+contract Fundraiser {
+  string public name;
+  string public url;
+  string public imageURL;
+  string public description;
+
+  constructor(
+    string memory _name,
+    string memory _url,
+    string memory _imageURL,
+    string memory _description
+  )
+  public
+  {
+    name = _name;
+    url = _url;
+    imageURL = _imageURL;
+    description = _description;
+  }
+}
+```
+
+Dengan bagian-bagian itu sudah ada, kita seharusnya memiliki rangkaian tes yang berhasil dengan output seperti berikut:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+
+Contract: Fundraiser
+  initialization
+    ✓ gets the beneficiary name
+    ✓ gets the beneficiary url
+    ✓ gets the beneficiary image url
+    ✓ gets the beneficiary description
+
+  4 passing (572ms)
+```
+
+Sebelum kita melanjutkan, mari kita bahas sedikit lebih banyak tentang **lokalitas data** (*data locality*) dan bagaimana hubungannya dengan parameter fungsi. Dalam fungsi *constructor* kita, kita melabeli semua parameter `string` sebagai berasal dari lokasi `memory`, tapi apa artinya itu?
+
+Parameter yang berisi tipe data referensi seperti *array* atau `string` perlu mencatat apakah mereka menunjuk langsung ke data yang tersimpan secara permanen, yang ditandai dengan `storage`, atau salinan lokal dari data tersebut, yang ditandai sebagai `memory`. Dalam kebanyakan kasus, Anda akan menginginkan `memory` sebagai lokasi data. Faktanya, `memory` adalah lokasi *default* dan tidak diperlukan dalam daftar parameter sebelum versi 0.5.0.
+
+Lokasi data terakhir `calldata` dibahas di bab terakhir dengan kontrak Greeter dan merupakan lokasi yang diperlukan ketika visibilitas fungsi diatur ke `external`.
+
+Dengan *field* `string` kita selesai, kita bisa melanjutkan untuk membahas bagaimana menangani *beneficiary* dan *custodian*.
+
+### Menetapkan Beneficiary dan Custodian
+
+Baik *beneficiary* maupun *custodian* akan direpresentasikan oleh alamat. Alamat *custodian* adalah alamat yang terkait dengan manajer penggalangan dana. Alamat ini tidak akan menerima dana apa pun tetapi akan menjadi alamat yang diizinkan untuk melakukan perubahan dan meminta dana ditransfer ke *beneficiary*. Ingat, kita melakukan langkah ekstra ini dengan asumsi bahwa alamat *beneficiary* terkait dengan sesuatu seperti Coinbase atau bursa mata uang lainnya, dan bukan alamat yang dapat digunakan untuk mengirim transaksi.
+
+Solidity menawarkan dua tipe berbeda untuk alamat: tipe `address` dan tipe `address payable`. Perbedaannya adalah alamat `payable` dapat menerima ether, dan akan memiliki metode `transfer` dan `send` yang tersedia. Dengan pemikiran ini, hanya alamat *beneficiary* yang perlu bersifat `payable`.
+
+Mari kita tambahkan tes kita untuk *field beneficiary* dan *custodian*. Kembali ke file tes kita, mari kita perbarui pengaturan untuk mengatur alamat *beneficiary* dan alamat *custodian*, perbarui panggilan untuk membuat penggalangan dana baru dengan parameter-parameter ini, dan kemudian tambahkan tes untuk *field* baru melalui fungsi *getter*. File tes yang diperbarui ditunjukkan dalam Contoh 6-5.
+
+**Contoh 6-5. Tes Fundraiser dengan beneficiary dan custodian**
+
+```javascript
+const FundraiserContract = artifacts.require("Fundraiser");
+
+contract("Fundraiser", accounts => {
+  let fundraiser;
+  const name = "Beneficiary Name";
+  const url = "beneficiaryname.org";
+  const imageURL = "https://placekitten.com/600/350";
+  const description = "Beneficiary description";
+  const beneficiary = accounts[1];
+  const custodian = accounts[0];
+
+  describe("initialization", () => {
+    beforeEach(async () => {
+      fundraiser = await FundraiserContract.new(
+        name,
+        url,
+        imageURL,
+        description,
+        beneficiary,
+        custodian
+      )
+    });
+
+    it("gets the beneficiary name", async () => {
+      const actual = await fundraiser.name();
+      assert.equal(actual, name, "names should match");
+    });
+
+    it("gets the beneficiary url", async () => {
+      const actual = await fundraiser.url();
+      assert.equal(actual, url, "url should match");
+    });
+
+    it("gets the beneficiary image url", async () => {
+      const actual = await fundraiser.imageURL();
+      assert.equal(actual, imageURL, "imageURL should match");
+    });
+
+    it("gets the beneficiary description", async () => {
+      const actual = await fundraiser.description();
+      assert.equal(actual, description, "description should match");
+    })
+
+    it("gets the beneficiary", async () => {
+      const actual = await fundraiser.beneficiary();
+      assert.equal(actual, beneficiary, "beneficiary addresses should match");
+    });
+
+    it("gets the custodian", async () => {
+      const actual = await fundraiser.custodian();
+      assert.equal(actual, custodian, "custodian addresses should match");
+    });
+  });
+});
+```
+
+Menjalankan tes kita, kita akan melihat kesalahan serupa dari sebelumnya. *Constructor* kita di sisi Solidity belum diperbarui untuk menerima parameter baru. Mari perbarui *constructor* agar sesuai dengan Contoh 6-6.
+
+**Contoh 6-6. Memperbarui constructor dengan alamat beneficiary dan custodian**
+
+```solidity
+constructor(
+  string memory _name,
+  string memory _url,
+  string memory _imageURL,
+  string memory _description,
+  address payable _beneficiary,
+  address _custodian
+)
+public
+{
+  name = _name;
+  url = _url;
+  imageURL = _imageURL;
+  description = _description;
+}
+```
+
+Setelah kita menjalankan tes kita, *compiler* kita seharusnya sekali lagi memberi kita peringatan parameter yang tidak digunakan karena kita belum melakukan apa pun dengan alamat *beneficiary* atau *custodian*. Kita juga seharusnya melihat dua tes lagi yang gagal yang menunjukkan bahwa ada beberapa fungsi *getter* yang hilang.
+
+Untuk memperbaiki peringatan, kita perlu menambahkan variabel *state* ke kontrak, dan kemudian memperbarui *constructor* agar sesuai dengan Contoh 6-7.
+
+**Contoh 6-7. Menetapkan beneficiary dan custodian**
+
+```solidity
+pragma solidity >0.4.23 <0.7.0;
+
+contract Fundraiser {
+  string public name;
+  string public url;
+  string public imageURL;
+  string public description;
+  address payable public beneficiary;
+  address public custodian;
+
+  constructor(
+    string memory _name,
+    string memory _url,
+    string memory _imageURL,
+    string memory _description,
+    address payable _beneficiary,
+    address _custodian
+  )
+  public
+  {
+    name = _name;
+    url = _url;
+    imageURL = _imageURL;
+    description = _description;
+    beneficiary = _beneficiary;
+    custodian = _custodian;
+  }
+}
+```
+
+Sekarang dengan ini, saat kita menjalankan tes, kita seharusnya melihat semuanya berhasil:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+
+Contract: Fundraiser
+  initialization
+    ✓ gets the beneficiary name (49ms)
+    ✓ gets the beneficiary url
+    ✓ gets the beneficiary image url
+    ✓ gets the beneficiary description
+    ✓ gets the beneficiary
+    ✓ gets the custodian
+
+  6 passing (873ms)
+```
+
+Bagus\! Kita sudah selesai dengan cara menangani pembuatan penggalangan dana baru. Selanjutnya, kita akan melihat cara membuat agar *custodian* kita dapat memperbarui alamat *beneficiary*.
+
+### Mengedit Beneficiary
+
+Mungkin ada saatnya ketika *custodian* perlu memperbarui alamat *beneficiary*. Ini bisa terjadi jika *custodian* secara tidak sengaja memasukkan alamat yang salah atau jika *beneficiary* memutuskan untuk beralih bursa yang digunakannya. Sama seperti kontrak `Greeter` dari bab terakhir, kita akan ingin membatasi siapa yang dapat melakukan operasi ini, tetapi tidak seperti Bab 4, kita memiliki *custodian* alih-alih *owner*. Untuk menghindari mengimplementasikan ulang perilaku yang sudah dikenal dari kontrak yang telah diaudit, mari kita buat beberapa perubahan pada kontrak `Fundraiser` untuk mendukung `Ownable`.
+
+Kita akan mulai dengan menghapus variabel *state custodian* dan kemudian memperbarui *constructor* untuk menggunakan fungsi internal `_transferOwnership` yang didefinisikan dalam kontrak `Ownable`. Perubahan yang dihasilkan diilustrasikan dalam Contoh 6-8.
+
+**Contoh 6-8. Memperbarui constructor**
+
+```solidity
+address payable public beneficiary;
+
+constructor(
+  string memory _name,
+  string memory _url,
+  string memory _imageURL,
+  string memory _description,
+  address payable _beneficiary,
+  address _custodian
+)
+public
+{
+  name = _name;
+  url = _url;
+  imageURL = _imageURL;
+  description = _description;
+  beneficiary = _beneficiary;
+  _transferOwnership(_custodian);
+}
+```
+
+Kembali ke file tes kita, kita perlu memperbarui semua referensi `custodian` menjadi `owner`. Contoh 6-9 menyertakan file tes yang diperbarui.
+
+**Contoh 6-9. Memperbarui custodian menjadi owner**
+
+```javascript
+const FundraiserContract = artifacts.require("Fundraiser");
+
+contract("Fundraiser", accounts => {
+  let fundraiser;
+  // ...dihilangkan...
+  const owner = accounts[0];
+
+  describe("initialization", () => {
+    beforeEach(async () => {
+      fundraiser = await FundraiserContract.new(
+        name,
+        url,
+        imageURL,
+        description,
+        beneficiary,
+        owner
+      )
+    });
+
+    // ...dihilangkan...
+
+    it("gets the owner", async () => {
+      const actual = await fundraiser.owner();
+      assert.equal(actual, owner, "owners should match");
+    });
+  });
+});
+```
+
+Dengan perubahan ini, mari kita jalankan tes:
+
+```bash
+$ truffle test
+Compiling your contracts...
+// ...dihilangkan...
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+    5 passing (864ms)
+    1 failing
+
+    1) Contract: Fundraiser
+         initialization
+           gets the owner:
+       TypeError: fundraiser.owner is not a function
+        at Context.it (test/fundraiser_test.js:51:39)
+        at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Untungnya kontrak `Ownable` mengimplementasikan fungsi ini, dan kita akan mendapatkannya setelah kita mulai mewarisi dari kontrak tersebut.
+
+Instal OpenZeppelin dengan perintah berikut:
+
+```bash
+$ npm install openzeppelin-solidity --save
+```
+
+Kemudian di kontrak `Fundraiser` kita, kita akan mengimpor dan mewarisi dari kontrak `Ownable`:
+
+```solidity
+pragma solidity >0.4.23 <0.7.0;
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
+contract Fundraiser is Ownable {
+  // ...dihilangkan...
+}
+```
+
+Dengan perubahan ini, kita kembali ke tes yang berhasil:
+
+```bash
+$ truffle test
+// ...dihilangkan...
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+    ✓ gets the owner
+  6 passing (892ms)
+```
+
+Sekarang mari kita rencanakan fungsi baru kita. Kita ingin fungsi `setBeneficiary` yang akan gagal jika dipanggil oleh siapa pun selain pemilik. Jika pengirim adalah pemilik, maka ia akan memperbarui alamat *beneficiary* dengan yang dilewatkan sebagai parameter. Setiap kali kita berurusan dengan kontrol akses, kita harus berencana untuk menguji fungsi dalam berbagai peran untuk memverifikasi bahwa kita telah membatasi perilaku dengan tepat.
+
+Mari buat blok `describe` baru untuk fungsi `setBeneficiary`, seperti yang ada di Contoh 6-10.
+
+**Contoh 6-10. Blok describe untuk setBeneficiary**
+
+```javascript
+const FundraiserContract = artifacts.require("Fundraiser");
+
+contract("Fundraiser", accounts => {
+  // ...dihilangkan...
+  describe("initialization", () => {
+    beforeEach(async () => {
+      fundraiser = await FundraiserContract.new(
+        name,
+        url,
+        imageURL,
+        description,
+        beneficiary,
+        owner
+      )
+    });
+    // ...dihilangkan...
+  });
+
+  describe("setBeneficiary", () => {
+  });
+});
+```
+
+Kita perlu menyiapkan penggalangan dana seperti yang kita lakukan di blok tes inisialisasi. Alih-alih menduplikasi kode ini, kita dapat memindahkan `beforeEach` ke lingkup `contract` induk agar terlihat seperti Contoh 6-11.
+
+**Contoh 6-11. Memindahkan beforeEach ke lingkup induk**
+
+```javascript
+const FundraiserContract = artifacts.require("Fundraiser");
+
+contract("Fundraiser", accounts => {
+  // ...dihilangkan...
+  beforeEach(async () => {
+    fundraiser = await FundraiserContract.new(
+      name,
+      url,
+      imageURL,
+      description,
+      beneficiary,
+      owner
+    )
+  });
+
+  describe("initialization", () => {
+    // ...dihilangkan...
+  });
+
+  describe("setBeneficiary", () => {
+  });
+});
+```
+
+Dengan pengaturan kita selesai, kita dapat menambahkan tes di Contoh 6-12.
+
+**Contoh 6-12. Kasus uji setBeneficiary**
+
+```javascript
+describe("setBeneficiary", () => {
+  const newBeneficiary = accounts[2];
+
+  it("updated beneficiary when called by owner account", async () => {
+    await fundraiser.setBeneficiary(newBeneficiary, {from: owner});
+    const actualBeneficiary = await fundraiser.beneficiary();
+    assert.equal(actualBeneficiary, newBeneficiary, "beneficiaries should match");
+  });
+
+  it("throws an error when called from a non-owner account", async () => {
+    try {
+      await fundraiser.setBeneficiary(newBeneficiary, {from: accounts[3]});
+      assert.fail("setBeneficiary was not restricted to owners")
+    } catch(err) {
+      const expectedError = "Ownable: caller is not the owner"
+      const actualError = err.reason;
+      assert.equal(actualError, expectedError, "should not be permitted")
+    }
+  })
+});
+```
+
+```bash
+$ truffle test
+Compiling your contracts...
+// ...dihilangkan...
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  setBeneficiary
+    1) updated beneficiary when called by owner account
+    // ...dihilangkan...
+    2) throws an error when called from a non-owner account
+    // ...dihilangkan...
+
+  6 passing (1s)
+  2 failing
+
+  1) Contract: Fundraiser
+       setBeneficiary
+         updated beneficiary when called by owner account:
+     TypeError: fundraiser.setBeneficiary is not a function
+      at Context.it (test/fundraiser_test.js:59:24)
+
+  2) Contract: Fundraiser
+       setBeneficiary
+         throws an error when called from a non-owner account:
+     AssertionError: should not be permitted: expected undefined to equal 'Ownable: caller is not the owner'
+      at Context.it (test/fundraiser_test.js:71:16)
+```
+
+Tes kita gagal karena kita belum mendefinisikan fungsi `setBeneficiary`. Mari tambahkan fungsi itu ke kontrak kita:
+
+```solidity
+function setBeneficiary(address payable _beneficiary) public onlyOwner {
+  beneficiary = _beneficiary;
+}
+```
+
+Mari jalankan tes kita lagi:
+
+```bash
+$ truffle test
+Compiling your contracts...
+// ...dihilangkan...
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  setBeneficiary
+    ✓ updated beneficiary when called by owner account (72ms)
+    ✓ throws an error when called from a non-owner account (60ms)
+
+  8 passing (2s)
+```
+
+Sukses\! Kita bisa melakukan ini untuk semua *field*, tetapi sangat penting bagi kita untuk memperbarui *beneficiary* karena akun ini akan menerima semua dana. Kita akan membahas ini lebih lanjut ketika kita mengerjakan fungsionalitas penarikan dana (*withdraw*) nanti di bab ini. Untuk saat ini, mari kita lanjutkan ke pembuatan donasi.
+
+### Melakukan Donasi
+
+Donasi adalah titik fokus dari aplikasi ini. Ini adalah area interaksi utama bagi sebagian besar pengguna, dan akan menjadi area yang perlu kita kerjakan dengan benar sehingga pengguna dapat kembali dan berdonasi ke berbagai organisasi. UI untuk donasi digambarkan pada Gambar 6-5.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-6.5.png" alt="gambar" width="580"/>
+</p>
+
+Untuk melakukan donasi, seorang donatur akan memasukkan jumlah dolar yang ingin mereka donasikan dalam USD, yang kemudian akan memperbarui jumlah yang ditampilkan dalam ether (ETH). Di bab-bab UI, kita akan membahas cara terhubung ke API pihak ketiga untuk mendapatkan nilai tukar terkini untuk konversi ini. Setelah pengguna mengklik tombol untuk berdonasi, kita ingin mengamati perubahan berikut:
+
+  * Sebuah catatan donasi dibuat dan dikaitkan dengan alamat donatur.
+  * Jumlah donasi (`donations count`) bertambah.
+  * Jumlah total donasi (`total donations amount`) bertambah sebesar jumlah donasi yang diberikan.
+  * Sebuah *event* di-emit untuk menambahkan donasi ke log (lebih lanjut tentang ini nanti).
+
+Mari kita luangkan waktu sejenak untuk membahas catatan donasi lebih lanjut. Sebuah donasi akan menjadi milik sebuah alamat. Catatan itu sendiri akan berisi berapa banyak ether yang didonasikan dan tanggal donasi. Dengan informasi ini, kita dapat mencari nilai tukar historis pada saat donasi untuk menentukan nilainya dan menyediakan tanda terima untuk penggunaan di luar *chain*.
+
+Kedua *field* (tanggal dan nilai) dapat direpresentasikan oleh *unsigned integer*. Tanggal akan direpresentasikan oleh jumlah detik sejak *Unix epoch*, dan nilainya akan direpresentasikan dalam satuan **wei**, denominasi terkecil dari ether. *Integer* di Solidity datang dalam tipe *signed* atau *unsigned*, dan dapat berukuran dari 8 hingga 256 bit. Jika Anda tidak menentukan ukuran `int` atau `uint`, secara *default* akan menjadi 256. Namun, disarankan agar Anda secara eksplisit menentukan ukuran *integer* Anda jika memungkinkan. Karena *field-field* ini memiliki tipe yang sama, kita bisa membuat sebuah *array* untuk menampungnya, seperti yang ditunjukkan pada cuplikan berikut:
+
+```solidity
+uint256[2] memory donation;
+donation[0] = 500;
+donation[1] = block.timestamp; // Seharusnya donation[1], bukan donation[2]
+```
+
+Di sini kita membuat *array* baru di-memori dari *unsigned integer* yang akan berisi dua item, dan memberikan nilai pada setiap item. Saat menggunakan variabel `donation`, akan menjadi tugas pengembang untuk mengingat indeks mana yang berisi item mana. Alih-alih menggunakan *array*, kita bisa menggunakan `struct` dan memberi nama pada data tersebut.
+
+### Structs
+
+`Struct` di Solidity memungkinkan kita untuk mendefinisikan tipe baru. Tipe tersebut akan memiliki properti yang dapat terdiri dari tipe yang berbeda. Untuk membuat `struct Donation`, kita dapat menggunakan cuplikan berikut:
+
+```solidity
+struct Donation {
+  uint256 value;
+  uint256 date;
+}
+```
+
+Ada dua cara kita bisa menginisialisasi sebuah `struct`. Kita bisa menginisialisasi `struct` menggunakan argumen posisional. Urutan di mana properti muncul dalam `struct` adalah urutan parameternya. Di sini, `value` akan menjadi parameter pertama diikuti oleh `date`, seperti yang diilustrasikan dalam cuplikan berikut:
+
+```solidity
+Donation memory donation = Donation(
+  100,
+  block.timestamp
+);
+```
+
+Sebagai alternatif, kita bisa menggunakan gaya kata kunci atau kamus (*dictionary*) untuk membuat `struct` kita, seperti yang ditunjukkan di sini:
+
+```solidity
+Donation memory donation = Donation({
+  value: 100,
+  date: block.timestamp
+});
+```
+
+Perhatikan dalam kasus kata kunci, Anda perlu menambahkan kurung kurawal `{}` untuk membungkus pemetaan kunci ke nilai. Dengan opsi ini, urutan tidak lagi menjadi ketergantungan yang kaku karena input dapat diberi label. Tidak harus mengingat urutan adalah keuntungan besar—oleh karena itu, kita akan menggunakan sintaks kata kunci untuk sisa sampel dalam buku ini.
+
+Karena `struct Donation` ini adalah struktur internal, kita tidak dapat mengujinya secara langsung. Untuk melihat jumlah donasi yang telah dibuat oleh donatur tertentu, kita perlu melacak donasi berdasarkan donatur. Untuk membuat asosiasi ini, kita bisa menggunakan tipe Solidity lain: `mappings`.
+
+### Mappings
+
+`Mapping` memungkinkan Anda untuk mengasosiasikan sebuah kunci dengan sebuah nilai. Di Solidity, tipe kunci dibatasi pada *integer*, *boolean*, *address*, *bytes*, dan *string*. Tipe nilai bisa apa saja, termasuk `mapping` lain. Sayangnya, `mapping` di Solidity tidak dapat di-enumerasi (*enumerable*), yang berarti Anda tidak dapat menggunakan *loop for* untuk melakukan iterasi melalui pasangan kunci/nilai seperti yang Anda lakukan pada *array*. Untuk tujuan kita, batasan ini tidak akan menjadi masalah. Namun, jika Anda perlu melakukan iterasi pada `mapping`, Anda perlu membuat perilakunya sendiri atau menggunakan *library* pihak ketiga untuk memperluas perilaku `mapping` *default*.
+
+Untuk mendeklarasikan `mapping`, kita perlu mengidentifikasi tipe kunci dan tipe nilai, seperti berikut:
+
+```solidity
+mapping(address => Donation[]) private _donations;
+```
+
+`Mapping` ini mengasosiasikan sebuah `address` dengan *array* dinamis dari `Donation`. Jika kita ingin mengakses donasi seorang donatur individu, kita akan mengaksesnya menggunakan notasi `[]`:
+
+```solidity
+address donor = msg.sender;
+_donations[donor];
+```
+
+Dengan struktur data baru ini, kita memiliki semua bagian yang dibutuhkan untuk menulis bagian pertama dari tes donasi kita.
+
+### Tes Donasi
+
+Di file tes kita, mari buat blok `describe` lain untuk berisi tes untuk melakukan donasi dan menginisialisasi beberapa variabel yang akan kita gunakan untuk membuat donasi. Pengaturan ini diilustrasikan dalam Contoh 6-13.
+
+**Contoh 6-13. Pengaturan untuk melakukan donasi**
+
+```javascript
+const FundraiserContract = artifacts.require("Fundraiser");
+
+contract("Fundraiser", accounts => {
+  // ...dihilangkan...
+  describe("initialization", () => {
+    // ...dihilangkan...
+  });
+
+  describe("making donations", () => {
+    const value = web3.utils.toWei('0.0289');
+    const donor = accounts[2];
+
+    it("increases myDonationsCount");
+    it("includes donation in myDonations");
+  });
+});
+```
+
+Dalam grup tes kita, kita membuat variabel untuk menampung nilai donasi dan alamat donatur. Nilai donasi kita direpresentasikan dalam satuan **wei**, yang merupakan denominasi terkecil dari ether. Alih-alih mengetik banyak angka nol, kita menggunakan fungsi bantuan `web3.utils.toWei` untuk melakukan konversi untuk kita.
+
+Donatur kita direpresentasikan dengan sebuah alamat dari variabel `accounts` kita yang dilewatkan ke fungsi `contract` kita. Saat kita mengirim donasi, kita akan memastikan untuk mengirimkannya dari akun ini alih-alih akun *default*.
+
+Ada dua tes yang tertunda yang sekarang perlu kita implementasikan. Kita akan mulai dengan yang berlabel "increases myDonationsCount". Perbarui tes tersebut dengan yang berikut:
+
+```javascript
+it("increases myDonationsCount", async () => {
+  const currentDonationsCount = await fundraiser.myDonationsCount(
+    {from: donor}
+  );
+
+  await fundraiser.donate({from: donor, value});
+
+  const newDonationsCount = await fundraiser.myDonationsCount(
+    {from: donor}
+  );
+
+  assert.equal(
+    1,
+    newDonationsCount - currentDonationsCount,
+    "myDonationsCount should increment by 1");
+})
+```
+
+Dalam tes baru kita, kita akan mendapatkan jumlah donasi saat ini untuk donatur tertentu, melakukan donasi dari donatur tersebut, dan kemudian memeriksa kembali jumlah donasi mereka. Kita kemudian menegaskan bahwa selisih antara jumlah tersebut adalah 1.
+
+Menjalankan tes kita, kita akan mendapatkan kegagalan berikut:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan..
+  setBeneficiary
+    // ...dihilangkan...
+  making donations
+    1) increases myDonationsCount
+    > No events were emitted
+    - includes donation in myDonations
+
+  8 passing (981ms)
+  1 pending
+  1 failing
+
+  1) Contract: Fundraiser
+       making donations
+         increases myDonationsCount:
+     TypeError: fundraiser.myDonationsCount is not a function
+      at Context.it (test/fundraiser_test.js:72:54)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Tes kita gagal karena kita tidak memiliki fungsi `myDonationsCount`. Fungsi ini seharusnya mengembalikan jumlah donasi untuk donatur yang membuat permintaan. Agar tes ini berhasil, kita perlu menambahkan `mapping` donatur-ke-donasi, dan kemudian mendapatkan ukuran *array* donasi yang terkait dengan pengirim. Mari perbarui kontrak `Fundraiser` kita, seperti yang diilustrasikan dalam Contoh 6-14.
+
+**Contoh 6-14. Menambahkan myDonationsCount**
+
+```solidity
+pragma solidity >0.4.23 <0.7.0;
+
+contract Fundraiser {
+  struct Donation {
+    uint256 value;
+    uint256 date;
+  }
+  mapping(address => Donation[]) private _donations;
+
+  string public name;
+  string public url;
+  string public imageURL;
+  string public description;
+  address payable public beneficiary;
+
+  constructor(
+    // ...dihilangkan...
+  )
+  public
+  {
+    // ...dihilangkan...
+  }
+
+  function setBeneficiary(address payable _beneficiary) public onlyOwner {
+    beneficiary = _beneficiary;
+  }
+
+  function myDonationsCount() public view returns(uint256) {
+    return _donations[msg.sender].length;
+  }
+}
+```
+
+Menjalankan tes kita masih akan menghasilkan kegagalan karena kita belum membuat fungsi `donate`. Tambahkan fungsi berikut ke kontrak `Fundraiser`:
+
+```solidity
+function donate() public payable {
+  Donation memory donation = Donation({
+    value: msg.value,
+    date: block.timestamp
+  });
+  _donations[msg.sender].push(donation);
+}
+```
+
+Ada beberapa hal baru di sini untuk dibahas. Ini adalah fungsi pertama yang kita implementasikan yang menerima ether, dan oleh karena itu kita perlu menambahkan *modifier* `payable` ke deklarasi fungsi kita. Saat kita mengirim ether ke kontrak atau EOA, kita akan meningkatkan saldo alamat tersebut secara otomatis, dan kita tidak perlu menambahkan kode apa pun untuk perilaku itu.
+
+Di dalam badan fungsi kita, kita membuat `struct Donation` baru di `memory`, dan kemudian memasukkannya ke dalam *array* `Donation` yang terkait dengan donatur kita melalui fungsi `push`. Fungsi `push` hanya tersedia pada *array* yang dideklarasikan sebagai *array* `storage`. Kita secara implisit membuat deklarasi itu lebih awal dengan menambahkan `mapping` alamat ke donasi.
+
+Dengan fungsi `donate` kita sudah ada, tes kita sekarang seharusnya berhasil:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  setBeneficiary
+    // ...dihilangkan...
+  making donations
+    ✓ increases myDonationsCount (106ms)
+    - includes donation in myDonations
+
+  9 passing (1s)
+  1 pending
+```
+
+Sukses\! Sekarang kita akan mengalihkan perhatian kita ke fungsi `myDonations`.
+
+### myDonations
+
+Fungsi `myDonations` seharusnya mengembalikan donasi yang dibuat oleh donatur untuk penggalangan dana tersebut. Sayangnya, karena keterbatasan pada ABI saat ini, kita tidak dapat mengembalikan *array* dari `struct` dari fungsi `external` atau `public`. Sebaliknya, kita perlu memanfaatkan beberapa nilai kembali (*multiple return values*) dan *array* untuk melakukannya.
+
+Sejauh ini, kita telah mengembalikan entah tidak sama sekali atau hanya satu nilai dari sebuah fungsi. Sekarang kita akan mengembalikan dua *array* dari sebuah fungsi, satu *array* untuk setiap properti dari `struct` kita. Saat kita mendeklarasikan nilai kembali kita di Solidity, kita bisa mendeklarasikan hanya tipenya atau kita bisa mendeklarasikan tipe dengan sebuah *identifier*. Kedua contoh berikut valid:
+
+```solidity
+function multipleReturns() pure public returns(uint256, uint256) {
+  return (1, 2);
+}
+
+function multipleReturnsWithNames() pure public returns(uint256 a, uint256 b) {
+  a = 1;
+  b = 2;
+  return (a, b);
+}
+```
+
+Ketika fungsi ini mengembalikan nilai, ia akan mengembalikan sebuah **tuple**. Tuple adalah tipe yang dapat terdiri dari tipe lain. Tapi tidak seperti tipe Solidity lainnya, kita tidak bisa membuat tuple secara langsung di kode kita; mereka hanya untuk nilai kembali seperti ini. Ketika kode tes kita menerima beberapa nilai kembali, mereka dapat diakses berdasarkan indeks seperti *array*, atau jika nilai kembali diberi nama, mereka dapat diakses berdasarkan nama.
+
+Agar `myDonations` dapat mengembalikan data, kita perlu membangun *array* dari nilai dan tanggal. Saat kita mendapatkan data kembali, tes kita perlu memeriksa nilai-nilai tersebut untuk memastikan mereka benar. Mari perbarui tes dengan label "includes donation in myDonations" dengan yang berikut:
+
+```javascript
+it("includes donation in myDonations", async () => {
+  await fundraiser.donate({from: donor, value});
+
+  const {values, dates} = await fundraiser.myDonations(
+    {from: donor}
+  );
+
+  assert.equal(
+    value,
+    values[0],
+    "values should match"
+  );
+  assert(dates[0], "date should be present");
+});
+```
+
+Dalam tes baru kita, kita melakukan donasi dari alamat donatur kita dan kemudian memanggil `myDonations` untuk mendapatkan daftar donasi. Kita sebenarnya akan mendapatkan kembali dua *array* dari fungsi tersebut dan, menggunakan *destructuring* di JavaScript, menetapkannya ke variabel masing-masing. Kemudian kita memeriksa item pertama dari *array values* untuk memastikan itu sesuai dengan yang kita harapkan. Untuk tanggal, kita hanya akan memeriksa bahwa itu ada.
+
+Menjalankan tes kita, kita akan mendapatkan kegagalan yang ditunjukkan di sini:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  setBeneficiary
+    // ...dihilangkan...
+  making donations
+    ✓ increases myDonationsCount (107ms)
+    1) includes donation in myDonations
+    > No events were emitted
+
+  9 passing (1s)
+  1 failing
+
+  1) Contract: Fundraiser
+       making donations
+         includes donation in myDonations:
+     TypeError: fundraiser.myDonations is not a function
+      at Context.it (test/fundraiser_test.js:84:67)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Kegagalan ini memberitahu kita bahwa kita perlu mendefinisikan fungsi di kontrak `Fundraiser`. Mari tambahkan fungsi berikut ke kontrak kita:
+
+```solidity
+function myDonations() public view returns(
+  uint256[] memory values,
+  uint256[] memory dates
+)
+{
+  uint256 count = myDonationsCount();
+  values = new uint256[](count);
+  dates = new uint256[](count);
+
+  for (uint256 i = 0; i < count; i++) {
+    Donation storage donation = _donations[msg.sender][i];
+    values[i] = donation.value;
+    dates[i] = donation.date;
+  }
+  return (values, dates);
+}
+```
+
+Mari kita tinjau kode ini. Salah satu hal pertama yang perlu diperhatikan adalah bahwa kita mengembalikan dua *array* yang telah kita diskusikan sebelumnya, keduanya bertipe `uint256`. Memasuki badan fungsi, hal pertama yang kita lakukan adalah mendapatkan jumlah donasi untuk pengirim pesan menggunakan fungsi `myDonationsCount` yang kita buat sebelumnya. Ini memberi tahu kita seberapa besar *array* kita harus dibuat.
+
+Kita kemudian menetapkan *array* dari tipe yang sesuai ke setiap variabel kembali yang diberi nama. Karena ukurannya tidak akan diketahui sampai *runtime*, kita harus menggunakan kata kunci `new` untuk membuat *array* ini di `memory`. Setelah mereka dibuat, kita kemudian melakukan iterasi melalui donasi menggunakan *loop for*.
+
+*Loop for* di Solidity beroperasi seperti *loop for* di banyak bahasa lain. Kita pertama-tama menginisialisasi variabel baru seperti `i`. Kita kemudian mengikutinya dengan ekspresi yang akan dievaluasi menjadi *true* atau *false* untuk mengetahui apakah kita harus melanjutkan iterasi. Terakhir, kita memperbarui variabel untuk mencegah *loop* tak terbatas.
+
+Di dalam *loop for*, kita membuat variabel `donation`. Kali ini kita menggunakan kata kunci `storage` alih-alih `memory`. Di sini, kita sekarang mereferensikan `struct` yang telah disimpan ke variabel *state* kontrak dan bukan membuat yang baru di `memory`. Setelah kita memiliki catatan donasi kita, kita mengakses properti `value` dan `date` darinya dan memasukkannya ke dalam *array* yang sesuai.
+
+Setelah *array* telah dibangun, kita dapat mengembalikannya. Dengan fungsi yang diimplementasikan, tes kita sekarang seharusnya berhasil:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  setBeneficiary
+    // ...dihilangkan...
+  making donations
+    ✓ increases myDonationsCount (105ms)
+    ✓ includes donation in myDonations (144ms)
+```
+
+Baiklah\! Dengan bagian itu selesai, kita sekarang perlu memperbarui total penggalangan dana.
+
+### Total Penggalangan Dana
+
+Setiap penggalangan dana melacak jumlah total donasi yang diterima beserta jumlah total donasi. Nilai-nilai ini adalah yang diilustrasikan dalam kutipan UI kita di Gambar 6-6.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-6.5.png" alt="gambar" width="580"/>
+</p>
+
+Karena donasi kita disimpan di bawah setiap alamat donatur, dan *map* tidak dapat diiterasi, kita akan memperbarui nilai-nilai ini setiap kali donasi dibuat alih-alih mencoba menghitungnya secara langsung. Untuk mendukung perilaku ini, kita perlu menambahkan dua variabel *state* lagi ke kontrak kita dan kemudian fungsi *getter* terkait.
+
+Kita akan mulai dengan tes total donasi:
+
+```javascript
+it("increases the totalDonations amount", async () => {
+  const currentTotalDonations = await fundraiser.totalDonations();
+  await fundraiser.donate({from: donor, value});
+  const newTotalDonations = await fundraiser.totalDonations();
+
+  const diff = newTotalDonations - currentTotalDonations;
+  assert.equal(
+    diff,
+    value,
+    "difference should match the donation value"
+  )
+});
+```
+
+Ketika kita melakukan donasi, kita seharusnya melihat nilai ini naik sebesar jumlah yang didonasikan. Satu nilai lain yang juga akan meningkat sebesar jumlah ini adalah saldo kontrak, jadi mengapa tidak menggunakan nilai itu? Saldo akan ditarik secara berkala oleh penerima manfaat, mengembalikannya ke 0. Melacak jumlah total yang didonasikan secara terpisah akan menunjukkan kepada kita berapa banyak yang telah dikumpulkan oleh penggalangan dana, alih-alih berapa banyak yang saat ini tersedia untuk ditarik oleh penerima manfaat.
+
+Tes ini dan tes kita berikutnya akan terlihat sangat mirip dengan tes `myDonationsCount` dari sebelumnya. Kita memeriksa `totalDonations` sebelum dan sesudah donasi dan memastikan nilainya meningkat sebesar jumlah donasi. Menjalankan tes ini, kita seharusnya melihat kegagalan berikut:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  setBeneficiary
+    // ...dihilangkan...
+  making donations
+    ✓ increases myDonationsCount (103ms)
+    ✓ includes donation in myDonations (94ms)
+    1) increases the totalDonations amount
+    > No events were emitted
+    - increments the donorsCount
+
+  10 passing (1s)
+  1 failing
+
+  1) Contract: Fundraiser
+       making donations
+         increases the totalDonations amount:
+     TypeError: fundraiser.totalDonations is not a function
+      at Context.it (test/fundraiser_test.js:92:54)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Agar tes ini berhasil, kita perlu menambahkan variabel *state* dan memperbarui metode `donate` kita untuk memperbarui nilai saat donasi dibuat. Karena siapa pun dapat melakukan donasi dan tidak ada batasan jumlah donasi, kita harus mempertimbangkan penggunaan **SafeMath** untuk mencegah masalah *integer overflow*.
+
+> 💡 **Tip**: **SafeMath** sudah termasuk dalam kontrak OpenZeppelin yang telah kita instal, dan penggunaannya dianjurkan setiap kali Anda berurusan dengan operasi aritmatika yang dapat menyebabkan variabel *integer* melebihi batasnya.
+
+Mari perbarui kontrak kita dengan kode dari Contoh 6-15.
+
+**Contoh 6-15. Memperbarui total donasi**
+
+```solidity
+pragma solidity >0.4.23 <0.7.0;
+
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
+contract Fundraiser is Ownable {
+  using SafeMath for uint256;
+  // ...dihilangkan..
+  uint256 public totalDonations;
+
+  constructor(
+    // ...dihilangkan...
+  )
+  public
+  {
+    // ...dihilangkan...
+  }
+
+  function setBeneficiary(address payable _beneficiary) public onlyOwner {
+    beneficiary = _beneficiary;
+  }
+
+  function myDonationsCount() public view returns(uint256) {
+    return _donations[msg.sender].length;
+  }
+
+  function donate() public payable {
+    Donation memory donation = Donation({
+      value: msg.value,
+      date: block.timestamp
+    });
+    _donations[msg.sender].push(donation);
+    totalDonations = totalDonations.add(msg.value);
+  }
+
+  function myDonations() public view returns(
+    uint256[] memory values,
+    uint256[] memory dates
+  )
+  {
+    uint256 count = myDonationsCount();
+    values = new uint256[](count);
+    dates = new uint256[](count);
+    for (uint256 i = 0; i < count; i++) {
+      Donation storage donation = _donations[msg.sender][i];
+      values[i] = donation.value;
+      dates[i] = donation.date;
+    }
+    return (values, dates);
+  }
+}
+```
+
+Dengan perubahan ini, tes kita seharusnya berhasil:
+
+```bash
+$ truffle test
+Compiling your contracts...
+// ...dihilangkan...
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  setBeneficiary
+    // ...dihilangkan...
+  making donations
+    ✓ increases myDonationsCount (107ms)
+    ✓ includes donation in myDonations (87ms)
+    ✓ increases the totalDonations amount (92ms)
+
+  11 passing (2s)
+```
+
+Bagus\! Sekarang kita perlu melakukan hal serupa untuk jumlah donasi. Mari tambahkan tes baru ke grup "making donations" kita:
+
+```javascript
+it("increases donationsCount", async () => {
+  const currentDonationsCount = await fundraiser.donationsCount();
+  await fundraiser.donate({from: donor, value});
+  const newDonationsCount = await fundraiser.donationsCount();
+  assert.equal(
+    1,
+    newDonationsCount - currentDonationsCount,
+    "donationsCount should increment by 1");
+});
+```
+
+Menjalankan tes kita seharusnya gagal karena fungsi `donationsCount` belum didefinisikan. Sama seperti fungsionalitas `totalDonations` kita, agar tes ini berhasil, kita harus menambahkan variabel *state* `public` dan menambahkannya di fungsi `donate`. Karena kita menambahkannya dengan konstanta 1 dan kemungkinan nilai ini akan melebihi batas `uint256` sangat rendah, kita bisa menggunakan `++` untuk menambah nilai ini. Mari tambahkan ini ke kontrak kita, seperti yang diilustrasikan dalam Contoh 6-16.
+
+**Contoh 6-16. Menambah jumlah donasi**
+
+```solidity
+pragma solidity >0.4.23 <0.7.0;
+
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
+contract Fundraiser is Ownable {
+  using SafeMath for uint256;
+  // ...dihilangkan...
+  uint256 public totalDonations;
+  uint256 public donationsCount;
+
+  constructor(
+    // ...dihilangkan...
+  )
+  public
+  {
+    // ...dihilangkan...
+  }
+
+  function setBeneficiary(address payable _beneficiary) public onlyOwner {
+    beneficiary = _beneficiary;
+  }
+
+  function myDonationsCount() public view returns(uint256) {
+    return _donations[msg.sender].length;
+  }
+
+  function donate() public payable {
+    Donation memory donation = Donation({
+      value: msg.value,
+      date: block.timestamp
+    });
+    _donations[msg.sender].push(donation);
+    totalDonations = totalDonations.add(msg.value);
+    donationsCount++;
+  }
+
+  function myDonations() public view returns(
+    uint256[] memory values,
+    uint256[] memory dates
+  )
+  {
+    // ...isi fungsi...
+  }
+}
+```
+
+Menjalankan tes kita, sekarang semuanya seharusnya berhasil:
+
+```bash
+$ truffle test
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  setBeneficiary
+    // ...dihilangkan...
+  making donations
+    ✓ increases myDonationsCount (111ms)
+    ✓ includes donation in myDonations (84ms)
+    ✓ increases the totalDonations amount (101ms)
+    ✓ increases donationsCount (144ms)
+
+  12 passing (3s)
+```
+
+Kita hampir selesai dengan fitur donasi kita\! Hal terakhir yang akan kita lihat adalah me-emit sebuah *event* saat donasi dibuat.
+
+### Events
+
+*Events* pada dasarnya adalah cara untuk menulis ke log Ethereum. Log ini mengirimkan notifikasi ketika entri baru dibuat dan telah diatur sedemikian rupa sehingga Anda dapat berlangganan atau mengawasi entri baru. Karena log dianggap sebagai bagian dari *blockchain*, menulis ke dalamnya tidak diizinkan dalam fungsi `view` atau `pure`.
+
+Anda dapat menguji *event* dengan melihat tanda terima transaksi (*transaction receipt*). Mari buat tes berikut di blok "making donation" kita yang akan menegaskan bahwa *event* tertentu telah di-emit:
+
+```javascript
+it("emits the DonationReceived event", async () => {
+  const tx = await fundraiser.donate({from: donor, value});
+  const expectedEvent = "DonationReceived";
+  const actualEvent = tx.logs[0].event;
+  assert.equal(actualEvent, expectedEvent, "events should match");
+});
+```
+
+Menjalankan tes kita, kita seharusnya melihat kegagalan berikut:
+
+```bash
+$ truffle test
+Using network 'test'.
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  1) Contract: Fundraiser
+       making donations
+         emits the DonationReceived event:
+     TypeError: Cannot read property 'event' of undefined
+      at Context.it (test/fundraiser_test.js:119:38)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Tes kita gagal karena log kita di indeks 0 adalah `undefined`. Ini berarti tidak ada *event* yang di-emit. Mari definisikan *event* kita dan kemudian perbarui fungsi `donate` kita untuk me-emit *event* setiap kali kita menerima donasi, seperti yang diilustrasikan dalam Contoh 6-17.
+
+**Contoh 6-17. Membuat event**
+
+```solidity
+// ...dihilangkan...
+contract Fundraiser is Ownable {
+  // ...dihilangkan...
+  mapping(address => Donation[]) private _donations;
+
+  event DonationReceived(address indexed donor, uint256 value);
+
+  // ...dihilangkan...
+  constructor(
+    // ...dihilangkan...
+  )
+  public
+  {
+    // ...dihilangkan...
+  }
+  // ...dihilangkan...
+  function donate() public payable {
+    Donation memory donation = Donation({
+      value: msg.value,
+      date: block.timestamp
+    });
+    _donations[msg.sender].push(donation);
+    totalDonations = totalDonations.add(msg.value);
+    donationsCount++;
+    emit DonationReceived(msg.sender, msg.value);
+  }
+}
+```
+
+Di sini kita mendefinisikan *event* `DonationReceived`. *Event* ini menerima alamat donatur dan jumlahnya. Perhatikan alamat ditandai sebagai `indexed`. Ini berarti bahwa EVM akan mempermudah pelanggan (*subscriber*) untuk memfilter *event* yang mungkin relevan bagi mereka. Hingga tiga parameter dapat diindeks saat mendefinisikan sebuah *event*.
+
+Dengan *event* kita didefinisikan, kita sekarang memperbarui fungsi `donate` untuk me-emit *event*. Menjalankan tes kita, kita seharusnya sekarang melihat semuanya berhasil.
+
+> 📝 **Catatan**: *Events* juga dapat digunakan sebagai cara yang lebih hemat biaya (gas lebih rendah) untuk menyimpan data di *chain*. Informasi dalam *event* dapat diakses oleh pelanggan, tetapi tidak tersedia dari dalam *smart contract*.
+
+```bash
+$ truffle test
+Using network 'test'.
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  making donations
+    ✓ increases myDonationsCount (118ms)
+    ✓ includes donation in myDonations (103ms)
+    ✓ increases the totalDonations amount (107ms)
+    ✓ increases donationsCount (116ms)
+    ✓ emits the DonationReceived event (61ms)
+
+  13 passing (2s)
+```
+
+Itu mencakup semua yang ingin kita bahas tentang melakukan donasi. Sekarang kita akan mengalihkan perhatian kita untuk mentransfer dana ke alamat penerima manfaat kita.
+
+### Menarik Dana
+
+Hal berikutnya yang harus dikerjakan adalah mentransfer saldo kontrak ke penerima manfaat. Transfer ini bisa terjadi pada saat setiap donasi, tetapi dianggap sebagai praktik terbaik untuk memisahkan tindakan penyetoran dan penarikan.
+
+Ingat, alamat penerima manfaat adalah sesuatu yang dikendalikan oleh layanan seperti Coinbase, dan tanpa kunci privat untuk alamat itu, kita tidak dapat mengirim transaksi untuk menarik dana secara langsung. Kita akan beralih ke alamat `owner` kita sebagai alamat yang dapat memicu penarikan.
+
+Untuk fungsi `withdraw` kita, kita akan ingin melakukan hal berikut:
+
+  * Mengharuskan pengirim cocok dengan alamat `owner`
+  * Mentransfer saldo kontrak ke penerima manfaat
+  * Me-emit *event withdraw*
+
+Mari tambahkan grup tes dan tes yang diilustrasikan dalam Contoh 6-18 ke file tes kita.
+
+**Contoh 6-18. Menambahkan grup tes withdraw**
+
+```javascript
+describe("withdrawing funds", () => {
+  beforeEach(async () => {
+    await fundraiser.donate(
+      {from: accounts[2], value: web3.utils.toWei('0.1')}
+    );
+  });
+
+  describe("access controls", () => {
+    it("throws an error when called from a non-owner account", async () => {
+      try {
+        await fundraiser.withdraw({from: accounts[3]});
+        assert.fail("withdraw was not restricted to owners")
+      } catch(err) {
+        const expectedError = "Ownable: caller is not the owner"
+        const actualError = err.reason;
+        assert.equal(actualError, expectedError, "should not be permitted")
+      }
+    });
+
+    it("permits the owner to call the function", async () => {
+      try {
+        await fundraiser.withdraw({from: owner});
+        assert(true, "no errors were thrown");
+      } catch(err) {
+        assert.fail("should not have thrown an error");
+      }
+    });
+  });
+});
+```
+
+Seperti yang dinyatakan sebelumnya dalam bab ini, ketika kita menguji fungsi yang memiliki izin, kita harus menguji kapan kondisi izin terpenuhi dan kapan gagal.
+
+Menjalankan tes kita, kita seharusnya melihat dua kegagalan, seperti yang ditunjukkan di sini:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  access controls
+    1) throws an error when called from a non-owner account
+    2) permits the owner to call the function
+
+  13 passing (2s)
+  2 failing
+
+  1) Contract: Fundraiser
+       withdrawing funds
+         access controls
+           throws an error when called from a non-owner account:
+       AssertionError: should not be permitted: expected undefined to equal 'Ownable: caller is not the owner'
+        at Context.it (test/fundraiser_test.js:130:18)
+
+  2) Contract: Fundraiser
+       withdrawing funds
+         access controls
+           permits the owner to call the function:
+       AssertionError: should not have thrown an error
+        at Context.it (test/fundraiser_test.js:139:18)
+```
+
+Untuk memperbaiki kedua tes tersebut, yang perlu kita lakukan hanyalah mendefinisikan fungsi `withdraw` dan menggunakan *modifier* `onlyOwner` untuk membatasi akses. Dua tes pertama ini tidak memeriksa efek samping lain, dan oleh karena itu badan fungsi dapat tetap kosong untuk saat ini. Tambahkan definisi fungsi berikut ke kontrak `Fundraiser` Anda:
+
+```solidity
+function withdraw() public onlyOwner {
+}
+```
+
+Menjalankan tes kita, kita kembali ke status hijau\!
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  withdrawing funds
+    access controls
+      ✓ throws an error when called from a non-owner account (60ms)
+      ✓ permits the owner to call the function (42ms)
+
+  15 passing (2s)
+```
+
+Selanjutnya, kita perlu mentransfer saldo kontrak ke penerima manfaat. Efek samping yang dapat diamati adalah saldo kontrak menjadi 0 dan saldo penerima manfaat meningkat sebesar saldo kontrak sebelumnya. Mari gunakan tes berikut untuk membuat pernyataan kita:
+
+```javascript
+it("transfers balance to beneficiary", async () => {
+  const currentContractBalance = await web3.eth.getBalance(fundraiser.address);
+  const currentBeneficiaryBalance = await web3.eth.getBalance(beneficiary);
+
+  await fundraiser.withdraw({from: owner});
+
+  const newContractBalance = await web3.eth.getBalance(fundraiser.address);
+  const newBeneficiaryBalance = await web3.eth.getBalance(beneficiary);
+  const beneficiaryDifference = newBeneficiaryBalance - currentBeneficiaryBalance;
+
+  assert.equal(
+    newContractBalance,
+    0,
+    "contract should have a 0 balance"
+  );
+  assert.equal(
+    beneficiaryDifference,
+    currentContractBalance,
+    "beneficiary should receive all the funds"
+  );
+});
+```
+
+Sama seperti tes penghitung kita dari saat membuat donasi, kita mengumpulkan *state* yang diperlukan (saldo) sebelum penarikan, melakukan penarikan, dan kemudian memvalidasi perubahannya. Untuk mengakses saldo, kita menggunakan metode `getBalance` dari Web3 dan kita perlu mengakses properti `address` dari *instance* `fundraiser` kita. Dengan semua ini diatur, menjalankan tes kita memberikan kegagalan berikut:
+
+```bash
+$ truffle test
+Using network 'test'.
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  withdrawing funds
+    1) transfers balance to beneficiary
+
+  13 passing (3s)
+  1 failing
+
+  1) Contract: Fundraiser
+       withdrawing funds
+         transfers balance to beneficiary:
+     AssertionError: contract should have a 0 balance: expected '100000000000000000' to equal 0
+      at Context.it (test/fundraiser_test.js:154:14)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Masalah kita di sini adalah saldo kita belum berubah. Fungsi `withdraw` saat ini kosong, jadi tes ini tampaknya gagal karena alasan yang benar. Mari perbarui fungsi `withdraw` dengan kode berikut:
+
+```solidity
+function withdraw() public onlyOwner {
+  uint256 balance = address(this).balance;
+  beneficiary.transfer(balance);
+}
+```
+
+Untuk mengakses saldo kontrak, kita harus terlebih dahulu melakukan *casting* kontrak ke tipe `address`, seperti yang kita lakukan di baris pertama fungsi. Setelah kita memiliki saldo, kita dapat mentransfernya ke penerima manfaat. Dengan perubahan ini, mari jalankan tes kita:
+
+```bash
+$ truffle test
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  withdrawing funds
+    ✓ transfers balance to beneficiary (66ms)
+
+  16 passing (3s)
+```
+
+Dengan tes itu berhasil, bagian terakhir kita adalah me-emit *event Withdraw*. Sama seperti sebelumnya, kita akan menyiapkan tes untuk memeriksa log transaksi dan kemudian menegaskan bahwa *event* kita cocok. Tambahkan tes berikut ke grup "withdrawing funds" kita:
+
+```javascript
+it("emits Withdraw event", async () => {
+  const tx = await fundraiser.withdraw({from: owner});
+  const expectedEvent = "Withdraw";
+  const actualEvent = tx.logs[0].event;
+  assert.equal(
+    actualEvent,
+    expectedEvent,
+    "events should match"
+  );
+});
+```
+
+Menjalankan tes kita seharusnya menghasilkan kegagalan berikut:
+
+```bash
+$ truffle test
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  withdrawing funds
+    ✓ transfers balance to beneficiary (66ms)
+    1) emits Withdraw event
+
+  16 passing (3s)
+  1 failing
+
+  1) Contract: Fundraiser
+       withdrawing funds
+         emits Withdraw event:
+     TypeError: Cannot read property '0' of undefined
+      at Context.it (test/fundraiser_test.js:169:34)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Karena kita tidak mencatat *event* di fungsi `withdraw`, log di indeks 0 adalah `undefined`. Agar tes ini berhasil, mari definisikan *event Withdraw* dan pastikan untuk me-emitnya dari fungsi `withdraw` kita. Perubahan ini diilustrasikan dalam Contoh 6-19.
+
+**Contoh 6-19. Mencatat event Withdraw**
+
+```solidity
+contract Fundraiser is Ownable {
+  event Withdraw(uint256 amount);
+  // ...dihilangkan...
+  function withdraw() public onlyOwner {
+    uint256 balance = address(this).balance;
+    beneficiary.transfer(balance);
+    emit Withdraw(balance);
+  }
+}
+```
+
+Menjalankan tes kita untuk terakhir kalinya, kita seharusnya melihat hasil berikut:
+
+```bash
+$ truffle test
+> Compiling ./contracts/Fundraiser.sol
+
+Contract: Fundraiser
+  initialization
+    // ...dihilangkan...
+  withdrawing funds
+    ✓ transfers balance to beneficiary (67ms)
+    ✓ emits Withdraw event (50ms)
+    access controls
+      ✓ throws an error when called from a non-owner account (59ms)
+      ✓ permits the owner to call the function (42ms)
+
+  17 passing (3s)
+```
+
+Dengan fungsi `withdraw` kita selesai, ada satu hal terakhir yang perlu dibahas, yaitu **fungsi fallback**.
+
+-----
+
+### Fallback Functions
+
+Fungsi *fallback* adalah fungsi yang tidak bernama dan akan menyediakan perilaku *default* jika kontrak menerima ether melalui transaksi biasa atau jika kontrak dipanggil dengan tanda tangan metode yang tidak cocok dengan fungsi yang didefinisikan. Saat mendefinisikan fungsi ini, ia tidak dapat menerima parameter apa pun dan harus ditandai `external`. Meskipun tidak wajib, ada baiknya untuk membuatnya `payable` juga.
+
+Untuk tujuan kita, kita akan menggunakan ini untuk mensimulasikan ide donasi anonim. Karena *blockchain* akan memiliki catatan transaksi, itu tidak akan benar-benar anonim, tetapi mungkin alamat yang digunakan untuk mengirim donasi diatur secara khusus untuk membuat pelacakannya lebih sulit.
+
+Fungsi kita seharusnya menambah variabel *state* `totalDonations` dan `donationsCount`, dan itu saja. Ini perilaku yang sangat mirip dengan yang kita uji saat melakukan donasi. Contoh 6-20 menunjukkan grup tes baru untuk perilaku *fallback* kita.
+
+**Contoh 6-20. Menguji perilaku fallback**
+
+```javascript
+describe("fallback function", () => {
+  const value = web3.utils.toWei('0.0289');
+
+  it("increases the totalDonations amount", async () => {
+    const currentTotalDonations = await fundraiser.totalDonations();
+    await web3.eth.sendTransaction(
+      {to: fundraiser.address, from: accounts[9], value}
+    );
+    const newTotalDonations = await fundraiser.totalDonations();
+    const diff = newTotalDonations - currentTotalDonations;
+    assert.equal(
+      diff,
+      value,
+      "difference should match the donation value"
+    )
+  });
+
+  it("increases donationsCount", async () => {
+    const currentDonationsCount = await fundraiser.donationsCount();
+    await web3.eth.sendTransaction(
+      {to: fundraiser.address, from: accounts[9], value}
+    );
+    const newDonationsCount = await fundraiser.donationsCount();
+    assert.equal(
+      1,
+      newDonationsCount - currentDonationsCount,
+      "donationsCount should increment by 1");
+  });
+});
+```
+
+Perubahan paling signifikan dari tes kita sebelumnya adalah penggunaan `sendTransaction`. Ini akan memungkinkan kita untuk memanggil fungsi *fallback*. Dengan ini, kita dapat menjalankan tes:
+
+```bash
+$ truffle test
+// ...dihilangkan...
+  fallback function
+    1) increases the totalDonations amount
+
+  17 passing (3s)
+  2 failing
+
+  1) Contract: Fundraiser
+       fallback function
+         increases the totalDonations amount:
+     Error: Returned error: VM Exception while processing transaction: revert
+
+  2) Contract: Fundraiser
+       fallback function
+         increases donationsCount:
+     Error: Returned error: VM Exception while processing transaction: revert
+```
+
+Tanpa fungsi *fallback* yang `payable`, tes kita akan di-*revert*. Mari tambahkan fungsi *fallback* kita di Contoh 6-21.
+
+**Contoh 6-21. Fungsi fallback**
+
+```solidity
+function () external payable {
+  totalDonations = totalDonations.add(msg.value);
+  donationsCount++;
+}
+```
+
+Mari jalankan tes untuk terakhir kalinya:
+
+```bash
+$ truffle test
+Contract: Fundraiser
+  initialization
+    ✓ gets the beneficiary name (54ms)
+    ✓ gets the beneficiary url (43ms)
+    ✓ gets the beneficiary image url
+    ✓ gets the beneficiary description
+    ✓ gets the beneficiary
+    ✓ gets the owner
+  setBeneficiary
+    ✓ updated beneficiary when called by owner account (78ms)
+    ✓ throws an error when called from a non-owner account (68ms)
+  making donations
+    ✓ increases myDonationsCount (111ms)
+    ✓ includes donation in myDonations (133ms)
+    ✓ increases the totalDonations amount (137ms)
+    ✓ increases donationsCount (107ms)
+    ✓ emits the DonationReceived event (90ms)
+  withdrawing funds
+    ✓ transfers balance to beneficiary (91ms)
+    ✓ emits Withdraw event (46ms)
+    access controls
+      ✓ throws an error when called from a non-owner account (49ms)
+      ✓ permits the owner to call the function (45ms)
+  fallback function
+    ✓ increases the totalDonations amount (81ms)
+    ✓ increases donationsCount (80ms)
+
+  19 passing (4s)
+```
+
+Kerja bagus\! Kita telah menyelesaikan semua fitur untuk kontrak `Fundraiser` kita. Tapi sebelum beristirahat, mari kita rekap bab ini.
+
+## Ringkasan
+
+Bab ini memperkenalkan banyak konsep dan ada baiknya meluangkan waktu sejenak untuk merangkumnya.
+
+Kita pertama-tama membangun fungsi *constructor* kita menggunakan kebutuhan UI untuk memengaruhi properti yang perlu kita dukung. Untuk memastikan fungsi *constructor* kita berfungsi dengan baik, kita menulis banyak fungsi *getter* untuk semua variabel *state* yang kita atur. Saat mengatur alamat penerima manfaat kita, kita dapat membedakan antara tipe `address` dan `address payable`, di mana yang terakhir dapat menerima ether.
+
+Setelah *constructor* kita selesai, kita banyak berfokus pada fungsionalitas donasi. Ini membawa kita untuk membuat tipe kustom pertama kita dengan `struct Donation` dan menggunakan tipe `mapping` untuk mengasosiasikan donatur dengan donasi mereka. Kita juga dapat menjelajahi perbedaan antara *array storage* dinamis dan *array memory* berukuran tetap. Bagian terakhir dari fungsionalitas donasi kita termasuk me-emit *event* `DonationReceived`. *Event* ini bahkan menyertakan *field* yang diindeks untuk donatur.
+
+Kita kemudian beralih ke fungsi `withdraw`. Ini memungkinkan kita mentransfer saldo kontrak ke penerima manfaat kita, dan kita menyelesaikan kontrak `Fundraiser` dengan mengimplementasikan fungsi *fallback*.
+
+Di bab berikutnya, kita akan fokus pada kontrak lain, yaitu kontrak `FundraiserFactory`. Ini akan menyediakan sebagian besar fungsionalitas untuk halaman beranda. Kapan pun Anda siap, lompat ke bab berikutnya.
+
+---
+
+# BAB 7
+### FundraiserFactory
+
+Di bab terakhir, kita membuat kontrak `Fundraiser` dan mengimplementasikan fungsionalitas untuk mendukung pembuatan donasi dan penarikan dana. Kontrak `Fundraiser` memiliki banyak fungsionalitas, tetapi saat ini ia tidak memiliki cara untuk dibuat. Dalam bab ini, kita akan menambahkan kontrak yang akan membuat *instance* individual dari `Fundraiser` menggunakan pola yang mungkin sudah tidak asing lagi: **pola Pabrik** (*Factory pattern*).
+
+Di akhir bab, kita juga akan membahas cara mengambil UI dari repo GitHub dan melakukan *deploy* ke Ganache. Setelah di-*deploy*, kita dapat meluncurkan aplikasi di browser kita, membuat penggalangan dana baru, melakukan donasi, dan menarik dana.
+
+### Melakukan Migrasi FundraiserFactory Kita
+
+Kontrak `Fundraiser` kita dari bab terakhir dirancang dengan gagasan bahwa ia akan diinisialisasi dari kontrak lain, yaitu `FundraiserFactory`, dan oleh karena itu tidak memerlukan migrasinya sendiri. Namun, `FundraiserFactory` perlu di-*deploy* agar pengguna kita dapat berinteraksi dengan pabrik dan membuat penggalangan dana mereka sendiri.
+
+Buat file baru di direktori `test` menggunakan perintah berikut:
+
+```bash
+$ touch test/fundraiser_factory_test.js
+```
+
+Mari tambahkan kasus uji *deployment* ke file baru kita:
+
+```javascript
+const FundraiserFactoryContract = artifacts.require("FundraiserFactory");
+
+contract("FundraiserFactory: deployment", () => {
+  it("has been deployed", async () => {
+    const fundraiserFactory = await FundraiserFactoryContract.deployed();
+    assert(fundraiserFactory, "fundraiser factory was not deployed");
+  });
+});
+```
+
+Menjalankan tes kita seharusnya akan memberikan kesalahan dengan pesan berikut:
+`Error: Could not find artifacts for FundraiserFactory from any sources`
+
+Agar dapat melewati kesalahan ini, kita perlu mendefinisikan kontrak kosong dengan nama `FundraiserFactory`. Mari buat file `contracts/FundraiserFactory.sol` dan kemudian definisikan kontrak kita, seperti yang diilustrasikan berikutnya:
+
+```bash
+$ touch contracts/FundraiserFactory.sol
+```
+
+```solidity
+pragma solidity >0.4.23 <0.7.0;
+
+contract FundraiserFactory {
+}
+```
+
+Menjalankan tes kita sekarang akan menghasilkan output berikut:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+> Compiling ./contracts/Fundraiser.sol
+> Compiling ./contracts/FundraiserFactory.sol
+
+Contract: FundraiserFactory: deployment
+  1) has been deployed
+  > No events were emitted
+
+...dihilangkan...
+  19 passing (3s)
+  1 failing
+
+  1) Contract: FundraiserFactory: deployment
+       has been deployed:
+     Error: FundraiserFactory has not been deployed to detected network
+...dihilangkan...
+```
+
+Kegagalan ini berarti saatnya menulis migrasi. Buat file migrasi dengan perintah berikut:
+
+```bash
+touch migrations/2_deploy_fundraiser_factory.js
+```
+
+Kemudian tambahkan kode *deployment* berikut ke file tersebut:
+
+```javascript
+const FundraiserFactoryContract = artifacts.require("FundraiserFactory");
+
+module.exports = function(deployer) {
+  deployer.deploy(FundraiserFactoryContract);
+}
+```
+
+Dengan migrasi sudah siap, mari jalankan tes kita:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+> Compiling ./contracts/Fundraiser.sol
+> Compiling ./contracts/FundraiserFactory.sol
+
+Contract: FundraiserFactory: deployment
+  ✓ has been deployed
+
+Contract: Fundraiser
+...dihilangkan...
+
+20 passing (3s)
+```
+
+Dengan tes *deployment* kita selesai, kita dapat mulai mengerjakan tujuan utama kontrak kita: membuat `Fundraiser`.
+
+### Membuat Fundraiser
+
+Tugas utama `FundraiserFactory` adalah membuat *instance* baru dari `Fundraiser`. Untuk melakukan ini, kita perlu menambahkan fungsi yang dapat menginisialisasinya atas nama pengguna kita. Fungsi `createFundraiser` yang akan kita buat akan mengambil data yang dimasukkan di halaman baru yang ditunjukkan pada Gambar 6-2 untuk membuat `Fundraiser` baru dan kemudian menyimpan referensi ke sana untuk memungkinkan paginasi dari semua `Fundraiser` yang tersedia.
+
+Perilaku yang dapat diamati dan bisa kita uji adalah `fundraisersCount` akan bertambah dan *event* `FundraiserCreated` akan di-emit.
+
+Kembali ke `test/fundraiser_factory_test.js`, mari tambahkan tes yang diilustrasikan dalam Contoh 7-1.
+
+**Contoh 7-1. Menambah fundraisersCount**
+
+```javascript
+contract("FundraiserFactory: createFundraiser", (accounts) => {
+  let fundraiserFactory;
+  // args fundraiser
+  const name = "Beneficiary Name";
+  const url = "beneficiaryname.org";
+  const imageURL = "https://placekitten.com/600/350"
+  const description = "Beneficiary Description"
+  const beneficiary = accounts[1];
+
+  it("increments the fundraisersCount", async () => {
+    fundraiserFactory = await FundraiserFactoryContract.deployed();
+    const currentFundraisersCount = await fundraiserFactory.fundraisersCount();
+    await fundraiserFactory.createFundraiser(
+      name,
+      url,
+      imageURL,
+      description,
+      beneficiary
+    );
+    const newFundraisersCount = await fundraiserFactory.fundraisersCount();
+
+    assert.equal(
+      newFundraisersCount - currentFundraisersCount,
+      1,
+      "should increment by 1"
+    )
+  });
+});
+```
+
+Dalam tes baru kita, kita membuat blok `contract` lain. Ingat, Truffle akan men-*deploy instance* baru dari kontrak kita saat kita menggunakan fungsi `contract`; ini akan mencegah *state* dipertahankan antara grup tes dan mencegah masalah urutan pada saat tes berjalan. Di dalam blok `contract` kita, kita menetapkan variabel untuk menampung data penggalangan dana yang akan dimasukkan ke dalam formulir.
+
+Dalam tes tersebut, kita mengambil *instance* yang telah di-*deploy*, dan seperti tes penghitung kita di bab terakhir, kita menyimpan jumlah saat ini (`currentFundraisersCount`), membuat penggalangan dana baru, dan kemudian memeriksa jumlahnya lagi. Kita berharap jumlahnya telah bertambah 1.
+
+Menjalankan tes kita akan menghasilkan output berikut:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Fundraiser.sol
+> Compiling ./contracts/FundraiserFactory.sol
+
+Contract: FundraiserFactory: deployment
+  ✓ has been deployed
+
+Contract: FundraiserFactory: createFundraiser
+  1) increments the fundraisersCount
+  > No events were emitted
+
+Contract: Fundraiser
+...dihilangkan...
+
+  20 passing (3s)
+  1 failing
+
+  1) Contract: FundraiserFactory: createFundraiser
+       increments the fundraisersCount:
+     TypeError: fundraiserFactory.fundraisersCount is not a function
+      at Context.it (test/fundraiser_factory_test.js:22:61)
+      at web3.eth.getBlockNumber.then.result (/usr/local/lib/node_modules/...
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Tes kita memberitahu bahwa kita belum menyiapkan fungsi `fundraisersCount`. Untuk melewati kesalahan ini, kita perlu menyiapkan variabel *state* baru di kontrak kita untuk menyimpan *fundraiser* yang telah dibuat. Kemudian kita perlu membuat fungsi untuk mengambil panjang koleksi tersebut. Kode dalam Contoh 7-2 akan membantu kita melewati bagian pertama ini.
+
+**Contoh 7-2. FundraiserFactory menghitung jumlah item dalam koleksi**
+
+```solidity
+pragma solidity >0.4.23 <0.7.0;
+
+import "./Fundraiser.sol";
+
+contract FundraiserFactory {
+  Fundraiser[] private _fundraisers;
+
+  function fundraisersCount() public view returns(uint256) {
+    return _fundraisers.length;
+  }
+}
+```
+
+Menjalankan tes kita lagi, kita akan melihat kesalahan yang sama seperti sebelumnya, tetapi kali ini fungsi `createFundraiser` yang akan menjadi sumber masalah kita. Mari kita buat fungsi ini, seperti yang diilustrasikan berikutnya:
+
+```solidity
+function createFundraiser(
+  string memory name,
+  string memory url,
+  string memory imageURL,
+  string memory description,
+  address payable beneficiary
+)
+public
+{
+  Fundraiser fundraiser = new Fundraiser(
+    name,
+    url,
+    imageURL,
+    description,
+    beneficiary,
+    msg.sender
+  );
+  _fundraisers.push(fundraiser);
+}
+```
+
+Melihat kode ini, kita mengambil semua parameter dari formulir dan kemudian menginisialisasi `Fundraiser` baru. Ini adalah pertama kalinya kita membuat *instance* baru dari sebuah kontrak dari dalam kontrak lain\! Saat menginisialisasi kontrak, kita akan menerima kembali alamat dari *instance* baru, dan kemudian kita menempatkannya di dalam *array* `_fundraisers` kita.
+
+Menjalankan tes kita, kita seharusnya melihat semuanya berhasil:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+> Compiling ./contracts/Fundraiser.sol
+> Compiling ./contracts/FundraiserFactory.sol
+
+Contract: FundraiserFactory: deployment
+  ✓ has been deployed
+
+Contract: FundraiserFactory: createFundraiser
+  ✓ increments the fundraisersCount (213ms)
+
+Contract: Fundraiser
+...dihilangkan...
+
+21 passing (3s)
+```
+
+Dengan tes itu berhasil, kita dapat beralih ke pengujian bahwa *event* `FundraiserCreated` telah di-emit. Kita akan mulai dengan menambahkan tes berikut:
+
+```javascript
+it("emits the FundraiserCreated event", async () => {
+  fundraiserFactory = await FundraiserFactoryContract.deployed();
+  const tx = await fundraiserFactory.createFundraiser(
+    name,
+    url,
+    imageURL,
+    description,
+    beneficiary
+  );
+  const expectedEvent = "FundraiserCreated";
+  const actualEvent = tx.logs[0].event;
+  assert.equal(
+    actualEvent,
+    expectedEvent,
+    "events should match"
+  );
+});
+```
+
+Menjalankan tes kita akan menghasilkan kegagalan berikut:
+
+```bash
+$ truffle test
+Using network 'test'.
+
+Compiling your contracts...
+...dihilangkan...
+
+Contract: FundraiserFactory: createFundraiser
+  ✓ increments the fundraisersCount (216ms)
+  1) emits the FundraiserCreated event
+...dihilangkan...
+
+Contract: Fundraiser
+...dihilangkan...
+
+  21 passing (3s)
+  1 failing
+
+  1) Contract: FundraiserFactory: createFundraiser
+       emits the FundraiserCreated event:
+     TypeError: Cannot read property 'event' of undefined
+      at Context.it (test/fundraiser_factory_test.js:49:36)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Agar tes ini berhasil, kita perlu mendefinisikan *event* baru dan kemudian me-emitnya dari fungsi `createFundraiser`. *Event* ini akan disebut `FundraiserCreated` dan akan menyertakan alamat dari *fundraiser* baru dan alamat pemiliknya. Mari perbarui kontrak `FundraiserFactory` kita agar terlihat seperti Contoh 7-3.
+
+**Contoh 7-3. Menambahkan event FundraiserCreated**
+
+```solidity
+pragma solidity >0.4.23 <0.7.0;
+
+import "./Fundraiser.sol";
+
+contract FundraiserFactory {
+  Fundraiser[] private _fundraisers;
+
+  event FundraiserCreated(Fundraiser fundraiser, address owner);
+
+  function createFundraiser(
+    string memory name,
+    string memory url,
+    string memory imageURL,
+    string memory description,
+    address payable beneficiary
+  )
+  public
+  {
+    Fundraiser fundraiser = new Fundraiser(
+      name,
+      url,
+      imageURL,
+      description,
+      beneficiary,
+      msg.sender
+    );
+    _fundraisers.push(fundraiser);
+    emit FundraiserCreated(fundraiser, msg.sender);
+  }
+
+  function fundraisersCount() public view returns(uint256) {
+    return _fundraisers.length;
+  }
+}
+```
+
+Menjalankan tes kita, sekarang kita seharusnya melihatnya berhasil\! Dengan pembuatan `Fundraiser` selesai, kita akan mengalihkan perhatian kita untuk mendapatkan data dari koleksi `Fundraiser`. Fungsionalitas berikutnya ini akan mendukung bagian bawah halaman beranda yang ditunjukkan pada Gambar 6-1.
+
+### Melihat Fundraiser yang Tersedia
+
+Agar pengguna kami dapat menemukan *fundraiser* yang telah dibuat, kita memerlukan cara untuk menampilkan opsi-opsi tersebut. Salah satu pendekatan adalah dengan mendapatkan semua *fundraiser* yang dibuat dalam satu panggilan ke kontrak kita, yang mirip dengan apa yang kita lakukan untuk fungsi `myDonations` di kontrak `Fundraiser` kita. Pendekatan itu berfungsi baik ketika kita mengharapkan ukuran koleksi tetap relatif kecil, tetapi jika aplikasi kita menjadi populer, kita akan ingin memecah pemuatan data ini menjadi beberapa bagian. Meskipun melihat data dari *blockchain* itu gratis, artinya tidak memerlukan gas, itu tetap menggunakan sumber daya di EVM. Jika seorang pengguna datang ke aplikasi kita dan langsung melihat *fundraiser* yang mereka inginkan, kita akhirnya membuang banyak sumber daya tersebut. Bagian-bagian yang lebih kecil juga akan memungkinkan halaman kita untuk dirender lebih cepat daripada menunggu semua item dikembalikan dari satu permintaan.
+
+Kita akan meminjam dari teman-teman SQL kita dan membuat fungsi yang akan mengambil parameter `limit` dan `offset`. Kita juga akan menambahkan konstanta `maxLimit` ke kontrak `FundraiserFactory` kita untuk membatasi jumlah catatan yang dapat diminta pada satu waktu. Dengan kata lain, jika ada permintaan masuk yang meminta 50 catatan tetapi batas kita adalah 20, mereka hanya akan menerima 20 catatan. Dalam kasus di mana permintaan pengguna menyertakan `offset` yang lebih besar dari `fundraisersCount`, kita akan keluar dengan kesalahan *out-of-bounds*.
+
+Karena jumlah skenario yang perlu kita cakup dalam tes kita, kita akan membuat metode bantuan untuk menginisialisasi *instance* baru dari kontrak `FundraiserFactory` kita alih-alih menggunakan *instance* yang telah di-*deploy*, dan kemudian membuat sejumlah *fundraiser* yang ditentukan.
+
+#### Menguji Paginasi Saat Kosong
+
+Saat kita pertama kali men-*deploy* `FundraiserFactory` kita, koleksi `Fundraiser` akan kosong. Itu sepertinya kasus awal yang sempurna untuk tes kita.
+
+Kode dalam Contoh 7-4 mencakup pengaturan kita dan tes pertama.
+
+**Contoh 7-4. Pengaturan untuk mengambil data fundraiser**
+
+```javascript
+contract("FundraiserFactory: fundraisers", (accounts) => {
+  async function createFundraiserFactory(fundraiserCount, accounts) {
+    const factory = await FundraiserFactoryContract.new();
+    await addFundraisers(factory, fundraiserCount, accounts);
+    return factory;
+  }
+
+  async function addFundraisers(factory, count, accounts) {
+    const name = "Beneficiary";
+    const lowerCaseName = name.toLowerCase();
+    const beneficiary = accounts[1];
+
+    for (let i=0; i < count; i++) {
+      await factory.createFundraiser(
+        // membuat serangkaian fundraiser. Indeks akan digunakan
+        // untuk membuat masing-masing unik
+        `${name} ${i}`,
+        `${lowerCaseName}${i}.com`,
+        `${lowerCaseName}${i}.png`,
+        `Description for ${name} ${i}`,
+        beneficiary
+      );
+    }
+  }
+
+  describe("when fundraisers collection is empty", () => {
+    it("returns an empty collection", async () => {
+      const factory = await createFundraiserFactory(0, accounts);
+      const fundraisers = await factory.fundraisers(10, 0);
+      assert.equal(
+        fundraisers.length,
+        0,
+        "collection should be empty"
+      );
+    });
+  });
+});
+```
+
+Melihat pengaturan ini, fungsi `createFundraiserFactory` kita membuat *instance* baru dari `FundraiserFactory` dan kemudian meneruskannya ke fungsi `addFundraisers`. Fungsi `addFundraisers` kemudian membuat sejumlah *fundraiser* yang ditentukan.
+
+Tes pertama kita adalah skenario koleksi kosong. Saat kita menjalankan tes ini, kita akan mendapatkan kegagalan tes yang menunjukkan bahwa fungsi `fundraisers` tidak ada, seperti pada output di sini:
+
+```bash
+$ truffle test
+Using network 'test'.
+...dihilangkan...
+
+Contract: FundraiserFactory: fundraisers
+  when fundraisers collection is empty
+    1) returns an empty collection
+    > No events were emitted
+...dihilangkan...
+
+  1 failing
+
+  1) Contract: FundraiserFactory: fundraisers
+       when fundraisers collection is empty
+         returns an empty collection:
+     TypeError: factory.fundraisers is not a function
+      at Context.it (test/fundraiser_factory_test.js:86:41)
+      at process._tickCallback (internal/process/next_tick.js:68:7)
+```
+
+Mari tambahkan fungsi ke kontrak kita, yang mengembalikan koleksi kosong. Kodenya diilustrasikan dalam Contoh 7-5.
+
+**Contoh 7-5. Mendefinisikan fungsi fundraisers**
+
+```solidity
+function fundraisers(uint256 limit, uint256 offset)
+  public
+  view
+  returns(Fundraiser[] memory coll)
+{
+  return coll;
+}
+```
+
+Tes kita seharusnya semua berhasil lagi, tetapi kita masih memiliki jalan panjang sebelum kita bisa mengatakan fungsi kita berperilaku dengan benar. Mari kita lanjut ke grup tes berikutnya, yang berfokus pada berapa banyak hasil yang akan kembali.
+
+#### Menguji Batas (Limit)
+
+Untuk beberapa tes berikutnya, kita akan menjaga `offset` kita di 0. Kita akan membuat 30 *fundraiser* dan akan memvariasikan `limit` kita, yaitu jumlah item yang ingin kita terima kembali. Jika kita meminta 10, kita akan mendapatkan 10 hasil kembali; meminta 20 akan memberi kita 20; meminta 30 akan memberi kita 20...tunggu, apa? Ingat, kita menyebutkan bahwa kita akan memberlakukan batasan pada jumlah item yang dapat diminta—kita akan mengatur batas kita menjadi 20. Tes-tes ini diilustrasikan dalam Contoh 7-6.
+
+**Contoh 7-6. Menguji parameter limit**
+
+```javascript
+describe("varying limits", async () => {
+  let factory;
+  beforeEach(async () => {
+    factory = await createFundraiserFactory(30, accounts);
+  })
+
+  it("returns 10 results when limit requested is 10", async ()=>{
+    const fundraisers = await factory.fundraisers(10, 0);
+    assert.equal(
+      fundraisers.length,
+      10,
+      "results size should be 10"
+    );
+  });
+
+  // xit menandai tes sebagai tertunda
+  xit("returns 20 results when limit requested is 20", async ()=>{
+    const fundraisers = await factory.fundraisers(20, 0);
+    assert.equal(
+      fundraisers.length,
+      20,
+      "results size should be 20"
+    );
+  });
+
+  xit("returns 20 results when limit requested is 30", async ()=>{
+    const fundraisers = await factory.fundraisers(30, 0);
+    assert.equal(
+      fundraisers.length,
+      20,
+      "results size should be 20"
+    );
+  });
+})
+```
+
+Dalam sampel kode ini, tes pertama kita menggunakan `it` normal yang telah kita gunakan, tetapi tes-tes berikutnya ditandai dengan `xit` untuk menunjukkan bahwa mereka tertunda. Kita kemudian dapat menghapus `x` di depan saat tiba waktunya untuk fokus pada kasus penggunaan tertentu.
+
+Ukuran koleksi yang dikembalikan sekarang akan menjadi yang lebih kecil dari `fundraisersCount` atau `limit` yang diminta. Jika kita hanya mengembalikan koleksi dari `limit` yang diminta, tes ukuran 0 kita akan rusak. Contoh 7-7 menunjukkan fungsi `fundraisers` kita yang diperbarui.
+
+**Contoh 7-7. Menentukan ukuran koleksi yang akan dikembalikan**
+
+```solidity
+function fundraisers(uint256 limit, uint256 offset)
+  public
+  view
+  returns(Fundraiser[] memory coll)
+{
+  uint256 size = fundraisersCount() < limit ? fundraisersCount() : limit;
+  coll = new Fundraiser[](size);
+  return coll;
+}
+```
+
+Ini sekarang akan membuat tes kita berhasil, tetapi kita tidak mendapatkan data yang benar. Kita mendapatkan kembali koleksi dengan ukuran yang benar, tetapi itu akan menjadi *array* dari alamat `0x0`. Kita akan menulis lebih banyak tes untuk menegaskan terhadap konten sebentar lagi, tetapi untuk saat ini, kita akan terus fokus pada pengembalian koleksi dengan ukuran yang sesuai.
+
+Lanjut ke tes berikutnya, kita dapat menghapus `x` di depan agar bisa berjalan. Saat kita melakukannya, kita akan melihat bahwa itu juga berhasil dan kita memiliki satu tes lagi yang tertunda untuk dikerjakan. Tes berikutnya akan gagal karena kita belum mendeklarasikan ukuran maksimal.
+
+Kegagalan kita ditunjukkan dalam output ini:
+
+```bash
+$ truffle test
+Using network 'test'.
+...dihilangkan..
+
+Contract: FundraiserFactory: fundraisers
+  when fundraisers collection is empty
+    ✓ returns an empty collection (96ms)
+  varying limits
+    ✓ returns 10 results when limit requested is 10
+    ✓ returns 20 results when limit requested is 20
+    1) returns 20 results when limit requested is 30
+...dihilangkan...
+
+Contract: Fundraiser
+...dihilangkan...
+
+  25 passing (10s)
+  1 failing
+
+  1) Contract: FundraiserFactory: fundraisers
+       varying limits
+         returns 20 results when limit requested is 30:
+     results size should be 20
+      + expected - actual
+
+      -30
+      +20
+```
+
+Untuk membuat tes ini berhasil, kita perlu membuat batas maksimal kita. Kita akan menetapkannya sebagai variabel *state* konstan di kontrak kita dan kemudian memperbarui fungsi `fundraisers` kita untuk menggunakan nilai minimum dari `fundraisersCount`, `limit`, atau `maxLimit`. Fungsi kita yang diperbarui ditunjukkan dalam Contoh 7-8.
+
+**Contoh 7-8. Membatasi ukuran**
+
+```solidity
+contract FundraiserFactory {
+  // item terbanyak yang dapat dikembalikan dari fungsi fundraisers
+  uint256 constant maxLimit = 20;
+  // ...dihilangkan...
+
+  function fundraisers(uint256 limit, uint256 offset)
+    public
+    view
+    returns(Fundraiser[] memory coll)
+  {
+    // ukuran harus lebih kecil dari jumlah atau limit
+    uint256 size = fundraisersCount() < limit ? fundraisersCount() : limit;
+    // ukuran tidak boleh melebihi maxLimit
+    size = size < maxLimit ? size : maxLimit;
+    coll = new Fundraiser[](size);
+    return coll;
+  }
+}
+```
+
+Dengan perubahan ini, ukuran koleksi kita tampaknya berfungsi dengan baik. Sekarang kita akan melihat variasi `offset`.
+
+#### Menguji Offset
+
+`Offset` menentukan indeks mana yang kita gunakan sebagai titik awal. Dalam contoh-contoh ini, kita juga akan menegaskan bahwa kita mendapatkan *fundraiser* yang kita harapkan. Untuk contoh-contoh ini, kita akan menjaga `limit` hanya satu dan memastikan bahwa nama penerima manfaat menyertakan indeks yang sesuai. Contoh 7-9 mengilustrasikan grup tes kita berikutnya.
+
+**Contoh 7-9. Menguji offset**
+
+```javascript
+describe("varying offset", () => {
+  let factory;
+  beforeEach(async () => {
+    factory = await createFundraiserFactory(10, accounts);
+  });
+
+  it("contains the fundraiser with the appropriate offset", async ()=>{
+    const fundraisers = await factory.fundraisers(1, 0);
+    const fundraiser = await FundraiserContract.at(fundraisers[0]);
+    const name = await fundraiser.name();
+    assert.ok(await name.includes(0), `${name} did not include the offset`);
+  });
+
+  xit("contains the fundraiser with the appropriate offset", async ()=>{
+    const fundraisers = await factory.fundraisers(1, 7);
+    const fundraiser = await FundraiserContract.at(fundraisers[0]);
+    const name = await fundraiser.name();
+    assert.ok(await name.includes(7), `${name} did not include the offset`);
+  });
+});
+```
+
+Selain tes di Contoh 7-9, Anda perlu menambahkan baris berikut di bagian atas file tes untuk memuat `Fundraiser`:
+`const FundraiserContract = artifacts.require("Fundraiser");`
+
+Dalam tes baru kita, kita membuat 10 *fundraiser* melalui `FundraiserFactory` dan menguji pengaturan `offset` ke 0 dan kemudian ke 7. Angka-angka ini dipilih secara acak; untuk lebih lengkap, kita bisa membuat pembantu tes yang mengatur `offset` ke semua nilai dari 0 hingga 10 dan menegaskan bahwa `offset` disesuaikan dengan tepat.
+
+Menjalankan tes akan mendapatkan kegagalan seperti ini:
+
+```bash
+$ truffle test
+...dihilangkan...
+
+Contract: FundraiserFactory: fundraisers
+  ...dihilangkan..
+  varying offset
+    1) contains the fundraiser with the appropriate offset
+  ...dihilangkan...
+
+  26 passing (11s)
+  1 pending
+  1 failing
+
+  1) Contract: FundraiserFactory: fundraisers
+       varying offset
+         contains the fundraiser with the appropriate offset:
+     Error: Cannot create instance of Fundraiser; no code at address 0x000000...
+```
+
+Sekaranglah saatnya alamat `0x0` yang disebutkan sebelumnya mencegah kita lolos dari tes. Sekarang saatnya mengisi koleksi yang kita kembalikan dengan alamat *fundraiser* yang sebenarnya. Kita dapat memperbarui badan fungsi `fundraisers` kita agar terlihat seperti Contoh 7-10.
+
+**Contoh 7-10. Menambahkan fundraiser ke koleksi**
+
+```solidity
+function fundraisers(uint256 limit, uint256 offset)
+  public
+  view
+  returns(Fundraiser[] memory coll)
+{
+  uint256 size = fundraisersCount() < limit ? fundraisersCount() : limit;
+  size = size < maxLimit ? size : maxLimit;
+  coll = new Fundraiser[](size);
+
+  for(uint256 i = 0; i < size; i++) {
+    coll[i] = _fundraisers[i];
+  }
+  return coll;
+}
+```
+
+Itu sekarang membuat tes pertama kita berhasil. Mari kita lanjut ke tes kedua. Hapus `x` di depan dan jalankan tes lagi. Sekarang tes kita gagal, dengan pesan yang mirip dengan berikut:
+
+```
+1) Contract: FundraiserFactory: fundraisers
+     varying offset
+       contains the fundraiser with the appropriate offset:
+   AssertionError: Beneficiary 0 did not include the offset: expected false to be truthy
+```
+
+Kita perlu menyesuaikan titik awal kita saat mengisi koleksi dengan `Fundraiser`. Sesuaikan *loop for* di fungsi `fundraisers` kita untuk menyertakan `offset`, dan kita akan kembali ke tes yang hijau.
+
+```solidity
+for(uint256 i = 0; i < size; i++) {
+  coll[i] = _fundraisers[offset + i];
+}
+```
+
+Hanya ada dua kasus lagi yang harus kita tangani. Dalam kasus di mana `offset` lebih besar dari `fundraisersCount` kita, aplikasi kita perlu keluar dengan pesan *out-of-bounds*. Kita juga harus waspada terhadap kasus di mana jumlah `offset` dan `limit` akan melebihi ukuran `fundraisersCount` kita.
+
+Mari buat grup tes lain dengan kasus batas kita dan tambahkan tes di Contoh 7-11.
+
+**Contoh 7-11. Tes kondisi batas**
+
+```javascript
+describe("boundary conditions", () => {
+  let factory;
+  beforeEach(async () => {
+    factory = await createFundraiserFactory(10, accounts);
+  });
+
+  it("raises out of bounds error", async () => {
+    try {
+      await factory.fundraisers(1, 11);
+      assert.fail("error was not raised")
+    } catch(err) {
+      const expected = "offset out of bounds";
+      assert.ok(err.message.includes(expected), `${err.message}`);
+    }
+  });
+
+  xit("adjusts return size to prevent out of bounds error", async () => {
+    try {
+      const fundraisers = await factory.fundraisers(10, 5);
+      assert.equal(
+        fundraisers.length,
+        5,
+        "collection adjusted"
+      );
+    } catch(err) {
+      assert.fail("limit and offset exceeded bounds");
+    }
+  });
+});
+```
+
+Dalam grup contoh baru kita, kita pertama-tama menguji situasi di mana `offset` kita berada di luar `fundraisersCount` kita. Harapan kita di sini adalah bahwa kesalahan yang dilemparkan akan menyertakan pesan *out-of-bounds*.
+
+Menjalankan tes kita, kita akan mengalami kegagalan yang menunjukkan *opcode* yang tidak valid, seperti kesalahan ini:
+
+```
+1) Contract: FundraiserFactory: fundraisers
+     boundary conditions
+       raises out of bounds error:
+   AssertionError: Returned error: VM Exception while processing transaction: invalid opcode: expected false to be truthy
+    at Context.it (test/fundraiser_factory_test.js:161:16)
+```
+
+Ini terjadi saat kita mencoba mengakses indeks yang tidak ada di *loop for* kita. Kita bisa menambahkan pernyataan `require` untuk memberi makna lebih pada kesalahan ini. Menambahkan baris kode berikut di bagian atas fungsi `fundraisers` kita akan cukup untuk membuat tes kita berhasil:
+`require(offset <= fundraisersCount(), "offset out of bounds");`
+
+Hapus `x` di depan tes kita yang tertunda, dan jalankan tes, kita mendapatkan kegagalan seperti ini:
+
+```
+1) Contract: FundraiserFactory: fundraisers
+     boundary conditions
+       adjusts return size to prevent out of bounds error:
+   AssertionError: limit and offset exceeded bounds
+    at Context.it (test/fundraiser_factory_test.js:174:16)
+```
+
+Dalam kasus ini, `offset` memenuhi kriteria pernyataan `require` kita, tetapi iterasi di *loop for* menyebabkan kita mengakses tempat di memori di luar `fundraisersCount` kita.
+
+Kita akan memperbarui fungsi `fundraisers` kita untuk memulai variabel `size` lokal untuk mewakili selisih antara `fundraisersCount` dan `offset`. Sisa logika akan menjaga kita agar tidak terlalu jauh. Contoh 7-12 memiliki versi final dari fungsi `fundraisers` kita.
+
+**Contoh 7-12. Menjaga agar tetap dalam batas**
+
+```solidity
+function fundraisers(uint256 limit, uint256 offset)
+  public
+  view
+  returns(Fundraiser[] memory coll)
+{
+  require(offset <= fundraisersCount(), "offset out of bounds");
+
+  uint256 size = fundraisersCount() - offset;
+  size = size < limit ? size : limit;
+  size = size < maxLimit ? size : maxLimit;
+
+  coll = new Fundraiser[](size);
+  for(uint256 i = 0; i < size; i++) {
+    coll[i] = _fundraisers[offset + i];
+  }
+  return coll;
+}
+```
+
+Fiuh\! Itu membungkus kode Solidity yang kita perlukan untuk mendukung aplikasi kita. Bagian selanjutnya akan membahas penyiapan UI sehingga Anda dapat mengklik-klik di sekitar aplikasi.
+
+### Menyiapkan UI
+
+Seperti kontrak `Greeter` kita, kita akan mengunduh UI dan melakukan *deploy* secara lokal ke Ganache sehingga kita dapat berinteraksi dengan aplikasi kita melalui browser alih-alih hanya melalui tes.
+
+Jika Anda belum mengunduh kode buku, Anda dapat mengaksesnya dari [GitHub](https://github.com/RedSquirrelTech/hoscdev). Dengan asumsi repositori yang di-*clone* adalah saudara dari direktori `fundraiser` kita, Anda dapat menggunakan perintah berikut untuk menyalin file:
+`$ cp -r ../hoscdev/chapter-10+11/* ./client`
+
+Di tab terminal baru, masuk ke direktori `client` dan instal paket menggunakan perintah berikut. Kita akan merujuk terminal ini sebagai terminal *client*.
+
+```bash
+$ cd client
+$ npm install
+```
+
+Setelah semua paket terinstal, kita dapat memperbarui file `truffle-config.js` kita dengan kunci `host` dan `network_id` untuk jaringan `develop`. Konfigurasi akhir akan terlihat seperti Contoh 7-13.
+
+**Contoh 7-13. Konfigurasi Truffle**
+
+```javascript
+const path = require("path");
+
+module.exports = {
+  // Lihat <http://truffleframework.com/docs/advanced/configuration>
+  // untuk menyesuaikan konfigurasi Truffle Anda!
+  contracts_build_directory: path.join(__dirname, "client/src/contracts"),
+  networks: {
+    develop: {
+      host: "127.0.0.1",
+      port: 8545,
+      network_id: "*",
+    }
+  }
+};
+```
+
+Jalankan aplikasi Ganache dan buat *workspace* baru. Saat diminta untuk proyek, sertakan file `truffle-config.js` dan simpan *workspace*. Dengan itu berjalan, kita siap untuk melakukan migrasi kontrak kita.
+
+Di terminal yang terletak di direktori root aplikasi `fundraiser` kita, gunakan perintah berikut:
+`$ truffle migrate --network develop`
+
+Di browser Anda, impor akun baru yang dibuat oleh *workspace* ke MetaMask dengan menggunakan *mnemonic* di Ganache.
+
+Saat migrasi selesai, kita siap untuk memulai server klien. Kembali ke terminal *client*, jalankan perintah berikut:
+`$ npm run start`
+
+Perintah tersebut akan membuka tab browser untuk Anda, membawa Anda ke aplikasi Anda. Selamat\! Anda sekarang dapat membuat penggalangan dana dan melakukan donasi di *blockchain* lokal Anda. 🎉
+
+## Ringkasan
+
+Dalam bab ini, kita membuat kontrak yang sebagian besar untuk menangani pembuatan dan pengelolaan koleksi penggalangan dana yang berpotensi besar. Dalam melakukan ini, kita belajar bahwa kontrak dapat menginisialisasi kontrak lain dan kita juga mendalami paginasi.
+
+Kita menghabiskan banyak waktu menguji kasus paginasi kita untuk memastikan kita melakukannya dengan benar. Ini membawa kita untuk mencakup kasus kosong dan berbagai batas (`limit`) (beberapa di antaranya melebihi `maxLimit` kita) dan juga memindahkan `offset`, termasuk ke tempat-tempat di luar jangkauan koleksi. Dengan fitur-fitur ini selesai, saatnya untuk mulai belajar lebih banyak tentang Web3 dan teknologi frontend yang dapat kita gunakan untuk membangun UI dari aplikasi kita.
+
+---
+
