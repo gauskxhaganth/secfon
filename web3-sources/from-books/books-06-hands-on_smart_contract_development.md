@@ -714,3 +714,847 @@ Dengan terpasangnya komponen terakhir ini, kita memiliki semua yang dibutuhkan u
 Dalam bab ini, kita telah menyiapkan **lingkungan lokal** untuk pengembangan *blockchain*. Ini mencakup penyiapan klien Ethereum penuh dengan **Parity**, yang termasuk menyinkronkan jaringan uji (*test network*) **Goerli**. Kita juga menginstal *plug-in* Chrome **MetaMask** untuk berinteraksi dengan DApps dari peramban kita. Kemudian, kita menginstal lingkungan JavaScript yang dibutuhkan untuk alat-alat *smart contract* kita dengan menggunakan **Node.js**. Terakhir, kita menginstal **Truffle** dan **Ganache** dari **Truffle Suite**, yang memberi kita semua yang dibutuhkan untuk pengembangan *smart contract*.
 
 Di bab berikutnya, kita akan mengembangkan sebuah aplikasi kecil untuk menjelajahi perangkat (*toolset*) **Truffle** dan bahasa pemrograman **Solidity**.
+
+---
+
+# BAGIAN II
+## Mengembangkan Smart Contract
+
+Pada Bagian II, kita akan mulai menjelajahi pengembangan *smart contract* menggunakan bahasa pemrograman **Solidity**. Kita juga akan mendapatkan pengalaman dengan *framework* **Truffle**, yang menyediakan alat untuk melakukan *deploy* dan menguji kontrak kita.
+
+Untuk membatasi jumlah topik baru, tautan ke antarmuka pengguna berbasis web telah disediakan. Membangun antarmuka ini adalah fokus dari Bagian III.
+
+---
+
+# BAB 4
+## Smart Contract Pertama Kita
+
+Sekarang setelah semuanya terinstal, saatnya untuk membangun kontrak pertama kita. Mengikuti tradisi buku-buku pemrograman pengantar, program pertama kita akan menyapa kita dengan “Hello, World\!”
+
+Dalam mengembangkan program ini, kita akan belajar cara menggunakan alat yang disediakan oleh Truffle untuk membuat dan menguji aplikasi kita. Kita juga akan mulai menjelajahi bahasa Solidity, termasuk melihat *functions* (fungsi) dan *state variables* (variabel state).
+
+Tujuan kita untuk bab ini adalah menemukan ritme dalam cara kita membangun aplikasi dan mengetahui apakah kita berada di jalur yang benar. Untuk membantu kita, kita akan mengadopsi ***test-driven development*** **(TDD)** untuk mendapatkan *feedback loop* yang instan.
+
+Mari kita mulai dengan menyiapkan proyek kita.
+
+### Pengaturan Awal (Setup)
+
+Saat kita bersiap-siap, kita akan membutuhkan sebuah direktori untuk menampung aplikasi baru kita. Mari kita buat direktori bernama `greeter` dan masuk ke direktori baru tersebut. Buka terminal Anda dan gunakan perintah berikut:
+
+```bash
+$ mkdir greeter
+$ cd greeter
+```
+
+Sekarang kita akan menginisialisasi proyek Truffle baru sebagai berikut:
+
+```bash
+$ truffle init
+```
+
+Perintah ini akan menghasilkan output berikut:
+
+```
+✔ Preparing to download
+✔ Downloading
+✔ Cleaning up temporary files
+✔ Setting up box
+
+Unbox successful. Sweet!
+
+Commands:
+
+  Compile:        truffle compile
+  Migrate:        truffle migrate
+  Test contracts: truffle test
+```
+
+Direktori `greeter` kita sekarang seharusnya berisi file-file berikut:
+
+```
+greeter
+├── contracts
+│   └── Migrations.sol
+├── migrations
+│   └── 1_initial_migration.js
+├── test
+└── truffle-config.js
+```
+
+Perhatikan bahwa perintah yang ditentukan dalam output selaras dengan struktur direktori yang dihasilkan saat menginisialisasi aplikasi kita. `truffle compile` akan meng-kompilasi semua kontrak di direktori `contracts`, `truffle migrate` akan men-*deploy* kontrak yang telah dikompilasi dengan menjalankan skrip di direktori `migrations` kita, dan terakhir, `truffle test` akan menjalankan pengujian di direktori `test` kita.
+
+Item terakhir yang dibuat untuk Anda adalah file `truffle-config.js`. Di sinilah kita akan menempatkan konfigurasi spesifik aplikasi kita.
+
+Sekarang kita memiliki struktur awal, kita siap untuk memulai pengembangan.
+
+### Tes Pertama Kita
+
+Saat kita mengimplementasikan fitur untuk kontrak kita, kita akan menggunakan TDD untuk memanfaatkan *feedback loop* singkat yang disediakannya. Jika Anda tidak terbiasa dengan TDD, ini adalah cara menulis perangkat lunak di mana kita pertama-tama memulai dengan tes yang gagal dan kemudian menulis kode yang diperlukan untuk membuat tes tersebut berhasil (*pass*). Setelah semuanya berfungsi, kita kemudian dapat me-*refactor* kode untuk membuatnya lebih mudah dipelihara.
+
+Dukungan pengujian yang disediakan Truffle adalah salah satu area di mana perangkat ini benar-benar bersinar. Ia menawarkan dukungan pengujian dalam JavaScript dan Solidity; untuk contoh kita, kita akan menggunakan JavaScript karena jauh lebih banyak diadopsi, yang membuatnya lebih mudah untuk menemukan sumber daya tambahan jika Anda mengalami kendala. Jika Anda ingin menjelajahi penulisan tes di Solidity, Anda dapat merujuk pada [dokumentasi pengujian Truffle](https://www.google.com/search?q=https://trufflesuite.com/docs/truffle/testing/writing-tests-in-solidity.html).
+
+Tes pertama kita dalam Contoh 4-1 akan memastikan kontrak kosong kita dapat di-*deploy* dengan benar. Ini mungkin tampak tidak perlu, tetapi kesalahan yang akan kita alami dalam membuat ini berhasil memberikan cara yang bagus untuk melihat beberapa kesalahan yang kemungkinan akan kita temui dalam karier kita.
+
+Di direktori `test`, buat file bernama `greeter_test.js`:
+
+```bash
+$ touch test/greeter_test.js
+```
+
+Kemudian tambahkan kode tes, seperti pada Contoh 4-1.
+
+**Contoh 4-1. Menguji bahwa kontrak kita dapat di-deploy**
+
+```javascript
+const GreeterContract = artifacts.require("Greeter");
+
+contract("Greeter", () => {
+  it("has been deployed successfully", async () => {
+    const greeter = await GreeterContract.deployed();
+    assert(greeter, "contract was not deployed");
+  });
+});
+```
+
+1.  Truffle menyediakan cara untuk memuat dan berinteraksi dengan kontrak yang telah dikompilasi melalui fungsi `artifacts.require`. Di sini, Anda akan memasukkan nama kontrak, bukan nama file karena sebuah file mungkin berisi beberapa deklarasi kontrak.
+2.  Tes Truffle menggunakan Mocha, tetapi dengan sedikit modifikasi. Fungsi `contract` akan bertindak serupa dengan `describe` bawaan tetapi dengan manfaat tambahan menggunakan fitur *clean room* dari Truffle. Fitur ini berarti bahwa kontrak-kontrak baru akan di-*deploy* sebelum tes yang ada di dalamnya dieksekusi. Ini membantu mencegah *state* (keadaan) dibagikan antara grup tes yang berbeda.
+3.  Setiap interaksi dengan *blockchain* akan bersifat asinkron, jadi alih-alih menggunakan `Promises` dan metode `Promise.prototype.then`, kita akan memanfaatkan sintaks `async/await` yang sekarang tersedia di JavaScript.
+4.  Jika `greeter` bernilai *truthy* (ada), tes kita akan berhasil.
+
+Menjalankan tes kita, kita akan menerima kesalahan yang terlihat seperti ini:
+
+```bash
+$ truffle test
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Migrations.sol
+
+Error: Could not find artifacts for Greeter from any sources
+    at Resolver.require (/usr/local/lib/node_modules/truffle/build/webpack:...
+    at TestResolver.require (/usr/local/lib/node_modules/truffle/build/...
+    at Object.require (/usr/local/lib/node_modules/truffle/build/webpack:...
+...omitted..
+
+Truffle v5.0.31 (core: 5.0.31)
+Node v12.8.0
+```
+
+Ini memberi kita umpan balik yang dapat ditindaklanjuti. Kesalahan tersebut memberitahu kita bahwa setelah kontrak kita dikompilasi, Truffle tidak dapat menemukan kontrak yang disebut `Greeter`. Karena kita belum membuat kontrak ini, kesalahan ini sangat wajar. Namun, jika Anda sudah membuat kontrak dan masih mendapatkan kesalahan ini, kemungkinan besar disebabkan oleh kesalahan ketik dalam deklarasi kontrak yang ditemukan di file Solidity atau dalam pernyataan `artifacts.require`.
+
+Mari kita buat file `Greeter` dan tambahkan kode dari Contoh 4-2 untuk melihat umpan balik apa yang akan diberikan saat menjalankan rangkaian tes kita.
+
+Di terminal, buat file `Greeter`:
+
+```bash
+$ touch contracts/Greeter.sol
+```
+
+**Contoh 4-2. Kontrak Greeter yang kosong**
+
+```solidity
+pragma solidity >= 0.4.0 < 0.7.0;
+
+contract Greeter {
+}
+```
+
+1.  Baris `pragma` adalah instruksi untuk *compiler*. Di sini kita memberitahu *compiler* Solidity bahwa kode kita kompatibel dengan Solidity versi 0.4.0 hingga, tetapi tidak termasuk, versi 0.7.0.
+2.  Kontrak dalam Solidity sangat mirip dengan *class* dalam bahasa pemrograman berorientasi objek. Data dan fungsi atau metode yang didefinisikan di dalam kurung kurawal pembuka dan penutup kontrak akan terisolasi untuk kontrak tersebut.
+
+Dengan perubahan ini dibuat, mari kita jalankan tes kita lagi:
+
+```bash
+$ truffle test
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Greeter.sol
+> Compiling ./contracts/Migrations.sol
+
+
+Contract: Greeter
+  1) has been deployed successfully
+    > No events were emitted
+
+
+  0 passing (34ms)
+  1 failing
+
+  1) Contract: Greeter
+       has been deployed successfully:
+     Error: Greeter has not been deployed to detected network...
+      at Object.checkNetworkArtifactMatch (/usr/local/lib/node_modules/...
+      at Function.deployed (/usr/local/lib/node_modules/truffle/build/...
+      at processTicksAndRejections (internal/process/task_queues.js:85:5)
+      at Context.<anonymous> (test/greeter_test.js:5:21)
+```
+
+Kesalahan di sini menunjukkan bahwa kontrak kita belum ada di jaringan; dengan kata lain, kontrak tersebut belum di-*deploy*. Setiap kali kita menjalankan perintah `truffle test`, Truffle pertama-tama meng-kompilasi kontrak kita, dan kemudian men-*deploy*-nya ke jaringan tes. Untuk men-*deploy* kontrak kita, kita perlu beralih ke alat lain yang disediakan oleh Truffle: *migrations*.
+
+*Migrations* adalah skrip yang ditulis dalam JavaScript yang digunakan untuk mengotomatiskan proses *deployment* kontrak kita. Kontrak `Migrations` default yang ditemukan di `contracts/Migrations.sol` adalah kontrak yang di-*deploy* oleh `migrations/1_initial_migration.js` dan saat ini merupakan satu-satunya kontrak yang telah masuk ke jaringan tes. Untuk menambahkan kontrak `Greeter` kita ke jaringan, kita perlu membuat sebuah *migration* menggunakan kode yang ditemukan di Contoh 4-3.
+
+Pertama, kita perlu membuat file untuk menampung kode *migrations* kita:
+
+```bash
+$ touch migrations/2_deploy_greeter.js
+```
+
+Kemudian kita dapat menambahkan kode di Contoh 4-3.
+
+**Contoh 4-3. Melakukan deploy kontrak Greeter**
+
+```javascript
+const GreeterContract = artifacts.require("Greeter");
+
+module.exports = function(deployer) {
+  deployer.deploy(GreeterContract);
+}
+```
+
+*Migration* awal kita tidak memiliki banyak hal. Kita menggunakan objek `deployer` yang disediakan untuk men-*deploy* kontrak `Greeter`. Untuk saat ini, hanya ini yang perlu kita lakukan agar kontrak kita tersedia di jaringan tes lokal, tapi jangan khawatir: kita akan membahas *migrations* lebih dalam di bab berikutnya. Dengan itu, jalankan tes sekali lagi:
+
+```bash
+$ truffle test
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Greeter.sol
+> Compiling ./contracts/Migrations.sol
+
+
+Contract: Greeter
+  ✓ has been deployed successfully
+
+  1 passing (27ms)
+```
+
+Sukses\! Tes ini memberitahu kita bahwa semuanya telah diatur dengan benar dan kita siap untuk mulai mengimplementasikan fitur.
+
+### Mengucapkan Halo
+
+Ini biasanya adalah titik di mana kita akan menggunakan panggilan ke beberapa varian `printf` atau `println` untuk menampilkan sapaan kita, tetapi di Solidity kita tidak memiliki akses ke *standard out*, atau sistem file, jaringan, atau *input/output* (I/O) lainnya. Yang kita miliki adalah fungsi.
+
+Setelah di-*deploy*, *smart contract* kita akan disimpan di jaringan Ethereum pada alamat tertentu. Kontrak tersebut akan tidak aktif sampai ada permintaan masuk yang memintanya melakukan suatu pekerjaan, dan pekerjaan yang dapat dilakukan oleh kontrak kita didefinisikan oleh fungsi-fungsi kita. Yang kita inginkan adalah fungsi yang dapat mengatakan "Hello, World\!" dan sama seperti sebelumnya, kita akan mulai dengan sebuah tes.
+
+Di `test/greeter_test.js`, mari tambahkan tes dari Contoh 4-4.
+
+**Contoh 4-4. Menguji untuk "Hello, World\!"**
+
+```javascript
+describe("greet()", () => {
+  it("returns 'Hello, World!'", async () => {
+    const greeter = await GreeterContract.deployed();
+    const expected = "Hello, World!";
+    const actual = await greeter.greet();
+    assert.equal(actual, expected, "greeted with 'Hello, World!'");
+  });
+});
+```
+
+Dalam kasus ini, kita menetapkan nilai yang diharapkan, dan kemudian mengambil nilai dari kontrak kita dan melihat apakah keduanya sama. Kita harus menandai fungsi tes sebagai `async` karena kita akan melakukan panggilan ke *blockchain* tes lokal kita untuk berinteraksi dengan kontrak ini.
+
+Menjalankan tes menghasilkan hasil sebagai berikut:
+
+```bash
+$ truffle test
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Greeter.sol
+> Compiling ./contracts/Migrations.sol
+
+
+Contract: Greeter
+  ✓ has been deployed successfully
+  greet()
+    1) returns 'Hello, World!'
+    > No events were emitted
+
+
+  1 passing (42ms)
+  1 failing
+
+  1) Contract: Greeter
+       greet()
+         returns 'Hello, World!':
+     TypeError: greeter.greet is not a function
+      at Context.<anonymous> (test/greeter_test.js:13:36)
+      at processTicksAndRejections (internal/process/task_queues.js:85:5)
+```
+
+Ketika kita fokus pada kesalahannya, kita melihat bahwa `greeter.greet` bukan sebuah fungsi. Saatnya menambahkan fungsi ke kontrak kita. Perbarui kontrak `Greeter` dengan fungsi di Contoh 4-5.
+
+**Contoh 4-5. Menambahkan fungsi greet ke Greeter**
+
+```solidity
+pragma solidity >= 0.4.0 < 0.7.0;
+
+contract Greeter {
+  function greet() external pure returns(string memory) {
+    return "Hello, World!";
+  }
+}
+```
+
+Di sini kita membuat fungsi dengan *identifier* atau nama `greet`, yang tidak menerima parameter apa pun. Setelah *identifier*, kita menunjukkan bahwa fungsi kita adalah fungsi `external`. Ini berarti fungsi tersebut adalah bagian dari antarmuka kontrak kita dan dapat dipanggil dari kontrak lain, atau dari transaksi, tetapi tidak dapat dipanggil dari dalam kontrak itu sendiri—atau setidaknya tidak tanpa referensi eksplisit ke objek tempat ia dipanggil.
+
+Opsi kita yang lain di sini adalah `public`, `internal`, dan `private`.
+
+  - Fungsi `public` juga merupakan bagian dari antarmuka, artinya dapat dipanggil dari kontrak atau transaksi lain, tetapi selain itu juga dapat dipanggil secara internal. Ini berarti Anda dapat menggunakan penerima pesan implisit saat memanggil metode di dalam metode lain.
+  - Fungsi `internal` dan `private` harus menggunakan penerima implisit atau, dengan kata lain, tidak dapat dipanggil pada sebuah objek atau pada `this`. Perbedaan utama antara kedua *modifier* ini adalah bahwa fungsi `private` hanya terlihat di dalam kontrak tempat mereka didefinisikan, dan tidak di dalam kontrak turunan.
+
+Fungsi yang tidak akan mengubah *state* variabel kontrak dapat ditandai sebagai `pure` atau `view`.
+
+  - Fungsi `pure` tidak membaca dari *blockchain*. Sebaliknya, mereka beroperasi pada data yang dimasukkan atau, seperti dalam kasus kita, data yang tidak memerlukan input sama sekali.
+  - Fungsi `view` diizinkan untuk membaca data dari *blockchain*, tetapi sekali lagi mereka dibatasi karena tidak dapat menulis ke *blockchain*.
+
+Setelah deklarasi kita bahwa fungsi ini `pure`, kita mengidentifikasi apa yang kita harapkan akan dikembalikan oleh fungsi kita. Solidity memungkinkan beberapa nilai kembali, tetapi dalam kasus kita, kita hanya akan memiliki satu nilai yang dikembalikan: tipe `string`. Kita juga menunjukkan bahwa ini adalah nilai yang tidak mereferensikan apa pun yang terletak di penyimpanan tetap kontrak kita dengan menggunakan kata kunci `memory`.
+
+Badan fungsi kita mengembalikan string yang kita cari, "Hello, World\!". Ini seharusnya memenuhi persyaratan tes kita. Tapi jangan percaya begitu saja—jalankan tes lagi untuk memverifikasi:
+
+```bash
+$ truffle test
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Greeter.sol
+> Compiling ./contracts/Migrations.sol
+
+
+Contract: Greeter
+  ✓ has been deployed successfully
+  greet()
+    ✓ returns 'Hello, World!' (51ms)
+
+  2 passing (82ms)
+```
+
+Dengan tes ini berhasil, mari kita lanjutkan untuk membuat kontrak kita sedikit lebih fleksibel dengan memberikan pengguna kemampuan untuk mengubah sapaan.
+
+### Membuat Kontrak Kita Dinamis
+
+Sekarang kontrak kita telah mengembalikan nilai yang di-*hardcode*, mari kita lanjutkan dan membuat sapaan menjadi dinamis. Untuk melakukan ini, kita perlu menambahkan fungsi lain yang memungkinkan kita untuk mengatur pesan yang akan dikembalikan oleh fungsi `greet()` kita.
+
+Sebelumnya kita menyebutkan fitur "clean room" saat menggunakan fungsi `contract` dalam tes kita. Fitur ini akan men-*deploy instance* baru dari kontrak kita untuk digunakan dalam fungsi *callback* untuk blok kode tersebut. Dalam tes yang akan kita tulis, kita ingin memastikan perubahan *state* kita tetap terisolasi dari sisa tes sehingga kita tidak berada dalam situasi di mana urutan tes kita akan mempengaruhi keberhasilan atau kegagalan rangkaian tes kita. Untuk melakukan ini, kita akan membuat blok `contract` lain di file `test/greeter_test.js` kita, seperti yang diilustrasikan dalam Contoh 4-6.
+
+**Contoh 4-6. Menguji sapaan dapat dibuat dinamis**
+
+```javascript
+const GreeterContract = artifacts.require("Greeter");
+
+contract("Greeter", () => {
+  it("has been deployed successfully", async () => {
+    const greeter = await GreeterContract.deployed();
+    assert(greeter, "contract failed to deploy");
+  });
+
+  describe("greet()", () => {
+    it("returns 'Hello, World!'", async () => {
+      const greeter = await GreeterContract.deployed();
+      const expected = "Hello, World!";
+      const actual = await greeter.greet();
+      assert.equal(actual, expected, "greeted with 'Hello, World!'");
+    });
+  });
+});
+
+contract("Greeter: update greeting", () => {
+  describe("setGreeting(string)", () => {
+    it("sets greeting to passed in string", async () => {
+      const greeter = await GreeterContract.deployed()
+      const expected = "Hi there!";
+
+      await greeter.setGreeting(expected);
+      const actual = await greeter.greet();
+
+      assert.equal(actual, expected, "greeting was not updated");
+    });
+  });
+});
+```
+
+Anda akan mengenali pengaturannya sangat mirip dengan tes kita sebelumnya. Kita menetapkan sebuah variabel untuk menampung nilai kembali yang kita harapkan, yaitu string yang juga akan kita berikan ke fungsi `setGreeting`. Kita kemudian memperbarui sapaan dan meminta nilai kembali dari `greet`. Keduanya adalah panggilan asinkron yang mengharuskan kita menggunakan kata kunci `await`. Terakhir, kita memeriksa nilai dari `greet` terhadap nilai yang kita harapkan.
+
+Saat menjalankan tes, kita mendapatkan output berikut:
+
+```bash
+$ truffle test
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Greeter.sol
+> Compiling ./contracts/Migrations.sol
+
+
+Contract: Greeter
+  ✓ has been deployed successfully
+  greet()
+    ✓ returns 'Hello, World!' (48ms)
+
+Contract: Greeter: update greeting
+  setGreeting(string)
+    1) sets greeting to passed in string
+    > No events were emitted
+
+
+  2 passing (111ms)
+  1 failing
+
+  1) Contract: Greeter: update greeting
+       setGreeting(string)
+         sets greeting to passed in string:
+     TypeError: greeter.setGreeting is not a function
+      at Context.<anonymous> (test/greeter_test.js:26:21)
+      at processTicksAndRejections (internal/process/task_queues.js:85:5)
+```
+
+Tes kita menunjukkan bahwa fungsi `setGreeting` belum ada; mari tambahkan fungsi ini ke kontrak kita. Kembali ke file `contracts/Greeter.sol` kita, setelah fungsi `greet`, tambahkan tanda tangan fungsi dari Contoh 4-7.
+
+**Contoh 4-7. Menambahkan `setGreeting()` ke Greeter**
+
+```solidity
+function setGreeting(string calldata greeting) external {
+}
+```
+
+Fungsi `setGreeting` kita dimaksudkan untuk memperbarui *state* kontrak kita dengan sapaan baru, yang berarti kita perlu menerima parameter untuk nilai baru ini. Nilai baru ini diharapkan berupa `string`, dan akan dirujuk oleh *identifier* `greeting`. Sama seperti fungsi `greet` kita, fungsi ini dimaksudkan untuk dipanggil dari skrip eksternal atau kontrak lain dan tidak akan dirujuk secara internal.
+
+Karena fungsi ini dipanggil dari dunia luar, data yang dilewatkan sebagai parameter bukanlah bagian dari penyimpanan tetap kontrak, tetapi disertakan sebagai bagian dari `calldata` dan harus diberi label dengan lokasi data `calldata`. Lokasi `calldata` hanya diperlukan ketika fungsi dideklarasikan sebagai `external` dan ketika tipe data parameter adalah tipe referensi seperti `mapping`, `struct`, `string`, atau `array`. Menggunakan tipe nilai seperti `int` atau `address` tidak memerlukan label ini.
+
+Dengan fungsi yang dideklarasikan, jika kita menjalankan tes kita sekarang, kita akan mendapatkan output berikut:
+
+```bash
+$ truffle test
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Greeter.sol
+> Compiling ./contracts/Migrations.sol
+
+
+Contract: Greeter
+  ✓ has been deployed successfully
+  greet()
+    ✓ returns 'Hello, World!' (45ms)
+
+Contract: Greeter: update greeting
+  setGreeting(string)
+    1) sets greeting to passed in string
+    > No events were emitted
+
+
+  2 passing (215ms)
+  1 failing
+
+  1) Contract: Greeter: update greeting
+       setGreeting(string)
+         sets greeting to passed in string:
+     greeting was not updated
+      + expected - actual
+
+      -Hello, World!
+      +Hi there!
+
+      at Context.<anonymous> (test/greeter_test.js:29:14)
+      at processTicksAndRejections (internal/process/task_queues.js:85:5)
+```
+
+Melihat kegagalan tes, kita mengetahui bahwa nilai yang dikembalikan oleh fungsi `greet` tidak sesuai dengan yang diharapkan. Fungsi kita belum melakukan apa-apa dan oleh karena itu sapaan tidak pernah berubah.
+
+Untuk memperbarui variabel di satu fungsi, dan membuat variabel tersebut tersedia di fungsi lain, kita perlu menyimpan data di penyimpanan tetap kontrak dengan menggunakan **variabel state** (*state variable*), seperti yang ditunjukkan pada Contoh 4-8.
+
+Di file `contracts/Greeter.sol` kita, tambahkan kode di Contoh 4-8 ke kontrak `Greeter`.
+
+**Contoh 4-8. Menambahkan variabel state ke kontrak Greeter**
+
+```solidity
+pragma solidity >= 0.4.0 < 0.7.0;
+
+contract Greeter {
+  string private _greeting;
+
+  function greet() external pure returns(string memory) {
+    return "Hello, World!";
+  }
+
+  function setGreeting(string calldata greeting) external {
+  }
+}
+```
+
+Variabel state akan tersedia untuk semua fungsi yang didefinisikan di dalam kontrak, mirip dengan variabel *instance* atau variabel anggota dari bahasa berorientasi objek lainnya. Di sinilah juga kita akan menyimpan data yang akan ada selama seluruh masa hidup kontrak kita. Seperti fungsi, variabel state dapat dideklarasikan dengan tingkat *visibility modifier* yang berbeda, termasuk `public`, `internal`, dan `private`. Dalam contoh kita sebelumnya, kita menggunakan *modifier* `private`, yang berarti variabel ini dapat diakses di kontrak `Greeter` kita.
+
+> 📝 **Catatan**: Semua data di *blockchain* dapat dilihat secara publik dari dunia luar. *Modifier* variabel state hanya membatasi bagaimana data dapat berinteraksi dari dalam kontrak atau kontrak lain.
+
+Saat menulis fungsi yang memperbarui variabel state, seperti yang akan dilakukan oleh `setGreeting` kita, kita tidak bisa menamai parameter sama dengan variabel state kita. Untuk menghindari konflik semacam ini, praktik umum adalah memberi awalan nama variabel state atau parameter dengan karakter garis bawah (`_`).
+
+Mari kita perbarui fungsi `setGreeting` untuk mengatur variabel state, seperti yang ditunjukkan pada Contoh 4-9.
+
+**Contoh 4-9. Memperbarui variabel state**
+
+```solidity
+function setGreeting(string calldata greeting) external {
+  _greeting = greeting;
+}
+```
+
+Bahkan dengan perubahan ini, tes kita masih akan gagal. Apa yang sekarang ingin kita lakukan adalah memperbarui fungsi `greet` untuk membaca dari variabel state ini, tetapi ada beberapa hal yang perlu kita pertimbangkan sebelum membuat perubahan ini. Yang pertama adalah fungsi kita saat ini ditandai sebagai `pure`. Kita perlu memperbarui fungsi menjadi fungsi `view` karena kita sekarang akan mengakses data yang disimpan di *blockchain*. Setelah kita beralih ke membaca dari variabel state di fungsi `greet` kita, kita tidak akan lagi memiliki sapaan default kita dan tes awal akan gagal. Untuk mengatasi masalah ini, kita akan memberikan `_greeting` nilai default "Hello, World\!". Kita juga akan mengubah fungsi dari `pure` menjadi `view` dan memperbarui nilai kembali untuk menggunakan nilai yang disimpan di `_greeting`. Contoh 4-10 menunjukkan kontrak kita dengan semua perubahan ini dibuat.
+
+**Contoh 4-10. Membaca dari variabel state kita**
+
+```solidity
+pragma solidity >= 0.4.0 < 0.7.0;
+
+contract Greeter {
+  string private _greeting = "Hello, World!";
+
+  function greet() external view returns(string memory) {
+    return _greeting;
+  }
+
+  function setGreeting(string calldata greeting) external {
+    _greeting = greeting;
+  }
+}
+```
+
+Setelah menjalankan tes kita, kita sekarang akan melihat ketiga tes berhasil\!
+
+```bash
+$ truffle test
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Greeter.sol
+> Compiling ./contracts/Migrations.sol
+
+
+Contract: Greeter
+  ✓ has been deployed successfully
+  greet()
+    ✓ returns 'Hello, World!' (57ms)
+
+Contract: Greeter: update greeting
+  setGreeting(string)
+    ✓ sets greeting to passed in string (116ms)
+
+  3 passing (224ms)
+```
+
+### Membuat Greeter Dapat Dimiliki (*Ownable*)
+
+Saat ini, siapa pun dapat mengubah pesan dari kontrak `Greeter` kita. Ini mungkin tidak masalah dalam beberapa kasus, tetapi juga bisa menyebabkan seseorang mengubah pesan menjadi sesuatu yang kurang ramah. Untuk mencegah ini, kita sekarang akan menambahkan ide **kepemilikan** (*ownership*) ke kontrak, dan kemudian membatasi kemampuan untuk mengubah sapaan hanya kepada pemiliknya.
+
+Untuk melakukan ini, kita ingin mengatur pemilik kontrak `Greeter` ke alamat yang men-*deploy* kontrak tersebut. Ini berarti kita perlu menyimpan alamat tersebut selama inisialisasi, dan untuk itu, kita perlu menulis fungsi *constructor*. Kita juga perlu mengakses beberapa informasi dari objek `msg`. Objek `msg` tersedia secara global dan mencakup `calldata`, pengirim pesan (`sender`), tanda tangan fungsi yang dipanggil, dan nilai (`value` atau berapa banyak wei yang dikirim).
+
+Tes pertama kita akan menegaskan bahwa seorang pemilik ada dengan memanggil fungsi *getter* `owner`. Karena ini tidak bergantung pada perubahan *state* apa pun, kita akan menempatkan tes ini di blok tes `Greeter` awal, seperti yang ditunjukkan pada Contoh 4-11.
+
+**Contoh 4-11. Menguji bahwa seorang pemilik ada**
+
+```javascript
+const GreeterContract = artifacts.require("Greeter");
+
+contract("Greeter", () => {
+  it("has been deployed successfully", async () => {
+    const greeter = await GreeterContract.deployed();
+    assert(greeter, "contract failed to deploy");
+  });
+
+  describe("greet()", () => {
+    it("returns 'Hello, World!'", async () => {
+      const greeter = await GreeterContract.deployed();
+      const expected = "Hello, World!";
+      const actual = await greeter.greet();
+      assert.equal(actual, expected, "greeted with 'Hello, World!'");
+    })
+  });
+
+  describe("owner()", () => {
+    it("returns the address of the owner", async () => {
+      const greeter = await GreeterContract.deployed();
+      const owner = await greeter.owner();
+      assert(owner, "the current owner");
+    });
+  });
+})
+```
+
+Menjalankan tes ini akan menghasilkan kegagalan berikut:
+
+```bash
+$ truffle test
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Greeter.sol
+> Compiling ./contracts/Migrations.sol
+
+
+Contract: Greeter
+  ✓ has been deployed successfully
+  greet()
+    ✓ returns 'Hello, World!' (54ms)
+  owner()
+    1) returns the address of the owner
+    > No events were emitted
+
+Contract: Greeter: update greeting
+  setGreeting(string)
+    ✓ sets greeting to passed in string (274ms)
+
+
+  3 passing (409ms)
+  1 failing
+
+  1) Contract: Greeter
+       owner()
+         returns the address of the owner:
+     TypeError: greeter.owner is not a function
+      at Context.<anonymous> (test/greeter_test.js:22:35)
+      at processTicksAndRejections (internal/process/task_queues.js:85:5)
+```
+
+Kegagalan ini terlihat familiar. Kita tidak memiliki fungsi yang didefinisikan pada kontrak `Greeter` kita yang disebut `owner`. Karena ini adalah fungsi *getter*, kita perlu menambahkan variabel state yang akan menampung alamat pemilik, dan kemudian fungsi kita harus mengembalikan alamat tersebut. Bahasa Solidity menyediakan dua tipe alamat: satu adalah `address` dan yang lainnya adalah `address payable`. Perbedaannya adalah `address payable` memberikan akses ke metode `transfer` dan `send`, dan variabel dari tipe ini juga dapat menerima ether. Kita tidak mengirim ether ke alamat ini dan kita dapat menggunakan tipe `address` untuk tujuan kita.
+
+Mari kita lanjutkan dan perbarui kontrak `Greeter` dengan perubahan ini, seperti yang diilustrasikan pada Contoh 4-12.
+
+**Contoh 4-12. Menambahkan variabel state kepemilikan dan fungsi getter**
+
+```solidity
+pragma solidity >= 0.4.0 < 0.7.0;
+
+contract Greeter {
+  string private _greeting = "Hello, World!";
+  address private _owner;
+
+  function greet() external view returns(string memory) {
+    return _greeting;
+  }
+
+  function setGreeting(string calldata greeting) external {
+    _greeting = greeting;
+  }
+
+  function owner() public view returns(address) {
+    return _owner;
+  }
+}
+```
+
+Menjalankan tes kita menunjukkan bahwa kita sekali lagi berhasil:
+
+```
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Greeter.sol
+> Compiling ./contracts/Migrations.sol
+
+
+Contract: Greeter
+  ✓ has been deployed successfully
+  greet()
+    ✓ returns 'Hello, World!' (57ms)
+  owner()
+    ✓ returns the address of the owner (50ms)
+
+Contract: Greeter: update greeting
+  setGreeting(string)
+    ✓ sets greeting to passed in string (125ms)
+
+  4 passing (292ms)
+```
+
+Yang sebenarnya ingin kita uji di sini adalah bahwa alamat pemilik sama dengan alamat yang melakukan *deploy*. Untuk itu, kita sekarang akan menambahkan tes untuk memeriksa bahwa alamat kepemilikan sama dengan akun default (yang digunakan untuk men-*deploy* kontrak). Untuk melakukan ini, kita memerlukan akses ke akun-akun di lingkungan tes kita, dan untungnya Truffle telah membuatnya dapat diakses melalui variabel `accounts`. Kita perlu memasukkannya ke blok level `contract` dari kode tes, seperti yang diilustrasikan pada Contoh 4-13.
+
+**Contoh 4-13. Menguji pemilik adalah sama dengan deployer**
+
+```javascript
+const GreeterContract = artifacts.require("Greeter");
+
+contract("Greeter", (accounts) => {
+  it("has been deployed successfully", async () => {
+    const greeter = await GreeterContract.deployed();
+    assert(greeter, "contract failed to deploy");
+  });
+
+  describe("greet()", () => {
+    it("returns 'Hello, World!'", async () => {
+      const greeter = await GreeterContract.deployed();
+      const expected = "Hello, World!";
+      const actual = await greeter.greet();
+      assert.equal(actual, expected, "greeted with 'Hello, World!'");
+    })
+  });
+
+  describe("owner()", () => {
+    it("returns the address of the owner", async () => {
+      const greeter = await GreeterContract.deployed();
+      const owner = await greeter.owner();
+      assert(owner, "the current owner");
+    });
+
+    it("matches the address that originally deployed the contract", async () => {
+      const greeter = await GreeterContract.deployed();
+      const owner = await greeter.owner();
+      const expected = accounts[0];
+      assert.equal(owner, expected, "matches address used to deploy contract");
+    });
+  });
+})
+```
+
+Perhatikan bahwa blok `contract` kita sekarang memasukkan parameter `accounts` ke fungsi yang berisi kasus uji kita. Tes baru kita kemudian menegaskan bahwa akun pertama adalah yang men-*deploy* kontrak `Greeter`. Ketika kita menjalankan tes, kita akan mendapatkan kegagalan yang memberitahu kita bahwa `owner` dan `expected` tidak cocok. Sekarang saatnya menulis fungsi *constructor* itu.
+
+Sampai sekarang kita telah menggunakan *constructor* default, `constructor() public {}`. Sekarang kita perlu mencatat `msg.sender` sebagai pemilik ketika kontrak diinisialisasi. Kontrak `Greeter` kita sekarang akan terlihat seperti Contoh 4-14.
+
+**Contoh 4-14. Menambahkan constructor ke kontrak Greeter**
+
+```solidity
+pragma solidity >= 0.4.0 < 0.7.0;
+
+contract Greeter {
+  string private _greeting = "Hello, World!";
+  address private _owner;
+
+  constructor() public {
+    _owner = msg.sender;
+  }
+
+  function greet() external view returns(string memory) {
+    return _greeting;
+  }
+
+  function setGreeting(string calldata greeting) external {
+    _greeting = greeting;
+  }
+
+  function owner() public view returns(address) {
+    return _owner;
+  }
+}
+```
+
+Dengan perubahan ini, tes kita sekali lagi berhasil.
+
+Sekarang kita tahu siapa yang membuat kontrak, kita dapat membuat batasan bahwa hanya pemilik yang dapat memperbarui sapaan. Jenis kontrol akses ini biasanya dilakukan dengan ***function modifier***.
+
+*Function modifier* memungkinkan kita untuk memperluas fungsi dengan kode yang dapat berjalan sebelum dan/atau sesudah fungsi. Ini biasanya berbentuk *guard clause* dan akan mencegah fungsi dipanggil jika klausa tidak terpenuhi, yang persis seperti yang kita inginkan untuk kontrak `Greeter` kita.
+
+Contoh 4-15 telah memperbarui tes `setGreeting`, menetapkan harapan bahwa hanya pemilik yang dapat mengubah sapaan.
+
+**Contoh 4-15. Tes yang membatasi `setGreeting` hanya untuk pemilik**
+
+```javascript
+contract("Greeter: update greeting", (accounts) => {
+  describe("setGreeting(string)", () => {
+    describe("when message is sent by the owner", () => {
+      it("sets greeting to passed in string", async () => {
+        const greeter = await GreeterContract.deployed()
+        const expected = "The owner changed the message";
+
+        await greeter.setGreeting(expected);
+        const actual = await greeter.greet();
+
+        assert.equal(actual, expected, "greeting updated");
+      });
+    });
+
+    describe("when message is sent by another account", () => {
+      it("does not set the greeting", async () => {
+        const greeter = await GreeterContract.deployed()
+        const expected = await greeter.greet();
+        try {
+          await greeter.setGreeting("Not the owner", { from: accounts[1] });
+        } catch(err) {
+          const errorMessage = "Ownable: caller is not the owner"
+          assert.equal(err.reason, errorMessage, "greeting should not update");
+          return;
+        }
+        assert(false, "greeting should not update");
+      });
+    });
+  })
+});
+```
+
+Dalam tes yang diperbarui, kita kembali memasukkan parameter `accounts` ke fungsi *callback* `contract` agar tersedia untuk kasus uji kita. Kita juga menambahkan bagian kedua untuk kasus ketika akun non-pemilik mengirim pesan. Kita sekarang mengharapkan kesalahan akan muncul ketika alamat non-pemilik mencoba melakukan perubahan ini. Jika Anda melihat panggilan `setGreeting`, sekarang ada parameter kedua yang dilewatkan; ini adalah objek dengan properti `from`, dan kita secara eksplisit mengirim pesan ini dari akun yang berbeda. Ini juga cara kita bisa mengatur `value` (dalam unit wei) untuk dikirim ke kontrak juga.
+
+Menjalankan tes kita seharusnya menghasilkan kegagalan seperti ini:
+
+```
+  1 failing
+
+  1) Contract: Greeter: update greeting
+       setGreeting(string)
+         when message is sent by another account
+           does not set the greeting:
+     AssertionError: greeting should not update
+```
+
+Mari kita buat dan terapkan *modifier* kita untuk memperbaikinya. Kembali ke kontrak `Greeter` kita, setelah *constructor*, tambahkan kode berikut:
+
+```solidity
+modifier onlyOwner() {
+  require(
+    msg.sender == _owner,
+    "Ownable: caller is not the owner"
+  );
+  _;
+}
+```
+
+Sintaks *modifier* sangat mirip dengan sintaks fungsi tetapi tanpa deklarasi visibilitas. Di sini, *modifier* kita menggunakan fungsi `require`, di mana argumen pertama adalah ekspresi yang akan dievaluasi menjadi boolean. Ketika ekspresi ini menghasilkan `false`, transaksi sepenuhnya dikembalikan (*reverted*), yang berarti semua perubahan *state* dibatalkan dan eksekusi program berhenti. Fungsi `revert` juga menerima parameter string opsional yang dapat digunakan untuk memberikan lebih banyak informasi kepada pemanggil tentang mengapa operasi gagal.
+
+Bagian terakhir dari fungsi *modifier* kita adalah baris `_;`. Baris ini adalah tempat di mana fungsi yang dimodifikasi akan dipanggil. Jika Anda menempatkan apa pun setelah baris ini, itu akan dijalankan setelah badan fungsi selesai.
+
+Sekarang mari kita perbarui fungsi `setGreeting` kita untuk menggunakan *modifier* dengan menambahkan deklarasi `onlyOwner` setelah `external` dalam definisi fungsi:
+
+```solidity
+function setGreeting(string calldata greeting) external onlyOwner {
+  _greeting = greeting;
+}
+```
+
+Menjalankan tes kita, kita melihat semuanya berhasil\!
+
+Ini bagus, tetapi kita akan membuat satu perubahan terakhir sebelum mengakhiri bab ini. Di Bab 2, kita membahas **OpenZeppelin** dan bagaimana mereka telah membuat kontrak yang dapat digunakan sebagai dasar untuk membuat token. Nah, mereka juga memiliki kontrak yang mengimplementasikan ide kepemilikan, dan kita menduplikasi beberapa perilaku itu. Alih-alih menduplikasinya, kita akan memperbarui kontrak `Greeter` kita untuk memanfaatkan implementasi mereka.
+
+Kembali ke terminal kita, di direktori root aplikasi kita, masukkan perintah berikut:
+
+```bash
+$ npm install openzeppelin-solidity
+```
+
+Setelah itu selesai, perbarui bagian atas kontrak `Greeter` agar terlihat seperti Contoh 4-16.
+
+**Contoh 4-16. Mewarisi dari Ownable**
+
+```solidity
+pragma solidity >= 0.4.0 < 0.7.0;
+
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
+contract Greeter is Ownable {
+  // ... sisa file ...
+}
+```
+
+Di sini, kita menambahkan pernyataan `import` yang akan mengambil semua simbol global dari file yang diimpor, seperti `Ownable`, dan membuatnya tersedia dalam lingkup saat ini. Hal berikutnya yang perlu diperhatikan adalah bahwa kontrak `Greeter` kita sekarang mewarisi dari `Ownable` melalui sintaks `is`. Solidity mendukung *multiple inheritance* (pewarisan ganda) seperti Python atau bahkan C++. Kelas-kelas yang mewarisi dicantumkan dengan koma yang memisahkannya.
+
+Dengan ini, kita dapat menghapus implementasi kita dari *modifier* `onlyOwner`, fungsi *getter* `owner`, dan fungsi *constructor* karena `Ownable` menyediakan definisi-definisi ini. Ini mungkin tampak berlebihan, dan biasanya saya akan setuju dengan pemikiran itu. Namun, menggunakan kode yang telah melalui audit menyeluruh dan diuji dengan baik adalah bijaksana ketika bekerja dengan *smart contract* karena keamanan *smart contract* sangat penting.
+
+Ini mengakhiri pembahasan kontrak `Greeter` kita. Tapi sebelum kita melanjutkan, mari kita renungkan apa yang telah kita pelajari di bab ini.
+
+### Ringkasan
+
+Sejauh ini dalam perjalanan kita, kita telah belajar cara membuat proyek *smart contract* baru menggunakan `truffle init`, yang menyediakan struktur direktori untuk aplikasi kita. Struktur ini mencakup direktori untuk menampung kontrak, tes, dan *migrations* kita.
+
+Kita menulis tes *deployment* yang membantu memandu kita melalui *migration* awal yang diperlukan untuk memasukkan kontrak kita ke jaringan tes. Ini memungkinkan tes-tes kita selanjutnya untuk berinteraksi dengan kontrak yang telah di-*deploy*.
+
+Terakhir, kita mulai menjelajahi bahasa Solidity dan belajar tentang *visibility modifier* fungsi yang berbeda (`external`, `public`, `internal`, `private`). *Modifier* yang sama juga tersedia untuk variabel state (dengan pengecualian `external`) yang digunakan untuk menyimpan data secara permanen di *blockchain*. Kita juga mengimplementasikan konsep `Ownable` dan melakukan *refactor* untuk menggunakan kontrak OpenZeppelin melalui pewarisan.
+
+Di bab berikutnya, kita akan mendalami cara men-*deploy* kontrak kita secara lokal dan juga ke salah satu jaringan tes yang tersedia untuk publik.
+
+---
+
