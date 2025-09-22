@@ -22,7 +22,6 @@ Memperoleh kemampuan untuk membuat jaringan komputer memerlukan pemahaman tentan
 
 > **Tahukah Anda?**
 >
-> **Membaca untuk Mempelajari Lebih Lanjut**
 >
 > Semakin banyak Anda membaca tentang konsep jaringan dan isu-isu yang berkaitan dengan jaringan komputer, akan semakin mudah untuk mengimplementasikan dan memelihara jaringan Anda sendiri. Situs web `www.informit.com` adalah cara yang baik untuk memulai. Setelah membaca buku ini, kunjungi situs tersebut. Anda mungkin akan terkejut mengetahui betapa akrabnya konsep-konsep tersebut bagi Anda.
 >
