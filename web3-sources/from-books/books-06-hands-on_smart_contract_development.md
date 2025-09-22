@@ -4959,3 +4959,208 @@ Alur aplikasi web 2.0 diilustrasikan pada Gambar 8-1.
   <img src="images/books-06-hands-on_smart_contract_development/figure-8.1.png" alt="gambar" width="580"/>
 </p>
 
+Jika Anda memiliki pengalaman dalam pengembangan web tradisional, Web3 mirip dengan permintaan (*request*) API yang mengambil atau menambahkan data ke *backend*. Namun dengan Web3, Anda akan membaca dan menulis data ke *blockchain*, bukan ke *backend* tradisional.
+
+Pengguna Anda akan berinteraksi dengan *frontend* aplikasi Anda seperti React, yang kemudian akan menggunakan Web3 untuk membuat permintaan yang terhubung ke *blockchain*. Web3 akan berinteraksi dengan *blockchain* melalui RPC dan memberikan respons ke *frontend*, yang kemudian akan Anda *render* (tampilkan) kepada pengguna.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-8.2.png" alt="gambar" width="580"/>
+</p>
+
+Kita akan melihat beberapa metode untuk berinteraksi dengan *blockchain* yang dapat kita gunakan dan yang tersedia dari Web3 di bagian selanjutnya.
+
+### Metode-Metode Web3
+
+Web3 menawarkan banyak metode yang bisa kita gunakan untuk berinteraksi dengan *blockchain*. Kita akan menggunakan metode-metode ini untuk membaca atau menulis data ke *blockchain* dari aplikasi React kita. Kita dapat mengirim *ether* dari alamat Anda ke alamat lain, memanggil metode, mendapatkan saldo dari sebuah alamat *blockchain*, mendapatkan biaya *gas*, dan banyak lagi. Kita akan menggunakan metode-metode ini nanti saat menghubungkan aplikasi kita ke *node* Ethereum.
+
+Mari kita mulai dengan melihat beberapa contoh metode Web3.
+
+#### `getAccounts()`
+
+Metode `getAccounts()` dapat digunakan untuk mengembalikan daftar dompet (*wallet*) Web3 Anda.
+
+Penting untuk dicatat bahwa `getAccounts` hanya akan mengembalikan dompet Anda yang tidak terkunci (*unlocked*). Hal ini mungkin akan menyulitkan Anda nanti, jadi selalu ingat untuk mencari pesan *error* di Google dan ikuti buku ini dengan saksama.
+
+```javascript
+web3.eth.getAccounts()
+```
+
+-----
+
+#### `getBlockNumber()`
+
+Metode `getBlockNumber` akan mengembalikan nomor *block* saat ini.
+
+```javascript
+web3.eth.getBlockNumber()
+> 8911
+```
+
+-----
+
+#### `getBalance()`
+
+`getBalance` dapat digunakan untuk mendapatkan saldo dari akun yang Anda berikan sebagai argumen. Kita akan menggunakan ini nanti saat menghubungkan kontrak kita ke React, kerangka kerja (*framework*) *frontend* yang akan kita gunakan.
+
+Berikut adalah contoh penggunaan metode `getBalance` untuk menemukan saldo dari alamat ini:
+
+```javascript
+web3.eth.getBalance
+web3.eth.getBalance("0xa589BDa5379fDE626dD3eBF462fA22F5dfF43f30")
+.then(console.log);
+```
+
+Berikut adalah hasilnya:
+
+```
+"2000000000000"
+```
+
+-----
+
+#### `sendTransaction()`
+
+Jika kita ingin mengirim dana dari satu alamat ke alamat lain, kita akan menggunakan `sendTransaction` untuk melakukannya.
+
+```javascript
+web3.eth.sendTransaction()
+```
+
+Berikut adalah contoh pengiriman dana dari satu akun ke akun lainnya:
+
+```javascript
+web3.eth.sendTransaction({
+from: "0xa589BDa5379fDE626dD3eBF462fA22F5dfF43f30",
+to: "0xa289BDa5379fDE626dM3eBF462fA22F5dfF43f31",
+value: web3.toWei(1, "ether"),
+})
+```
+
+Parameter `from` adalah akun tempat Anda ingin mentransfer dana. Parameter `to` adalah akun tujuan pengiriman dana. Parameter `value` adalah jumlah *ether* yang akan Anda kirim dari alamat pengirim ke alamat penerima.
+
+> **Peringatan**
+>
+> Jangan pernah mencoba menulis alamat Anda dari sumber lain. **Selalu salin dan tempel** (*copy and paste*) saat mengirim dana. Tidak masalah jika Anda kehilangan beberapa *test ether*, tetapi akan menjadi masalah besar jika Anda tidak sengaja mentransfer dana sungguhan. Juga, selalu pastikan untuk **memeriksa kembali** bahwa alamatnya sudah benar sebelum Anda mengirim dana.
+
+Jika kita ingin menggunakan Web3, kita harus mengatur sebuah *provider* agar Web3 tahu *node* mana yang harus dihubungi:
+
+```javascript
+web3.setProvider
+```
+
+Kita akan menggunakan metode ini nanti saat kita menyiapkan aplikasi React untuk bekerja dengan kontrak kita.
+
+Untuk saat ini, selagi kita mengembangkan secara lokal, kita akan mengatur *provider* kita ke `localhost`. Jika kita ingin terhubung ke `localhost` kita, kita akan mengatur *provider* kita ke `localhost:8545` seperti yang ditunjukkan pada contoh berikut:
+
+```javascript
+new Web3(new Web3.providers.HttpProvider("http://localhost:8545"))
+```
+
+Kita akan menggunakan beberapa metode Web3 ini nanti saat kita membangun aplikasi yang lebih besar. Selanjutnya, kita akan mempelajari apa sebenarnya yang dimaksud dengan *provider*.
+
+### Provider
+
+Sebuah *provider* Web3 akan memberitahu proyek Anda *node* mana yang akan diajak bicara. Sederhananya, ini adalah cara proyek Anda dapat berbicara dengan *blockchain*. Ini dapat dibandingkan dengan URL yang mungkin Anda gunakan untuk melakukan panggilan API dalam aplikasi web tradisional. *Provider* akan mengirim instruksi RPC kita ke *node* Ethereum yang benar.
+
+Ada berbagai cara berbeda untuk terhubung ke *node* yang sedang berjalan. Sebuah *provider* terhubung ke *node* yang berjalan seperti Parity atau Geth. Setelah Anda terhubung melalui *provider*, *node* tersebut dapat berinteraksi dengan *blockchain*.
+
+Nanti di DApp yang akan kita bangun, kita akan terhubung ke *provider* kita seperti berikut. Kita akan memanggil Web3 dan mengatur *provider* untuk aplikasi kita agar pengguna dapat berinteraksi dengan *blockchain*.
+
+```javascript
+web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'))
+```
+
+Jika kita ingin memeriksa *provider* saat ini, kita bisa menggunakan `web3.currentProvider`, yang akan mengembalikan *provider* saat ini jika kita menggunakannya, dan `null` jika tidak ada *provider*.
+
+Selanjutnya, mari kita pelajari bagaimana kita dapat membuat permintaan ke *blockchain* dan melihat hasilnya dikembalikan melalui sebuah *promise*.
+
+### Promise dengan Web3
+
+Kita akan cukup sering menggunakan *promise* dengan Web3. *Promise* adalah sebuah konsep di mana sesuatu mungkin atau mungkin tidak mengembalikan nilai di masa depan. Kita dapat melampirkan sebuah *callback* ke *promise*, yang akan mengembalikan *error* jika *promise* tidak terpenuhi (*resolve*).
+
+Jika kita perlu melakukan beberapa panggilan, *promise* adalah solusi terbaik karena memungkinkan kita untuk mengembalikan hasil atau *error*. Jika kita ingin menggunakan fungsi `getBalance()` untuk melihat saldo pengguna, kita akan menggunakan kode berikut:
+
+```javascript
+return new Promise (function (resolve, reject) {
+    web3.eth.getBalance("0xa589...", function (error, balance) {
+        if (error) {
+            reject(error)
+        } else {
+            resolve(balance)
+        }
+    })
+}
+```
+
+Tanpa *promise*, panggilan tersebut tidak akan mengembalikan nilai yang benar. Berikut adalah contoh yang lebih rumit dari file `web3.js` yang menggunakan *promise*, yang akan Anda gunakan untuk mengatur Web3 dengan aplikasi Anda. Kita akan menggunakan ini nanti untuk berinteraksi dengan Web3 dan *frontend* kita.
+
+```javascript
+import Web3 from 'web3'
+
+let getWeb3 = new Promise(function(resolve, reject) {
+    window.addEventListener('load', function() {
+        var results
+        var web3 = window.web3
+
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider)
+            results = {
+                web3: web3
+            }
+            resolve(results)
+        } else {
+            var provider = new Web3.providers.HttpProvider('http://127.0.0.1:9545')
+            web3 = new Web3(provider)
+            results = {
+                web3: web3
+            }
+            resolve(results)
+        }
+    })
+})
+
+export default getWeb3
+```
+
+Pada potongan kode di atas, kita pertama-tama menunggu halaman kita dimuat dengan *promise* kita. Setelah kita memiliki Web3, kita akan menggunakan `resolve(results)` untuk melihat hasil *promise* kita.
+
+Jika kita tidak memiliki injeksi Web3 (*Web3 injection*), kita akan menggunakan pernyataan `else` dan mengaturnya ke `localhost` dan menggunakan Web3 secara lokal. `http://127.0.0.1:9545` akan menjadi *port* Anda sendiri, yang diatur dengan aplikasi Anda.
+
+Selanjutnya, mari kita pelajari tentang MetaMask dan bagaimana kita akan berinteraksi dengan aplikasi Web3 melaluinya. Kita sebelumnya telah mengaturnya di buku ini, tetapi sekarang mari kita pelajari bagaimana kita akan menggunakannya dalam aplikasi di buku ini.
+
+### MetaMask untuk Injeksi Web3
+
+MetaMask adalah ekstensi *browser* yang memungkinkan kita berinteraksi dengan mudah dengan situs web yang menggunakan Web3. MetaMask mengelola akun Ethereum dan *private key* Anda. Ini seperti dompet tetapi di dalam *browser* Anda.
+
+MetaMask akan menyimpan *ether* Anda dan memungkinkan Anda menandatangani transaksi serta membayar biaya *gas*. Ini juga menyediakan cara yang sangat nyaman bagi pengguna untuk berinteraksi dengan aplikasi Web3 Anda tanpa menjalankan *node* mereka sendiri. Rujuk kembali ke bab instalasi untuk informasi lebih lanjut tentang MetaMask.
+
+Tetapi bagaimana kita berinteraksi dengan *blockchain*? Kita akan menggunakan metode berikutnya, `send`, untuk berinteraksi dengan *blockchain* dan membuka *pop-over* MetaMask. Mari kita bahas metode `send` dan bagaimana kita bisa menulis ke *blockchain* dengannya.
+
+### Send (Pembaruan State/Tulis)
+
+Jenis metode lain yang akan kita gunakan dengan Web3 adalah metode `send`. DApp Anda perlu menggunakan metode `send` setiap kali Anda ingin menambahkan sesuatu ke *blockchain*. Anda akan lihat nanti saat kita menyiapkan *frontend* untuk DApp kita bahwa metode `send` mengharuskan pengguna Anda untuk menggunakan MetaMask, menandatangani transaksi, dan membayar biaya *gas*.
+
+Kita akan menggunakan metode `send` untuk saat-saat di mana kita perlu mengubah *blockchain*.
+
+Selanjutnya, mari kita pelajari tentang metode yang kurang intrusif: `call`. Metode `call` tidak memerlukan biaya *gas*, dan digunakan untuk metode di mana kita mungkin ingin mendapatkan hasil dari sesuatu di dalam kontrak. Metode `send` meneruskan *gas*, jadi ini lebih invasif daripada metode `call`.
+
+### Call (Baca)
+
+`Call` digunakan untuk fungsi `view` dan `pure`.
+
+Sementara metode `send` akan meminta pengguna Anda untuk menggunakan MetaMask, metode `call` tidak akan meminta pengguna Anda untuk menandatangani apa pun dengan MetaMask, dan tidak akan memungut biaya *gas* apa pun.
+
+Perhatikan bahwa metode `call` juga lebih aman digunakan karena tidak meneruskan *gas*. Metode ini juga tidak akan membuat transaksi di *blockchain*, jadi lebih aman digunakan karena tidak mempublikasikan apa pun.
+
+Nilai kembalian (*return value*) dikembalikan secara langsung dan merupakan fungsi hanya-baca (*read-only*). Karena itu, metode `call` juga lebih cepat. Kita akan sering menggunakan metode `call` dalam buku ini karena cepat dan tidak memerlukan biaya *gas* atau biaya transaksi.
+
+### Ringkasan
+
+Dalam bab ini, kita telah belajar bahwa Web3 adalah kumpulan pustaka JS yang memungkinkan kita terhubung ke *node* Ethereum. Web3 adalah *wrapper* untuk JSON RPC, dan menyediakan kita sebuah API yang dapat kita gunakan dalam aplikasi kita untuk berinteraksi dengan *blockchain* secara sederhana.
+
+Kita telah belajar tentang bagaimana Web3 berbeda dari aplikasi web 2.0 tradisional. Kita juga telah belajar tentang bagaimana *frontend* kita akan terhubung ke Web3, yang akan mentransfer data dengan *blockchain*. Dan kita telah mempelajari beberapa metode Web3, seperti `call` dan `send`, yang akan kita mulai gunakan di bab berikutnya.
+
+Di bab selanjutnya, kita akan mengerjakan cara menghubungkan *smart contract* ke UI. Kita akan menggunakan Web3 di dalam aplikasi React kita untuk terhubung dan berinteraksi dengan *blockchain*.
+
+---
+
