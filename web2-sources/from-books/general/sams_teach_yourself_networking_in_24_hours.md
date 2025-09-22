@@ -23,11 +23,10 @@ Memperoleh kemampuan untuk membuat jaringan komputer memerlukan pemahaman tentan
 > **Tahukah Anda?**
 >
 >
-> Semakin banyak Anda membaca tentang konsep jaringan dan isu-isu yang berkaitan dengan jaringan komputer, akan semakin mudah untuk mengimplementasikan dan memelihara jaringan Anda sendiri. Situs web `www.informit.com` adalah cara yang baik untuk memulai. Setelah membaca buku ini, kunjungi situs tersebut. Anda mungkin akan terkejut mengetahui betapa akrabnya konsep-konsep tersebut bagi Anda.
+> Semakin banyak Anda membaca tentang konsep jaringan dan isu-isu yang berkaitan dengan jaringan komputer, akan semakin mudah untuk mengimplementasikan dan memelihara jaringan Anda sendiri. Situs web `http://www.isoc.org` adalah cara yang baik untuk belajar lebih lanjut. Setelah membaca buku ini, kunjungi situs tersebut.
 >
 > Selain itu, saya merekomendasikan entri Wikipedia tentang subjek ini di `http://wikipedia.org`.
 >
-> Untuk pembaca yang lebih mahir, saya sarankan untuk mempelajari spesifikasi Internet, yang tersedia di `http://www.isoc.org`.
 
 ### Apa Itu Jaringan? Apa Itu Berjejaring (*Networking*)?
 
