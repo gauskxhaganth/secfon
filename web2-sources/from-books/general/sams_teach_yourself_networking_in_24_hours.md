@@ -650,3 +650,291 @@ Dalam beberapa halaman berikutnya, kita akan melakukan tur tingkat tinggi pada s
   <img src="images/book-sams_teach_yourself_networking/figure-4.2.png" alt="gambar" width="580"/>
 </p>
 
+### CPU
+
+Saat Anda melepas penutup dari komputer pribadi, hal pertama yang mungkin Anda lihat adalah bagian dari logam dan keramik, yang terpasang pada sebuah papan sirkuit. Komponen ini adalah **CPU**, yang juga sering disebut **prosesor**. Tujuan dasar dari CPU adalah untuk menjalankan program perangkat lunak, yang merupakan instruksi yang digunakan CPU untuk memanipulasi data yang disimpan di memori komputer. Data tersebut bisa berupa email, spreadsheet Excel, grafik PowerPoint, dan sebagainya. Apapun itu, CPU, sebuah mikroprosesor yang kuat, adalah titik fokus untuk memproses data—seperti yang diperintahkan oleh perangkat lunak.
+
+#### Motherboard
+
+CPU biasanya ditempatkan pada sebuah papan sirkuit yang dipasang ke dalam soket di **motherboard**. Sebuah motherboard juga menyediakan koneksi yang melaluinya komponen internal komputer berkomunikasi. Misalnya, motherboard dikonfigurasi dengan porta-porta tempat memori terpasang. Motherboard juga dapat menghubungkan perangkat periferal eksternal, seperti printer.
+
+Nama *motherboard* (papan induk) sangat tepat karena ia adalah titik fokus bagi "keluarga" komponen perangkat keras di dalam komputer dan yang terpasang pada komputer.
+
+CPU adalah *sine qua non* (sesuatu yang mutlak diperlukan) untuk komputasi—tanpanya, sebuah komputer kehilangan dayung dan kemudinya. CPU mengelola semua angka 1 dan 0 yang datang dari papan ketik, *mouse*, disk, jaringan, dan apa pun yang kita miliki di komputer kita. Kemudian ia memproses data ini sehingga kita dapat mencapai apa pun yang ingin kita capai—untuk melihat tampilan di layar video, mengetik surat, membuat spreadsheet. Apa pun yang kita lakukan di komputer, CPU terlibat.
+
+Seperti yang telah disebutkan, CPU adalah mikroprosesor. Mikroprosesor paling awal hanya memiliki beberapa ratus transistor per chip. Mikroprosesor modern, seperti POWER4 dari Silicon Graphics, Inc., mengandung lebih dari 170 juta transistor pada sebuah persegi seukuran kuku ibu jari Anda. Generasi chip prosesor berikutnya diproyeksikan memiliki lebih dari 1 miliar transistor—sebuah kemampuan luar biasa yang kemungkinan akan mengarah pada arsitektur yang berbeda dari yang dibahas dalam jam ini.
+
+Mikroprosesor menjalankan instruksi dengan cepat. Misalnya, saat saya mengetik kalimat ini di papan ketik PC saya dan mungkin menjalankan perintah Simpan untuk teks ini, CPU komputer saya sedang menjalankan baris-baris kode perangkat lunak yang dirancang untuk mendukung input saya—perintah saya ke komputer. CPU akan membutuhkan beberapa hingga banyak siklus (iterasi) untuk menyelesaikan tugas ini. Ia harus mengambil instruksi perangkat lunak dari memori komputer, mendekodenya, menjalankannya, dan menyimpan hasilnya.
+
+CPU melakukan operasi yang agak biasa ini dengan kecepatan yang menakjubkan. PC yang saya gunakan untuk menjelaskan fitur ini memiliki kecepatan clock 1.73GHz. Angka ini berarti CPU beroperasi (bersiklus) sebanyak 1.730.000.000 kali per detik. Memang, beberapa siklus mungkin diperlukan untuk, katakanlah, menyimpan kalimat ini di memori. Meskipun demikian, CPU 1.73GHz dapat melakukan ribuan operasi—seperti mengambil halaman Web, menampilkan foto di layar, dan sebagainya—dalam satu detik. Terlebih lagi, komputer modern mampu menjalankan beberapa instruksi per siklus clock, yang berarti CPU lebih cepat dari yang dijelaskan sebelumnya. Akibatnya, "kecepatan clock" saja tidak banyak digunakan saat ini untuk menggambarkan kekuatan pemrosesan sebenarnya dari sebuah komputer.
+
+Mari kita tambahkan beberapa poin lagi tentang prosesor komputer dan kapasitasnya. Istilah lain digunakan untuk menggambarkan kekuatan pemrosesan CPU, seperti **instruksi per detik (IPS)** dan **operasi titik mengambang per detik (FLOPS)**. Para ahli yang menganalisis kapasitas komputer berhati-hati dalam menggunakan statistik ini saja untuk mengevaluasi dan membandingkan kinerja. Meskipun demikian, untuk analisis kita, penting untuk dicatat bahwa pada Juni 2008, sebuah CPU mencapai kecepatan 1 teraflop. Itu berarti $10^{12}$ FLOPS!
+
+Manusia biasa menghabiskan beberapa detik (menit?) untuk melakukan penjumlahan numerik dengan pensil dan kertas, tergantung pada besarnya angka. Dalam istilah komputer, manusia menjalankan penjumlahan ini dengan kecepatan sekitar 0.0119 IPS. Salah satu prosesor 3.2GHz dari Intel melakukan 59.455.000.000 IPS untuk penjumlahan numerik yang sebanding. Tak perlu dikatakan lagi, CPU ini dapat melakukan banyak pekerjaan dalam waktu singkat.
+
+Terlebih lagi, komputer tidak menuntut tunjangan kesehatan atau meminta kenaikan gaji. Ia tidak pulang kerja lebih awal untuk menjemput anak-anak. Sementara kita manusia terus menaikkan biaya overhead yang ditanggung oleh bisnis, komputer terus menurunkan biaya-biaya ini. Anda pikir kita akan melihat lebih sedikit layanan suara otomatis dan situs Web dan lebih banyak interaksi manusia untuk reservasi maskapai penerbangan kita dan pembelian lainnya? Pikirkan lagi. Kita manusia telah gagal! Coba pertimbangkan:
+* **1961**—Sekitar \$1.100.000.000.000 (\$1,1 triliun) per GigaFLOPS
+* **1997**—Sekitar \$30.000 per GigaFLOPS
+* **2008: Mei**—Sekitar \$0,13 per GigaFLOPS
+
+### Memori
+
+Sebuah mikroprosesor mengintegrasikan sebagian besar atau seluruh CPU pada sebuah sirkuit terpadu (chip silikon). Namun, tidak semua chip adalah mikroprosesor. Beberapa chip, yang disebut **chip memori**, dibuat sebagai larik (*array*) yang menampung angka 1 dan 0 yang sedang diproses oleh CPU. Tujuannya adalah untuk menyediakan tempat di komputer untuk penyimpanan data. Data dapat diakses dalam urutan apa pun (tidak berurutan)—oleh karena itu, dinamakan **memori akses acak (*random access memory*, atau RAM)**.
+
+> **Ngomong-ngomong**
+>
+> **Modul Memori**
+>
+> Ketika chip-chip ini disusun menjadi kelompok, perangkat memori yang dihasilkan disebut **Single Inline Memory Modules (SIMMs**, yang merupakan teknologi lama), atau **Dual Inline Memory Modules (DIMMs)**. Ketika Anda membeli memori dari pengecer, Anda membeli modul memori, bukan chip memori individual.
+
+RAM biasanya dikaitkan dengan jenis memori yang *volatile* (sering disebut dinamis, atau **DRAM**), di mana data hilang setelah daya dimatikan. Namun, beberapa jenis memori dapat menyimpan muatan (dan mempertahankan data) setelah komputer dimatikan. Terlepas dari perbedaan istilah, semua memori komputer bekerja dengan cara yang serupa: Beri muatan pada memori, dan ia akan menampung angka 1 dan 0 untuk diakses oleh CPU. Poin kunci sehubungan dengan memori adalah memastikan memori yang Anda beli adalah jenis yang dibutuhkan oleh komputer Anda. Manual pengguna Anda seharusnya memberikan informasi ini. Jika Anda tidak dapat menemukannya, personel di toko komputer dapat membantu Anda. Tentu saja, situs web produsen juga dapat memberikan informasi ini. Haruskah Anda menelepon telepon vendor untuk meminta bantuan? Semoga beruntung! Ingat diskusi kita baru-baru ini tentang perbedaan biaya/kinerja antara aktivitas manusia dan komputer. Kemungkinan besar, Anda akan berbicara dengan komputer tentang memori komputer.
+
+Bagaimanapun, memori juga digunakan untuk menyediakan akses CPU ke data. Jika komputer harus membaca data dari pita atau disk setiap kali membutuhkan kumpulan data atau instruksi berikutnya, komputer akan terlalu lambat untuk berguna. Tetapi penggunaan memori, khususnya RAM, telah menghasilkan komputer yang luar biasa cepat.
+
+Namun, RAM tidak sebanding dengan kecepatan CPU karena kecepatan akses memori untuk data dan instruksi yang relatif lambat. CPU dapat memproses kode dalam 3 nanodetik (ns). Akses memori kira-kira 100ns, sebuah perbedaan kecepatan yang sangat besar. Oleh karena itu, memori kecil, yang disebut **cache**, ditempatkan dekat dengan CPU untuk menyediakan data dan instruksi lebih cepat daripada memori konvensional.
+
+Memori sangat bagus untuk membantu komputer beroperasi secara efisien. Namun, ada satu hal yang tidak bisa dilakukan oleh memori, yang akan dijelaskan di bagian selanjutnya.
+
+> **Peringatan!**
+>
+> **Jadilah Cerdas—Tambah Memori!**
+>
+> Analis dari lembaga pemikir, seperti Gartner Group dan Meta Group, mengklaim bahwa memori sering kali lebih penting daripada kekuatan CPU: Memori adalah penyimpanan cepat. Biasanya, sebuah komputer dapat mengakses chip memori dengan sangat cepat; kecepatan akses diukur dalam nanodetik (sepersejuta detik). Bandingkan ini dengan *hard drive*, yang memiliki waktu akses milidetik (seperseratus detik). Bahkan jika sebuah komputer memiliki prosesor yang kuat, ia akan berjalan lambat jika kekurangan memori. Sebaliknya, CPU yang kurang kuat yang dipersenjatai dengan banyak memori mungkin mengungguli CPU yang lebih kuat tetapi kekurangan memori.
+
+### Disk
+
+Memori membantu kecepatan komputer. Namun, RAM bersifat *volatile*, yang berarti ia hanya berfungsi ketika komputer dinyalakan. Karena RAM terbuat dari chip yang bergantung pada sumber daya listrik untuk menyimpan data, ketika daya terputus, ia tidak dapat lagi menyimpan apa pun. Saya ragu Anda ingin mengetik ulang semuanya setiap kali Anda menyalakan komputer. Seharusnya ada cara untuk menyimpan data sehingga dapat diambil kembali saat Anda menyalakan mesin Anda lagi.
+
+Perangkat penyimpanan eksternal diciptakan untuk menyimpan data, terlepas dari keadaan komputer. Salah satu perangkat tersebut disebut **disk** (atau **hard disk**). Disk memenuhi dua kebutuhan paling umum dari komputer: Mereka menyimpan data dalam keadaan non-volatile (artinya, data yang disimpan di disk tidak hilang ketika daya terputus), dan mereka bertindak sebagai memori tambahan (meskipun lebih lambat) ketika komputer membutuhkan lebih banyak memori (RAM) daripada yang terpasang secara fisik.
+
+Penyimpanan disk dinamakan demikian karena data direkam pada permukaan bundar yang berputar yang disebut disk. Sebelum penemuan disk, hampir semua data disimpan pada kartu (kartu pons) atau pita magnetik. Untuk kartu dan pita, akses ke data bersifat sekuensial. Rekaman 1 harus diakses sebelum rekaman 2 dapat diperoleh, dan seterusnya. Teknologi disk memungkinkan **akses acak**, yang sangat memudahkan pencarian rekaman spesifik. Anda bisa bayangkan penundaan jika operator bantuan direktori di Los Angeles harus mencari file komputer secara berurutan untuk menemukan nomor telepon XYZ Corporation.
+
+> **Disk dan Magnetisme**
+>
+> Magnet memiliki dua kutub: utara dan selatan. Ingat bahwa komputer hanya menggunakan angka 1 dan 0. Nilai 1 dan 0 adalah biner—artinya, mereka bisa 1 atau 0; tidak ada di antaranya. Untungnya, kutub utara dan selatan pada partikel magnetik juga biner, dan komputer dapat memanfaatkan orientasi partikel magnetik mikroskopis untuk sesuai dengan angka 1 dan 0. Partikel magnetik dengan kutub utara menghadap ke atas mungkin adalah 0, dan partikel dengan kutub selatan menghadap ke atas mungkin adalah 1—persis seperti yang kita butuhkan untuk menyimpan data.
+
+Selama bertahun-tahun, penyimpanan disk memiliki kapasitas yang terbatas. Dengan risiko menunjukkan usia saya, saya memulai pemrograman pada disk IBM 2311 kuno. Disk tersebut menyimpan 7,25 juta *byte* pada satu paket disk (enam piringan berputar sebagai satu unit). Tingkat transfer data dari disk ke memori komputer hanya 156 *kilobyte* per detik (Kbps). Unit-unit yang lebih baru yang beroperasi saat ini menyimpan sekitar 250 *gigabyte* (GB) data. Tingkat transfer data mereka adalah 61,4 *megabyte* per detik (Mbps).
+
+#### Ragam Disk
+
+Disk modern untuk komputer pribadi umumnya datang dalam salah satu dari dua varietas: IDE dan SCSI. Variasi ini memerlukan metode yang berbeda di mana *hard drive* terhubung ke komputer. Karena perangkat dari satu jenis tidak kompatibel dengan perangkat dari jenis lain, penting untuk mengetahui sedikit tentang keduanya.
+
+**Integrated Drive Electronics (IDE)** (juga dikenal sebagai **Advanced Technology Attachment, atau ATA**) adalah standar koneksi untuk *hard drive* yang menempatkan elektronik yang mengontrol drive langsung pada drive itu sendiri. IDE/ATA mendukung hingga dua drive yang terhubung ke satu kabel dan ukuran disk hingga 528 *megabyte* (MB). Versi standar IDE yang lebih baru, yang disebut **Extended IDE (EIDE)**, dapat mendukung disk yang lebih besar; sekarang umum untuk melihat disk EIDE dengan kapasitas hingga 120 *gigabyte* (GB). EIDE sering disebut "Ultra DMA." Anda biasanya akan menemukan drive ini dijual sebagai ATA saat ini, tetapi itu hanyalah IDE dengan nama yang berbeda, karena antarmukanya sama dengan IDE. Anda mungkin juga menemukan istilah **SATA**, untuk **Serial Advanced Technology Attachment**, yang merupakan peningkatan dari ATA dalam menawarkan tingkat transfer yang lebih cepat.
+
+> **Solid State Drives (SSDs)**
+>
+> Anda juga harus menyelidiki kemungkinan menggunakan **solid state drives (SSDs)**. Mereka menggunakan memori solid state untuk penyimpanan data. Pada saat tulisan ini dibuat, harganya lebih mahal daripada unit disk konvensional, tetapi untuk beberapa aplikasi, biaya tambahan mungkin dapat dibenarkan. Mereka jauh lebih cepat daripada disk yang berputar dan tidak mengeluarkan suara. Untuk aplikasi yang membutuhkan waktu respons yang sangat cepat, SSD mungkin sepadan dengan biayanya.
+
+#### Small Computer System Interface (SCSI)
+
+**Small computer system interface (SCSI**, diucapkan "skazi"), yang ditunjukkan pada Gambar 4.3, adalah standar untuk menghubungkan perangkat periferal ke komputer. SCSI memungkinkan 8 hingga 16 perangkat terhubung ke komputer dalam sebuah rantai (yaitu, pada satu bus).
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-4.3.png" alt="gambar" width="580"/>
+</p>
+
+Setiap perangkat pada rantai SCSI memiliki nomor yang disebut (tidak mengherankan) **ID SCSI**, yang memungkinkan komputer untuk menemukan perangkat tersebut saat dibutuhkan. Setiap ujung rantai SCSI harus dihentikan (*terminated*), yang berarti perangkat khusus yang disebut **resistor terminator** harus dicolokkan ke ujung kabel. Resistor terminator memastikan karakteristik listrik kabel tetap konsisten di sepanjang kabel. SCSI hadir dalam berbagai kecepatan mulai dari 5Mbps hingga 300Mbps. Dengan beberapa pengecualian, SCSI bersifat **kompatibel ke belakang (*backward compatible*)**, yang merupakan cara mewah untuk mengatakan bahwa perangkat lama dapat terhubung ke pengontrol SCSI yang lebih baru dan tetap berfungsi (meskipun seluruh bus SCSI melambat ke kecepatan perangkat paling lambat yang terhubung dengannya).
+
+Tentu saja, perangkat periferal, seperti disk, tidak beroperasi sendiri; mereka harus terhubung ke sesuatu di dalam komputer, yang merupakan subjek dari bagian selanjutnya. Selain itu, pada Jam ke-11, "Memilih Perangkat Keras dan Perangkat Lunak Jaringan," subjek ini akan dibahas kembali dengan beberapa rekomendasi tentang teknologi disk mana yang mungkin sesuai dengan jaringan Anda.
+
+### Kartu Ekspansi
+
+Di awal jam ini, kita belajar bahwa CPU masuk ke dalam *motherboard* melalui sebuah soket. Selain soket untuk CPU, *motherboard* menyediakan antarmuka untuk perangkat *after-market*. Perangkat-perangkat ini, yang masuk ke dalam **slot ekspansi** di *motherboard*, disebut **kartu ekspansi** (juga dikenal sebagai papan ekspansi, kartu adaptor, atau kartu aksesori).
+
+Apapun sebutannya, mereka adalah rakitan elektronik yang terhubung ke komputer melalui antarmuka standar yang disebut slot kartu. Kartu adaptor menyediakan berbagai layanan untuk komputer, termasuk operasi video, jaringan, dan modem.
+
+Aman untuk mengklaim bahwa tanpa keputusan IBM untuk mengadopsi desain modular untuk komputer pribadi awalnya, dan diikuti oleh industri komputer, komputer pribadi modern tidak akan menjadi mesin yang kuat dan dapat beradaptasi seperti sekarang ini. Modularitas dan kemampuan beradaptasi dari IBM PC mendorong ledakan popularitas komputer pribadi pada awal 1980-an. Faktanya, pertumbuhan pesat industri komputer dapat dikaitkan dengan standar kartu adaptor yang diumumkan oleh IBM untuk PC awal.
+
+Kartu adaptor menangani berbagai fungsi, termasuk yang berikut:
+* **Adaptor jaringan** menghubungkan komputer ke jaringan.
+* **Adaptor video** menyediakan cara bagi komputer untuk menampilkan gambar di monitor video.
+* **Pengontrol drive** menghubungkan *hard drive* ke sistem.
+* **Pengontrol SCSI** menghubungkan perangkat apa pun yang menggunakan antarmuka SCSI ke komputer.
+* **Kartu suara dan video** memungkinkan berbagai jenis media—dari CD hingga MP3—untuk diputar di komputer.
+
+Daftar ini tidak komprehensif; tidak mencakup semua jenis kartu adaptor yang berbeda. Meskipun demikian, daftar ini mencakup perangkat yang kemungkinan besar akan Anda temui di komputer biasa.
+
+Meskipun sebagian besar *motherboard* memiliki slot ekspansi, slot ekspansi di semua *motherboard* tidak sama. Berbagai produsen komputer telah merancang antarmuka yang berbeda untuk kartu yang digunakan dalam sistem mereka. Untuk komputer berbasis Intel, desain slot yang paling umum adalah, dalam urutan usia dari yang tertua hingga yang termuda, ISA, EISA, dan PCI. **ISA** adalah singkatan dari **Industry Standard Architecture**, yang merupakan sebutan IBM untuk antarmuka ini ketika mereka menciptakannya pada awal 1980-an. Pada saat tulisan ini dibuat, ISA, EISA, VESA-Local Bus, dan beberapa antarmuka slot lainnya dianggap sebagai teknologi usang.
+
+#### Peripheral Component Interconnect (PCI)
+
+**PCI** adalah standar antarmuka saat ini, menggantikan beberapa antarmuka yang lebih tua. PCI muncul dari inisiatif Intel untuk memungkinkan adaptor tambahan berjalan hampir secepat sistem tempat mereka dipasang. Antarmuka ke *motherboard* bisa berupa sirkuit terpadu yang dipasang pada *motherboard*, atau bisa berupa kartu ekspansi yang masuk ke dalam soket.
+
+Kartu PCI tipikal yang digunakan di PC termasuk kartu jaringan, kartu suara, modem, porta USB atau serial, kartu penala TV (*TV tuner*), dan pengontrol disk. Di masa lalu, kartu video adalah perangkat PCI, tetapi meningkatnya kebutuhan kapasitas untuk video telah melampaui kemampuan PCI. Namun, kartu PCI banyak digunakan pada perangkat seperti modem. Kemungkinan besar modem di PC Anda berbasis PCI.
+
+> **Ngomong-ngomong**
+>
+> **Status Kartu Ekspansi**
+>
+> Banyak perangkat yang telah diimplementasikan pada kartu ekspansi sekarang menjadi bagian dari *motherboard*. Namun, PCI masih digunakan untuk kartu-kartu khusus tertentu, meskipun banyak tugas yang telah dilakukan oleh kartu ekspansi sekarang dapat dilakukan oleh perangkat USB (dijelaskan nanti dalam jam ini).
+
+### Kartu Jaringan
+
+Untuk menghubungkan komputer ke jaringan, sebuah **kartu jaringan** dipasang di dalam komputer. Istilah lain yang digunakan untuk perangkat keras ini adalah **kartu adaptor jaringan** atau **kartu antarmuka jaringan (NIC)**; istilah-istilah tersebut sinonim. Kartu jaringan tersedia dari berbagai produsen dan dalam berbagai antarmuka termasuk Ethernet dan Asynchronous Transfer Mode (ATM), yang mungkin Anda ingat dari Jam ke-3, "Mengirim Data dari Sini ke Sana: Cara Kerja Jaringan Komputer." Dengan demikian, sebuah NIC beroperasi di Lapisan 1 dan 2 dari model OSI. Terlebih lagi, setiap NIC LAN berisi alamat MAC (Ethernet).
+
+Karena Ethernet hampir bersifat universal, sebagian besar perusahaan sekarang menawarkan antarmuka jaringan sebagai bagian dari *motherboard*, baik dengan chip Ethernet khusus (terhubung melalui PCI) atau dengan protokol Ethernet yang terintegrasi ke dalam perangkat keras *motherboard*. Kartu jaringan terpisah tidak diperlukan kecuali jika diperlukan beberapa antarmuka atau jenis jaringan lain, seperti ATM, digunakan. *Motherboard* yang lebih baru terkadang memiliki antarmuka jaringan ganda (Ethernet) yang terpasang di dalamnya.
+
+Anda akan menemukan bahwa kartu jaringan mudah dipasang. Biasanya, cukup matikan daya ke komputer, buka casing, temukan slot yang cocok dengan antarmuka kartu (biasanya ISA, EISA, atau PCI), posisikan kartu di atas slot, dan tekan kartu dengan kuat ke dalam slot untuk memasangnya. Misi selesai; nyalakan kembali komputer. Ketika komputer sudah berjalan sepenuhnya, Anda dapat menginstal **driver perangkat**. Komponen perangkat lunak ini (dijelaskan di bagian kedua jam ini) memungkinkan komputer untuk berkomunikasi dengan perangkat tersebut. Setelah perangkat lunak driver perangkat diinstal, Anda biasanya harus me-restart komputer Anda sekali lagi untuk terhubung ke jaringan. Jika ragu, bacalah manual yang menyertainya!
+
+### Kartu Adaptor Video dan Monitor
+
+Jika Anda meminta orang untuk mengidentifikasi "komputer," beberapa akan menunjuk ke monitor di meja mereka daripada casing yang berisi CPU. Meskipun mereka salah dalam mendefinisikan monitor sebagai komputer, mereka akan menunjukkan poin yang sebaiknya kita perhatikan. Manusia adalah makhluk yang berorientasi visual. Secara umum, gambar yang mencolok secara visual lebih menarik perhatian daripada kesan yang membosankan. Kotak komputer di samping meja Anda tidak menciptakan minat visual, yang menjelaskan mengapa produsen seperti Apple menawarkan CPU dalam warna-warna cerah. Ini menambah relevansi visual pada sebuah mesin. Ini juga menjual komputer.
+
+Sebaliknya, monitor menarik secara visual karena berwarna-warni dan penuh gerakan. Monitor komputer mendapatkan perhatian yang tidak sebanding dengan jumlah pekerjaan sebenarnya yang mereka lakukan. Papan ketik dan *mouse* adalah tempat bagian pekerjaan pengguna dilakukan; kotak sistem melakukan komputasi, tetapi monitor adalah apa yang kita lihat dan oleh karena itu apa yang kita tanggapi.
+
+Karena apa yang kita lihat di layar monitor video adalah bagian yang sangat penting dari cara kita berinteraksi dengan komputer, **kartu adaptor video**, atau **kartu video**, adalah bagian penting dari sistem. Kartu video mengubah informasi digital yang digunakan komputer secara internal menjadi format untuk ditampilkan di monitor komputer. Gambar di layar terdiri dari **piksel** (*picture elements*). Anggap saja piksel sebagai gambar kecil pada sebuah kisi, yang direpresentasikan oleh bit (angka 1 dan 0).
+
+Jumlah bit yang dibutuhkan untuk mendeskripsikan sebuah piksel disebut **kedalaman bit (*bit depth*)**. Kedalaman bit yang paling "dangkal" adalah 1. Satu bit biner dapat mewakili salah satu dari dua keadaan (1 dan 0), sebuah teknik untuk monitor monokrom. Kedalaman bit 2 dapat menggambarkan empat warna, dan seterusnya.
+
+> **Ngomong-ngomong**
+>
+> **Kedalaman Warna**
+>
+> **Kedalaman warna (*color depth*)** berkaitan dengan kualitas gambar yang dihasilkan oleh monitor, yang merupakan fungsi dari kedalaman bitnya, serta bagaimana bit tersebut digunakan.
+>
+> Layar 256 warna terkadang disebut **warna 8-bit**, karena 8 bit (atau delapan angka 1 dan 0) digunakan untuk memberitahu komputer warna apa yang akan ditampilkan di setiap piksel. Karena 8 bit dapat digabungkan menjadi 256 kombinasi yang berbeda, 256 warna dapat dideskripsikan dengan teknik ini. Langkah selanjutnya dari warna 8-bit adalah **warna 16-bit**, dan sungguh suatu perubahan! Dengan 16 bit, sebuah monitor dapat menampilkan hingga 65.536 warna di layar. Beberapa tahun yang lalu, warna 16-bit disebut sebagai *high color*.
+>
+> Saat ini, banyak monitor komputer dapat menampilkan jumlah warna yang tak terbatas dalam ruang warna **merah-hijau-biru (RGB)** dengan mengubah sinyal video merah (R), hijau (G), dan biru (B) dalam intensitas yang terus menerus bervariasi.
+
+Standar minimum untuk tampilan video pada komputer berbasis Intel disebut **VGA**, atau *video graphics adapter*, yang merupakan standar dasar yang sudah kuno. Yang lebih menarik adalah standar modern. Misalnya, tampilan yang beroperasi dalam mode **SuperVGA (SVGA)** dapat menampilkan hingga 16.777.216 warna karena mendukung deskripsi piksel sepanjang 24-bit.
+
+Di ujung kualitas tertinggi adalah monitor dengan kedalaman bit 32 bit (SuperVGA + Alpha Channel), sebuah mode grafis khusus yang digunakan oleh aplikasi yang membutuhkan gambar yang lebih baik lagi, seperti animasi dan video game. Prosedur ini menggunakan 24 bit untuk mendeskripsikan warna piksel dan 8 bit untuk mendeskripsikan difusi cahayanya (transparansi piksel). Anda telah melihat piksel-piksel ini ditampilkan di monitor yang lebih mahal. Mereka menghasilkan tampilan yang indah, bahkan menakjubkan.
+
+### The Universal Serial Bus (USB)
+
+Hanya beberapa tahun yang lalu—waktu yang lama dalam industri komputer—produsen komputer sering merancang dan membangun porta khusus vendor pada komputer. (Istilah **porta** digunakan di sini untuk menggambarkan "colokan," atau "konektor" di bagian belakang atau samping komputer.) Misalnya, porta *mouse* Apple adalah khusus Apple dan melarang *mouse* IBM untuk dicolokkan ke dalamnya.
+
+Untungnya, beberapa kelompok standar yang berpengaruh berhasil mempromosikan penggunaan porta standar untuk antarmuka tertentu. Salah satu set standar komunikasi data terkemuka adalah (dan masih) spesifikasi **Electronic Industries Association (EIA)**. EIA mempelopori standardisasi porta untuk **peralatan terminal data (DTE)**, seperti PC, dan koneksinya ke **peralatan komunikasi data (DCE)**, seperti modem.
+
+Meskipun ada upaya-upaya ini, porta khusus vendor menyebabkan masalah kompatibilitas, yang mengakibatkan ketidakmampuan untuk "colok dan mainkan" (*plug and play*) berbagai periferal dari produsen lain. Tidak hanya "colokannya" yang berbeda, **driver perangkat** (dibahas sebentar lagi) juga khusus produsen. Bagi pengguna PC non-teknis (sebagian besar populasi), menemukan driver yang benar untuk sebuah periferal sama seperti menyelam ke dalam lubang hitam teknis. Selain itu, banyak dari antarmuka ini tidak memungkinkan perangkat periferal (seperti *hard disk* eksternal) untuk dihubungkan atau dilepaskan tanpa me-restart (*rebooting*) komputer.
+
+Pada pertengahan 1990-an, beberapa perusahaan komputer berpengaruh berpartisipasi dalam mengembangkan spesifikasi **Universal Serial Bus (USB)** (berkat Intel, Microsoft, Philips, dan US Robotics). iMac G3 dari Apple (1998) adalah komputer pertama yang dibuat dengan porta USB. Saat ini, antarmuka USB (lihat Gambar 4.4) sudah umum dan telah menggantikan tidak hanya antarmuka khusus produsen, tetapi juga colokan dan soket standar lainnya.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-4.4.png" alt="gambar" width="580"/>
+</p>
+
+USB adalah standar bus serial (satu bit pada satu waktu) untuk menghubungkan perangkat periferal dengan komputer. USB memungkinkan ***hot swapping***: menghubungkan atau melepaskan perangkat tanpa me-restart komputer. USB mendukung hingga 127 koneksi perangkat per *host* dan dapat beroperasi dengan kecepatan transfer data 1,5 hingga 60Mbps. USB memungkinkan sebuah *host* untuk terhubung ke beberapa porta USB hilir (*downstream*) melalui **hub USB**, yang mirip dengan struktur pohon bercabang. Batasannya adalah lima tingkat tingkatan. Sebuah *host* dapat memiliki beberapa pengontrol *host* yang terpasang padanya.
+
+Untuk mengurangi jumlah antarmuka khusus produsen, USB mendefinisikan 19 kelas perangkat. Kelas tertentu menggambarkan bagaimana sebuah perangkat harus "berperilaku"—yaitu, bagaimana ia harus berkomunikasi dengan komputer yang terhubung dengannya. Akibatnya, antarmuka yang sama (konektor, kabel, dan driver perangkat lunak) dapat digunakan oleh perangkat apa pun yang mematuhi protokol untuk kelas tersebut. Sebagai salah satu contoh, Kelas `07h` mengatur perilaku untuk printer, terlepas dari apakah mereka dibuat oleh Dell, Apple, atau IBM.
+
+Selain itu, sistem operasi (OS, dibahas di bagian selanjutnya dari jam ini) sebuah komputer seharusnya mendukung semua kelas perangkat USB. Hanya beberapa tahun yang lalu, tidak mungkin membeli kamera digital tanpa CD yang menyertainya, yang penuh dengan perangkat lunak untuk memungkinkan kamera berkomunikasi dengan komputer. Sekarang, dan sebagai contoh lain, sistem operasi Vista dari Microsoft menyertakan dukungan untuk kelas perangkat `06h` (kamera digital). Begitu juga kamera Canon. Keduanya dapat bekerja sama, secara transparan bagi pengguna! (Saya menggunakan tanda seru di kalimat terakhir. Para pembaca yang telah lama berkecimpung di industri ini akan mengerti mengapa.)
+
+#### USB dan FireWire
+
+**FireWire**, yang diterbitkan sebagai **IEEE 1394** oleh Institute of Electronic and Electrical Engineers, mendefinisikan sebuah bus serial berkecepatan tinggi untuk menghubungkan periferal ke komputer. Begitu juga spesifikasi USB. Kedua standar ini berbeda dalam "perilaku" teknis mereka, dan kita tidak perlu mengkhawatirkan detail-detail ini. Jaringan Anda akan baik-baik saja dengan USB kecuali jika aplikasi Anda membutuhkan banyak kapasitas (dalam bit per detik) dan sensitif terhadap waktu. Contohnya adalah sistem audio dan video canggih. Anda akan membayar lebih untuk FireWire karena kinerjanya mengungguli USB yang lebih murah.
+
+### Sistem Operasi (OS) dan Perangkat Lunak Lainnya
+
+Perangkat keras komputer adalah subjek yang menarik. Tetapi jika dibiarkan sendiri, ia tak lebih dari rakitan logam, silikon, dan perekat teknologi tinggi lainnya yang bermuatan listrik tetapi diam. Agar perangkat keras ini efektif, agar ia dapat "menghitung," ia membutuhkan perangkat lunak.
+
+Memang, perangkat keras komputer dirancang untuk beroperasi dengan perangkat lunak, seperangkat instruksi yang memberitahu perangkat keras tugas-tugas yang harus dilakukannya untuk mendukung aplikasi pengguna akhir, seperti email. Sebuah **sistem operasi**, atau **OS**, adalah perangkat lunak dasar yang memungkinkan pengguna dan aplikasi mereka untuk berinteraksi dengan perangkat keras komputer. Jika perangkat keras adalah tubuh komputer, sistem operasi adalah otaknya.
+
+Tidak ada alasan teknis mengapa setiap program tidak bisa berisi OS dan mengontrol operasi perangkat keras. Tetapi pendekatan ini akan ceroboh karena OS membebaskan para perancang aplikasi dari keharusan mendalami seluk-beluk arsitektur fisik komputer, yang dengan sendirinya sudah kompleks.
+
+OS juga menawarkan antarmuka pengguna dan pemrograman yang konsisten serta cara standar untuk melakukan tugas-tugas sederhana seperti menyalin data antar aplikasi, menulis memo, mengedit foto, atau menempatkan lagu di iPod. Aplikasi memanggil layanan OS dengan **antarmuka pemrograman aplikasi (API)**, yang juga dikenal sebagai *system calls*. Sebuah API dapat meneruskan parameter, seperti data, ke OS dan menerima parameter yang memberitahu aplikasi tentang hasil operasi tersebut. Bagi non-programmer, pengguna dapat memanggil OS dari papan ketik, *mouse*, atau dengan menyentuh layar. Untuk fungsi *mouse* dan layar, OS menyediakan **antarmuka pengguna grafis (GUI**, diucapkan "gui").
+
+Sistem operasi yang umum—yang mungkin pernah Anda temui—adalah Windows dan Vista dari Microsoft, OS X dari Apple, UNIX, dan Linux.
+
+Ada beberapa jenis sistem operasi. Daftar berikut adalah kategorisasi umum. OS di komputer Anda mungkin menggunakan kombinasi dari kategori-kategori ini.
+* **Sistem tugas tunggal (*Single-tasking*)**—Melakukan satu tugas pada satu waktu. (Sebuah tugas juga disebut proses. Ini adalah sebuah instans dari program perangkat lunak yang sedang dieksekusi. Contohnya adalah operasi penjumlahan atau operasi cetak.)
+* **Sistem multitasking**—Dapat menjalankan beberapa tugas secara bersamaan dan memungkinkan program dari beberapa pengguna untuk berbagi dalam penggunaan CPU dan perangkat keras lainnya. Biasanya, OS memberikan setiap pengguna atau program pendukung pengguna sebuah "irisan" waktu. Pertukaran tugas terjadi begitu cepat sehingga operasinya transparan bagi pengguna.
+* **Sistem pengguna tunggal (*Single-user*)**—Digunakan oleh satu pengguna pada satu waktu di satu mesin pada satu waktu.
+* **Sistem multipengguna (*Multiuser*)**—Mendukung banyak sesi pengguna simultan di satu komputer.
+* **Sistem multipemrosesan (*Multiprocessing*)**—Beberapa komputer memiliki beberapa prosesor (CPU). Jika demikian, program yang berbeda mungkin berjalan di prosesor yang berbeda.
+
+#### Multitasking
+
+Sebuah sistem operasi mungkin menggunakan salah satu dari dua jenis multitasking: **kooperatif** dan **preemptif**. Pendekatan yang kedua lebih banyak ditemukan di OS terkemuka daripada yang pertama.
+
+**Multitasking kooperatif** mencegah OS membuat semua keputusan tentang tugas aplikasi mana yang diberikan sumber daya sistem, seperti CPU. Ketika sebuah aplikasi selesai dengan suatu tugas, sumber daya diteruskan ke aplikasi lain. **Multitasking preemptif** membuat OS yang mengambil keputusan tentang program mana yang mendapatkan penggunaan sumber daya sistem. Multitasking preemptif adalah model yang digunakan di Linux, UNIX, sistem operasi enterprise Microsoft Windows (Windows 2000, XP, 2003, dan seterusnya), dan NetWare.
+
+### Apa yang Terjadi Saat Komputer Dinyalakan
+
+Saat komputer dinyalakan, kita langsung melihat gambar dan teks di layar yang memberitahu kita bahwa penekanan tombol "on" kita berhasil, dan aktivitas sedang berlangsung untuk memungkinkan kita menggunakan mesin tersebut. Selama waktu ini, komputer sedang mempersiapkan perangkat keras dan OS-nya untuk mendukung aplikasi yang nantinya kita panggil saat kita mengklik sebuah ikon.
+
+Umumnya, proses startup ini—yang dijuluki oleh industri sebagai "**booting komputer**"—melibatkan eksekusi *firmware* dari memori hanya-baca (ROM), yang sering disebut **boot ROM**. *Firmware* ini pertama-tama memuat kode program dari disk dan kemudian mengeksekusi kode tersebut, yang disebut **boot loader**. Tugas *boot loader* adalah memuat bagian paling kritis dari OS, yang disebut **kernel**, dan memulai kernel berjalan. Nama kernel sangat tepat, karena ia merupakan pusat dari OS dan tetap berada di memori selama mesin dinyalakan. Ia bertanggung jawab atas tugas-tugas paling dasar, seperti manajemen input/output (I/O) dari periferal yang terpasang, manajemen memori, alokasi CPU, dan mengatur proses serta tugas untuk mendukung aplikasi pengguna.
+
+Mari kita asumsikan Anda diberitahu bahwa mesin Anda sekarang siap Anda gunakan. Windows menampilkan jendela berwarna (agak). Sebuah MAC memamerkan wajah senyum abstrak. Anda ingin masuk ke Internet, jadi Anda mengklik ikon di layar yang mengidentifikasi penyedia layanan Internet (ISP) Anda. Tindakan sederhana ini menghasilkan pemuatan perangkat lunak ISP dari disk Anda dan puluhan, mungkin ratusan, "rutinitas" perangkat lunak pendukung. Setelah itu, saat Anda berinteraksi dengan perangkat lunak ini dan Internet, OS melacak semua sumber daya ini dengan:
+* **Pengidentifikasi unik** untuk setiap proses perangkat lunak yang dieksekusi untuk mendukung sesi Anda. Ini disebut **ID proses (PID)**.
+* **Daftar lokasi memori** yang digunakan atau diizinkan untuk digunakan oleh program. Beberapa memori dicadangkan untuk OS dan "non-aplikasi" kritis lainnya.
+* **PID dari program**, yang meminta eksekusi program ini. Pengidentifikasi ini disebut **ID proses induk (PPID)**.
+* **Nama file** dari mana program tersebut dimuat.
+* **Sebuah file yang berisi nilai** dari semua lokasi penyimpanan CPU untuk program ini. Ini bukan memori konvensional. Ini diimplementasikan dengan perangkat keras khusus yang disebut **register**.
+* **Sebuah penghitung program (*program counter*)**, yang menunjukkan kode mana dalam program yang sedang berjalan.
+
+Rumit? Ya, tetapi cukup logis. Tidak seperti manusia, perangkat keras dan perangkat lunak komputer yang dirancang dengan baik selalu dapat dipahami karena semuanya beroperasi...ya, secara logis.
+
+Mari kita berhenti sejenak dan memeriksa item-item dalam daftar ini dan membandingkannya dengan aktivitas manusia yang umum: naik pesawat komersial. Maskapai penerbangan melacak sumber dayanya (penumpang) dengan:
+* **Pengidentifikasi unik** untuk setiap orang dalam penerbangan. Ini disebut **nomor reservasi**.
+* **Daftar kursi** di pesawat yang diizinkan untuk digunakan oleh penumpang. Beberapa kursi dicadangkan untuk kru dan penumpang kelas satu.
+* **Nama orang** yang membuat reservasi. Pengidentifikasi ini berisi informasi kartu kredit.
+* **Nomor penerbangan maskapai** dari mana orang tersebut memulai perjalanannya, untuk memeriksa bagasi yang hilang, misalnya.
+* **Sebuah daftar yang berisi informasi** tentang semua penumpang (terutama, setelah 9/11). Ini bukan data konvensional, tetapi informasi istimewa.
+
+Saya tidak bisa memperluas analogi ke operasi keenam, tetapi poin dari perbandingan ini adalah untuk menyadari bahwa aktivitas yang tampaknya rumit dari OS komputer mirip dengan banyak tugas kita sehari-hari: mencatat apa yang sedang terjadi.
+
+#### OS: Pekerja Keras Transparan dari Komputer
+
+Selama sesi di komputer, pengguna seharusnya tidak menyadari aktivitas OS. Terlebih lagi, akan tidak biasa jika Anda harus mendalami operasi OS di komputer Anda. Bahkan, pernyataan ini juga berlaku untuk OS di mesin lain yang mungkin menjadi bagian dari jaringan Anda, seperti *router* yang menghubungkan mesin Anda ke Internet. Jika pesan kesalahan muncul di layar Anda yang memberitahu Anda tentang masalah dengan sistem operasi Anda, langkah terbaik Anda adalah "memindahkan" komputer ke ahli OS terdekat—mungkin toko komputer terdekat. Beberapa teman dan kolega non-teknis saya telah mencoba memperbaiki masalah OS. Tidak hanya mereka tidak pernah berhasil, tetapi pada beberapa kesempatan mereka malah memperburuk keadaan.
+
+Meskipun demikian, integritas sistem operasi modern cukup baik, terutama jika dibandingkan dengan hanya 10 tahun yang lalu. Bukan prestasi kecil bagi OS untuk mengelola semua perangkat keras dan perangkat lunak di komputer modern. Baru-baru ini, saya menjalankan perangkat lunak deteksi virus di PC saya dan membiarkan jendela terbuka yang memberitahu saya jumlah file yang dapat diidentifikasi yang diperiksa oleh perangkat lunak virus. Yang saya maksud dengan "dapat diidentifikasi" adalah file dengan nama Windows, seperti "C:\Uyless Black\Networking in 24 Hours\Hour 4." Setelah pemindaian selesai, saya diberitahu bahwa 162.976 file telah dipindai. Perlu diingat bahwa banyak dari file-file ini berisi program, email, foto, video, presentasi slide, spreadsheet, dan sebagainya. Itu adalah banyak hal yang harus dijaga agar tetap berfungsi dengan baik.
+
+Satu poin lagi tentang sistem operasi dan perangkat lunak lainnya. Saya sarankan Anda mengizinkan setiap produsen untuk mengunduh perubahan pada produknya. Jika Anda memblokir pembaruan dan "perbaikan" ini, Anda akan mendapati diri Anda beroperasi dengan sistem yang sudah ketinggalan zaman. Ini bisa menjadi masalah karena OS yang usang mungkin mengandung masalah (*bug*) dan mungkin tidak memiliki peningkatan keamanan terbaru.
+
+### Contoh Sistem Operasi
+
+Untuk mengakhiri diskusi tentang sistem operasi, bagian ini menyoroti beberapa produk yang lebih banyak digunakan. Pertama, kita akan membahas Windows dan Vista dari Microsoft.
+
+#### Windows dan Vista
+
+Microsoft Windows adalah keluarga sistem operasi. Pada November 1985, Microsoft memperkenalkan Windows sebagai tambahan untuk MS-DOS sebagai tanggapan terhadap meningkatnya minat pada GUI dan keluhan tentang antarmuka pengguna yang buruk yang disediakan oleh MS-DOS—terutama jika dibandingkan dengan GUI Apple. Windows sekarang mendominasi pasar OS komputer pribadi dunia. Perkiraan bervariasi, tetapi sebagian besar survei mengklaim Windows memiliki sekitar 90% pangsa pasar.
+
+Microsoft mengambil pendekatan bahwa OS untuk rumah (dengan pengguna yang tidak berpengalaman) tidak boleh sama dengan OS untuk kantor (pengguna berpengalaman atau staf pendukung yang kompeten). Setelah bekerja secara ekstensif di kedua lingkungan, saya pikir filosofi ini masuk akal. Sebagian besar pengguna rumahan tidak membutuhkan kekuatan dan kerumitan OS yang berorientasi kantor. Mereka juga tidak membutuhkan label harga yang terkait dengan OS yang lebih kaya fitur.
+
+Dengan setiap rilis Windows, produk tersebut telah membaik. (Dengan Windows 95 (1995), OS Microsoft mulai mendukung multitasking preemptif.) OS Microsoft telah dikritik selama bertahun-tahun karena "ketidakramahan pengguna" dan kurangnya fungsionalitas. Saya setuju dengan beberapa keluhan ini, tetapi perlu dicatat bahwa Tuan Gates dan perusahaannya memulai pekerjaan OS mereka menggunakan MS-DOS dan harus menjaga aspek-aspek OS ini sebagai bagian dari sistem operasi masa depan mereka. Bagaimanapun, dengan pengenalan Windows XP pada tahun 2001, Microsoft mendapatkan pujian untuk OS-nya.
+
+Microsoft juga memasuki pasar server pada tahun 2003 dengan Windows Server 2003. Saat ini, Windows Server 2008 dijadwalkan sebagai penggantinya. Karena server memainkan peran kunci dalam jaringan komputer, mereka dibahas sebagai subjek terpisah pada Jam ke-5, 10, 14, dan 15–18.
+
+Vista dijadwalkan untuk menggantikan Windows XP. Vista menawarkan banyak fitur baru, termasuk GUI baru, alat pencarian yang lebih kuat, dan dukungan untuk aplikasi multimedia. Vista menyederhanakan berbagi file dan mempermudah instalasi jaringan rumah. Mungkin perubahan terbesar dari XP adalah fitur keamanan yang lebih baik, sebuah subjek untuk Jam ke-20, "Keamanan."
+
+#### Mac OS
+
+Pada masa-masa awal Windows, banyak pengguna Macintosh mengeluh bahwa Microsoft telah "mencuri" tampilan dan nuansa Macintosh. Para pengguna ini tampaknya tidak tahu bahwa GUI keren Apple mengandung banyak fitur yang pertama kali dikembangkan di Palo Alto Research Center (PARC) milik Xerox. Seperti yang disebutkan di jam sebelumnya, saya mengunjungi PARC pada tahun 1982 untuk mengevaluasi Ethernet. Saya tercengang ketika melihat GUI PARC, termasuk tempat sampah dan ikon file. Saya tidak bisa mengatakan apakah Steven Jobs mengambil ide PARC. Tetapi saya bisa mengatakan keduanya sangat mirip...dan GUI PARC datang lebih dulu.
+
+Bagaimanapun, pada tahun 1984 Apple menciptakan Macintosh OS, juga disebut Sistem. Ia memiliki antarmuka yang bersih dan sederhana, sangat cocok untuk pengguna non-teknis. Fitur-fitur ini, dikombinasikan dengan reputasi Macintosh yang membebaskan pengguna dari kekhawatiran tentang perangkat keras komputer dan perintah MS-DOS yang tidak jelas, membuat pengguna mengembangkan pengabdian yang hampir fanatik kepada Apple. (Saya adalah salah satu dari fanatik itu. Tidak seperti aplikasi MS-DOS, Apple memiliki—untuk saat itu—paket grafis luar biasa yang disebut MacDraw. Saya membeli Mac pertama saya karena MacDraw. Keesokan harinya, saya memutuskan kontak dengan seniman grafis yang telah menggambar tangan ilustrasi untuk buku-buku saya.)
+
+Mac OS awalnya datang dengan jaringan proprietary yang disebut LocalTalk, yang ditingkatkan menjadi AppleTalk. Itu adalah arsitektur berlapis, sangat mirip dengan model tujuh lapis OSI yang dijelaskan pada Jam ke-3. Dengan munculnya Internet, MacTCP tiba dan menggantikan AppleTalk. Setelah itu, pengguna Mac dapat terhubung ke Internet menggunakan rangkaian protokol TCP/IP.
+
+Apple telah menulis ulang perangkat lunak sistem operasinya untuk menciptakan **OS X**, sebuah OS yang dibangun di sekitar mikrokernel berbasis UNIX. Ini adalah sistem operasi preemptif yang bekerja sangat mirip dengan stasiun kerja teknis UNIX kelas atas dengan antarmuka yang ramah pengguna. OS X terbukti cukup andal dan telah membuat terobosan lebih jauh ke dalam komunitas artistik/teknis.
+
+#### UNIX dan Linux
+
+Sistem operasi terakhir yang kita periksa untuk komputer dan jaringan komputer adalah UNIX dan Linux. **UNIX** dimulai sebagai sebuah eksperimen di laboratorium komputer Bell Labs pada tahun 1969 dan sekarang menjadi sistem operasi server dan stasiun kerja yang populer. AT&T membuat UNIX tersedia bagi siapa saja di bawah pengaturan lisensi yang liberal. Lisensi tersebut mencakup semua kode sumber, yang merupakan praktik yang belum pernah terjadi pada waktu itu. Sejak awal, tumpukan protokol Internet TCP/IP disertakan dalam paket, yang selanjutnya memacu penggunaannya (dan membantu mendorong standar Internet yang relatif baru).
+
+UNIX berjalan di hampir setiap jenis komputer mulai dari yang kompatibel dengan Intel hingga server transaksi multiprosesor kelas atas yang digunakan oleh bank, lembaga keamanan publik, dan institusi lain. Perlu disebutkan bahwa pemilik merek dagang adalah The Open Group. Hanya sistem yang sepenuhnya patuh dan disertifikasi sesuai dengan Spesifikasi UNIX Tunggal yang memenuhi syarat untuk menggunakan merek dagang tersebut.
+
+UNIX, seperti adiknya Windows NT, adalah sistem operasi preemptif. Seperti yang disebutkan, tidak seperti setiap sistem operasi lain yang telah kita diskusikan, UNIX sering dikirimkan dengan kode sumber (seperangkat instruksi yang ditulis dalam bahasa komputer seperti C). Sebagian besar vendor sistem operasi komersial tidak menyediakan kode sumber karena mereka percaya itu adalah hak milik. Dengan UNIX, Anda sering mendapatkan kode sumber, yang berarti jika Anda bisa memprogram komputer, Anda bisa menyesuaikan sistem operasi.
+
+Sejak pertengahan 1990-an, varian baru dari UNIX yang disebut **Linux** telah muncul dan menerima banyak perhatian. Linux adalah sistem operasi mirip UNIX yang ditulis sedemikian rupa untuk menghindari batasan hak cipta pada UNIX sambil mempertahankan tampilan dan nuansanya. Dari perspektif biaya/manfaat, Linux adalah sistem operasi yang menarik.
+
+Terkenal karena penggunaannya di server, Linux didukung oleh banyak perusahaan. Linux beroperasi di berbagai mesin, termasuk komputer, pembaca E-book, DVR, perangkat video game, ponsel, dan *router*.
+
+Sebagai klien jaringan, UNIX dan Linux berkinerja cukup baik. Tumpukan protokol jaringan default mereka adalah model TCP/IP, yang merupakan seperangkat protokol yang digunakan di Internet. Server UNIX (atau Linux) adalah fondasi dari sebagian besar server web Internet. Kita akan melihat lebih dekat pada UNIX dan Linux pada Jam ke-17, "Jaringan UNIX dan Linux."
+
+### Driver Perangkat
+
+Sebuah **driver perangkat** adalah sebuah modul perangkat lunak yang beroperasi atas nama sebuah perangkat, seperti pemindai, printer, unit disk, dan sebagainya. Driver ini mengizinkan program perangkat lunak lain untuk berinteraksi dengan perangkat dan biasanya berkomunikasi dengan perangkat melalui bus komputer. Ketika sebuah program meminta sebuah layanan, katakanlah untuk mengakses data di *hard disk* eksternal, driver mengeluarkan perintah ke disk tersebut. Setelah disk mengirim data kembali ke driver, driver dapat memberitahu program tentang aktivitas tersebut, serta menyebabkan aplikasi mengambil tindakan lain. Driver sangat bergantung pada perangkat keras dan spesifik untuk sistem operasi. Di tingkat driver perangkat inilah produk menjadi paling spesifik untuk produsen.
+
+Driver perangkat cukup penting untuk arsitektur keseluruhan komputer karena mereka mengisolasi program aplikasi dan sistem operasi dari banyak detail perangkat keras tertentu. Misalnya, sebuah program aplikasi mungkin memiliki baris kode yang menginstruksikan komputer untuk mencetak dokumen. Kode tersebut mungkin "WRITE," "PRINT," atau "PRINTLN" dengan parameter dalam kode yang mengidentifikasi apa yang akan dicetak. Printer Hewlett-Packard memerlukan perintah yang berbeda dari PRINTLN generik, begitu pula dengan Komputer Apple, dan seterusnya. Driver menerima perintah perangkat lunak generik dan mengubahnya menjadi perintah spesifik yang digunakan oleh perangkat tersebut.
+
+### Ringkasan
+
+Di awal jam ini, kami mencatat bahwa sangat membantu untuk mengetahui sedikit (atau *byte*) tentang komputer untuk memahami aspek-aspek tertentu tentang jaringan komputer. Jam ini ditulis untuk membantu Anda melakukan hal itu.
+
+Jika Anda tidak memiliki pemahaman umum tentang cara kerja komputer, apa saja bagian-bagian komputer, atau apa itu sistem operasi, Anda masih dapat membangun jaringan Anda sendiri. Lagi pula, untuk jaringan kecil, produk vendor sering kali "colok dan mainkan."
+
+Meskipun demikian, jika Anda telah memahami konsep-konsep yang disajikan dalam jam ini, Anda akan membuat proses menghubungkan sistem Anda menjadi tugas yang jauh lebih mudah. Oke? Mari kita lihat bagaimana hasil Anda.
+
+---
+
