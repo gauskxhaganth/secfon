@@ -1277,7 +1277,7 @@ Wi-Fi lebih mahal daripada Bluetooth karena beroperasi pada kapasitas yang lebih
 
 Selama jam ini, kita telah belajar tentang komponen perangkat keras dan perangkat lunak utama yang membentuk jaringan berbasis komputer. Kita telah memeriksa router dan pekerjaan penting yang mereka lakukan terkait dengan penemuan rute dan penerusan. Sistem operasi server diperkenalkan, dengan sorotan pada yang mendominasi pasar. Pentingnya "kecepatan" ditekankan karena pengaruhnya terhadap *throughput* dan waktu respons. Jam ini diakhiri dengan survei media yang paling banyak digunakan untuk saluran komunikasi.
 
-> ¹ Kabel dipilin (diplintir/twisted) untuk meningkatkan kualitas sinyal listrik. apa itu sinyal listrik? Sinyal listrik adalah suatu bentuk transmisi energi melalui muatan listrik, seperti aliran tegangan atau arus, yang membawa informasi dari satu titik ke titik lain. Sinyal ini bisa berupa variasi yang berubah seiring waktu, seperti sinyal analog, atau memiliki nilai diskrit tertentu, seperti sinyal digital.
+> ¹ Kabel dipilin (diplintir/twisted) untuk meningkatkan kualitas sinyal listrik. Apa itu sinyal listrik? Sinyal listrik adalah suatu bentuk transmisi energi melalui muatan listrik, seperti aliran tegangan atau arus, yang membawa informasi dari satu titik ke titik lain. Sinyal ini bisa berupa variasi yang berubah seiring waktu, seperti sinyal analog, atau memiliki nilai diskrit tertentu, seperti sinyal digital.
 
 ---
 
