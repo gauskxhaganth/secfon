@@ -1,4 +1,4 @@
-# JAM 1
+# JAM ke 1
 ## Gambaran Umum Jaringan Komputer
 
 **Apa yang Akan Anda Pelajari dalam Jam Ini:**
@@ -202,7 +202,7 @@ Dalam jam ini, kita telah mempelajari tentang apa itu jaringan komputer dan baga
 
 ---
 
-# JAM 2
+# JAM ke 2
 ## Manfaat Jaringan Komputer
 
 **Apa yang Akan Anda Pelajari dalam Jam Ini:**
@@ -330,7 +330,7 @@ Ketika sumber daya komputer dibagikan melalui jaringan, para penggunanya menuai 
 
 ---
 
-# JAM 3
+# JAM ke 3
 ## Mengirim Data dari Sini ke Sana: Cara Kerja Jaringan Komputer
 
 **Apa yang Akan Anda Pelajari dalam Jam Ini:**
@@ -605,7 +605,7 @@ Kita telah membahas banyak materi dalam jam ini. Informasi ini penting dan akan 
 
 ---
 
-# JAM 4
+# JAM ke 4
 ## Konsep Komputer
 
 **Apa yang Akan Anda Pelajari dalam Jam Ini:**
@@ -938,3 +938,75 @@ Meskipun demikian, jika Anda telah memahami konsep-konsep yang disajikan dalam j
 
 ---
 
+# JAM ke 5
+## Konsep Jaringan
+
+**Apa yang Akan Anda Pelajari dalam Jam Ini:**
+* Elemen perangkat keras dan perangkat lunak utama dari sebuah jaringan
+* Kebutuhan akan kecepatan dalam jaringan komputer
+* Perangkat keras jaringan: router (switch, bridge, hub), server
+* Perangkat lunak jaringan: sistem operasi server
+* Pilihan media untuk tautan komunikasi
+
+Selama empat jam terakhir, kita telah memeriksa komponen dasar komputer dan bagaimana komponen-komponen ini berhubungan dengan jaringan. Jam ini akan memperluas informasi tersebut dan menjelaskan perangkat keras serta perangkat lunak jaringan secara lebih mendalam. Beberapa topik yang dibahas di sini telah diperkenalkan sebelumnya. Untuk jam ini, kita akan melihatnya lebih dekat. Pembahasan sebelumnya memandang topik-topik tersebut sebagai bahan-bahan yang berdiri sendiri dalam resep jaringan. Sekarang kita akan mencampurnya sedikit dan menemukan bagaimana mereka berinteraksi untuk menyediakan layanan yang koheren bagi pengguna. Karena kebutuhan dan cakupannya, kita akan membagi subjek perangkat lunak jaringan menjadi lebih dari satu jam. Bagian akhir dari jam ini adalah pengenalan **Sistem Operasi Server (SOS)**. Di Bagian IV, "Sistem Operasi Jaringan," kita akan kembali membahas SOS dengan detail lebih lanjut.
+
+### Elemen-elemen Jaringan
+
+Sebuah komputer, seperti PC dengan perangkat lunak khusus, dapat memenuhi peran perangkat keras dan perangkat lunak yang dijelaskan dalam jam ini. Namun, perangkat keras dan perangkat lunak komputer tersebut telah dirancang untuk mendukung lingkungan komputasi serbaguna. Jadi, komputer konvensional adalah seorang "generalis": ia melakukan layanan generik dengan baik tetapi tidak dirancang khusus untuk tugas-tugas spesifik, seperti jaringan komunikasi data. Untuk mengilustrasikan ide ini, kita akan memeriksa dua perangkat keras jaringan utama: **router** dan **server**. Kita akan melanjutkan diskusi ini dengan pemeriksaan komponen kunci dari perangkat lunak jaringan: **sistem operasi server**. Kita akan mengawali topik-topik ini dengan diskusi tentang kecepatan jaringan komputer.
+
+### Kebutuhan akan Kecepatan
+
+Kita telah belajar di Jam ke-1, "Gambaran Umum Jaringan Komputer," bahwa istilah "kecepatan" mengacu pada seberapa cepat isi sebuah paket dikirim ke penerima. Waktu ini bergantung pada berapa lama mesin jaringan memproses sebuah paket, seperti menerima paket dari tautan komunikasi, memeriksa alamat tujuannya, dan meneruskannya ke tautan lain. Untuk analisis kita di sini, kecepatan tidak berarti waktu yang dibutuhkan sebuah paket untuk melakukan perjalanan melalui tautan. Waktu perjalanan, atau **penundaan propagasi**, adalah aspek kecepatan yang diatur oleh hukum fisika.
+
+Apapun definisi kecepatan, pengguna menginginkan jaringan yang "cepat". Mereka menginginkan respons yang cepat atas permintaan halaman baru selama sesi Web; mereka menginginkan penyelesaian yang cepat atas permintaan transfer file mereka. Bahkan jika teman pena elektronik mereka membutuhkan waktu sejenak untuk mengetik pesan teks, mereka menginginkan tampilan instan dari masukan kebetulan dari mitra mereka.
+
+Jadi, selain persyaratan jaringan komputer untuk mengirimkan informasi yang akurat kepada pengguna akhir, jaringan juga harus mengirimkan informasi ini secara tepat waktu. Tugas ini bukanlah hal yang mudah. Ambil contoh Internet. Internet memproses miliaran paket 24/7, memberikan penundaan rata-rata melalui Internet kurang dari seperempat detik, dan hanya kehilangan sekitar 2–3% dari miliaran paket tersebut. Dan, jangan lupa: Perangkat lunak di komputer Anda memastikan paket yang hilang (jika diperlukan) dikirim ulang. Ini adalah layanan luar biasa yang sebagian besar dari kita anggap biasa saja.
+
+#### Faktor Kecepatan
+
+Dua faktor berkontribusi pada kecepatan...atau kekurangannya: (a) penundaan dalam memproses lalu lintas di **perangkat keras** dan (b) penundaan dalam memproses lalu lintas di **perangkat lunak**. Meskipun demikian, terlepas dari efisiensi dan kecepatan perangkat keras dan perangkat lunak, pada akhirnya mereka adalah budak dari jumlah data yang harus mereka proses dalam waktu tertentu.
+
+Misalnya, selama waktu-waktu tertentu dalam sehari, lebih banyak pengguna yang masuk ke jaringan daripada di waktu lain, yang tentu saja menghasilkan lebih banyak lalu lintas (paket) untuk diproses oleh perangkat keras dan perangkat lunak. Jika perangkat keras dan perangkat lunak tidak dapat memproses setiap paket saat tiba, data ditempatkan ke dalam **antrean** di memori atau di disk untuk menunggu ketersediaan sumber daya. Idenya sama seperti kita menunggu dalam antrean di bioskop untuk membeli tiket. Kita tetap berada di antrean ini sampai penjual tiket dapat melayani kita. Jika banyak pelanggan tiba sebelum kita dan sedang menunggu dalam antrean di depan kita, kita mengalami penundaan dalam membeli tiket kita. Seperti paket data yang mendapatkan layanan dari CPU, kita mengalami waktu respons yang lebih lama saat mendapatkan layanan dari penjual tiket.
+
+Penjelasan ini juga menjelaskan mengapa Anda mungkin mengalami waktu respons yang lebih lama saat terhubung ke jaringan data. Ada lebih banyak pengguna yang masuk; mereka menghasilkan lebih banyak lalu lintas; antreannya lebih besar. Hampir sesederhana itu. Faktor lainnya adalah campuran lalu lintas yang sedang diproses oleh jaringan. Jika banyak pengguna video dan suara aktif, jaringan harus memproses paket yang jauh lebih banyak, karena aplikasi suara dan video membutuhkan lebih banyak *bandwidth* (dalam bit per detik) daripada email dan pesan teks.
+
+Kecepatan perangkat keras dan perangkat lunak dapat diukur dengan beberapa cara—beberapa dilakukan di atas kertas, yang lain dilakukan di laboratorium. Tes terbaik mengukur kinerja dunia nyata, atau bagaimana data diproses dalam situasi yang ada. Untungnya bagi Anda, pada saat Anda membuat keputusan tentang komponen perangkat keras dan perangkat lunak jaringan Anda, vendor Anda telah menghabiskan banyak jam dalam desain dan pengujian produk mereka—semua dengan tujuan memberikan pemrosesan yang cepat untuk meminimalkan penundaan.
+
+#### Pertimbangan Perangkat Keras
+
+Kecuali jika spesialisasi Anda adalah kinerja jaringan, Anda biasanya dibebaskan dari keharusan melakukan tes pada kecepatan perangkat keras. Dengan situasi seperti itu, apa yang harus Anda waspadai? Aspek apa dari kinerja perangkat keras yang mungkin menjadi perhatian yang valid? Jika Anda memiliki kekhawatiran, periksa kinerja vendor Anda pada komponen berikut:
+* **Kapasitas CPU** (diukur dalam kecepatan clock, bit atau operasi titik mengambang per detik [FLOPS], atau untuk jaringan, jumlah paket yang diproses per detik)
+* **Jumlah memori dan kinerja aksesnya** (latensi untuk mengambil data dari dan mengirim data ke lokasi memori)
+* **Efisiensi dan kecepatan cache** (latensi untuk mengambil data dari dan mengirim data ke CPU)
+* **Jumlah disk dan waktu untuk mengakses serta mentransfer data** ke dalam dan ke luar komputer
+* **Kapasitas kartu jaringan** dalam hal kecepatan dan kemampuan buffering
+
+#### Pertimbangan Perangkat Lunak
+
+Demikian pula, mengingat bahwa Anda biasanya akan dibebaskan dari keharusan melakukan tes pada efisiensi perangkat lunak, apa yang harus Anda waspadai? Dengan risiko penyederhanaan yang berlebihan, selain membeli produk yang berkinerja lebih baik, kemungkinan besar perangkat lunak yang berkinerja buruk akan berada di luar jangkauan sebagian besar tindakan perbaikan yang tersedia bagi Anda. Tetapi beberapa opsi biasanya tersedia di sebagian besar produk vendor perangkat lunak.
+
+Salah satu opsinya adalah meningkatkan jumlah memori yang tersedia untuk program. Perubahan ini dapat menghasilkan dua manfaat, keduanya berkontribusi pada kinerja yang lebih baik. Pertama, kode program mungkin tidak perlu ditukar masuk dan keluar dari memori komputer ke dan dari disk. Dengan memori terbatas, sistem operasi mungkin terpaksa melakukan **operasi *paging***: memindahkan modul perangkat lunak ke dan dari disk, situasi yang dapat menyebabkan kinerja yang buruk. Kedua, untuk beberapa program perangkat lunak, ruang untuk antrean mereka ditingkatkan, sehingga memungkinkan perangkat lunak untuk melayani beban lalu lintasnya dengan lebih baik.
+
+> **Tahukah Anda?**
+>
+> **Bicaralah dengan Vendor Anda**
+>
+> Untuk masalah kinerja perangkat keras dan perangkat lunak, pendekatan terbaik adalah berbicara dengan vendor Anda. Merupakan kepentingan mereka untuk membuat Anda senang. Tetapi dialog ini biasanya bukan hanya masalah vendor menjaga hubungan dengan pelanggan tertentu. Vendor ingin menyelesaikan masalah itu sendiri. Plus, dan ini adalah nilai tambah yang sangat besar, vendor memiliki prosedur canggih untuk membantu Anda dalam menilai "kecepatan" jaringan Anda. Anda membayar untuk produk tersebut; manfaatkan kontrak Anda sebaik-baiknya.
+
+Meskipun ada peringatan ini, banyak komponen perangkat keras dan perangkat lunak jaringan menyediakan kemampuan diagnostik bagi pengguna, yang tersedia untuk Anda. Di Bagian IV, kita akan membahas topik ini lebih detail.
+
+Untuk sisa jam ini, kita akan mengalihkan perhatian kita ke beberapa elemen perangkat keras dan perangkat lunak utama yang ditemukan di banyak jaringan komunikasi data. Pertama, kita akan memeriksa dua komponen perangkat keras: **router** dan **server**. Selanjutnya, kita akan menyoroti **sistem operasi server**, dengan penekanan pada Microsoft Windows Server, UNIX dan Linux, serta Novell NetWare. Sisa jam ini diakhiri dengan pengenalan media yang umum digunakan, seperti kabel tembaga dan serat optik.
+
+### Router
+
+Sebuah **router** adalah perangkat keras khusus dengan sistem operasi yang disesuaikan—semua dirancang untuk menyampaikan (*relay*) atau merutekan (*route*) paket antar *node* dalam jaringan data. Meskipun istilah "data" digunakan dalam kalimat sebelumnya, router secara rutin memproses paket yang berisi suara, video, foto, dan musik. Semua lalu lintas pengguna telah dikodekan menjadi citra biner dari angka 1 dan 0. Jadi, router tidak peduli dengan sifat spesifik dari lalu lintas tersebut. Meskipun demikian, manajer jaringan memiliki alat untuk menempatkan parameter prioritas di *header* paket untuk memberitahu router bahwa ia harus memperlakukan paket tertentu, seperti lalu lintas suara yang sensitif terhadap waktu, dengan prioritas lebih tinggi daripada, katakanlah, transfer file.
+
+Gambar 1.3 di Jam ke-1 adalah contoh situasi router sederhana: satu yang menghubungkan dua jaringan rumah kecil ke Internet ke router "kelas bawah" (*low-end*). Router-router ini biasanya hanya mendukung beberapa antarmuka Ethernet dan sejumlah perangkat nirkabel yang terbatas. Sebaliknya, router yang digunakan di perusahaan, seperti bank dan toko ritel, jauh lebih kuat. Mesin "kelas atas" (*high-end*) ini berisi beberapa prosesor dan perangkat keras khusus yang disebut **sirkuit terpadu khusus aplikasi (ASICs)**. Seperti namanya, IC ini disesuaikan untuk melakukan tugas-tugas khusus. Untuk router, mereka membantu dalam tugas (a) menemukan rute ke tujuan dan (b) meneruskan paket berdasarkan penemuan rute ini. Terlepas dari kemungkinan penggunaan ASIC, semua router terlibat dalam pekerjaan terpenting mereka: **perutean** dan **penerusan**.
+
+#### Perutean (*Routing*)
+
+*Routing*, atau lebih tepatnya, **penemuan rute**, melibatkan pembangunan **tabel perutean** atau **basis informasi perutean (RIB)** di memori router. Tabel ini menyediakan layanan yang sama seperti peta jalan. Peta jalan menunjukkan ke mana (jalan mana) harus mengendarai kendaraan ke kota berikutnya menuju kota tujuan akhir. Demikian pula, tabel perutean menunjukkan ke mana (tautan komunikasi mana) harus meneruskan lalu lintas (paket) ke *node* berikutnya menuju komputer tujuan akhir. Entri dalam tabel perutean dibuat oleh sebuah proses yang disebut **pengiklanan rute (*route advertising*)**, yang ditunjukkan pada Gambar 5.1.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-5.1.png" alt="gambar" width="580"/>
+</p>
