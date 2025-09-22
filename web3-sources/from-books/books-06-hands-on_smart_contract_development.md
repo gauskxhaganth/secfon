@@ -5164,3 +5164,1324 @@ Di bab selanjutnya, kita akan mengerjakan cara menghubungkan *smart contract* ke
 
 ---
 
+# BAB 9
+## Menghubungkan UI ke Kontrak Kita
+
+Mari kita mulai membuat UI untuk DApp kita. Kita akan menggunakan kerangka kerja (*framework*) *frontend* yang disebut **React** untuk mengimplementasikan fitur-fitur yang kita butuhkan agar pengguna dapat berinteraksi dengan *blockchain*. React akan membantu kita membuat aplikasi *frontend* dengan mudah, lengkap dengan berbagai rute (*route*) untuk navigasi pengguna, formulir masukan (*input form*), dan tombol untuk mengirimkan data, serta banyak lagi. Dalam bab ini, kita akan belajar cara menggunakan React untuk bekerja dengan *blockchain* dan mengirimkan fungsi yang akan membaca dan menulis ke *blockchain*.
+
+### Mengapa React?
+
+Pertama-tama, apa itu React? **React** adalah pustaka (*library*) JavaScript yang dibuat oleh Facebook yang digunakan untuk membangun aplikasi *frontend* atau sisi klien (*client side*) dari sebuah aplikasi. Jika aplikasi Anda menggunakan React, apa pun yang dilihat oleh pengguna—lapisan tampilan (*view layer*)—disajikan dari aplikasi React. React menggunakan **komponen** dan **manajemen data**, seperti *reducer* dan *action*, serta menyediakan **JSX** (ekstensi sintaks) dan **Virtual DOM**. Belum lagi, kode pustaka yang mudah digunakan kembali akan membantu Anda membangun *frontend* aplikasi Anda dengan cepat.
+
+Jika Anda menjadi seorang *blockchain engineer*, kemungkinan besar Anda harus terbiasa dengan **Web3** dan **React** untuk mengembangkan aplikasi Web3. Untuk mempelajari lebih lanjut tentang React, Anda dapat melihat situs resminya.
+
+Mengapa kita ingin menggunakan React? React adalah *framework frontend* yang paling banyak digunakan bersama **Truffle**. Karena penggunaannya yang sangat luas, akan jauh lebih mudah untuk menemukan dokumentasi dan jawaban atas pertanyaan Anda. Sebagian besar pertanyaan yang akan Anda temukan di Stack Overflow tentang *frontend* dan Ethereum akan menggunakan React. Selain itu, sebagian besar tutorial yang Anda temukan secara daring akan ditulis menggunakan React.
+
+Kita akan menggunakan **React Box**. React Box adalah *scaffolding* ringan yang memungkinkan kita berinteraksi dengan cepat dengan *smart contract* kita melalui *frontend* React. Anda dapat melihat dokumentasinya di repositori GitHub React Box dan mencobanya sendiri.
+
+Meskipun React adalah *framework frontend*, React Box adalah cara cepat untuk menjalankan aplikasi React dan membuatnya berinteraksi dengan Web3. Tanpa React Box, kita perlu membuat banyak folder dan melakukan penyiapan yang akan menampung kontrak, migrasi, dan konfigurasi Web3 kita.
+
+Mari kita mulai dengan menyiapkan React Truffle Box agar kita dapat membaca dan menulis ke *blockchain*.
+
+### Penyiapan Pengembangan (Dev Setup)
+
+Sekarang, mari kita siapkan kontrak `Greeter` kita dengan React Truffle Box. Kita perlu mengikuti langkah-langkah di repositori React Truffle Box.
+
+Buat direktori baru:
+
+```bash
+mkdir greeter-dapp
+```
+
+Pindah ke direktori baru:
+
+```bash
+cd greeter-dapp
+```
+
+Instal Truffle secara global:
+
+```bash
+npm install -g truffle
+```
+
+Dan jalankan perintah ini di dalamnya untuk membuka (*unbox*) React Truffle Box:
+
+```bash
+truffle unbox react
+```
+
+Proyek `Greeter` Anda sekarang seharusnya menyertakan file-file berikut:
+
+```
+greeter
+├── client
+│   └── src
+├── contracts
+│   └── ...
+├── migrations
+├── test
+└── truffle-config.js
+```
+
+Aplikasi React kita dapat ditemukan di dalam direktori `/client/src` pada direktori `greeter` kita. Di sini Anda akan menemukan semua file *frontend* yang akan kita gunakan dalam bab ini dan nanti dengan aplikasi penggalangan dana kita.
+
+Mari kita mulai dengan mengimpor kontrak kita ke React dan menjalankannya dengan Truffle agar kita dapat memanggil metode dari kontrak `Greeter` kita dan berinteraksi dengannya di *frontend* aplikasi kita.
+
+### Truffle
+
+Nanti dalam bab ini, kita akan mengimpor kontrak `Greeter` kita sendiri. Tapi mari kita jalankan semuanya terlebih dahulu dengan kontrak standar bawaan React Truffle Box. Nanti saat Anda membangun aplikasi Truffle Anda sendiri, Anda dapat mengikuti proses yang sama untuk membangun aplikasi *blockchain* unik Anda.
+
+Pertama, kita akan menjalankan perintah berikut untuk memulai server Truffle kita:
+
+```bash
+truffle develop
+```
+
+`truffle develop` tidak hanya memulai server untuk Anda, tetapi juga membuat akun dengan *ether* yang dapat Anda gunakan untuk pengujian DApp Anda. Ini juga menyertakan *private key* dan *mnemonic* yang bisa Anda gunakan.
+
+Saat berjalan, Anda akan melihat sesuatu yang mirip seperti ini di terminal Anda:
+
+```
+Truffle Develop started at http://127.0.0.1:9545/
+
+Accounts:
+(0) 0xb94454c83ff541c82391b4331e75d2e2b16bae9e
+(1) 0xf1f8d85aef05e7587cbc3ddae9753f4865a3a349
+(2) 0xe6a27378e478eb6d3fe2d97c916e8b4813889d1e
+(3) 0x3e41e8e0cdace3079cd6084380f00cd855cd28ea
+(4) 0x135d3e70c2a2633141a433fa349d18d3dcf36c40
+(5) 0x3c84bd6957fc3d6093be672df7e2b40caa427f5e
+(6) 0x661c74f3765d87ab881fe09eec4ef019fc8098bd
+(7) 0x44ee71f3e047ac88b203775621a4e8bfd4112b24
+(8) 0x3a9553825d228b6c2f5fdfcc6d6cd2a96a527c0a
+(9) 0x2ddb954595ef1a9f5f27ed22e04f3009c8789a03
+
+Private Keys:
+(0) 98831bde4e476ffc7dd7021860bd93c4a0ac95b08368057256db49cef900990d
+(1) 632b963c3d3b1b03197e6120fb5200bbfe155f36f60c9e0a461a046aca3e53e6
+(2) df389a349ae4f7c29fc4da3ee70e5bdc0bf7e4eeeeb3cafcecb38cb43266bb1f
+(3) 88eb15bb7e98a24b76eafcbecd4de419c17f2c5b00cb129ab84b276857d9f303
+(4) 11b862620fd7150ba20a255a88bd4046c9d674d36d297811e06008fde588983a
+
+Mnemonic: flush cupcake slice area urban slice motor click rocket response lobster sustain
+
+⚠ Penting ⚠ : Mnemonic ini dibuat untuk Anda oleh Truffle. Ini tidak aman.
+Pastikan Anda tidak menggunakannya di blockchain produksi, atau Anda berisiko kehilangan dana.
+
+truffle(develop)>
+```
+
+Salin `http://127.0.0.1:9545/` dan *private key* pertama yang Anda lihat dari output setelah menjalankan `truffle develop`. Kita akan menggunakannya nanti.
+
+Setelah Anda melihat konsol interaktif Truffle sudah aktif, kita dapat meng-*compile* kontrak `Greeter` kita dengan perintah `compile`:
+
+```bash
+truffle(develop)> compile
+```
+
+Berikut adalah output-nya:
+
+```
+Compiling your contracts...
+===========================
+> Compiling ./contracts/Migrations.sol
+> Compiling ./contracts/SimpleStorage.sol
+```
+
+Menjalankan `compile` akan membuat file JSON dari semua kontrak Anda di bawah direktori `build/contracts` dalam proyek Anda.
+
+Selanjutnya, kita akan men-*deploy* kontrak bawaan React Truffle Box ke jaringan tes Ethereum kita dengan menjalankan perintah berikut:
+
+```bash
+migrate
+```
+
+Berikut adalah output-nya:
+
+```
+Starting migrations...
+======================
+> Network name:    'develop'
+> Network id:      5777
+> Block gas limit: 0x6691b7
+
+1_initial_migration.js
+======================
+
+   Deploying 'Migrations'
+   ----------------------
+   ...
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.0021003 ETH
+
+2_deploy_contracts.js
+=====================
+   ...
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.00522786 ETH
+
+Summary
+=======
+> Total deployments:   2
+> Final cost:          0.00732816 ETH
+```
+
+Sekarang setelah sisi Truffle sudah siap, mari kita siapkan dan jalankan aplikasi React kita.
+
+### Penyiapan React Truffle Box
+
+Sebelum kita memulai pengembangan aplikasi *frontend* kita, kita perlu mengganti jaringan MetaMask kita agar sesuai dengan apa yang kita lihat sebelumnya saat menjalankan `truffle develop`. Ini harus sama agar kita terhubung ke `localhost` yang benar dan menyajikan informasi yang tepat.
+
+Saat kita menjalankan `truffle develop`, kita melihat ini:
+
+```
+Truffle Develop started at http://127.0.0.1:9545/
+```
+
+Salin `http://127.0.0.1:9545/` ke *clipboard* Anda. Selanjutnya, kita perlu membuka MetaMask dan mengimpor jaringan tersebut. Buka ekstensi MetaMask dan pilih **Jaringan Utama Ethereum** (*Main Ethereum Network*). Kita perlu memilih **RPC Kustom** (*Custom RPC*) dan memasukkan `http://127.0.0.1:9545` di tempat yang bertuliskan "URL RPC Baru" (*New RPC URL*).
+
+Anda seharusnya melihat ini di ekstensi MetaMask setelah memilih RPC Kustom, seperti yang diilustrasikan pada Gambar 9-1.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-9.1.png" alt="gambar" width="580"/>
+</p>
+
+Selanjutnya, kita perlu mengimpor salah satu akun tes palsu yang telah kita simpan sebelumnya. Di MetaMask, pilih ikon lingkaran di kanan atas, di mana Anda akan melihat sesuatu yang mirip dengan menu *dropdown* pada Gambar 9-2.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-9.2.png" alt="gambar" width="580"/>
+</p>
+
+Tempelkan *private key* di bagian impor MetaMask dan pilih **Impor** (lihat Gambar 9-3).
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-9.3.png" alt="gambar" width="580"/>
+</p>
+
+Jika akun berhasil diimpor, Anda akan melihat sejumlah besar *ether* muncul di akun baru Anda, seperti yang diilustrasikan pada Gambar 9-4.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-9.4.png" alt="gambar" width="580"/>
+</p>
+
+Sekarang setelah Truffle dan MetaMask aktif dan berjalan, kita akan menjalankan aplikasi React.
+
+Pindah ke direktori `src` di dalam repositori `Greeter` kita dan instal dependensinya:
+
+```bash
+cd client // ini adalah perintah cd yang memungkinkan Anda pindah direktori
+npm i
+```
+
+Setelah semuanya terinstal, kita bisa memulai *frontend* aplikasi Anda agar kita benar-benar dapat melihat aplikasi beraksi:
+
+```bash
+npm run start
+```
+
+Sekarang Anda akan dapat melihat DApp Anda di *browser* jika Anda membuka `http://localhost:3000/`. Tampilannya akan terlihat mirip dengan Gambar 9-5.
+
+Anda seharusnya melihat MetaMask muncul meminta Anda untuk menyetujui permintaan koneksi. Lihat Gambar 9-6.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-9.6.png" alt="gambar" width="580"/>
+</p>
+
+Sekarang setelah aplikasi dasar kita aktif dan berjalan, mari kita impor kontrak kita agar dapat menggunakan kontrak `Greeter`.
+
+### Mengimpor Kontrak Greeter Kita
+
+Saat ini, kita masih menggunakan kontrak bawaan dari React Box. Kita perlu mengimpor kontrak `Greeter` yang telah kita tulis sebelumnya agar bisa berinteraksi dengannya. Kembali ke repositori kontrak `Greeter` Anda, dan salin file `Greeter.sol`. Di dalam file `contracts` pada repositori `Greeter` yang baru saja kita buat, buat sebuah file baru:
+
+```bash
+touch contracts/Greeter.sol
+```
+
+Buka repositori `Greeter` di editor teks Anda dan tempelkan (*paste*) kontrak `Greeter` ke dalam file tersebut.
+
+Buat file baru untuk migrasi seperti yang kita lakukan sebelumnya:
+
+```bash
+touch migrations/3_deploy_greeter.js
+```
+
+Sekarang kita akan menjalankan kembali perintah `compile` dan `migrate` agar kita yakin sedang berinteraksi dengan kontrak `Greeter` baru yang telah kita impor. Jika kita tidak melakukan ini, terminal Truffle Develop kita akan tetap berinteraksi dengan kontrak standar dari React Truffle Box.
+
+Setelah kontrak kita berhasil di-*compile* dan proses migrasi selesai, mari buka direktori `client` di aplikasi kita dan mulai membuat UI untuk kontrak kita sendiri.
+
+Buka file `App.js`. Kita akan memodifikasi beberapa kode untuk berinteraksi dengan kontrak kita. Mulailah dengan menghapus semua *boilerplate* standar Truffle di dalam fungsi `return`. Kode Anda sekarang seharusnya terlihat seperti ini:
+
+```jsx
+return (
+    <div className="App">
+    </div>
+);
+```
+
+Sekarang, mari tambahkan *header* untuk kontrak `Greeter` kita:
+
+```jsx
+return (
+    <div className="App">
+        <h1>Greeter</h1>
+    </div>
+);
+```
+
+Selanjutnya, alih-alih mengimpor kontrak *boilerplate* `SimpleStorage`, mari kita impor kontrak `Greeter` kita agar dapat mulai memanggil metode dari kontrak `Greeter` yang telah kita tulis sebelumnya:
+
+```javascript
+import GreeterContract from "./contracts/Greeter.json";
+```
+
+Masih di file `App.js`, dan di dalam fungsi `componentDidMount`, kita akan mengganti baris berikut dengan ID jaringan kontrak `Greeter` kita:
+
+```javascript
+const deployedNetwork = SimpleStorageContract.networks[networkId];
+```
+
+Ini akan memungkinkan kita untuk benar-benar terhubung ke kontrak `Greeter` kita:
+
+```javascript
+const deployedNetwork = GreeterContract.networks[networkId];
+```
+
+Di dalam fungsi `componentDidMount` yang sama, ganti referensi kontrak `SimpleStorage` dengan referensi `GreeterContract` kita sendiri:
+
+```javascript
+const instance = new web3.eth.Contract(
+    GreeterContract.abi,
+    deployedNetwork && deployedNetwork.address,
+);
+```
+
+Sekarang mari kita tambahkan kontrak `Greeter` agar pengguna dapat berinteraksi dengannya melalui *frontend* React kita.
+
+### Menambahkan Fungsionalitas Kontrak Greeter
+
+Kita perlu membuat beberapa modifikasi lagi pada kode *boilerplate* `App.js` sebelum kita dapat bekerja dengan kontrak `Greeter` kita.
+
+Di dalam file `App.js` kita, kita perlu menggunakan Web3 agar dapat terhubung ke jaringan Ethereum. Di dalam metode `componentDidMount` kita, kita akan mengakses Web3 dan menyimpannya di dalam *state* React kita. Kita akan tetap menggunakan sebagian besar kode *boilerplate*, dengan beberapa tambahan.
+
+Untuk menyiapkan kontrak `Greeter` agar bekerja dengan *frontend* kita, pertama-tama kita perlu menyingkirkan beberapa kode *boilerplate* dari Truffle Box. Kita pertama-tama perlu mengubah *state* dari komponen `App.js` kita agar cocok dengan kode kontrak kita:
+
+```javascript
+state = { storageValue: 0, web3: null, accounts: null, contract: null };
+```
+
+Di bagian `storageValue: 0`, kita akan menggantinya dengan *state* baru untuk menyimpan nilai kembalian (*return*) dari fungsi `greeting` kita. Sekarang, alih-alih `storageValue: 0`, Anda dapat menggantinya dengan `greeting: ''` seperti yang ditunjukkan di sini. Ini akan menggunakan *state* React untuk menampilkan sapaan kita kepada pengguna:
+
+```javascript
+state = { greeting: '', web3: null, accounts: null, contract: null };
+```
+
+Selanjutnya, kita perlu mengganti kode fungsi `runExample` yang ada dengan kode kita sendiri. Hapus semua kode lama dari Truffle Box, kecuali untuk kode berikut:
+
+```javascript
+runExample = async () => {
+    const { accounts, contract } = this.state;
+};
+```
+
+Sekarang, mari tambahkan kode kita sendiri, yang akan memanggil kontrak `Greeter` kita, dan mengatur *state* React kita:
+
+```javascript
+const response = await contract.methods.greet().call()
+this.setState({ greeting: response });
+```
+
+Kita ingin memanggil metode kontrak `Greeter` kita tepat setelah baris pertama di dalam `runExample`. Ini akan menyimpan respons dari metode `greet()` kita dalam sebuah *const*.
+
+Setelah kita mendapatkan responsnya, kita mengatur *state* React kita dengan respons tersebut, seperti yang dapat Anda lihat pada `greeting: response`.
+
+Selanjutnya, kita perlu mengembalikan *state* React baru kita dari fungsi `render`\! Ganti fungsi `render` yang ada dengan kode berikut:
+
+```jsx
+render() {
+    if (!this.state.web3) {
+        return <div>Loading Web3, accounts, and contract...</div>;
+    }
+    return (
+        <div className="App">
+            <h1>Greeter</h1>
+            {this.state.greeting}
+        </div>
+    );
+}
+```
+
+Kita mengakses *state* React kita dan sekarang me-*render*-nya di halaman kita. Anda sekarang seharusnya melihat **“Hello World”** di `localhost:3000` (Gambar 9-7).
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-9.7.png" alt="gambar" width="580"/>
+</p>
+
+Selamat\! Anda baru saja menampilkan respons kontrak pertama Anda di aplikasi React\! Tetapi bagaimana jika kita ingin mengubah sapaan yang ditampilkan? Di bagian selanjutnya, kita akan memperbarui sapaan kita di UI melalui interaksi pengguna.
+
+## Mengatur Sapaan Kita Melalui React
+
+Langkah kita selanjutnya adalah mengatur sapaan baru menggunakan React. Saat ini, kontrak kita hanya mengembalikan sapaan *default*. Kita akan menggunakan fungsi `setGreeting` di dalam file `Greeter.sol` kita dan mengatur pesan kita sendiri.
+
+Mari kita mulai dengan membuat *input* teks React agar kita dapat menulis pesan kita sendiri untuk diatur. Berikut adalah formulir sederhana yang akan kita tambahkan tepat setelah `{this.state.greeting}` di dalam fungsi `render` kita:
+
+```jsx
+<form>
+    <label>
+        New Greeting:
+        <input type="text" value={this.state.greeting}
+        onChange={this.handleGreetingChange} />
+    </label>
+</form>
+<button onClick={this.formSubmitHandler}> Submit </button>
+```
+
+Setelah aplikasi Anda me-*render* ulang, Anda sekarang seharusnya melihat *input* baru Anda di layar, seperti yang diilustrasikan pada Gambar 9-8.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-9.8.png" alt="gambar" width="580"/>
+</p>
+
+Jika Anda mengetik sesuatu sekarang, tidak akan terjadi apa-apa\! Mari kita perbaiki.
+
+Pertama, buat kerangka fungsi kosong untuk aksi `onSubmit` dan `onChange` kita:
+
+```javascript
+formSubmitHandler = () => {
+    // lakukan hal-hal Web3 yang keren di sini!
+}
+
+handleGreetingChange = (e) => {
+    // perbarui state react kita di sini
+}
+```
+
+Pada akhirnya, kita akan menggunakan Web3 di dalam fungsi `formSubmitHandler` untuk terhubung ke kontrak kita dan memperbarui sapaan. Tapi mari kita mulai terlebih dahulu dengan mengambil data dari pengguna di dalam fungsi `handleGreetingChange` kita.
+
+Kita perlu memperbarui fungsi `onChange` di dalam formulir *input* kita, seperti yang ditunjukkan di sini. Ini akan memungkinkan kita untuk mengakses *input* aktual dari pengguna di dalam fungsi kita:
+
+```jsx
+<input type="text" value={this.state.greeting}
+onChange={e => this.handleGreetingChange(e)} />
+```
+
+Di dalam fungsi `handleGreetingChange`, sekarang kita perlu mengambil data dari *input* kita saat fungsi tersebut dipanggil. Tambahkan kode berikut ke fungsi `handleGreetingChange` Anda:
+
+```javascript
+handleGreetingChange = (e) => {
+    const inputVal = e.target.value
+    this.setState({ greeting: inputVal })
+}
+```
+
+Fungsi ini sekarang akan mengambil *input* dari pengguna dan mengatur *state*. Namun, kita hanya memperbarui *state*, dan belum mengirimkannya ke *blockchain*. Jika Anda me-*refresh* halaman sekarang, Anda akan melihat data tersebut tidak tersimpan. Mari kita kerjakan itu selanjutnya.
+
+Di dalam fungsi `formSubmitHandler` kita, pertama-tama kita perlu mengambil *state* untuk *input* sapaan kita saat ini agar kita tahu informasi apa yang ingin kita kirim ke *blockchain*.
+
+```javascript
+formSubmitHandler = async () => {
+    const { accounts, contract, greeting } = this.state
+}
+```
+
+Sekarang kita hanya perlu menambahkan satu hal terakhir untuk mengirim data kita ke *blockchain*. Kita akan menggunakan Web3 untuk berinteraksi dengan metode `setGreeting` dari kontrak kita:
+
+```javascript
+formSubmitHandler = async () => {
+    const { accounts, contract, greeting } = this.state;
+    const updatedGreeting = await contract.methods.setGreeting(greeting)
+}
+```
+
+Sekarang jika Anda mengetik sesuatu ke dalam formulir *input*, dan mengklik *submit*, yang akan memanggil aksi *submit* kita, data kita benar-benar disimpan di *blockchain*. Sebuah transaksi ada secara permanen di *blockchain* dengan *input* sapaan baru kita. Jika kita me-*refresh* halaman lagi, kita dapat melihat *frontend* sapaan kita telah berubah.
+
+## Ringkasan
+
+Dalam bab ini, kita belajar tentang React dan bagaimana React menjadi *framework* paling populer untuk digunakan dengan Ethereum dan pengembangan *smart contract*. Sebagian besar tutorial daring dan jawaban di Stack Overflow untuk pengembangan *frontend* dengan Truffle menggunakan React.
+
+Berinteraksi dengan *smart contract* kita menjadi mudah dengan menggunakan React Truffle Box untuk aplikasi *frontend* kita. Dan dengan React, kita membuat beberapa aksi dan *input* sederhana yang memungkinkan kita mengatur pesan sapaan kita di *blockchain*.
+
+Kita juga belajar lebih banyak tentang Web3 dan MetaMask serta bagaimana kita dapat benar-benar menggunakan alat-alat ini untuk terhubung ke *blockchain* dan *smart contract* kita.
+
+Di bab selanjutnya, kita akan menggunakan semua informasi yang telah kita pelajari untuk membuat *frontend* yang lebih rumit untuk kontrak Penggalangan Dana (*Fundraiser*) kita.
+
+---
+
+# BAB 10
+## DApp Kita yang Lebih Besar
+
+Sekarang setelah kita menyelesaikan kontrak untuk aplikasi skala besar kita, mari kita buat sisi klien (*client side*) agar pengguna dapat berinteraksi dengan kontrak kita di *browser*. Setelah kita membuat *frontend* untuk aplikasi kita, pengguna akan dapat membuat penggalangan dana mereka sendiri dan melihatnya muncul di halaman utama kita. Pengguna kita juga akan dapat melihat informasi lebih lanjut tentang penggalangan dana individu dan berdonasi padanya. Kita akan menggunakan kontrak `Fundraiser` yang telah kita tulis di bab-bab sebelumnya.
+
+Mari kita mulai pengembangan aplikasi kita.
+
+## Memulai dengan React Truffle Box
+
+Kita akan menggunakan React Truffle Box sekali lagi untuk menghasilkan kode *frontend* untuk aplikasi Web3 kita agar dapat berjalan dengan cepat dan berinteraksi dengan Web3. Mari kita mulai dengan membuat direktori baru untuk aplikasi penggalangan dana kita dan membuat aplikasi Truffle React Box baru di dalamnya.
+
+Hal pertama yang perlu kita lakukan adalah membuat repositori kosong baru untuk aplikasi `Fundraiser` kita. Selanjutnya, kita akan pindah ke direktori tersebut dan membuka (*unbox*) React Truffle Box:
+
+```bash
+mkdir fundraiser
+cd fundraiser
+truffle unbox react
+```
+
+Sama seperti di Bab 8, ini akan dengan cepat membuat *scaffolding* dari aplikasi React yang telah diatur untuk berinteraksi dengan *smart contract* penggalangan dana kita dan Web3. Setelah React Truffle Box selesai melakukan *unboxing*, mari kita impor semua kontrak dan migrasi kita.
+
+Pertama-tama, kita perlu menghapus file `2_deploy_contracts.js` yang berisi migrasi untuk kontrak `SimpleStorage` karena kita tidak akan membutuhkannya lagi.
+
+Selanjutnya, Anda perlu membuat file baru untuk kontrak dan migrasi kita. Pertama, buat semua file kosong untuk kontrak dan migrasi kita:
+
+```bash
+touch contracts/Factory.sol
+touch contracts/Fundraiser.sol
+touch migrations/2_factory_contract_migrations.js
+```
+
+Setelah Anda membuat file-file kosong tersebut, impor semua kode Solidity yang kita tulis untuk kontrak dan migrasi `Fundraiser` ke dalam file yang sesuai.
+
+> **Penting**
+>
+> Pastikan Anda membuat semua ini di dalam folder `contracts` dan `migrations` terluar dan Anda tidak berada di dalam direktori `client`.
+
+Kita juga perlu menginstal OpenZeppelin karena kita menggunakan kontrak `Ownable`:
+
+```bash
+npm install @openzeppelin/contracts
+```
+
+Dan di dalam file `Fundraiser.sol`, ubah pernyataan `import` untuk menggunakan `node_module` yang baru saja kita instal dari OpenZeppelin:
+
+```solidity
+import '../client/node_modules/@openzeppelin/contracts/ownership/Ownable.sol';
+```
+
+Setelah kita menambahkan kontrak, mari kita siapkan dan jalankan kembali lingkungan pengembangan Truffle kita. Di repositori `fundraiser`, mari jalankan perintah untuk meng-*compile* dan me-*migrate* kontrak `Fundraiser` kita agar kita dapat berinteraksi dengannya dari aplikasi *frontend* kita:
+
+```bash
+truffle develop
+```
+
+Setelah perintah tersebut selesai berjalan, kita akan menjalankan `compile` dan `migrate` di jendela terminal yang sama:
+
+```bash
+compile
+migrate
+```
+
+> **Tips**
+>
+> Jika Anda mengalami masalah migrasi dan buntu mencari solusi, coba jalankan `migrate --reset`.
+
+Jika kontrak Anda telah berhasil di-*migrate*, outputnya akan terlihat seperti ini:
+
+```
+Starting migrations...
+======================
+> Network name:    'develop'
+> Network id:      5777
+> Block gas limit: 0x6691b7
+
+1_initial_migration.js
+======================
+
+   Replacing 'Migrations'
+   ----------------------
+   > transaction hash:    0xf04ee2a0c62330e7a051148d4660de6441abd817caf6...
+   > Blocks: 0            Seconds: 0
+   > contract address:    0x6Af651D4c6E9f32a627381BFC771a82C882B1E8C
+   > block number:        1
+   > block timestamp:     1566526994
+   > account:             0xb94454C83ff541c82391b4331e75d2E2b16bae9E
+   > balance:             99.99477342
+   > gas used:            261329
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.00522658 ETH
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.00522658 ETH
+
+2_factory_contract_migrations.js
+================================
+
+   Replacing 'Factory'
+   -------------------
+   > transaction hash:    0xebc5a26bbe12f52b809d9144a839befd0eebd877f7845...
+   > Blocks: 0            Seconds: 0
+   > contract address:    0xB7780C9AD3ef38bb4C8B48fab37Ef176603E7787
+   > block number:        3
+   > block timestamp:     1566526995
+   > account:             0xb94454C83ff541c82391b4331e75d2E2b16bae9E
+   > balance:             99.95063086
+   > gas used:            2165105
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.0433021 ETH
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.0433021 ETH
+
+Summary
+=======
+> Total deployments:   2
+> Final cost:          0.04852868 ETH
+```
+
+Bagus\! Sekarang setelah kontrak `Fundraiser` kita berhasil di-*compile*, di-*migrate*, dan di-*deploy*, mari kita mulai menjalankan *frontend* aplikasi kita agar pengguna dapat berinteraksi dengannya dan membuat penggalangan dana.
+
+## Penyiapan Fundraiser
+
+Mari kita siapkan dan jalankan React Truffle Box kita agar dapat berinteraksi dengan aplikasi kita. Pertama-kita kita perlu masuk (`cd`) ke dalam file `src` dari aplikasi React kita dan menginstal semua dependensi yang disediakan oleh React Truffle Box untuk kita. Setelah itu, kita perlu memulai *frontend* aplikasi kita seperti yang kita lakukan di bab sebelumnya:
+
+```bash
+cd client
+npm i
+```
+
+Setelah modul selesai diinstal, jalankan server:
+
+```bash
+npm start
+```
+
+Jika semuanya telah terinstal dengan benar dan dimulai dengan sukses, kita sekarang dapat membuka `localhost:3000` untuk melihat aplikasi Web3 kita. Lihat Gambar 10-1.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-10.1.png" alt="gambar" width="580"/>
+</p>
+
+Ups! Kita lupa mengganti jaringan kita agar sesuai dengan aplikasi baru kita. Kita harus berada di jaringan yang sama agar aplikasi kita dapat berjalan dengan baik. Mari kita masuk ke MetaMask terlebih dahulu dan ganti jaringan di bagian atas menjadi **Localhost 8545** (lihat Gambar 10-2). Localhost 8545 seharusnya sudah ada di daftar *default*. Jika tidak, Anda bisa merujuk kembali ke bab sebelumnya dan menambahkannya.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-10.2.png" alt="gambar" width="580"/>
+</p>
+
+Sekarang, *refresh* layarnya dan Anda seharusnya akan melihat UI *simple storage* yang kita lihat sebelumnya. Pastikan halaman Anda terlihat seperti Gambar 10-3.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-10.3.png" alt="gambar" width="580"/>
+</p>
+
+Dengan aplikasi kita yang sudah berjalan, mari kita mulai dari file `App.js` dan buang beberapa kode *boilerplate* untuk mempersiapkan *frontend* kita agar dapat berinteraksi dengan penggalangan dana (*fundraiser*).
+
+Pertama, navigasikan ke direktori `client/src` dan buka file `App.js`. Kita perlu menghapus kode React yang lama dan menggantinya dengan kode React kita sendiri:
+
+```jsx
+import React, { useState, useEffect } from "react";
+import FactoryContract from "./contracts/Factory.json";
+import getWeb3 from "./utils/getWeb3";
+import "./App.css";
+
+const App = () => {
+  const [state, setState] =
+    useState({web3: null, accounts: null, contract: null});
+  const [storageValue, setStorageValue] = useState(0);
+
+  useEffect(() => {
+    const init = async() => {
+      try {
+        const web3 = await getWeb3();
+        const accounts = await web3.eth.getAccounts();
+        const networkId = await web3.eth.net.getId();
+        const deployedNetwork = FactoryContract.networks[networkId];
+        const instance = new web3.eth.Contract(
+          FactoryContract.abi,
+          deployedNetwork && deployedNetwork.address,
+        );
+        setState({web3, accounts, contract: instance});
+      } catch(error) {
+        alert(
+          `Failed to load web3, accounts, or contract.
+          Check console for details.`,
+        )
+        console.error(error);
+      }
+    }
+    init();
+  }, []);
+
+  const runExample = async () => {
+    const { accounts, contract } = state;
+  };
+
+  return(
+    <div>
+      <h1>Fundraiser</h1>
+    </div>
+  );
+}
+
+export default App;
+```
+
+Ini akan memungkinkan kita untuk menyiapkan aplikasi untuk mengimpor kontrak kita. Mari kita mulai dengan mengimpor kontrak `Fundraiser` kita, seperti yang ditunjukkan pada kode di atas.
+
+Sekarang setelah kita mengimpor kontrak kita, mari kita kerjakan pembuatan *frontend* untuk aplikasi kita dan menampilkan daftar penggalangan dana\!
+
+## React Routing
+
+Untuk dapat bernavigasi di antara halaman-halaman yang berbeda dari aplikasi kita—dengan halaman utama yang terhubung ke halaman penggalangan dana baru dan halaman tanda terima donasi—kita perlu menyiapkan rute (*route*) di dalam aplikasi React kita. Kita akan menggunakan `react-router-dom` agar pengguna dapat melihat halaman yang berbeda, tergantung pada apa yang mereka pilih dari *navbar*.
+
+Kita akan mulai dengan menginstal paket npm untuk `react-router-dom`:
+
+```bash
+npm install --save react-router-dom
+```
+
+Setelah Anda menginstal paket npm dan me-restart server *frontend* Anda, impor file yang diperlukan dari `react-router-dom` di dalam file `App.js` Anda, seperti yang ditunjukkan di sini:
+
+```javascript
+import { BrowserRouter as Router, Route, NavLink } from "react-router-dom"
+```
+
+Kita juga perlu mengimpor dua komponen baru kita untuk halaman utama dan penggalangan dana baru untuk digunakan di dalam rute kita:
+
+```javascript
+import NewFundraiser from './NewFundraiser'
+import Home from './Home'
+```
+
+Selanjutnya, mari kita ganti fungsi `render` dengan kode berikut. Ini akan memungkinkan kita menggunakan *navbar* yang disediakan dari Material UI untuk bernavigasi ke halaman yang berbeda di seluruh aplikasi kita:
+
+```jsx
+<Router>
+  <div>
+    <nav>
+      <ul>
+        <li>
+          <NavLink to="/">Home</NavLink>
+        </li>
+        <li>
+          <NavLink to="/new/">New</NavLink>
+        </li>
+      </ul>
+    </nav>
+    <Route path="/" exact component={Home} />
+    <Route path="/new/" component={NewFundraiser} />
+  </div>
+</Router>
+```
+
+Jika Anda mencoba menjalankan kode sekarang, Anda akan mendapatkan *error* yang menyatakan bahwa komponen kita tidak ada. Kita perlu membuat beberapa komponen baru terlebih dahulu untuk memperbaikinya. Di direktori `src` Anda, Anda perlu membuat dua komponen baru.
+
+Buat dua file baru: `Home.js` dan `NewFundraiser.js`. Kita akan menggunakan komponen halaman utama sebagai halaman arahan (*landing page*) utama untuk aplikasi kita dan halaman Penggalangan Dana Baru (*New Fundraiser*) untuk membuat penggalangan dana baru di aplikasi kita:
+
+```bash
+touch Home.js
+touch NewFundraiser.js
+```
+
+Nanti, kita juga akan membuat rute untuk tanda terima (*receipts*). Tapi untuk saat ini, mari kita kerjakan pembuatan tampilan Beranda (*Home*). Kita akan membiarkannya sebagai fungsi `render` sederhana untuk saat ini sampai kita perlu membangun tampilan halaman utama. Di dalam file `Home.js` Anda, gunakan kode *placeholder* berikut dan simpan file tersebut:
+
+```jsx
+import React, { useState, useEffect } from "react";
+
+const Home = () => {
+  useEffect(() => {
+  }, []);
+
+  return (
+    <div><h2>Home</h2></div>
+  )
+}
+
+export default Home;
+```
+
+Demikian pula, di file `NewFundraiser.js`, tambahkan kode ini:
+
+```jsx
+import React, { useState, useEffect } from "react";
+
+const NewFundraiser = () => {
+  useEffect(() => {
+  }, []);
+
+  return (
+    <div><h2>Create a New Fundraiser</h2></div>
+  )
+}
+
+export default NewFundraiser;
+```
+
+Itu seharusnya memperbaiki *error* kita. Tetapi satu hal terakhir yang perlu kita lakukan adalah memodifikasi kode di file `index.js` kita agar kita dapat me-*render* rute dengan benar. Kita akan menggunakan `BrowserRouter` dari `react-router-dom` untuk membungkus aplikasi kita di dalam sebuah `Router`:
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom'
+import App from './App';
+
+ReactDOM.render((
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+), document.getElementById('root'))
+```
+
+Seharusnya sudah beres\! Kode di atas akan menunjukkan halaman yang berbeda setiap kali Anda mengklik tautan navigasi. Sekarang jika Anda memuat ulang `localhost:3000`, Anda seharusnya melihat halaman yang diilustrasikan pada Gambar 10-4.
+
+Dan jika Anda mengklik **New**, itu akan menavigasi Anda ke tampilan kedua (lihat Gambar 10-5).
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-10.5.png" alt="gambar" width="580"/>
+</p>
+
+Cobalah dan pastikan semuanya berfungsi. Selanjutnya, mari kita kerjakan penataannya (*styling*).
+
+## React dan Material UI
+
+Tujuan utama kita dalam buku ini adalah belajar pengembangan *blockchain*, bukan pengembangan *frontend*, jadi kita akan menggunakan kerangka kerja UI React untuk mengurangi waktu yang kita habiskan pada pengembangan *frontend* untuk aplikasi Web3 kita. Kita akan menggunakan **Material UI**, yang merupakan kerangka kerja UI yang menyediakan komponen React seperti *popover*, tombol, *tooltip*, navigasi, dan banyak lagi. Kita juga akan menggunakan gaya *default* Material UI dengan beberapa modifikasi kecil. Anda dapat mengetahui lebih lanjut tentang Material UI di sini.
+
+Mari kita mulai dengan menginstal Material UI ke dalam aplikasi kita.
+
+Jalankan perintah instalasi di direktori `src` Anda untuk menginstal **Material UI** di aplikasi penggalangan dana kita sebagai berikut:
+
+```bash
+npm install @material-ui/core --save
+```
+
+Perhatikan bahwa Anda harus menghentikan jendela terminal tempat aplikasi *frontend* Anda berjalan dan me-restartnya setelah menginstal Material UI. Anda belum akan melihat perubahan apa pun di *frontend*. Mari kita tambahkan beberapa\! Pertama, mari kita mulai dengan membuat navigasi yang lebih baik untuk aplikasi kita agar pengguna dapat mengklik berbagai bagian dari aplikasi penggalangan dana kita untuk membuat penggalangan dana baru, berdonasi, atau mendapatkan tanda terima donasi.
+
+Dari situs Material UI, mari kita lihat halaman *app bar* di sini.
+
+Mari kita mulai dengan *app bar* sederhana. Pertama, kita perlu menambahkan semua *import* ke bagian atas file `App.js` kita. Ini akan memungkinkan kita untuk menggunakan komponen Material UI yang kita butuhkan:
+
+```javascript
+import { makeStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+```
+
+Sekarang setelah kita memiliki *import*, kita perlu menambahkan gaya agar aplikasi penggalangan dana kita terlihat bagus. Anda perlu menambahkan gaya ini setelah fungsi `useEffect` Anda:
+
+```javascript
+const useStyles = makeStyles({
+  root: {
+    flexGrow: 1,
+  },
+});
+
+const classes = useStyles();
+```
+
+Setelah Anda mengimpor file yang benar dan menambahkan kode gaya sebelumnya, mari kita ganti kode `render` yang sebenarnya agar kita bisa melihat *navbar* baru kita:
+
+```jsx
+<Router>
+  <div>
+    <AppBar position="static" color="default">
+      <Toolbar>
+        <Typography variant="h6" color="inherit">
+          <NavLink className="nav-link" to="/">Home</NavLink>
+        </Typography>
+        <NavLink className="nav-link" to="/new/">New Fundraiser</NavLink>
+      </Toolbar>
+    </AppBar>
+
+    <Route path="/" exact component={Home} />
+    <Route path="/new/" component={NewFundraiser} />
+  </div>
+</Router>
+```
+
+Mari kita tambahkan sedikit gaya dengan cepat ke komponen `NavLink` agar terlihat lebih profesional. Di dalam file `App.css` Anda, tambahkan kode ini ke file tersebut:
+
+```css
+body {
+  margin: 0 !important;
+}
+
+.nav-link {
+  color: inherit;
+  text-decoration: none;
+  margin-right: 15px;
+}
+
+.nav-link:hover,
+.nav-link:active,
+.nav-link:visited {
+  color: black;
+  text-decoration: none;
+}
+```
+
+Jika semuanya berfungsi, Anda sekarang seharusnya melihat *app bar* baru dan aplikasi yang kosong. Lihat Gambar 10-6 sebagai referensi.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-10.6.png" alt="gambar" width="580"/>
+</p>
+
+Sekarang setelah kita menyiapkan navigasi dan rute, mari kita kerjakan tampilan halaman pertama kita untuk memungkinkan pengguna membuat penggalangan dana baru.
+
+## Membuat Tampilan Halaman Penggalangan Dana Baru
+
+Untuk membuat penggalangan dana baru, kita ingin menampilkan formulir sederhana kepada pengguna yang akan menerima masukan pengguna untuk nama penggalangan dana, situs web, alamat Ethereum, dll. Mengikuti *wireframe* kita, kita akan menggunakan formulir dan membuat tombol *submit* agar pengguna dapat membuat penggalangan dana baru milik mereka sendiri. Karena kita telah membuat kode kerangka dan file untuk tampilan Penggalangan Dana Baru kita sebelumnya, mari kita buka kembali file tersebut. File tersebut seharusnya ada di `src/NewFundraiser.js`. Hal pertama yang ingin kita lakukan adalah membuat serangkaian *input* untuk ditampilkan kepada pengguna kita.
+
+Kita akan mulai dengan menggunakan komponen *text field* dari Material UI. Tambahkan pernyataan `import` ke file `NewFundraiser.js` Anda tepat setelah pernyataan `import` terakhir Anda:
+
+```javascript
+import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+
+const useStyles = makeStyles(theme => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
+  dense: {
+    marginTop: theme.spacing(2),
+  },
+  menu: {
+    width: 200,
+  },
+}));
+```
+
+Kita juga perlu menambahkan item *state* baru untuk setiap bagian data yang akan kita ambil dari kontrak kita tentang penggalangan dana. Buat setiap `useState` kosong seperti yang ditunjukkan di sini:
+
+```javascript
+const [ name, setFundraiserName ] = useState(null)
+const [ website, setFundraiserWebsite ] = useState(null)
+const [ description, setFundraiserDescription ] = useState(null)
+const [ image, setImage ] = useState(null)
+const [ address, setAddress ] = useState(null)
+const [ custodian, setCustodian ] = useState(null)
+const [ contract, setContract] = useState(null)
+const [ accounts, setAccounts ] = useState(null)
+```
+
+Sekarang di fungsi `render` Anda, tambahkan ini tepat setelah *header* Anda. Kita juga akan menambahkan fungsi `onChange` untuk memungkinkan pengguna mengetik masukan, melihatnya benar-benar berubah di halaman, dan menyimpannya ke *state* React kita:
+
+```jsx
+<label>Name</label>
+<TextField
+  id="outlined-bare"
+  className={classes.textField}
+  placeholder="Fundraiser Name"
+  margin="normal"
+  onChange={(e) => setFundraiserName(e.target.value)}
+  variant="outlined"
+  inputProps={{ 'aria-label': 'bare' }}
+/>
+<label>Website</label>
+<TextField
+  id="outlined-bare"
+  className={classes.textField}
+  placeholder="Fundraiser Website"
+  margin="normal"
+  onChange={(e) => setFundraiserWebsite(e.target.value)}
+  variant="outlined"
+  inputProps={{ 'aria-label': 'bare' }}
+/>
+<label>Description</label>
+<TextField
+  id="outlined-bare"
+  className={classes.textField}
+  placeholder="Fundraiser Description"
+  margin="normal"
+  onChange={(e) => setFundraiserDescription(e.target.value)}
+  variant="outlined"
+  inputProps={{ 'aria-label': 'bare' }}
+/>
+<label>Image</label>
+<TextField
+  id="outlined-bare"
+  className={classes.textField}
+  placeholder="Fundraiser Image"
+  margin="normal"
+  onChange={(e) => setImage(e.target.value)}
+  variant="outlined"
+  inputProps={{ 'aria-label': 'bare' }}
+/>
+<label>Address</label>
+<TextField
+  id="outlined-bare"
+  className={classes.textField}
+  placeholder="Fundraiser Ethereum Address"
+  margin="normal"
+  onChange={(e) => setAddress(e.target.value)}
+  variant="outlined"
+  inputProps={{ 'aria-label': 'bare' }}
+/>
+<label>Custodian</label>
+<TextField
+  id="outlined-bare"
+  className={classes.textField}
+  placeholder="Fundraiser Custodian"
+  margin="normal"
+  onChange={(e) => setCustodian(e.target.value)}
+  variant="outlined"
+  inputProps={{ 'aria-label': 'bare' }}
+/>
+```
+
+Mari kita tambahkan juga gaya ini ke file `App.css` kita agar *input* kita terlihat sedikit lebih baik:
+
+```css
+.MuiTextField-root {
+  display: block !important;
+}
+
+.MuiInputBase-root {
+  width: 300px !important;
+  margin-left: 3px;
+}
+```
+
+Hal terakhir yang perlu kita lakukan adalah membuat tombol untuk mengirimkan data baru ke kontrak `Fundraiser` kita dan membuat kontrak tersebut.
+
+Pertama, impor tombol ke file `NewFundraiser.js` kita. Tambahkan kode Material UI ini agar kita bisa menggunakan gaya *default*:
+
+```javascript
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+
+const useStyles = makeStyles(theme => ({
+  button: {
+    margin: theme.spacing(1),
+  },
+  input: {
+    display: 'none',
+  },
+}));
+```
+
+Dan kemudian tepat setelah fungsi `useEffect` kita, tambahkan kode `useStyles` berikut:
+
+```javascript
+const classes = useStyles();
+```
+
+Setelah kita mengimpor tombol dan menyiapkan gaya *default*, tambahkan tombol untuk di-*render* sebagai berikut:
+
+```jsx
+<Button
+  onClick={handleSubmit}
+  variant="contained"
+  className={classes.button}>
+  Submit
+</Button>
+```
+
+Sekarang, mari kita lanjutkan untuk mendapatkan Web3 agar kita dapat mengakses kontrak `Factory` kita. Di file `NewFundraiser.js` kita, perbarui fungsi `useEffect` untuk menggunakan kode Web3. Kode berikut akan membuat instansi baru dari kontrak kita dan mengatur *state* dari Web3, kontrak, dan akun kita saat ini:
+
+```javascript
+useEffect(() => {
+  const init = async() => {
+    try {
+      const web3 = await getWeb3();
+      const networkId = await web3.eth.net.getId();
+      const deployedNetwork = FactoryContract.networks[networkId];
+      const accounts = await web3.eth.getAccounts();
+      const instance = new web3.eth.Contract(
+        FactoryContract.abi,
+        deployedNetwork && deployedNetwork.address,
+      );
+      setWeb3(web3)
+      setContract(instance)
+      setAccounts(accounts)
+    } catch(error) {
+      alert(
+        `Failed to load web3, accounts, or contract. Check console for details.`,
+      );
+      console.error(error);
+    }
+  }
+  init();
+}, []);
+```
+
+Selanjutnya, kita perlu mengimpor kontrak kita dan menunjuk ke kontrak kita yang telah di-*deploy* secara lokal di file `NewFundraiser.js`. Tambahkan kode ini tepat setelah semua pernyataan `import` Anda:
+
+```javascript
+import getWeb3 from "./utils/getWeb3";
+import FactoryContract from "./contracts/Factory.json";
+```
+
+Terakhir, mari kita panggil fungsi `createFundraiser` dari kontrak kita dan berikan parameter dari *state* kita, termasuk nama, situs web, deskripsi, dll. Setelah itu dipanggil dan dibuat, kita hanya akan menampilkan `alert` sederhana kepada pengguna:
+
+```javascript
+const handleSubmit = async () => {
+  await contract.methods.createFundraiser(
+    name,
+    website,
+    image, // sebelumnya imageURL
+    description,
+    address, // sebelumnya beneficiary
+    custodian
+  ).send({ from: accounts[0] })
+  alert('Successfully created fundraiser')
+}
+```
+
+Mari kita buat beberapa penggalangan dana baru. Selanjutnya, kita akan memerlukan cara untuk menampilkan penggalangan dana baru kita kepada pengguna agar mereka dapat berdonasi dan melihat informasi lebih lanjut tentang setiap penggalangan dana individu.
+
+## Menampilkan Daftar Penggalangan Dana Saat Ini
+
+Sekarang kita dapat membuat penggalangan dana baru, mari kita tambahkan *frontend* agar kita dapat menampilkan penggalangan dana yang telah kita buat di halaman dan juga semua penggalangan dana lain yang dibuat. Setelah kita membuat UI untuk menampilkan penggalangan dana, kita juga akan menggunakan *modal* agar pengguna dapat mengklik penggalangan dana individu dan berdonasi melaluinya. Tapi mari kita mulai dengan menampilkan daftar penggalangan dana.
+
+Kita akan menggunakan komponen *card* dari Material UI untuk menampilkan setiap penggalangan dana individu. Hal pertama yang perlu kita lakukan adalah memanggil kontrak `Factory` kita menggunakan Web3 dan mengembalikan data tentang penggalangan dana.
+
+Untuk melakukan ini, kita perlu sekali lagi mengimpor Web3 dan JSON `FactoryContract` kita di bagian atas file impor kita. Kita juga perlu menambahkan `web3`, `contracts`, dan `accounts` ke *state* kita. Terakhir, kita perlu memperbarui fungsi `useEffect` kita untuk menggunakan kode yang sama seperti di file `NewFundraiser.js`.
+
+Kita akan membuat satu modifikasi pada fungsi `useEffect` ini. Di dalam pernyataan `try/catch`, kita akan menambahkan fungsi bernama `getFunds()` di dalam pernyataan `try`. Kita akan mendapatkan penggalangan dana kita di fungsi itu dan akan menambahkannya sebentar lagi.
+
+```javascript
+useEffect(() => {
+  init()
+}, []);
+
+const init = async () => {
+  try {
+    const networkId = await web3.eth.net.getId();
+    const deployedNetwork = FactoryContract.networks[networkId];
+    const accounts = await web3.eth.getAccounts();
+    const instance = new web3.eth.Contract(
+      FactoryContract.abi,
+      deployedNetwork && deployedNetwork.address,
+    );
+    setContract(instance)
+    setAccounts(accounts)
+    // Kita akan menambahkan panggilan fungsi fundraisers() kita di sini
+  }
+  catch(error) {
+    alert(
+      `Failed to load web3, accounts, or contract. Check console for details.`,
+    );
+    console.error(error);
+  }
+}
+```
+
+Setelah kita mengatur *state*, kita akan memanggil kontrak kita dan mengembalikan alamat dari setiap kontrak di dalam kontrak `Factory` yang kita buat. Kita akan menyimpan dana tersebut di *state* kita. Tepat setelah deklarasi komponen `Home` kita, tambahkan satu `setState` lagi:
+
+```javascript
+const [ funds, setFunds ] = useState(null)
+```
+
+Selanjutnya, tambahkan kode berikut ke kode `useEffect` kita di tempat kita meninggalkan *placeholder* sebelumnya. Kode berikut akan memanggil metode kontrak kita untuk mendapatkan daftar penggalangan dana:
+
+```javascript
+const funds = await instance.methods.fundraisers(10, 0).call()
+setFunds(funds)
+```
+
+Metode `fundraiser()` kita akan mengembalikan output berikut. Kita akan menggunakan ini nanti untuk mengatur instansi kontrak dan mengambil data tentang setiap penggalangan dana.
+
+```
+(2) ["0x500116801EAE512672648c80C7a5DB6AdFb2b283", "0xB705bb647cf75580133540855d015f3Ba5D38C71"]
+```
+
+Sekarang setelah kita menerima data dari kontrak kita, kita akan mengerjakan *frontend* untuk menampilkan setiap kartu Penggalangan Dana kepada pengguna. Hal pertama yang perlu kita lakukan adalah membuat komponen baru yang akan kita gunakan untuk menampilkan komponen *Card* kita:
+
+```bash
+touch FundraiserCard.js
+```
+
+Di dalam file `FundraiserCard.js`, kita akan menambahkan kode kartu dari Material UI. Ini akan menampilkan kartu sederhana kepada pengguna dengan beberapa informasi dasar tentang penggalangan dana:
+
+```jsx
+import React, { useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import FundraiserContract from "./contracts/Fundraiser.json";
+import Web3 from 'web3'
+
+const useStyles = makeStyles({
+  card: {
+    maxWidth: 450,
+    height: 400
+  },
+  media: {
+    height: 140,
+  },
+});
+
+const FundraiserCard = (props) => {
+  const classes = useStyles();
+  const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
+  const [ contract, setContract] = useState(null)
+  const [ accounts, setAccounts ] = useState(null)
+  const [ fundName, setFundname ] = useState(null)
+  const [ description, setDescription ] = useState(null)
+  const [ totalDonations, setTotalDonations ] = useState(null)
+  const [ donationCount, setDonationCount ] = useState(null)
+  const [ imageURL, setImageURL ] = useState(null)
+  const [ url, setURL ] = useState(null)
+
+  useEffect(() => {
+    // kita akan menambahkan panggilan Web3 di sini
+  }, []);
+
+  return (
+    <div className="fundraiser-card-content">
+      <Card className={classes.card}>
+        <CardActionArea>
+          <CardMedia
+            className={classes.media}
+            image={props.fundraiser.image}
+            title="Fundraiser Image"
+          />
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="h2">
+              {fundName}
+            </Typography>
+            <Typography variant="body2" color="textSecondary" component="p">
+              <p>{description}</p>
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+        <CardActions>
+          <Button size="small" color="primary">
+            View More
+          </Button>
+        </CardActions>
+      </Card>
+    </div>
+  )
+}
+
+export default FundraiserCard;
+```
+
+Jika Anda menavigasi ke `localhost:3000`, Anda akan melihat bahwa halamannya masih kosong. Mari kita buat fungsi `render` untuk menelusuri setiap penggalangan dana dan menampilkannya dalam sebuah kartu.
+
+Di dalam fungsi `render` kita yang mengikuti gambar utama dan *header*, mari kita tambahkan panggilan ke fungsi yang akan me-*render* setiap penggalangan dana:
+
+```jsx
+{displayFundraisers()}
+```
+
+Selanjutnya, mari kita buat fungsinya. Kita perlu melakukan iterasi melalui setiap penggalangan dana dari `props` kita dan menampilkannya dalam sebuah kartu. Tapi pertama-tama, kita perlu mengimpor kartu `Fundraiser` yang baru saja kita buat.
+
+Di bagian atas file `Home.js`, tambahkan pernyataan `import` berikut agar kita dapat menggunakan kartu `Fundraiser`:
+
+```javascript
+import FundraiserCard from './FundraiserCard'
+```
+
+Selanjutnya, kita akan melakukan iterasi melalui daftar penggalangan dana dan menampilkan komponen *Card* untuk masing-masing:
+
+```javascript
+const displayFundraisers = () => {
+  return funds.map((fundraiser) => {
+    return (
+      <FundraiserCard fundraiser={fundraiser} />
+    )
+  })
+}
+```
+
+Kita juga ingin menambahkan beberapa gaya ke komponen `Home.js` agar kartu kita dapat di-*render* dengan benar. Di file `Home.js`, tambahkan `div` kontainer ini:
+
+```jsx
+<div className="main-container">
+  {displayFundraisers()}
+</div>
+```
+
+Di file `App.css`, tambahkan gaya berikut agar kartu kita di-*render* dengan benar menggunakan CSS:
+
+```css
+.main-container {
+  margin: 20px;
+}
+
+.fundraiser-card-container {
+  display: inline-flex;
+  width: 250px;
+  height: 250px;
+  margin: 20px;
+}
+```
+
+Selanjutnya, kita perlu memanggil kontrak `Fundraiser` kita, mendapatkan informasi tentang setiap penggalangan dana, dan menampilkannya kepada pengguna. Pertama, mari kita hanya panggil fungsi `init` kita jika penggalangan dana ada. Berikan penggalangan dana sebagai argumen ke fungsi `init` agar kita dapat menggunakannya di dalam fungsi untuk mengambil data yang kita butuhkan:
+
+```javascript
+useEffect(() => {
+  if (fundraiser) {
+    init(fundraiser)
+  }
+}, [fundraiser]);
+
+const init = async (fundraiser) => {
+  try {
+    const fund = fundraiser
+    const networkId = await web3.eth.net.getId();
+    const deployedNetwork = FundraiserContract.networks[networkId];
+    const accounts = await web3.eth.getAccounts();
+    const instance = new web3.eth.Contract(
+      FundraiserContract.abi,
+      fund
+    );
+    setContract(instance)
+    setAccounts(accounts)
+    // Placeholder untuk mendapatkan informasi tentang setiap kontrak
+  }
+  catch(error) {
+    alert(
+      `Failed to load web3, accounts, or contract. Check console for details.`,
+    );
+    console.error(error);
+  }
+}
+```
+
+Hal terakhir yang perlu kita lakukan adalah memanggil kontrak `Fundraiser` kita dan mendapatkan informasi tentang penggalangan dana tersebut. Setelah kita memanggil kontrak `Fundraiser`, kita akan mengaturnya di *state* React kita. Setelah pengaturan *state* `setAccounts` di dalam fungsi `useEffect`, tambahkan kode yang ditunjukkan di sini:
+
+```javascript
+const name = await instance.methods.name().call()
+const description = await instance.methods.description().call()
+const totalDonations = await instance.methods.totalDonations().call()
+const imageURL = await instance.methods.imageURL().call()
+const url = await instance.methods.url().call()
+
+setFundname(name)
+setDescription(description) // sebelumnya descriptions
+setImageURL(imageURL)
+setTotalDonations(totalDonations)
+setURL(url)
+```
+
+Mari kita simpan itu dan kunjungi halaman `localhost:3000/` kita. Jika semuanya berfungsi dengan benar, Anda seharusnya melihat penggalangan dana ditampilkan di halaman, seperti pada Gambar 10-7.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-10.7.png" alt="gambar" width="580"/>
+</p>
+
+Sekarang setelah daftar penggalangan dana kita tampil di halaman, kita akan mengerjakan cara menampilkan informasi lebih lanjut kepada pengguna di bab berikutnya dan menambahkan fungsionalitas donasi kita.
+
+## Ringkasan
+
+Dalam bab ini, kita meninjau kembali cara menyiapkan aplikasi Truffle dengan *frontend*. Kita juga belajar cara menyiapkan **React Router** agar dapat me-*render* tampilan yang berbeda kepada pengguna melalui komponen *navbar*.
+
+Kita mengerjakan pembuatan formulir baru dan menampilkannya kepada pengguna agar mereka sekarang dapat berinteraksi dengan aplikasi Web3 kita dan membuat penggalangan dana mereka sendiri. Kita belajar tentang cara mengirimkan data tersebut ke *blockchain* dan juga mengembalikannya.
+
+Kita belajar tentang **Material UI**, menggunakannya untuk menyiapkan aplikasi React dengan cepat, dan menggunakan komponen serta gaya dari Material UI agar aplikasi kita dapat segera aktif dan berjalan.
+
+Kita juga menampilkan penggalangan dana dari aplikasi kita dan me-*render*-nya di halaman. Di bab berikutnya, kita akan mengerjakan cara menampilkan informasi terperinci tentang penggalangan dana dan mengirimkan donasi.
+
+---
+
