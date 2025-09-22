@@ -605,3 +605,48 @@ Kita telah membahas banyak materi dalam jam ini. Informasi ini penting dan akan 
 
 ---
 
+# JAM 4
+## Konsep Komputer
+
+**Apa yang Akan Anda Pelajari dalam Jam Ini:**
+* Cara kerja komputer
+* Ragam perangkat keras komputer
+* Fungsi dan operasi perangkat lunak
+* Sistem operasi
+
+Jaringan terbuat dari komputer dengan cara yang sama seperti sebuah band terbuat dari musisi. Setiap komputer—dan setiap anggota band—unik, dan dalam keadaan yang tepat, mereka semua bekerja sama untuk menghasilkan pertunjukan yang bagus. Jika tidak, hasilnya adalah kekacauan bagi komputer dan hiruk-pikuk bagi band.
+
+Mirip dengan band, jaringan komputer mengharuskan konvensi tertentu dipatuhi ketika komputer dihubungkan untuk berinteraksi satu sama lain. Meskipun setiap komputer unik, ia beroperasi dengan cara yang sama seperti komputer lain di jaringan. Jika Anda memahami cara kerja komputer, Anda akan lebih siap untuk memahami cara kerja jaringan. Analogi berakhir di sini, karena saya belum pernah menemukan seorang musisi yang beroperasi dengan cara yang sama seperti musisi lain.
+
+Bagaimanapun, perlu diingat Anda tidak diminta untuk menjadi seorang ahli komputer, tetapi mengingat bahwa jaringan menghubungkan komputer, pemahaman dasar tentang arsitektur komputer membantu untuk mencapai pemahaman yang lebih baik tentang jaringan.
+
+### Angka, Besaran, dan Fraksi
+
+Karena kebutuhan, buku ini menggunakan istilah-istilah seperti "giga," "tera," "nano," dan "piko" untuk menggambarkan besaran dan presisi angka. Istilah-istilah ini tidak dapat dihindari karena jaringan komputer sering digambarkan berdasarkan kapasitasnya, atau jumlah *byte* (karakter) atau jumlah bit (0 dan 1) yang dikirim per detik. Sebagai contoh, literatur vendor tentang jaringan berkapasitas tinggi menyebutkan "kecepatan" transmisi 10 gigabit per detik, atau 10Gbps dan vendor penyimpanan merujuk pada *terabyte* ketika membahas sistem file besar. Selain itu, komputer sering dibandingkan berdasarkan berapa lama waktu yang dibutuhkan untuk melakukan suatu tugas. Misalnya, waktu akses untuk sebuah disk mungkin 10 milidetik, atau 10ms. Untuk membantu dengan terjemahan ini, Gambar 4.1 mencantumkan istilah-istilah umum yang terkait dengan sistem penomoran basis 10.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-4.1.png" alt="gambar" width="580"/>
+</p>
+
+### Perangkat Keras Komputer
+
+Komputer terdiri dari dua komponen: perangkat keras (*hardware*) dan perangkat lunak (*software*). Perangkat keras adalah bagian fisik dari sebuah komputer. Perangkat lunak dieksekusi pada perangkat keras. Perangkat keras biasanya stabil dan jarang diubah. Sebaliknya, perangkat lunak sering berubah. Sebagai contoh, sebagai pengguna Internet, kita sering menerima pemberitahuan di layar kita tentang vendor yang ingin mengunduh perubahan pada produk perangkat lunak.
+
+Kedua istilah ini cukup deskriptif: **Perangkat keras** menyiratkan komponen yang agak kaku—tidak mudah diubah. **Perangkat lunak** menyiratkan komponen yang fleksibel—mudah diubah. Hmm, lebih tepatnya mudah diubah jika dibandingkan dengan perangkat keras. Beberapa program perangkat lunak berisi ribuan baris kode (yang merupakan instruksi, seperti "cetak," "salin," dan "hapus") dengan banyak instruksi yang saling bergantung. Mungkin mudah untuk diubah, tetapi mungkin tidak mudah untuk diubah dengan benar.
+
+**Firmware** adalah jenis perangkat lunak khusus yang jarang berubah. Ia disimpan dalam perangkat keras yang disebut **memori hanya-baca (*read-only memory*, atau ROM)**. Sesuai namanya, ROM hanya bisa "dibaca" dan tidak "ditulis." Ia bisa diubah, tetapi hanya dengan operasi dan prosedur khusus. Oleh karena itu, ia tidak "keras" (*hard*) ataupun "lunak" (*soft*); ia "teguh" (*firm*).
+
+Perangkat keras, seperti yang mungkin sudah Anda duga, membentuk komponen fisik sebuah komputer. Ini termasuk tetapi tidak terbatas pada hal-hal berikut:
+* CPU (*central processing unit* atau unit pemrosesan sentral)
+* Layar dan papan ketik
+* Memori
+* Disk
+* Komponen tambahan, seperti kartu antarmuka jaringan (NICs)
+* Soket, slot, dan porta
+
+Dalam beberapa halaman berikutnya, kita akan melakukan tur tingkat tinggi pada sebuah PC. Meskipun deskripsi akan fokus pada PC yang kompatibel dengan IBM (jenis komputer pribadi yang paling umum), konsep yang disajikan di sini juga berlaku untuk Macintosh atau komputer lain yang dirancang dengan arsitektur modular yang dapat diperluas. Jangan khawatir tentang PC spesifik Anda, seperti Dell atau HP. Deskripsi kami sesuai untuk komputer apa pun. Gambar 4.2 akan membantu saat kita mengamati bagian dalam komputer.¹
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-4.2.png" alt="gambar" width="580"/>
+</p>
+
