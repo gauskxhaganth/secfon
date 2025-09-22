@@ -202,4 +202,131 @@ Dalam jam ini, kita telah mempelajari tentang apa itu jaringan komputer dan baga
 
 ---
 
+# JAM 2
+## Manfaat Jaringan Komputer
+
+**Apa yang Akan Anda Pelajari dalam Jam Ini:**
+* Komputasi sebelum munculnya jaringan komputer
+* Jaringan komputer pertama
+* Bagaimana *packet-switching* mentransformasi jaringan data
+* Kerugian dari tidak menghubungkan komputer dalam jaringan
+* Keuntungan menggunakan jaringan komputer
+
+Sangat menarik untuk berspekulasi bagaimana kehidupan ini jika kita manusia tidak memiliki—apa yang dinyatakan oleh Alexis de Tocqueville—kecenderungan alami untuk mengorganisir segala sesuatu dalam sekejap. Tapi kita memang mengorganisir. Sifat ini membantu menjadikan kita spesies bertubuh besar yang dominan di bumi. Terlebih lagi, kenyamanan hidup kita bergantung pada jaringan kita yang sangat terorganisir—mulai dari layanan pos, hingga sistem transfer dana elektronik dunia. Tanpa jaringan, banyak kemewahan yang kita anggap biasa dalam kehidupan sehari-hari tidak akan ada. Dalam jam ini, Anda akan belajar lebih banyak tentang manfaat luar biasa dari jaringan komputer.
+
+### Komputasi Sebelum Jaringan Komputer
+
+Asumsikan Anda memiliki mesin waktu dan dapat kembali 40–50 tahun ke belakang untuk memeriksa komputer yang ada pada masa itu. Kemungkinan besar Anda tidak akan mengenali banyak tentang mereka. Komputer yang digunakan oleh bisnis dan pemerintah adalah raksasa-raksasa seukuran ruangan yang didinginkan dengan air. Meskipun ukurannya besar, mereka tidak sekuat ukuran saat ini; mereka hanya bisa memproses program-program kecil, dan biasanya kekurangan memori yang cukup—yaitu, bagian fisik dari komputer tempat komputer menyimpan angka 1 dan 0 dari perangkat lunak dan data—untuk menampung seluruh program sekaligus. Itulah mengapa gambar-gambar mesin-mesin tua ini sering digambarkan dengan gulungan besar pita magnetik, yang menyimpan data yang tidak digunakan komputer pada saat itu. Model komputasi ini sudah kuno, tetapi hanya 40–50 tahun yang lalu, itu adalah yang tercanggih.
+
+Pada masa itu, komputer menawarkan sedikit interaksi antara pengguna dan sistem. Layar tampilan video interaktif dan papan ketik (*keyboard*) masih untuk masa depan. Alih-alih duduk di depan terminal atau PC mengetik karakter dan menggunakan *mouse*, pengguna menyerahkan pekerjaan yang perlu dilakukan komputer kepada seorang operator komputer, yang merupakan satu-satunya orang yang diizinkan untuk berinteraksi langsung dengan komputer. Biasanya, pekerjaan tersebut diserahkan dalam bentuk pita kertas berlubang atau kartu berlubang.
+
+Sering kali, komputer disimpan di ruangan dengan pengatur suhu dan dinding kaca—oleh karena itu muncul nama slang **"rumah kaca" (*glass house*)** untuk pusat data. Pengguna menyerahkan pekerjaan mereka dalam bentuk kartu berlubang yang dieksekusi (dijalankan) secara berkelompok (*batch*) di komputer—satu atau dua *batch* per shift—dari sinilah kita mendapatkan istilah **pemrosesan *batch* (*batch processing*)**. Pemrosesan *batch* umum terjadi di lingkungan awal di mana banyak tugas dijadwalkan untuk berjalan pada waktu tertentu larut malam. Pengguna tidak pernah berinteraksi langsung dengan komputer pemrosesan *batch*. Proses *Debugging* (memperbaiki) program jauh lebih sulit karena seorang programmer harus menunggu mesin mencetak hasil "eksekusi" program, memperbaiki kode, dan kemudian menyerahkan kembali pekerjaan tersebut untuk dijalankan lagi semalaman.
+
+Komputer pada waktu itu tidak dapat berinteraksi satu sama lain. Sebuah komputer IBM sama sekali tidak bisa "berbicara" dengan komputer Honeywell atau Burroughs. Bahkan jika mereka bisa terhubung, mereka tidak akan bisa berbagi data—komputer-komputer tersebut menggunakan format data yang berbeda; satu-satunya standar pada waktu itu adalah **ASCII**. ASCII adalah **American Standard Code for Information Interchange**, sebuah cara komputer memformat angka 1 dan 0 (kode biner) menjadi alfabet, angka, dan karakter lain yang dapat dipahami manusia. Komputer harus mengonversi data sebelum dapat menggunakannya, yang pada masa pra-standar itu, bisa memakan waktu selama memasukkan ulang data.
+
+Bahkan jika komputer mampu memahami format data satu sama lain, transfer data akan lambat karena ketidakmampuan untuk menghubungkan komputer secara langsung. Bahkan di antara komputer yang dibuat oleh produsen yang sama, satu-satunya metode untuk mentransfer data adalah dengan membawa pita atau *hard disk* besar ke penerima data. Ini berarti pengiriman fisik perangkat penyimpanan ini ke setiap lokasi yang membutuhkan salinan data—sebuah kecepatan siput jika dibandingkan dengan jaringan modern.
+
+Untungnya, **Advanced Research Projects Agency (ARPA)** pemerintah AS mendanai beberapa program berdasarkan serangkaian memo yang ditulis di MIT pada tahun 1962 tentang interkoneksi komputer. Ide-ide ini mendapat dukungan di ARPA, yang kemudian mendanai pembuatan **ARPANET**: sebuah jaringan komputer yang saling terhubung dan berkomunikasi satu sama lain dengan "paket." Pada tahun 1968, ARPA menerbitkan sebuah **Request for Comments (RFC)** untuk pengembangan sebuah *packet switch* yang disebut **Interface Message Processor (IMP)**. RFC tersebut dimenangkan oleh **Bolt, Beranek, and Newman (BBN)**, perusahaan yang merancang beberapa *packet switch* pertama yang berhasil.
+
+### Terobosan Jaringan: Data *Packet-Switched*
+
+Bagian ini memberikan penjelasan tentang ***packet-switching***, sebuah teknik yang digunakan di semua jaringan komputer untuk mengangkut lalu lintas antar *node*. Terlepas dari cakupan dan ukuran jaringan, ia menggunakan operasi *packet-switching*.
+
+*Packet-switching* diciptakan untuk menyelesaikan beberapa masalah yang berkaitan dengan metode yang digunakan oleh jaringan data yang sedang berkembang untuk mentransmisikan data. Di masa lalu, sebuah tautan komunikasi menggunakan teknik yang disebut ***circuit switching*** untuk mengalokasikan sumber daya ke lalu lintas. Untuk lalu lintas suara, *circuit switching* efektif, karena ia mendedikasikan sebuah saluran untuk percakapan suara selama percakapan tersebut berlangsung. Umumnya, tautan tersebut dimanfaatkan secara efektif karena dua orang di telepon berbicara hampir sepanjang waktu.
+
+Situasi ini tidak terjadi pada dialog data. Karena sifat maju-mundur dari pengetikan data pada papan ketik komputer (mengetik karakter, menekan *backspace* untuk memperbaiki kesalahan, berpikir sejenak tentang "transmisi"), jaringan *circuit-switched*, seperti sistem telepon, sering mengalami periode di mana tautan yang didedikasikan menganggur—menunggu kedua koresponden untuk benar-benar berkorespondensi.
+
+*Packet-switching* memecahkan masalah mahal ini dengan memberikan manfaat berikut:
+* Lebih dari satu aliran data pengguna dapat dikirim melalui sebuah tautan selama rentang waktu tertentu.
+* *Packet-switching* tidak membangun koneksi melalui jaringan. Dengan demikian, ia tidak memerlukan saluran ujung-ke-ujung (*end-to-end*) yang didedikasikan. Jika terjadi masalah di satu bagian jaringan, data pengguna dapat secara dinamis dialihkan kembali ke *switch* yang beroperasi dengan memuaskan. Di masa lalu, kegagalan pada *circuit switch* memerlukan pekerjaan yang membosankan dan memakan waktu untuk membangun kembali koneksi ujung-ke-ujung yang didedikasikan.
+* Karena banyak sesi pengguna (seperti email dan pesan teks) melibatkan pemasukan data yang lambat ke dalam jaringan, *packet-switching* "mengemas" data ini ke dalam bundel-bundel kecil dan mengirimkannya ke tujuan. (Ngomong-ngomong, bahkan sesi yang "lebih cepat," seperti transfer file, tidak sepenuhnya memanfaatkan tautan komunikasi berkapasitas tinggi.) Sementara perangkat lunak *packet switching* menunggu lebih banyak data muncul dari jari-jari dan ibu jari kita yang kikuk, ia mengalihkan perhatiannya ke pengguna yang aktif dan untuk waktu yang singkat, ia mengalokasikan sumber daya jaringan untuk pengguna ini. Nanti, ketika kita sedang mengetik data, ia mengalihkan perhatiannya kembali kepada kita.
+* Dengan kata lain, sumber daya jaringan yang mahal hanya digunakan saat pengguna membutuhkan sumber daya tersebut. Ini adalah pengaturan yang ideal untuk komunikasi data yang bersifat "*bursty*" (tidak menentu) di mana fasilitas digunakan secara berkala.
+
+Sekilas, *packet-switching* mungkin sedikit sulit untuk dipahami. Meskipun demikian, untuk memahami dasar-dasar jaringan komputer, kita harus memahami *packet-switching*. Untuk itu, berikut adalah eksperimen singkat yang akan membantu menjelaskan jaringan *packet-switching*. Kita akan membandingkan jaringan *packet-switching* dengan jaringan pos.
+
+Asumsikan Anda adalah seorang penulis yang sedang menulis naskah yang harus dikirimkan ke editor Anda, yang tinggal jauh dari Anda. Asumsikan juga (untuk tujuan eksperimen ini) bahwa layanan pos membatasi berat paket yang dibawanya, dan seluruh naskah lebih berat dari batas tersebut. Jelas, Anda harus memecah naskah dengan cara yang memastikan editor Anda dapat menyusunnya kembali dalam urutan yang benar tanpa kesulitan. Bagaimana Anda akan menyelesaikan tugas ini?
+
+Pertama, Anda memecah naskah menjadi ukuran standar. Mari kita asumsikan bagian naskah 50 halaman ditambah amplop adalah berat maksimum yang akan didukung oleh layanan pos. Setelah memastikan halaman naskah Anda diberi nomor, Anda membagi naskah menjadi potongan-potongan 50 halaman. Tidak masalah apakah potongan itu memisahkan bab atau bahkan di tengah kalimat—halaman-halamannya diberi nomor, sehingga dapat disusun kembali di *node* penerima. Jika ada halaman yang hilang karena amplop robek, nomor halaman membantu menentukan apa yang hilang.
+
+Membagi naskah besar menjadi potongan-potongan kecil berukuran sama dengan metode verifikasi kelengkapan data (melalui penggunaan nomor halaman) adalah bagian pertama dari **paketisasi data**. Editor dapat menggunakan nomor halaman, yang merupakan properti dari data, untuk menentukan apakah semua data telah tiba dengan benar. Dia dapat menggunakan prosedur lain untuk memverifikasi kebenaran data yang diterima.
+
+Selanjutnya, Anda memasukkan potongan-potongan naskah 50 halaman ke dalam amplop yang diberi nomor secara berurutan—50 halaman pertama masuk ke amplop nomor 1, 50 halaman kedua masuk ke amplop nomor 2, dan seterusnya hingga Anda mencapai akhir naskah. **Nomor urut** penting karena membantu *node* tujuan (editor Anda, atau komputer) menyusun kembali data dalam urutan yang benar.
+
+Jumlah halaman di setiap amplop juga ditulis di bagian luar amplop, yang menjelaskan **ukuran paket data**. (Dalam jaringan komputer, jumlah karakter (*byte*) yang digunakan, bukan jumlah halaman.) Jika ukurannya salah ketika paket tiba di tujuan, komputer tujuan akan membuang paket tersebut dan meminta pengiriman ulang. Pendekatan lain adalah agar pihak pengirim dan penerima menyetujui ukuran paket sebelum dikirim.
+
+Terakhir, Anda menulis alamat editor Anda sebagai tujuan dan alamat Anda sebagai alamat pengirim di bagian luar amplop dan mengirimkannya menggunakan layanan pos.
+
+Gambar 2.1 mengilustrasikan amplop hipotetis dan hubungan setiap elemen dengan paket data dalam jaringan komputer.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-2.1.png" alt="gambar" width="580"/>
+</p>
+
+Rute yang ditempuh amplop-amplop tersebut saat dalam perjalanan antara kotak surat Anda dan meja editor Anda tidaklah penting bagi editor Anda maupun Anda. Seperti yang ditunjukkan pada Gambar 2.2, beberapa amplop mungkin dirutekan melalui Chicago; yang lain mungkin dirutekan melalui Dallas—itu tidak penting selama semua amplop tiba di meja editor Anda. Jika jumlah halaman yang diterima editor Anda tidak cocok dengan jumlah halaman yang tertulis di luar amplop, editor tahu ada sesuatu yang salah—amplopnya terbuka dan halamannya tercecer, atau seseorang telah merusak isinya. Jika Anda mengirimkan naskah (elektronik) ini kepada editor Anda melalui Internet, prosesnya akan bekerja dengan cara yang sama—bagian-bagian buku (di dalam paket) bisa saja dirutekan melalui banyak mesin (*router*) sebelum tiba di komputer editor Anda.
+
+Dalam istilah jaringan, setiap amplop lengkap adalah sebuah **paket data**. Urutan di mana editor Anda—atau sebuah komputer—menerimanya tidak menjadi masalah karena editor (atau komputer) dapat menyusun kembali data dari nomor urut di bagian luar amplop.
+
+Untuk setiap amplop yang benar yang diterima editor Anda, ia mengirimi Anda sebuah **konfirmasi (*acknowledgment*)**. Jika sebuah amplop gagal tiba atau rusak dalam beberapa hal, editor Anda tidak akan memberikan konfirmasi penerimaan untuk amplop spesifik tersebut. Setelah waktu yang ditentukan, jika Anda tidak menerima konfirmasi untuk paket tersebut, Anda harus mengirimkannya kembali agar editor memiliki naskah yang lengkap. Data *packet-switched* tidak sepenuhnya sesuai dengan contoh ini, tetapi cukup dekat, dan cukup bagi kita untuk melanjutkan ke detail yang lebih teknis.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-2.2.png" alt="gambar" width="580"/>
+</p>
+
+Setiap data yang Anda kirim melalui jaringan komputer akan dipaketkan—mulai dari pesan teks terkecil hingga file terbesar. Keindahan jaringan *packet-switching* adalah lebih dari satu komputer dapat mentransmisikan data melalui satu tautan komunikasi pada saat yang sama—sebuah konsep yang disebut ***time-division multiplexing***. Ribuan paket dari beberapa mesin dapat di-*multiplex* ke dalam sebuah tautan tanpa kebingungan karena setiap paket (seperti amplop pos) mengandung elemen-elemen berikut:
+* **Alamat sumber**—Alamat pengirim atau asal paket
+* **Alamat tujuan**—Ke mana paket tersebut ditujukan
+* **Nomor urut**—Di mana posisi paket tersebut di antara paket-paket terkait lainnya
+* **Pemeriksaan kesalahan (*error check*)**—Jaminan bahwa data bebas dari kesalahan
+
+Karena setiap komputer memiliki alamat atau serangkaian alamat yang berbeda (seperti yang dijelaskan pada Jam ke-3 dan 15), mentransmisikan data melalui jaringan komputer mirip dengan mengirim surat melalui jaringan pos.
+
+Pentingnya standar terkait *packet switching* secara khusus (dan jaringan komputer secara umum) tidak dapat dilebih-lebihkan. Keberhasilan jaringan *packet-switched* bergantung pada adopsi standar yang luas. Jaringan komputer menghargai kerja sama. Tidak peduli seberapa elegan dan efisien sebuah sistem, jika tidak mematuhi standar yang diterima oleh komunitas, sistem itu akan gagal. Beberapa organisasi ada untuk menciptakan standar-standar ini. Untuk *packet-switching*, badan yang berwenang adalah **International Telecommunications Union (ITU)** dan beberapa kelompok kerja serta badan standar Internet.
+
+### Manfaat Jaringan Komputer
+
+Seperti yang dijelaskan di awal jam ini, sebelum jaringan komputer muncul, mentransfer data antar komputer adalah tugas yang memakan waktu dan padat karya. Ketika jaringan area lokal (LAN) mulai ada di kantor-kantor, seseorang yang ingin bertukar data dengan orang lain yang komputernya berada di LAN lain akan menyalin data ke disk, berjalan ke mesin lain, dan mentransfer file data ke komputer lain tersebut. Teknik ini mendapat julukan **Sneakernet**.
+
+#### Manajemen File
+
+Jelas, Sneakernet bukanlah cara yang efisien untuk memindahkan atau mengelola file. Ini memakan waktu dan tidak dapat diandalkan. Selain itu, datanya terdesentralisasi. Setiap pengguna dapat memiliki versi file tertentu yang berbeda yang disimpan di komputer mandirinya. Kebingungan yang terjadi ketika pengguna membutuhkan versi file yang sama dan tidak memilikinya dapat menciptakan masalah serius bagi sebuah organisasi. Dengan komputer yang terhubung melalui jaringan, data dapat dibagikan di antara mereka. Kita menganggap kemampuan ini biasa saja hari ini, tetapi kemampuan ini tidak ada sampai LAN terhubung pada akhir 1970-an.
+
+#### Berbagi Perangkat Lunak
+
+Komputer yang tidak terhubung juga menderita masalah lain: Mereka tidak dapat berbagi aplikasi perangkat lunak. Setiap aplikasi harus diinstal di setiap komputer agar data yang dikirim melalui Sneakernet bisa efektif. Jika seorang pengguna tidak memiliki aplikasi yang membuat file yang disimpan di komputernya, ia tidak dapat membaca file tersebut. Tentu saja, jika kita tidak dapat berbagi aplikasi, tidak ada yang bisa berbagi, katakanlah, kalender atau daftar kontak dengan pengguna lain, apalagi mengirimi mereka email. Berbagi perangkat lunak memiliki efek yang berlawanan dengan perangkat lunak yang tidak dibagikan. Sebagai contoh, kita tidak perlu memuat semua perangkat lunak di komputer kita agar lalu lintas kita dirutekan dari LAN kita di Los Angeles ke LAN di New York. Komputer kita berbagi sebagian perangkat lunaknya dengan banyak perangkat lunak di *router* lokal untuk menyediakan layanan ini.
+
+Aplikasi **groupware** (juga disebut **perangkat lunak kolaboratif**) adalah aplikasi yang memungkinkan banyak pengguna untuk bekerja bersama dengan menggunakan jaringan untuk menghubungkan mereka. Aplikasi semacam itu dapat bekerja secara serial, di mana (misalnya) sebuah dokumen secara otomatis dirutekan dari orang A ke orang B setelah orang A selesai mengerjakannya. Groupware juga mungkin memungkinkan kolaborasi waktu nyata (*real-time*). Perangkat lunak Lotus Notes dari IBM adalah contoh dari yang pertama, dan Microsoft Office memiliki beberapa fitur kolaboratif waktu nyata. Contoh lain adalah meja bantuan (*help desk*) dari vendor perangkat lunak. Sering kali, ketika pelanggan menelepon untuk meminta bantuan, teknisi terhubung ke aplikasi pengguna dengan rutinitas perangkat lunak pemecahan masalah untuk menganalisis masalah. Komputer pengguna berbagi perangkat lunak investigasi yang kuat, tetapi komputer pengguna tidak harus mengunduhnya untuk menggunakannya.
+
+Contoh lain dari aplikasi bersama adalah kalender grup, yang memungkinkan staf untuk merencanakan pertemuan dan tugas menggunakan jadwal terpusat alih-alih 20 jadwal yang berbeda; dan **email**, atau surat elektronik, yang sering disebut sebagai **aplikasi pembunuh (*killer application* atau *killer app*)** dari jaringan komputer. Email dan aplikasi jaringan lainnya dibahas lebih dalam pada Jam ke-13, "Aplikasi Jaringan."
+
+> **Ngomong-ngomong**
+>
+> **Memahami *Killer App***
+>
+> Istilah *killer app* bukanlah istilah negatif. Meskipun ada dugaan yang masuk akal tentang maknanya, istilah ini tidak mengacu pada virus atau perangkat lunak berbahaya lainnya. Sebaliknya, *killer app* adalah aplikasi yang sangat berguna sehingga memengaruhi operasi sebuah organisasi dan kemungkinan besar meningkatkan permintaan akan sumber daya komputer. Email adalah *killer app* dari jaringan komputer karena memungkinkan pengguna untuk melakukan percakapan di ruang kerja bersama tanpa bertukar file kertas dan memo yang merepotkan. Dengan popularitas ponsel, pesan teks menjadi *killer app* terkait. Dan Web adalah induk dari semua *killer app*.
+
+#### Berbagi Printer dan Perangkat Periferal Lainnya
+
+Printer dan pemindai (*scanner*) harganya mahal. Jika tidak dapat dibagikan, mereka menjadi beban modal yang sangat besar bagi organisasi dan bahkan rumah tangga. Anda bisa membayangkan tekanan pada anggaran jika setiap komputer di rumah atau perusahaan harus memiliki printer atau pemindai khusus.
+
+#### Manajemen Konfigurasi Terpusat
+
+Ketika komputer pribadi masuk ke pasar massal, produsen perangkat lunak menghadapi masalah besar: perbaikan dan peningkatan produk mereka, yang berada di jutaan mesin. Sebelum jaringan komputer menjadi hal yang umum (dibantu oleh Internet), perbaikan, katakanlah, sebuah *bug* di perangkat lunak DOS Microsoft memerlukan pengiriman disk kepada pengguna, atau pengguna harus memiliki cara untuk menghubungi situs Microsoft untuk mengunduh *patch* melalui jalur telepon berkapasitas rendah. Banyak pengguna tidak menjaga sistem mereka tetap ter-update dengan pembaruan ini, yang mengakibatkan versi perangkat lunak yang berbeda di seluruh lini produk. Perusahaan-perusahaan seperti Microsoft menghadapi situasi yang kompleks ketika mencoba menjaga perubahan mereka tetap kompatibel dengan perangkat lunak pelanggan.
+
+Dengan jaringan komputer berkapasitas tinggi, para vendor dapat secara otomatis mengunduh perubahan mereka ke jutaan pengguna, semua dalam beberapa detik. Di lingkungan saat ini, dengan setiap kali masuk ke Internet, tidak jarang PC pengguna mendapatkan peningkatan dan perbaikan pada beberapa dari ribuan program perangkat lunak di sebuah mesin.
+
+Terlebih lagi, administrator jaringan menggunakan jaringan mereka sendiri untuk mengelola jaringan tersebut. Sebagai contoh, di sebuah perusahaan besar, ratusan atau bahkan ribuan *server* dan *router* ditempatkan di seluruh negeri, benua, atau mungkin dunia. Dengan berbagai utilitas perangkat lunak, seorang administrator dapat mendiagnosis dan memperbaiki masalah, serta menginstal dan mengkonfigurasi perangkat lunak. Rangkaian utilitas ini memungkinkan seorang administrator jaringan untuk mengumpulkan dan menstandarisasi konfigurasi komputer serta untuk memecahkan masalah di dalam jaringan.
+
+Mempelajari tentang manajemen jaringan dan penyiapan awalnya membutuhkan banyak pekerjaan dari pihak administrator, tetapi ketika instalasi awal selesai, kehidupan administrator menjadi lebih mudah. Manajemen terpusat menghemat waktu dan uang (dua hal yang dihargai oleh akuntan). Ini juga menumbuhkan niat baik dari para pengguna dan kredibilitas administrator (dua hal yang dihargai oleh pengguna dan administrator). Untuk mengetahui lebih lanjut tentang mengelola jaringan, lihat jam-jam administrasi jaringan di Bagian V buku ini, "Administrasi Jaringan."
+
+#### Kecepatan dan Ekonomi
+
+Singkatnya, jaringan komputer memungkinkan kita untuk melakukan pekerjaan kita dengan lebih cepat dan lebih efisien serta mengarah pada produktivitas yang lebih besar di dunia kerja. Wajar untuk mengatakan bahwa mereka telah menjadi roda penggerak penting dalam meningkatkan kekayaan suatu negara, serta warganya.
+
+Dan kita tidak boleh lupa fakta bahwa sistem-sistem luar biasa ini memungkinkan kita untuk bermain Texas Holdem dan Scrabble online hingga larut malam ketika kita seharusnya sudah tidur.
+
+### Ringkasan
+
+Ketika sumber daya komputer dibagikan melalui jaringan, para penggunanya menuai berbagai manfaat mulai dari pengurangan biaya, kemudahan penggunaan, hingga administrasi yang lebih sederhana. Penghematan finansial dan peningkatan produktivitas pekerja yang diwakili oleh jaringan akan dihargai oleh perusahaan yang mencoba berhemat. Dari sudut pandang pekerja, seorang karyawan tidak perlu lagi mengejar informasi. Jika aplikasi seperti email, kalender, dan manajemen kontak ditambahkan, jaringan mulai membangun hubungan sinergis antara pengguna dan data. Jaringan komputer yang dirancang dengan baik memungkinkan kita untuk mencapai lebih banyak hal daripada yang bisa kita lakukan tanpanya.
+
+---
 
