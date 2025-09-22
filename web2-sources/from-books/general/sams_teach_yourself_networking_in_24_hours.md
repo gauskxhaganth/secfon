@@ -330,3 +330,177 @@ Ketika sumber daya komputer dibagikan melalui jaringan, para penggunanya menuai 
 
 ---
 
+# JAM 3
+## Mengirim Data dari Sini ke Sana: Cara Kerja Jaringan Komputer
+
+**Apa yang Akan Anda Pelajari dalam Jam Ini:**
+* Protokol jaringan dan model OSI untuk jaringan komputer
+* Alamat jaringan (IP dan MAC)
+* Pengenalan Ethernet, IP, dan ATM
+
+Pada jam sebelumnya, kita telah mempelajari mengapa *packet switching* penting untuk jaringan data dan pengangkutan data antar komputer. Pada jam ini, kita akan belajar lebih banyak tentang bagaimana jaringan mengangkut data. Bagian pertama dari jam ini akan memperluas konsep protokol, dengan penjelasan tentang model **Open Systems Interconnection (OSI)** yang terkenal. Selanjutnya, akan dijelaskan tentang alamat jaringan, diikuti dengan pengenalan jaringan Ethernet dan *ring*. Protokol **Asynchronous Transfer Mode (ATM)** akan disorot, begitu pula protokol yang beroperasi di hampir semua komputer saat ini: **Internet Protocol (IP)**. Pada jam-jam berikutnya, kita akan kembali ke jaringan dan protokol ini dengan penjelasan yang lebih detail.
+
+### Protokol Jaringan
+
+Untuk meninjau kembali secara singkat poin-poin yang dibahas pada Jam ke-1, "Gambaran Umum Jaringan Komputer," komputer berkomunikasi satu sama lain dengan **protokol jaringan**—aturan yang mengatur bagaimana mesin bertukar data. Kita telah belajar bahwa **protokol fisik** digunakan untuk mendeskripsikan media (misalnya, kabel tembaga), koneksi (misalnya, port USB), dan sinyal (misalnya, level tegangan pada kabel). Kita juga belajar bahwa **protokol logis** terdiri dari perangkat lunak yang mengontrol bagaimana dan kapan data dikirim dan diterima ke komputer, melalui protokol fisik yang mendukung. Singkatnya, protokol mewujudkan aturan—yang dieksekusi dalam berbagai kombinasi perangkat keras dan perangkat lunak—untuk mengirim dan menerima data melintasi jaringan.
+
+Untuk memahami konsep penuh dari protokol jaringan dan metode pergerakan data melalui jaringan komputer, Anda perlu memahami fungsi-fungsi mereka dalam hubungannya satu sama lain dan dengan jaringan komputer. Sebagai permulaan, mari kita periksa model konseptual paling populer untuk jaringan komputer: model OSI.
+
+### Model OSI (dan Mengapa Anda Harus Mengenalnya)
+
+Selama tahun 1980-an, dua badan standar internasional (**International Telecommunications Union [ITU]** dan **International Organization for Standardization [ISO]**) menciptakan sebuah model yang dengannya protokol komunikasi data dapat dirancang, dieksekusi, dan dipelihara. Bersamaan dengan model tersebut, ITU dan ISO juga menerbitkan banyak protokol yang mengikuti aturan model OSI. Model ini menyediakan paradigma yang sangat berguna tentang bagaimana fungsi-fungsi dapat didistribusikan di antara berbagai bagian jaringan.
+
+Karena protokol Internet (seperti TCP/IP) muncul sekitar waktu ini, protokol OSI tidak pernah mendapatkan pengikut yang luas, tetapi **model OSI** menjadi arketipe untuk jaringan komputer. Menariknya, protokol Internet berkembang agak terpisah dari model OSI, namun strukturnya sangat paralel.
+
+Seperti yang terlihat pada Gambar 3.1, model ini diorganisir menjadi tujuh lapisan. Lapisan-lapisan ini patut dihafal untuk melakukan *debugging* masalah jaringan—mulai dari masalah desain hingga kekacauan pada koneksi. Model ini juga membantu saat berdiskusi tentang jaringan. Sebagai contoh, Tommy mungkin berkata kepada saya, "Saya sedang mengerjakan aplikasi Web di Lapisan 7 model ini." Dengan informasi tersebut, saya langsung tahu sifat aplikasi tersebut dan fitur-fitur pendukungnya (protokol di Lapisan 6 hingga 1) yang dapat digunakan (atau harus digunakan) untuk mendukung aplikasinya.
+
+Setiap lapisan hanya berkomunikasi dengan lapisan yang berada tepat di atas atau di bawahnya di dalam komputer yang sama. Komunikasi ini terjadi dengan pemanggilan fungsi perangkat lunak atau *library*. Jika Anda memiliki latar belakang di bidang perangkat lunak, Anda tahu bahwa pemanggilan ini juga dikenal sebagai **antarmuka pemrograman aplikasi (*application programming interfaces* atau API)**. Jika Anda bukan seorang programmer perangkat lunak, jangan khawatir tentang hal itu; cukup ingat bahwa satu lapisan memanggil lapisan lain dengan memanggil perangkat lunak yang berada di lapisan tersebut. Kabar baiknya adalah Anda tidak perlu berurusan dengan tingkat detail ini untuk membangun jaringan Anda sendiri. Tetapi, seperti yang disebutkan, ada baiknya mengetahui struktur umum model ini.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-3.1.png" alt="gambar" width="580"/>
+</p>
+
+Tujuan utama dari komunikasi antar lapisan adalah agar satu mesin pengguna akhir dapat mengirimkan data ke mesin pengguna akhir lainnya, seperti yang terlihat pada tumpukan protokol kiri dan kanan di Gambar 3.1. Pengangkutan data ini berbentuk paket. Dalam gambar tersebut, panah bergaris tebal menggambarkan bagaimana data, bersama dengan informasi kontrol setiap lapisan (*header*), secara fisik dilewatkan antar lapisan (secara vertikal). Panah bergaris putus-putus menggambarkan bagaimana data dan *header* secara logis dipertukarkan melintasi lapisan-lapisan sejawat (*peer layers*) (secara horizontal). Terakhir, garis putus-putus/titik-titik menunjukkan data saat ditransmisikan melintasi tautan komunikasi.
+
+Tujuan utama dari proses vertikal adalah untuk melaksanakan proses horizontal. Tentu saja, transmisi aktual melintasi tautan atau tautan-tautan komunikasi hanya terjadi di Lapisan 1, sekali lagi seperti yang digambarkan oleh garis putus-putus/titik-titik.
+
+Lihatlah bagian tengah Gambar 3.1. Tidak semua lapisan perlu dieksekusi di setiap mesin dalam jaringan. Untuk penyampaian paket melalui jaringan antara dua komputer pengguna akhir, hanya Lapisan 1–3 yang diperlukan. Jadi, ketika Tommy mengirimi saya email, lalu lintas hanya melewati Lapisan 1–3 dari *router* di Internet. Meskipun *router-router* ini berisi ketujuh lapisan, untuk dukungan penyampaian yang berkelanjutan, mereka tidak peduli dengan aktivitas Lapisan 4–7, yang biasanya merupakan aktivitas ujung-ke-ujung (*end-to-end*). *Router* meneruskan *header-header* ini (dan email Tommy) secara transparan ke *node* berikutnya. Akibatnya, dengan mengeksekusi lebih sedikit lapisan dan fungsi-fungsi terkaitnya, *router* dapat menyampaikan paket lebih cepat.
+
+Dengan latar belakang ini, kita akan memeriksa Gambar 3.1 sedikit lebih detail. Dalam prosesnya, kita akan menjelaskan fungsi utama dari setiap lapisan dan memberikan contoh protokol terkemuka yang berada di setiap lapisan. Selain itu, kita akan membandingkan model ini dengan operasi layanan pos.
+
+* **Lapisan 7 (aplikasi)** berisi aplikasi yang paling akrab bagi pengguna, seperti email, pesan teks, dan transfer file. Aplikasi seperti **File Transfer Protocol (FTP)** dan **Telnet** berada di Lapisan 7. Dalam model pos, lapisan aplikasi sesuai dengan menulis atau membaca surat. Produk seperti Microsoft Word dan Excel beroperasi di lapisan ini, begitu pula **Hypertext Transfer Protocol (HTTP)** yang banyak digunakan.
+
+* **Lapisan 6 (presentasi)** berurusan dengan cara sistem yang berbeda merepresentasikan data. Misalnya, Lapisan 6 mendefinisikan sintaks data, seperti konvensi IBM dalam mengkodekan karakter yang dimasukkan dari papan ketik. Lapisan ini juga dapat melakukan konversi kode, seperti menampilkan data gaya UNIX di layar Windows, atau menerjemahkan gambar spesifik Photoshop ke gambar JPEG.
+    Lapisan 6 tidak memiliki analogi dalam model pos, tetapi jika ada, itu akan mirip dengan penulisan ulang surat agar siapa pun bisa membacanya. Analogi yang pas adalah penerjemah; menggunakan model pos lagi, asumsikan surat Anda yang ditulis dalam bahasa Inggris dikirim ke Meksiko. Seorang penerjemah (setara dengan perangkat lunak lapisan presentasi) menerjemahkan data dalam amplop Anda ke dalam bahasa Spanyol. Mirip dengan surat dalam contoh, data dapat "diatur ulang" agar sesuai dengan jenis komputer dan perangkat lunak tempat ia dieksekusi.
+    Berbagai produk Lapisan 6 ada di pasaran, banyak di antaranya disimpan di dalam komputer Anda atau di *hard disk* Anda. Anda tidak pernah melihatnya secara langsung, tetapi Anda memanggilnya saat diminta, seperti dalam, "Pilih dari daftar ini program mana yang ingin Anda gunakan untuk membuka file ini."
+
+* **Lapisan 5 (sesi)** menangani dialog antar sistem. Lapisan ini menangani komunikasi dua arah (*bidirectional*) atau satu arah (*unidirectional*). Dalam metafora pos, lapisan sesi mirip dengan penulis surat yang menginstruksikan penerima untuk segera membalas surat, tidak membalas sama sekali, atau membalas kapan saja. Dalam aplikasi pesan teks, satu pengguna mungkin sedang mengetik teks di ponsel dan mengirim pesan pada saat yang hampir bersamaan dengan pengguna lain yang melakukan operasi yang sama. Dalam situasi ini, Lapisan 5 memungkinkan pengguna untuk mengirim dan menerima data pada saat yang sama. Dalam aplikasi transfer file, satu pengguna mungkin tidak diizinkan untuk mengirim file saat ia sedang mengirim file. Lapisan 5 sering melarang Anda untuk memasukkan dan mengirim email saat sedang sibuk dengan tugas lain.
+
+* **Lapisan 4 (transport)** dapat dibandingkan dengan sistem surat tercatat. Lapisan ini peduli untuk memastikan surat tiba dengan aman di tujuannya. Jika sebuah paket gagal mencapai pengguna akhir, Lapisan 4 pengirim akan mengirim ulang paket tersebut. Akibatnya, Lapisan 4 memulihkan dari kesalahan apa pun di Lapisan 1–3. Misalnya, jika sebuah *router* dalam jaringan mengalami kegagalan sementara dan kehilangan lalu lintas, lapisan transport datang untuk menyelamatkan. Lapisan 4 mesin pengirim harus menyimpan salinan setiap paket yang dikirimnya dan hanya dapat membuang paket ini ketika menerima konfirmasi dari mesin penerima. Jika diberitahu untuk mengirim ulang, ia akan melakukannya. Jika tidak menerima konfirmasi seperti itu, ia mengasumsikan ada sesuatu yang salah dan tetap mengirim ulang. Jika mesin penerima kebetulan menerima paket duplikat, ia menggunakan nomor urut dalam paket untuk membuang data yang berlebihan.
+    Semua ini sungguh luar biasa, bukan? Semua aktivitas ini (mengirim paket, memeriksa kesalahan, mengonfirmasi data, mungkin mengirim ulang satu atau lebih paket) terjadi begitu cepat sehingga biasanya tetap transparan bagi pengguna akhir.
+    Untuk layanan pos, layanan integritas ujung-ke-ujung memakan waktu beberapa hari. Untuk jaringan komputer, dibutuhkan beberapa sepersekian detik, bahkan jika sesi pengguna akhir mencakup seluruh dunia. Kemungkinan besar, Anda pernah menemukan **Transmission Control Protocol (TCP)**. Protokol ini beroperasi di Lapisan 4 di dalam komputer Anda—tanpa campur tangan Anda—untuk menyediakan layanan ujung-ke-ujung yang luar biasa ini.
+
+* **Lapisan 3 (jaringan)** menyediakan layanan pengalamatan dan perutean. Ketika kita mengirim surat kepada seseorang, kita menggunakan alamat jalan dan kode pos untuk mengidentifikasi lokasi penerima. Ketika sebuah komputer mengirim data, ia juga menggunakan alamat. Untuk operasi ini, Lapisan 3 menempatkan dua alamat dalam paket: alamatnya sendiri (alamat sumber) dan alamat penerima paket (alamat tujuan). Setelah itu, seperti yang ditunjukkan Gambar 3.1, hanya Lapisan 1–3 yang perlu dieksekusi dalam sebuah internet sampai paket tiba di tujuan akhirnya.
+    Lapisan 3 mirip dengan petugas sortir surat di kantor pos, yang tidak peduli tentang surat mencapai tujuan akhirnya. Sebaliknya, perhatian mereka adalah menyortir dan meneruskan amplop ke *node* berikutnya (kantor pos) menuju tujuan. Tentu saja, tukang pos di kantor pos tujuan memang mengantarkan surat ke penerima.
+    Lapisan ini berisi **Internet Protocol**, yaitu IP dalam TCP/IP, dan **Internetwork Packet Exchange (IPX)**, sebuah protokol mirip IP yang digunakan pada produk NetWare yang lebih tua.
+
+* **Lapisan 2 (data link)** mendefinisikan seperangkat aturan untuk mengangkut lalu lintas pada satu tautan (*link* adalah saluran atau jalur komunikasi fisik) dari satu *node* ke *node* lain. Lapisan 2 tidak memiliki kesadaran tentang kondisi di luar satu tautan ini. Dalam model pos kita, Lapisan 2 merepresentasikan konvensi yang mengontrol pengiriman amplop pos, seperti memasukkan surat ke kotak surat, tanpa pengetahuan bahwa surat itu mungkin harus pergi ke kotak surat lain. Lapisan ini berisi aturan untuk perilaku beberapa protokol yang banyak digunakan, seperti Ethernet dan ATM.
+    Lapisan ini peduli untuk menemukan cara agar komponen Lapisan 3 dapat berkomunikasi secara transparan dengan komponen Lapisan 1. Dengan demikian, ia menjaga Lapisan 3 tetap independen dan tidak menyadari detail Lapisan 1—sebuah layanan yang luar biasa berguna. Misalnya, IP yang beroperasi di $L_3$ tidak pernah peduli apakah paketnya dikirim melalui, katakanlah, saluran telepon seluler nirkabel atau kabel tembaga berbasis kawat. Lapisan 2 melakukan mediasi yang diperlukan untuk menciptakan tabir ini. IP berada di depan tabir ini, tidak peduli apakah paketnya akan ditempatkan pada tautan satelit, tembaga, kabel, radio, atau optik. Ini adalah cara yang brilian untuk menyusun bagian model ini.
+    Lapisan 2 dapat menempatkan paket di dalam **bingkai (*frame*)**, yang digunakan oleh perangkat keras untuk mengirim dan menerima lalu lintas di bawah Lapisan 3. Operasi ini mirip dengan menempatkan satu amplop pos (amplop konvensional) di dalam amplop pos lain (amplop pengiriman kilat).
+
+> **Sebuah Pengalihan Singkat tapi Penting**
+>
+> Mengapa perlu menempatkan paket di dalam *frame*? Jawaban parsialnya adalah bahwa jaringan area lokal (LAN) tidak dirancang untuk bekerja dengan paket dan alamat Lapisan 3. LAN hanya beroperasi di Lapisan 1 dan 2 dari model dan menggunakan alamat lain. Anda mungkin pernah mendengar tentang alamat ini; disebut alamat **MAC** atau **Ethernet**. Anda akan belajar lebih banyak tentang alamat ini nanti di bagian, "Alamat MAC atau Lapisan 2: Yaitu, Alamat Ethernet."
+>
+> Akibatnya, setelah paket melintasi Internet atau intranet, alamat Lapisan 3 jaringan dikorelasikan dengan alamat Lapisan 2 untuk digunakan di LAN. Setelah itu, menjadi tugas Lapisan 1 dan 2 LAN untuk mengirimkan *frame* dan paket ke komputer tujuan akhir.
+>
+> Aspek jaringan komputer ini bisa membingungkan bagi pendatang baru. Bahkan, banyak orang yang berpengalaman dalam subjek ini tidak memahami hubungan Lapisan 2 dan 3 (dan terutama alamat mereka). Mari kita berhenti sejenak untuk memeriksa Gambar 3.2. Ini akan membantu kita memahami hubungan antara paket dan *frame*, Lapisan 3 dengan Lapisan 2, dan alamat yang digunakan di kedua lapisan ini.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-3.2.png" alt="gambar" width="580"/>
+</p>
+
+Lapisan-lapisan yang lebih bawah tidak peduli dengan makna dan sintaks data pengguna. Seperti yang terlihat pada Gambar 3.2, data ini (yang juga berisi informasi kontrol—*header* dan mungkin *trailer*—yang ditambahkan oleh Lapisan 4–7) diteruskan ke Lapisan 3. Lapisan ini menambahkan alamat jaringan sumber dan tujuan serta informasi kontrol lainnya ke dalam bagian paket, yang disebut *header* paket, yang diberi label $L_3$ pada gambar.
+
+Selanjutnya, data diteruskan ke Lapisan 2, yang menambahkan *header* dan *trailer* ke paket Lapisan 3 (diberi label $L_2$ pada gambar). Seluruh unit data ini disebut **bingkai (*frame*) Lapisan 2**, yang berisi semua data dari lapisan atas, termasuk paket Lapisan 3. Selain itu, lapisan ini menambahkan alamat sumber dan tujuan di dalam *header*-nya. Tetapi alamat-alamat ini memainkan peran yang berbeda dari alamat Lapisan 3. Sebentar lagi, kita akan memeriksa fungsi dari kedua set alamat ini.
+
+Terakhir, Lapisan 1 menerima *frame* lengkap dan mengirimkannya ke tautan dan ke dalam jaringan dengan sinyal listrik, elektromagnetik, atau optik. Panah vertikal di sisi kiri Gambar 3.2 dan panah horizontal panjang di bagian bawah mengilustrasikan operasi-operasi ini.
+
+Di komputer penerima, proses yang baru saja dijelaskan dibalik. Lalu lintas sekarang diteruskan ke atas melalui lapisan-lapisan, dan berbagai *header* dan *trailer* yang dibuat di situs pengirim digunakan oleh situs penerima untuk memberitahunya apa yang harus dilakukan dengan data pengguna. Jika data tersebut adalah email, *header* akan menunjukkannya; hal yang sama berlaku untuk pesan teks, video, dan sebagainya. Setelah lapisan masing-masing memeriksa *header* dan *trailer*, ia akan membuangnya.
+
+Perhatikan betapa simetrisnya operasi ini. Meskipun data secara fisik diteruskan ke bawah dan ke atas melalui lapisan-lapisan di pengirim dan penerima masing-masing (biasanya dalam bentuk pemanggilan fungsi perangkat lunak), tujuan dari model ini adalah untuk secara logis meneruskan data antar lapisan sejawat (*peer layers*) dari kedua *node*. Ide ini ditunjukkan pada Gambar 3.2 dengan panah putus-putus di tengah gambar.
+
+* **Lapisan 1 (fisik)** mirip dengan truk, kereta api, pesawat terbang, dan rel yang memindahkan surat. Lapisan ini berkaitan dengan aspek fisik dari operasi, seperti sinyal listrik, elektromagnetik, dan optik; kartu antarmuka jaringan (**NICs**); serta kawat dan kabel. **Modem** adalah contoh perangkat Lapisan 1. Juga, banyak operasi layanan *broadband* beroperasi di Lapisan 1. Sebagai contoh, layanan **Digital Subscriber Line (DSL)** dari perusahaan telepon dan layanan *broadband* kabel dari penyedia TV kabel terutama beroperasi di Lapisan 1 dari model OSI.
+
+> **Istilah yang Lebih Baik untuk "Paket"**
+>
+> Kita baru saja memperkenalkan istilah "*frame*," unit data yang beroperasi di Lapisan 2. Sebelumnya, istilah "*packet*" diperkenalkan untuk digunakan di Lapisan 3. Nanti, kita harus memperkenalkan dua istilah lagi yang menggambarkan unit data mandiri yang melewati jaringan komputer. (Anda mungkin pernah menemukan "datagram" dan "cell" dalam literatur lain.) Maaf atas semua istilah ini. Saya janji saya tidak mengarangnya. ITU dan ISO telah menciptakan istilah generik untuk mencakup semua jargon ini: **protocol data unit (PDU)**. Jika Anda tidak yakin istilah mana yang harus digunakan, gunakan saja "PDU."
+
+### Cara Mengidentifikasi Jenis Paket dalam Frame Ethernet
+
+Dalam jaringan saat ini, berbagai jenis paket dapat dipertukarkan antar komputer pada tautan Ethernet. Di masa lalu, kalimat sebelumnya dengan kata-kata "dapat dipertukarkan" akan berbunyi "dipertukarkan." Zaman telah berubah dan, dengan pengecualian langka, data di dalam *frame* Ethernet adalah paket IP.
+
+Meskipun demikian, *header* Ethernet berisi sebuah *field* yang disebut **EtherType**, yang diisi oleh *node* pengirim untuk mengidentifikasi paket spesifik yang dibawa dalam *frame* Ethernet. Sebagai contoh, IPv4 adalah EtherType `0800`, dan IPv6 adalah EtherType `86DD`. *Field* ini sangat berharga bagi organisasi yang sedang bermigrasi ke IPv6 tetapi masih harus mendukung komponen IPv4. Akibatnya, tumpukan perangkat lunak ganda dipertahankan, dan *field* EtherType digunakan untuk meneruskan paket IP ke proses dalam tumpukan protokol perangkat lunak yang sesuai.
+
+Seperti yang disebutkan, sebelum IP menjadi begitu meresap, IBM, Novell, DEC, Apple, dan vendor lain menggunakan protokol $L_3$ proprietary mereka sendiri, dan beberapa mesin, seperti *router*, harus mendukung semuanya. *Field* EtherType digunakan untuk meneruskan paket ke proses yang benar dalam sebuah tumpukan protokol.
+
+### Model Internet
+
+Internet juga menggunakan model protokol, yang mirip dengan model OSI. Namun, ini adalah skema lima lapis dan tidak termasuk lapisan presentasi atau sesi. Apakah ini berarti layanan yang terkait dengan lapisan-lapisan ini tidak tersedia untuk operasi Internet? Tidak, itu berarti layanan tersebut ada dalam produk vendor, dan dengan beberapa pengecualian, mereka tidak didefinisikan dalam standar Internet.
+
+Pada jam-jam berikutnya, kita akan memeriksa banyak aspek penggunaan model ini oleh Internet, serta standar dan protokol yang diterbitkan oleh **Internet Engineering Task Force (IETF)**. Spesifikasi ini sekarang tertanam di hampir semua produk vendor. Hanya dalam dua dekade, mereka telah mengubah industri jaringan komputer.
+
+---
+### Alamat: Alamat Jaringan atau Lapisan 3
+
+Melanjutkan analogi layanan pos kita, sekarang kita fokus pada alamat-alamat yang sangat penting itu. Jaringan komputer memiliki alamat sumber dan tujuan yang ditambahkan ke setiap *header* paket, mirip dengan amplop pos yang ditunjukkan pada Gambar 2.1 (Jam ke-2, "Manfaat Jaringan Komputer"). Alamat-alamat ini tertanam dalam *header* $L_3$, seperti yang terlihat pada Gambar 3.2. Tugas utama sebuah *router* (sesuai namanya) adalah menggunakan alamat tujuan untuk **merutekan** paket menuju tujuan akhirnya. Karena operasi ini terjadi di Lapisan 3 model OSI, pengidentifikasi ini disebut **alamat jaringan**.
+
+Alamat jaringan yang paling banyak digunakan adalah **alamat IP**. Panjangnya 32 bit, yang secara konseptual memungkinkan $2^{32}$ alamat (4.294.967.296). Ketika alamat ini dibuat, 8 bit pertama mengidentifikasi sebuah jaringan, dan 24 bit sisanya mengidentifikasi sebuah *host* (seperti komputer) yang terpasang pada jaringan itu. Konvensi ini mengasumsikan alamat IP tidak perlu mengidentifikasi lebih dari 256 jaringan! Pengetahuan di kemudian hari memang selalu lebih baik (LAN belum dikenal saat itu), dan kita akan segera belajar bahwa badan standar Internet telah memodifikasi struktur ini dan menerbitkan protokol lain untuk memungkinkan 32 bit mengidentifikasi lebih banyak jaringan dan *host*. Untuk saat ini, mari kita periksa format alamat IP konvensional.
+
+Alamat IP ditulis dalam **notasi desimal bertitik**, dengan satu *byte* (delapan bit) di antara setiap titik. Alamat IP desimal bertitik muncul sebagai `192.168.100.25`.
+
+Karena setiap angka dijelaskan oleh satu *byte*, dan karena setiap *byte* adalah 8 bit (dari angka biner 1 dan 0), setiap angka dapat memiliki nilai mulai dari 0 hingga 255. Karena ada 4 angka dengan masing-masing 8 bit, total ruang alamatnya adalah 32 bit ($4*8 = 32$). Jadi alamat sebelumnya, dalam biner, muncul sebagai:
+`11000000.10101000.01100100.00011001`.
+
+Di masa lalu, alamat IP dialokasikan ke organisasi dalam blok alamat. Blok alamat datang dalam berbagai ukuran, berdasarkan kelas alamat. Skema ini dijelaskan di sini untuk informasi latar belakang. Karena keterbatasannya, skema ini digantikan oleh **Classless Inter-Domain Routing (CIDR)**, yang dijelaskan selanjutnya.
+
+* **Alamat Kelas A** menggunakan 24 dari 32 bit dalam ruang alamat untuk alamat *host*. Alamat Kelas A muncul sebagai `X.0.0.0`, di mana X adalah alamat jaringan.
+* **Alamat Kelas B** menggunakan masing-masing 16 bit untuk jaringan dan *host*. Alamat Kelas B muncul sebagai `X.X.0.0`.
+* **Alamat Kelas C** menggunakan 24 bit untuk ruang alamat jaringan. Berikut contoh alamat Kelas C: `X.X.X.0`.
+* **Alamat Kelas D** digunakan untuk *multicasting*: mengirim pesan ke banyak sistem. Beberapa sistem 911 menggunakan *multicast* karena membantu memastikan sistem menerima semua pesan. Aplikasi pengajaran online sering menggunakan *multicast* untuk pengiriman suara dan paket video dosen ke audiens yang luas.
+
+**Alamat privat** dapat digunakan ketika lalu lintas tidak meninggalkan jaringan privat. Dengan demikian, alamat-alamat ini dapat digunakan kembali di setiap jaringan privat. Otoritas Internet telah mengalokasikan nilai-nilai ini untuk alamat privat:
+`10.0.0.0` hingga `10.255.255.255`
+`172.16.0.0` hingga `172.31.255.255`
+`192.168.0.0` hingga `192.168.255.255`
+
+#### Alternatif untuk Alamat Konvensional
+
+Pada bagian sebelumnya, kita belajar bahwa alamat IP hanya sepanjang 32 bit, dan strukturnya yang terdiri dari empat batas delapan bit membatasi bagaimana 32 bit tersebut digunakan. Di bagian ini, kita akan memeriksa tiga konvensi yang diterbitkan oleh otoritas Internet untuk mengkompensasi batasan panjang dan format alamat IP asli. Ketiganya adalah CIDR, NAT, dan IPv6.
+
+**CIDR**
+Badan standar Internet menyadari bahwa alamat "berkelas" yang dijelaskan sebelumnya tidak akan memenuhi kebutuhan masa depan. Akibatnya, pada tahun 1993, **CIDR** (diucapkan "cider") diperkenalkan. Alih-alih menggunakan batas 8-bit yang kaku, CIDR menentukan batas dengan panjang variabel (sewenang-wenang) dari 32 bit dalam alamat IP. Ini juga menentukan metode untuk mengelompokkan alamat jaringan dengan urutan bit yang sama dalam "ruang" jaringan sebagai satu entri saja di tabel perutean *router*. Teknik ini, yang disebut **agregasi alamat**, sangat mengurangi ukuran tabel perutean dan mempercepat pencarian tabel perutean.
+
+> **Ngomong-ngomong**
+>
+> **Alamat IP Sering Disebut Prefiks**
+>
+> Dengan penggunaan CIDR dan agregasi, angka 32-bit (empat digit desimal) sekarang digambarkan sebagai sebuah **prefiks (*prefix*)**. Misalnya, prefiks `128.7/16` adalah notasi singkat yang berarti menggunakan 16 bit pertama dari alamat IP 32-bit `128.7`. Akibatnya, semua lalu lintas dengan alamat IP yang dimulai dengan `127.7` termasuk dalam satu entri di tabel perutean. Jadi, `128.7.444.666` akan cocok dengan entri tabel ini. Begitu juga `128.7.33.11`, tetapi `128.8.222.111` tidak akan cocok.
+>
+> Idenya adalah agar perangkat lunak penerusan (*forwarding*) menemukan kecocokan yang memiliki prefiks perutean terpanjang. Dengan pendekatan ini, dimungkinkan untuk secara substansial mengurangi jumlah entri dalam tabel perutean *router* (juga disebut tabel penerusan atau basis informasi perutean).
+>
+> Agregasi rute dan prefiks secara konsep sederhana, meskipun rumit dalam implementasi. Jika Anda ingin detail lebih lanjut, Anda dapat menemukan beberapa ide bagus di `www.patentstorm.us/patents/7027445/description.html`.
+>
+> Selanjutnya, istilah alamat IP dan prefiks digunakan secara bergantian.
+
+**NAT**
+Protokol **Network Address Translation (NAT)** memungkinkan banyak *host* di satu jaringan (katakanlah LAN privat di kantor) untuk menggunakan Internet hanya dengan satu alamat IP publik. Sebuah *router* berada di antara jaringan privat dan Internet publik. *Router* tersebut diberi alamat IP publik untuk berkomunikasi dengan Internet. Namun, di belakang *router*, di LAN lokal, semua komputer (*host*) menggunakan alamat privat. Terlebih lagi, alamat-alamat privat ini tidak pernah diungkapkan ke Internet publik, yang menghasilkan layanan keamanan yang berharga bagi pengguna. Tugas *router* adalah memelihara tabel yang melacak dan mengubah alamat privat pada paket keluar menjadi alamat publik. Sebaliknya, untuk paket masuk, *router* mengubah alamat publik menjadi alamat privat yang sesuai. Pengidentifikasi lain, di luar diskusi ini, digunakan untuk membantu *router* menjaga lalu lintas tetap ditandai dengan benar.
+
+**Pengalamatan IPv6**
+**IPv6** (versi 6) dimaksudkan untuk menjadi penerus IP saat ini (IPv4). *Header* IPv6 berisi ruang alamat yang lebih besar, sehingga menghilangkan kebutuhan akan CIDR dan NAT. Setiap alamat memiliki panjang 128 bit, dibandingkan dengan 32 bit untuk IPv4. Jadi, IPv6 mendukung $2^{128}$ alamat. Angka yang sangat besar ini sering dibandingkan dengan jumlah orang yang hidup saat ini, yaitu sekitar 6,5 miliar manusia. IPv6 menyediakan $5 \times 10^{28}$ alamat untuk setiap orang ini! Alamat 128-bit mendukung ribuan miliar lebih banyak alamat daripada alamat 32-bit.
+
+Wajar untuk berasumsi bahwa *field* alamat sumber dan tujuan IPv6 akan cukup untuk masa depan yang dapat diperkirakan. Meskipun begitu, karena efektivitas CIDR dan NAT, IPv4 terus menjadi versi IP dominan yang digunakan di jaringan publik maupun privat. Beberapa pemerintah telah menetapkan tenggat waktu agar peralatan dan perangkat lunak mampu menggunakan IPv6. Tenggat waktu Pemerintah AS adalah 2008. Waktu akan membuktikan apakah IPv6 akan menjadi versi yang umum untuk menjalankan IP.
+
+### Alamat MAC atau Lapisan 2: Yaitu, Alamat Ethernet
+
+Setiap perangkat di LAN diidentifikasi dengan alamat **Media Access Control (MAC)**. Seperti yang disebutkan sebelumnya, ini juga disebut alamat Lapisan 2. Awalnya, pengidentifikasi ini disebut **alamat Ethernet**. Ketika spesifikasi Ethernet dimasukkan ke dalam standar IEEE 802, namanya diubah menjadi alamat MAC karena terkait dengan Lapisan 2 IEEE 802, yang disebut lapisan Media Access Control. Beberapa orang juga menyebut nilai ini sebagai **alamat perangkat keras**, karena produsen mungkin menempatkan alamat MAC pada papan logika (seperti NIC) di dalam komputer.
+
+Seperti halnya alamat IP sumber dan tujuan di Lapisan 3, sebuah PDU LAN (sebuah *frame*) berisi alamat MAC sumber dan tujuan Lapisan 2. Alamat-alamat ini dikodekan dalam *header* $L_2$, yang ditunjukkan pada Gambar 3.2. (Lapisan ini berisi *header* dan *trailer*.) Alamatnya sepanjang 48 bit dan harus digunakan di semua LAN agar dapat beroperasi dengan benar. Di masa lalu, Kantor Administrasi Ethernet Xerox memberikan nilai-nilai ini kepada produsen peralatan LAN. Sekarang IEEE yang mengambil alih tanggung jawab ini.
+
+#### Menggunakan Alamat untuk Meneruskan Lalu Lintas
+
+Ketika Ethernet mulai ada, begitu pula Internet. Keduanya diciptakan oleh penemunya tanpa mereka tahu seberapa sering ciptaan mereka akan berinteraksi satu sama lain di masa depan. Jadi, dua set standar pengalamatan jaringan komputer menemukan penggunaan luas di industri. Ketika menjadi jelas bahwa jaringan beralamat Ethernet harus berinteraksi dengan jaringan beralamat IP, pertanyaannya menjadi: Bagaimana caranya?
+
+Seperti yang disebutkan, alamat MAC (alias Ethernet) biasanya dikonfigurasi oleh vendor pada NIC di setiap komputer. Mari kita asumsikan Anda memiliki dua PC yang terhubung ke *router* Anda melalui kabel Ethernet. Untuk diskusi ini, kita perbesar gambar sebelumnya menjadi seperti yang ditunjukkan pada Gambar 3.3. Perhatikan bahwa LAN Ethernet beroperasi dengan IP di $L_3$ dan dengan MAC Ethernet di Lapisan 1 dan 2.
+
+Juga, perhatikan bahwa PC C dan D menggunakan protokol dan antarmuka nirkabel (W1 dan W1) di Lapisan 1 dan 2. Di beberapa jaringan nirkabel, Lapisan 2 ini mirip dengan Lapisan 2 Ethernet.
+
+PC A dan B serta *router* menggunakan alamat MAC untuk memastikan lalu lintas dikirim ke *node* yang benar di jaringan lokal ini. Mari kita asumsikan PC A mengirim data, melalui *router*, ke PC B. PC A membuat *frame* dengan alamat sumber MAC A dan alamat tujuan MAC B. *Router* dikonfigurasi untuk meneruskan unit data ini ke PC B dengan memeriksa alamat tujuan MAC PC B. *Router* tidak meneruskan data ke atas ke $L_3$-nya.¹
+
+---
+> ¹ Beberapa orang mengidentifikasi mesin yang melakukan perutean berdasarkan alamat MAC (dan bukan alamat IP) sebagai sebuah **bridge**. *Router* canggih dapat dikonfigurasi untuk beroperasi dengan alamat MAC atau IP.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-3.3.png" alt="gambar" width="580"/>
+</p>
+
