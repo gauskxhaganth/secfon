@@ -7,7 +7,7 @@ Repo ini berisi materi belajar seputar dunia keamanan siber, berdasarkan pemaham
 [Grokking Bitcoin](web3-sources/from-books/books-01-grokking_bitcoin.md)<br>
 [Mastering Bitcoin](web3-sources/from-books/books-02-mastering_bitcoin.md)<br>
 [Mastering Blockchain](web3-sources/from-books/books-03_mastering_blockchain.md)<br>
-[Masteringethereum](web3-sources/from-books/books-07-mastering_ethereum_.md)<br>
+[Mastering Ethereum](web3-sources/from-books/books-07-mastering_ethereum_.md)<br>
 [Hands-on smart contrac development](web3-sources/from-books/books-06-hands-on_smart_contract_development.md)<br>
 
 
