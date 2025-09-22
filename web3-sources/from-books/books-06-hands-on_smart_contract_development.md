@@ -6485,3 +6485,1075 @@ Kita juga menampilkan penggalangan dana dari aplikasi kita dan me-*render*-nya d
 
 ---
 
+# BAB 11
+## Menyelesaikan UI Penggalangan Dana Kita
+
+Dalam bab ini, kita akan melanjutkan dari bab 10, mengerjakan aplikasi Web3 baru kita. Kita akan menambahkan informasi yang lebih rinci tentang setiap penggalangan dana, di mana pengguna dapat mengklik sebuah penggalangan dana untuk melihat informasi lebih lanjut, menambahkan tanda terima donasi untuk setiap donasi individu, dan banyak lagi.
+
+Kita juga akan belajar cara menerima *ether* melalui aplikasi kita sehingga pengguna dapat mengirimkan dana ke penggalangan dana dan berinteraksi dengan kontrak kita.
+
+Langkah pertama kita adalah menampilkan informasi lebih detail tentang setiap penggalangan dana. Ini akan memungkinkan para donatur untuk lebih mudah memutuskan penggalangan dana mana yang ingin mereka danai dan membantu para pembuat penggalangan dana untuk membuat kasus yang lebih meyakinkan.
+
+## Menambahkan Informasi Rinci Tentang Setiap Penggalangan Dana
+
+Item berikutnya dalam agenda kita adalah menampilkan informasi lebih lanjut tentang setiap penggalangan dana kepada pengguna. Kita akan menggunakan *modal* dari Material UI agar pengguna dapat mengklik penggalangan dana individu dan melihat informasi ditampilkan dengan cepat dalam sebuah *pop-up*. Ketika *modal* terbuka, mereka akan dapat mengklik jumlah donasi dan membaca lebih lanjut tentang penggalangan dana tersebut. Mereka juga akan dapat dengan cepat menutup *modal*. Tapi pertama-tama, kita perlu membuat tombol pada setiap kartu yang membuka penggalangan dana yang benar.
+
+Salin kode berikut dan tambahkan tepat setelah pernyataan `import` terakhir Anda. Ini pertama-tama akan mengimpor tombol yang kita butuhkan dari Material UI dan juga menggunakan gaya *default* yang disediakan oleh Material UI:
+
+```javascript
+import Button from '@material-ui/core/Button';
+
+const useStyles = makeStyles(theme => ({
+  button: {
+    margin: theme.spacing(1),
+  },
+  input: {
+    display: 'none',
+  },
+}));
+```
+
+Dan tepat sebelum fungsi `useEffect` Anda, tambahkan yang berikut untuk menggunakan gaya *default* dari Material UI:
+
+```javascript
+const classes = useStyles();
+```
+
+Hal terakhir yang perlu kita lakukan adalah menambahkan tombol kita dengan aksi untuk membuka *modal*. Kita akan membiarkan fungsi `handleOpen` kosong untuk saat ini. Di dalam file `FundraiserCard.js`, tambahkan tombol ini ke bagian `CardActions` di dalam `Card`:
+
+```jsx
+<CardActions>
+  <Button
+    onClick={handleOpen}
+    variant="contained"
+    className={classes.button}>
+    View More
+  </Button>
+</CardActions>
+```
+
+Dan di file `FundraiserCard.js`, tambahkan metode `onClick` untuk membuka *modal* ke kartu `Fundraiser` individu:
+
+```jsx
+<Card className={classes.card} onClick={handleOpen}>
+```
+
+Sekarang, buat fungsi `handleOpen` yang kosong untuk saat ini agar kita bisa memperbaiki peringatan kita. Kita akan menggunakan ini nanti untuk membuka dialog kita:
+
+```javascript
+const handleOpen = () => {
+  // kita akan membuka dialog di sini nanti
+}
+```
+
+Komponen `Fundraiser` Anda sekarang seharusnya terlihat seperti ini:
+
+```jsx
+const FundraiserCard = (props) => {
+  const classes = useStyles();
+
+  useEffect(() => {
+  }, []);
+
+  const handleOpen = () => {
+  }
+
+  return (
+    <div>
+      <Card className={classes.card} onClick={handleOpen}>
+        <CardActionArea>
+          <CardMedia
+            className={classes.media}
+            image={imageURL}
+            title="Fundraiser Image"
+          />
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="h2">
+              {fundName}
+            </Typography>
+            <Typography variant="body2" color="textSecondary" component="p">
+              <p>{description}</p>
+              <p>Total Donations: {totalDonations}</p>
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+        <CardActions>
+          <Button
+            onClick={handleOpen}
+            variant="contained"
+            className={classes.button}>
+            View More
+          </Button>
+        </CardActions>
+      </Card>
+    </div>
+  )
+}
+```
+
+Mari kita lanjutkan ke langkah berikutnya\!
+
+## Mengimplementasikan Dialog Material UI
+
+Sekarang setelah kita menyelesaikan pengaturan tombol, mari kita implementasikan dialog dari Material UI selanjutnya agar kita bisa menggunakan *pop-over* di aplikasi kita. Dialog adalah tempat kita akan benar-benar menampilkan semua informasi tambahan tentang penggalangan dana kepada pengguna. Ketika pengguna mengklik tombol yang baru saja kita buat, *modal* akan terbuka dengan penggalangan dana tersebut.
+
+Di dalam komponen `FundraiserCard.js`, tambahkan kode dialog dari Material UI. Pertama, tambahkan pernyataan `import` ke bagian atas file setelah *import* Anda sebelumnya:
+
+```javascript
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+```
+
+Selanjutnya, tambahkan *state* dialog dan fungsi yang akan kita gunakan untuk membuka dialog:
+
+```javascript
+// Tambahkan kode ini tepat di bawah metode useEffect.
+const [open, setOpen] = React.useState(false);
+
+const handleOpen = () => {
+  setOpen(true);
+  // ini akan mengatur state kita menjadi true dan membuka modal
+};
+
+const handleClose = () => {
+  setOpen(false);
+  // ini akan menutup modal saat diklik di luar atau saat tombol tutup diklik
+};
+```
+
+Terakhir, mari kita perbarui proses *render* untuk membuka dialog. Tambahkan kode dialog baru tepat sebelum kode `<Card>` kita di dalam file `FundraiserCard.js`:
+
+```jsx
+<div>
+  <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+    <DialogTitle id="form-dialog-title">Donate to {fundName}</DialogTitle>
+    <DialogContent>
+      <DialogContentText>
+        <img src={imageURL} width='200px' height='200px' />
+        <p>{description}</p>
+      </DialogContentText>
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={handleClose} color="primary">
+        Cancel
+      </Button>
+    </DialogActions>
+  </Dialog>
+
+  <Card className={classes.card} onClick={handleOpen}>
+    {/* ... sisa kode Card di sini ... */}
+  </Card>
+</div>
+```
+
+Bagus\! Jika Anda menavigasi ke halaman utama aplikasi kita sekarang, Anda akan melihat penggalangan dana yang kita buat sebelumnya pada Gambar 11-1.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.1.png" alt="gambar" width="580"/>
+</p>
+
+Jika Anda mengklik **View More**, dialog akan terbuka dan kita akan melihat dialog kosong yang kita tambahkan pada Gambar 11-2.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.2.png" alt="gambar" width="580"/>
+</p>
+
+Di bagian selanjutnya, mari kita tambahkan fungsionalitas untuk berdonasi di dalam dialog baru kita dari Material UI.
+
+## Menerima Donasi dengan React
+
+Sekarang setelah sebagian besar UI aplikasi kita selesai, mari kita selesaikan fitur berikutnya: kemampuan untuk berdonasi ke penggalangan dana di aplikasi Web3 kita dan melihatnya diperbarui di halaman.
+
+Kita akan menggunakan formulir dari Material UI lagi untuk membuat *input* sederhana agar pengguna dapat mengubah berapa banyak yang ingin mereka donasikan ke sebuah dana.
+
+Impor formulir dari Material UI ke dalam file `FundraiserCard.js` kita:
+
+```javascript
+import { makeStyles } from '@material-ui/core/styles';
+import FilledInput from '@material-ui/core/FilledInput';
+import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
+
+const useStyles = makeStyles(theme => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    display: 'table-cell'
+  },
+  card: {
+    maxWidth: 450,
+    height: 400
+  },
+  media: {
+    height: 140,
+  },
+  paper: {
+    position: 'absolute',
+    width: 400,
+    backgroundColor: theme.palette.background.paper,
+    border: 'none',
+    boxShadow: 'none',
+    padding: 4,
+  },
+}));
+```
+
+Kita juga perlu menambahkan `useState` ke *import* React kita di baris pertama file `FundraiserCard.js`:
+
+```javascript
+import React, { useEffect, useState } from 'react';
+```
+
+Dan kita perlu menambahkan *input* untuk donasi kita:
+
+```javascript
+const [donationAmount, setDonationAmount] = useState(null)
+```
+
+Sekarang di dalam dialog Anda, tambahkan formulir yang ditunjukkan di sini:
+
+```jsx
+<FormControl className={classes.formControl}>
+  <Input value={donationAmount} />
+</FormControl>
+```
+
+Setelah kita membuat *input* ini, kita juga perlu mengubah *state* dari jumlah donasi:
+
+```jsx
+<Input
+  id="component-simple"
+  value={donationAmount}
+  onChange={(e) => setDonationAmount(e.target.value)}
+  placeholder="0.00"
+/>
+```
+
+Dengan menggunakan `setDonationAmount`, kita secara langsung mengatur jumlah donasi baru dan menyimpannya di dalam *state* hanya dalam satu baris kode. Mari kita kembali ke `localhost:3000/` dan lihat seperti apa tampilannya pada Gambar 11-3\!
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.3.png" alt="gambar" width="580"/>
+</p>
+
+Namun saat ini, ketika pengguna ingin berdonasi dan mengetik sesuatu di kolom *input*, tidak ada yang terjadi. Kita perlu menambahkan tombol kirim (*submit*) untuk jumlah donasi kita agar pengguna dapat mengirimkan jumlah yang ingin mereka donasikan ke sebuah penggalangan dana. Mari kita mulai dengan mengimpor tombol ke dalam *modal* kita. Selanjutnya, impor tombol dari Material UI dan kode `useStyles`:
+
+```javascript
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+
+const useStyles = makeStyles(theme => ({
+  button: {
+    margin: theme.spacing(1),
+  },
+  input: {
+    display: 'none',
+  },
+}));
+
+const DonateModal = () => {
+  const classes = useStyles();
+  useEffect(() => {
+```
+
+Sekarang setelah kita mengimpor tombol dan mengatur gaya *default*-nya, tambahkan tombol ke *modal* kita tepat setelah *input* donasi:
+
+```jsx
+<Button onClick={submitFunds} variant="contained" color="primary">
+  Donate
+</Button>
+```
+
+Sekarang setelah tombol kita di-*render*, mari kita tulis fungsi untuk memanggil Web3 dan mengirimkan donasi kita ke *blockchain*:
+
+```javascript
+const submitFunds = async () => {
+  const fundraisercontract = contract
+  const donation = web3.utils.toWei(donationAmount)
+
+  await contract.methods.donate().send({
+    from: accounts[0],
+    value: donation,
+    gas: 650000
+  })
+  setOpen(false);
+}
+```
+
+Hal terakhir yang perlu kita tambahkan adalah menampilkan total dana yang telah didonasikan ke sebuah penggalangan dana agar kita dapat melihat perubahan donasi di *frontend*. Di dalam komponen `Card` di `FundraiserCard.js`, tambahkan kode berikut ke konten `Card`:
+
+```jsx
+<Typography variant="body2" color="textSecondary" component="p">
+  <p>{description}</p>
+</Typography>
+```
+
+Sekarang setelah kita menyelesaikan kode untuk donasi, mari kita lihat *modal*-nya. Navigasikan ke penggalangan dana yang kita buat sebelumnya dan buka *modal* donasi pada Gambar 11-4.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.4.png" alt="gambar" width="580"/>
+</p>
+
+Bagus. Selanjutnya, mari kita uji kode kita dan lihat apakah kita bisa membuat donasi.
+
+## Menguji Donasi
+
+Sekarang setelah Anda menyelesaikan kode donasi, mari kita uji coba sebuah donasi. Pertama, pastikan Anda berada di jaringan **MetaMask** yang benar. Kita harus selalu memeriksa ulang bahwa kita tidak mengirim *ether* ke jaringan lokal kita. Setelah Anda memverifikasi bahwa Anda berada di jaringan yang benar, pilih jumlah donasi dan klik **submit**. MetaMask seharusnya akan terbuka dan meminta Anda untuk mengonfirmasi atau menolak transaksi.
+
+Jika semuanya terlihat benar, lanjutkan dan konfirmasi transaksi tersebut. Setelah Anda mengonfirmasi transaksi, Anda seharusnya dapat memeriksa saldo Anda dan melihat bahwa *eth* telah terpotong dari akun tes Anda.
+
+Sekarang jika Anda menavigasi ke penggalangan dana itu lagi, Anda akan melihat jumlah donasi telah meningkat di penggalangan dana tersebut, seperti yang ditunjukkan pada Gambar 11-5.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.5.png" alt="gambar" width="580"/>
+</p>
+
+Penggalangan dana sekarang seharusnya menampilkan jumlah donasi. Tetapi, jumlahnya tidak diformat dalam dolar. Selanjutnya, mari kita panggil API eksternal untuk menemukan nilai tukar (*exchange rate*) *ether* saat ini agar kita dapat menampilkan berapa dolar yang telah dikumpulkan oleh penggalangan dana kita.
+
+## Menampilkan Nilai Tukar ETH Saat Ini
+
+Bagaimana jika kita ingin menampilkan nilai tukar *ether* saat ini agar pengguna dapat melihat berapa banyak *ether* yang sebenarnya mereka beli? Mari kita kerjakan cara menampilkan nilai tukar *ether* saat ini di aplikasi kita. Kita akan menggunakan *add-on* untuk mempermudah ini:
+
+```bash
+npm install --save cryptocompare
+```
+
+Selanjutnya, impor modul tersebut agar kita bisa mendapatkan harga ETH saat ini. Tambahkan pernyataan `require` ke file `FundraiserCard.js` kita:
+
+```javascript
+const cc = require('cryptocompare')
+```
+
+*Add-on* ini akan berfungsi tanpa kunci API, tetapi Anda juga dapat membuatnya sendiri di CryptoCompare dan menggunakannya:
+
+```javascript
+cc.setApiKey('<your-api-key>')
+```
+
+Di dalam file `Fundraisercard.js`, tambahkan fungsi `init` tepat setelah kita mendapatkan data dari kontrak `Fundraiser` kita, atur dalam sebuah variabel, dan tambahkan panggilan ke *add-on* npm untuk mendapatkan nilai tukar saat ini. Untuk tutorial ini, kita akan melihat USD, tetapi *add-on* ini juga mendukung banyak mata uang lainnya.
+
+```javascript
+const imageURL = await instance.methods.imageURL().call()
+const url = await instance.methods.url().call()
+
+// hitung nilai tukar di sini
+const exchangeRate = await cc.price('ETH', ['USD'])
+// masukkan koin yang ingin Anda periksa dan mata uangnya
+
+const eth = web3.utils.fromWei(totalDonations, 'ether')
+const dollarDonationAmount = exchangeRate.USD * eth
+```
+
+Selanjutnya, ubah pengaturan *state* di React untuk menggunakan variabel `dollarDonationAmount` baru yang telah kita buat:
+
+```javascript
+setTotalDonations(dollarDonationAmount)
+```
+
+Di dalam konten `Card`, kita juga perlu menambahkan simbol USD kita:
+
+```jsx
+<p>Total Donations: ${totalDonations}</p>
+```
+
+Sekarang jika Anda me-*refresh* halaman, Anda akan melihat pada Gambar 11-6 bahwa kita mendapatkan jumlah dolar yang terkumpul untuk penggalangan dana kita saat ini.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.6.png" alt="gambar" width="580"/>
+</p>
+
+Selanjutnya, mari kita gunakan *add-on* ini juga di dalam *modal* donasi kita, agar pengguna tidak perlu menghitung berapa banyak ETH yang mereka kirim dan sebagai gantinya bisa langsung memasukkan jumlah dalam dolar.
+
+Pertama, mari kita perbarui fungsi `useEffect` kita dan simpan nilai tukar saat ini di dalam *state* React agar kita dapat dengan mudah menggunakannya kembali tanpa perlu memanggil API pada *add-on* lagi:
+
+```javascript
+const exchangeRate = await cc.price('ETH', ['USD'])
+setExchangeRate(exchangeRate.USD)
+const eth = web3.utils.fromWei(totalDonations, 'ether')
+const dollarDonationAmount = exchangeRate.USD * eth
+```
+
+Ingatlah untuk membuat *state* baru juga di React:
+
+```javascript
+const [ exchangeRate, setExchangeRate ] = useState(null)
+```
+
+Terakhir, di dalam fungsi `submitFunds` kita, mari kita gunakan *add-on* baru untuk menghitung berapa banyak ETH yang ingin dibeli seseorang dalam jumlah dolar:
+
+```javascript
+const submitFunds = async () => {
+  const fundraisercontract = contract
+  const ethRate = exchangeRate
+  const ethTotal = donationAmount / ethRate
+  const donation = web3.utils.toWei(ethTotal.toString())
+
+  await contract.methods.donate().send({
+    from: accounts[0],
+    value: donation,
+    gas: 650000
+  })
+  setOpen(false);
+}
+```
+
+Sekarang jika Anda mengirimkan donasi dalam jumlah dolar, aplikasi akan menghitung jumlah *ether* yang setara di dalam kontrak. Kita juga bisa menggunakan *add-on* ini untuk menghitung berapa banyak ETH yang sebenarnya dibeli oleh pengguna dengan jumlah dolar yang mereka kirimkan. Pertama, buat variabel baru tepat setelah `setState` nilai tukar kita di React:
+
+```javascript
+const [ exchangeRate, setExchangeRate ] = useState(null)
+const ethAmount = donationAmount / exchangeRate || 0
+```
+
+Dan tepat setelah *input* donasi kita, gunakan variabel tersebut untuk menampilkan berapa banyak yang dibeli pengguna dalam *eth*:
+
+```jsx
+      </DialogContentText>
+      <div className="donation-input-container">
+        <FormControl className={classes.formControl}>
+          $
+          <Input
+            id="component-simple"
+            value={donationAmount}
+            onChange={(e) => setDonationAmount(e.target.value)}
+            placeholder="0.00"
+          />
+        </FormControl>
+        <p>Jumlah ETH: {ethAmount}</p>
+      </div>
+```
+
+Dan di dalam file `App.css`, tambahkan CSS berikut:
+
+```css
+.donation-input-container {
+  display: flex;
+}
+```
+
+*Refresh* halaman dan buka sebuah penggalangan dana. Ketikkan jumlah dan pastikan Anda melihat konversinya. Halaman Anda seharusnya terlihat seperti Gambar 11-7.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.7.png" alt="gambar" width="580"/>
+</p>
+
+Selanjutnya, mari kita buat tanda terima donasi untuk pengguna kita.
+
+## Membuat Tanda Terima Donasi untuk Pengguna Kita
+
+Jika pengguna kita ingin membuktikan bahwa mereka telah berdonasi ke sebuah kampanye, kita perlu menyediakan cara untuk memberikan pengguna tanda terima donasi dari penggalangan dana yang telah mereka danai. Pertama-tama, kita perlu mengakses kontrak kita lagi.
+
+Di dalam `FundraiserCard.js` pada fungsi `useEffect`, tambahkan kode berikut setelah pengaturan *state* `setURL` kita:
+
+```javascript
+setURL(url)
+
+const userDonations = await instance.methods.myDonations().call({ from: accounts[0]})
+console.log(userDonations)
+setUserDonations(userDonations)
+```
+
+Jika Anda kembali ke `localhost:3000`, Anda akan melihat sebuah *error*:
+
+```
+./src/FundraiserCard.js
+Line 123: 'setUserDonations' is not defined
+  no-undef
+```
+
+Tambahkan `userDonations` ke *state* React, di sebelah semua pernyataan `useState` kita yang lain:
+
+```javascript
+const [ userDonations, setUserDonations ] = useState(null)
+```
+
+Jika Anda memeriksa konsol Anda sekarang, Anda seharusnya melihat output berikut:
+
+```
+Result {0: Array(1), 1: Array(1), 2: Array(1), values: Array(1), dates: Array(1), conversionFactors: Array(1)}
+  0: ["1198178768272226200"]
+  1: ["1567278668"]
+  2: ["18460"]
+  conversionFactors: Array(1)
+    0: "18460"
+  dates: Array(1)
+    0: "1567278668"
+    length: 1
+  values: Array(1)
+    0: "1198178768272226200"
+    length: 1
+```
+
+Kita akan menggunakan informasi di atas untuk kemudian membuat tanda terima bagi pengguna kita. Di dalam file `FundraiserCard.js`, tambahkan ini ke fungsi `render` kita tepat setelah kode jumlah *eth* kita:
+
+```jsx
+<p>Jumlah ETH: {ethAmount}</p>
+
+// tambahkan kode di bawah ini
+<div>
+  <h3>Donasi Saya</h3>
+  {renderDonationsList()}
+</div>
+```
+
+Buat sebuah fungsi kosong di mana kita akan me-*render* semua donasi pengguna:
+
+```javascript
+const renderDonationsList = () => {
+  var donations = userDonations
+  if (donations === null) {return null}
+  // kita akan mengembalikan null agar tidak terjadi error saat
+  // donasi belum ada di dalam state
+
+  return (
+    <div>
+    </div>
+  )
+}
+```
+
+Sekarang setelah kita memiliki fungsi kita, mari kita lakukan iterasi melalui donasi kita dan tampilkan tanda terima individual kepada pengguna. Mari kita ambil `donationList`, dan buat *for loop* yang melakukan iterasi melalui setiap donasi dan membuat *array* `donationList` yang bisa kita gunakan untuk fungsi `render` kita:
+
+```javascript
+const renderDonationsList = () => {
+  var donations = userDonations
+  if (donations === null) {return null}
+
+  const totalDonations = donations.values.length
+  let donationList = []
+  var i
+  for (i = 0; i < totalDonations; i++) {
+    const ethAmount = web3.utils.fromWei(donations.values[i])
+    const userDonation = exchangeRate * ethAmount
+    const donationDate = donations.dates[i]
+    donationList.push({ donationAmount: userDonation.toFixed(2),
+                        date: donationDate})
+  }
+}
+```
+
+Selanjutnya, mari kita tambahkan `return` agar kita bisa menampilkan jumlah donasi dan tombol permintaan tanda terima untuk setiap donasi. Tambahkan kode berikut tepat setelah *for loop* kita:
+
+```javascript
+return donationList.map((donation) => {
+  return (
+    <div className="donation-list">
+      <p>${donation.donationAmount}</p>
+      <Button variant="contained" color="primary">
+        Request Receipt
+      </Button>
+    </div>
+  )
+})
+```
+
+Ingatlah untuk menambahkan beberapa gaya agar jumlah dan tombol tanda terima ditampilkan dengan benar. Di dalam file `App.css`, tambahkan CSS berikut:
+
+```css
+.donation-list {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.donation-receipt-link {
+  color: inherit;
+  text-decoration: none;
+}
+```
+
+Jika Anda menavigasi ke `localhost:3000` dan memilih sebuah penggalangan dana, Anda seharusnya akan melihat daftar donasi baru di dalam dialog, seperti pada Gambar 11-8.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.8.png" alt="gambar" width="580"/>
+</p>
+
+Luar biasa\! Sekarang mari kita selesaikan fungsionalitas untuk menampilkan tanda terima. Mari kita kerjakan fungsi tampilkan Tanda Terima.
+
+Di dalam file `FundraiserCard.js` kita, mari tambahkan *import* baru agar kita bisa menggunakan tautan (*link*):
+
+```javascript
+import { Link } from 'react-router-dom'
+```
+
+Di file yang sama, sesuaikan tombol di dalam fungsi `renderDonationsList` kita agar memiliki komponen `Link` untuk tanda terima:
+
+```jsx
+<Button variant="contained" color="primary">
+  <Link
+    className="donation-receipt-link"
+    to={{ pathname: '/receipts',
+    state: { donation: donation.donationAmount, date: donation.date}
+  }}>
+    Request Receipt
+  </Link>
+</Button>
+```
+
+Kita akan mendapatkan *error*, jadi sekarang mari kita buat komponen `Receipts` kita. Pertama, mari kita mulai dengan membuat komponen baru untuk tanda terima yang akan kita tampilkan di navigasi:
+
+```bash
+touch Receipts.js
+```
+
+Di dalam file `Receipts.js`, tambahkan kode berikut seperti yang telah kita lakukan di bagian sebelumnya. Ini akan terhubung ke Web3 untuk kita dan memungkinkan kita mengakses tanda terima donasi untuk sebuah akun:
+
+```jsx
+import React, { useState, useEffect } from "react";
+
+const Receipts = (props) => {
+  useEffect(() => {
+    const { donation, date, fund } = props.location.state
+    debugger
+  }, []);
+
+  return (
+    <div>
+      <h1>Receipts</h1>
+    </div>
+  )
+}
+
+export default Receipts;
+```
+
+Selanjutnya, kita akan membuka file `App.js` dan menambahkan rute baru kita di bawah rute yang sudah ada:
+
+```jsx
+<Route path="/receipts" component={Receipts} />
+```
+
+Dan di file yang sama, pastikan Anda mengimpor komponen `Receipts` yang kita buat agar kita memiliki akses ke sana saat *render*:
+
+```javascript
+import Receipts from './Receipts'
+```
+
+-----
+
+Di `Receipts.js`, kita perlu melakukan beberapa hal untuk mengakses data kita dan menampilkannya dengan benar kepada pengguna. Pertama, kita perlu mengatur *state* untuk tiga *props* yang dilewatkan, yaitu `donation`, `fundName`, dan `date`. Kita juga perlu memformat tanggal dan mengatur *state* untuk semua *props* agar dapat menggunakannya saat *render*:
+
+```javascript
+const [ donation, setDonation ] = useState(null)
+const [ fundName, setFundName ] = a(null)
+const [ date, setDate ] = useState(null)
+
+useEffect(() => {
+  const { donation, date, fund } = props.location.state
+  const formattedDate = new Date(parseInt(date))
+
+  setDonation(donation)
+  setDate(formattedDate.toString())
+  setFundName(fund)
+}, []);
+```
+
+Di dalam file `Receipts.js` kita, tambahkan kode yang ditunjukkan di sini agar kita dapat me-*render* tanda terima kita:
+
+```jsx
+return (
+  <div className="receipt-container">
+    <div className="receipt-header">
+      <h3>Thank you for your donation to {fundName}</h3>
+    </div>
+    <div className="receipt-info">
+      <div>Date of Donation: {date}</div>
+      <div>Donation Value: ${donation}</div>
+    </div>
+  </div>
+)
+```
+
+Mari kita buat tampilannya sedikit lebih bagus dengan menambahkan CSS berikut ke file `App.css` kita:
+
+```css
+.receipt-header {
+  border-bottom: 1px solid gray;
+}
+.receipt-container {
+  text-align: center;
+}
+.receipt-info {
+  display: flex;
+  padding: 50px;
+  justify-content: space-between;
+}
+```
+
+Mari kita kembali ke halaman utama penggalangan dana dan buka salah satu penggalangan dana kita pada Gambar 11-9.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.9.png" alt="gambar" width="580"/>
+</p>
+
+Klik **Request Receipt**. Anda akan diarahkan ke halaman tanda terima kita. Lihat Gambar 11-10.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.10.png" alt="gambar" width="580"/>
+</p>
+
+Sekarang pengguna Anda seharusnya dapat melakukan donasi dan melihat tanda terima donasi. Terakhir, mari kita tambahkan kemampuan untuk menarik dana dari kontrak kita agar pemilik penggalangan dana dapat memanfaatkan donasi yang terkumpul.
+
+## Menangani Penarikan Dana dari Kontrak Kita
+
+Langkah pertama kita agar dapat menarik dana dari kontrak adalah dengan menambahkan tombol yang hanya dapat dilihat oleh **pemilik** kontrak kita. Kita perlu memverifikasi bahwa mereka adalah pemilik kontrak, dan menampilkan tombol penarikan yang akan kita tambahkan ke *frontend* kita jika benar. Jika mereka bukan pemilik kontrak, mereka hanya akan melihat opsi untuk berdonasi ke penggalangan dana.
+
+Untuk memeriksa apakah akun saat ini memiliki kontrak, kita perlu menambahkan kode berikut ke dalam fungsi `useEffect` kita. Kita akan mengakses `accounts[0]` untuk melihat akun mana yang sedang digunakan oleh pengguna, dan kita akan menunggu panggilan `owner()` untuk melihat siapa yang memiliki kontrak. Terakhir, kita akan menggunakan pernyataan `if` untuk memverifikasi bahwa pengguna adalah pemilik kontrak:
+
+```javascript
+const isUser = accounts[0]
+const isOwner = await instance.methods.owner().call()
+if (isOwner === accounts[0]) { // Perbaikan dari [[0]]
+  setIsOwner(true)
+}
+```
+
+Pastikan untuk menambahkan `useState` untuk `isOwner` agar sesaat lagi kita dapat menggunakan kondisional di dalam fungsi `render` kita:
+
+```javascript
+const [ userDonations, setUserDonations ] = useState(null)
+// tambahkan kode di bawah ini
+const [ isOwner, setIsOwner ] = useState(false)
+```
+
+Selanjutnya, mari kita tambahkan tombol di dalam *modal* penggalangan dana. Buka file `FundraiserCard.js` dan di dalam `DialogActions`, tambahkan tombol dengan aksi `onClick` untuk menarik dana. Kita akan menggunakan kondisional dari *state* kita untuk membungkus tombol tersebut juga, agar hanya pemilik kontrak yang dapat melihat tombolnya:
+
+```jsx
+<DialogActions>
+  <Button onClick={handleClose} color="primary">
+    Cancel
+  </Button>
+
+  // Tambahkan kode di bawah ini
+  {isOwner &&
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={withdrawalFunds}
+    >
+      Withdrawal
+    </Button>
+  }
+</DialogActions>
+```
+
+Tampilannya akan terlihat seperti Gambar 11-11.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.11.png" alt="gambar" width="580"/>
+</p>
+
+Halaman sekarang akan menampilkan *error* karena kita tidak memiliki fungsi `withdrawal funds`, jadi mari kita langsung membuatnya:
+
+```javascript
+const withdrawalFunds = async () => {
+  await contract.methods.withdraw().send({
+    from: accounts[0],
+  })
+  alert('Dana Berhasil Ditarik!')
+}
+```
+
+Untuk saat ini, mari kita *refresh* halaman jika akun berubah. Tambahkan ini di dalam file `FundraiserCard.js` Anda setelah fungsi `useEffect`:
+
+```javascript
+window.ethereum.on('accountsChanged', function (accounts) {
+  window.location.reload()
+})
+```
+
+Mari kita kembali ke `localhost:3000` dan mengujinya. Mulailah dengan memilih sebuah penggalangan dana dan donasikan sejumlah dana ke dalamnya (lihat Gambar 11-12). 🚀
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.12.png" alt="gambar" width="580"/>
+</p>
+
+Sekarang jika Anda membuka MetaMask, Anda akan melihat bahwa saldo Anda telah berkurang. Lihat Gambar 11-13.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.13.png" alt="gambar" width="580"/>
+</p>
+
+Anda juga seharusnya melihat jumlah donasi bertambah pada penggalangan dana tersebut (lihat Gambar 11-14).
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.14.png" alt="gambar" width="580"/>
+</p>
+
+Sekarang, kembali ke penggalangan dana tersebut dan, dengan menggunakan alamat yang sama di MetaMask yang membuat kontrak, klik **Withdraw Funds**. Setelah itu, Anda seharusnya melihat sebuah *alert* ditampilkan di halaman, seperti yang ditunjukkan pada Gambar 11-15.
+
+Dan terakhir, jika Anda membuka MetaMask lagi, Anda seharusnya melihat saldo Anda telah bertambah, seperti yang diilustrasikan pada Gambar 11-16. Anda juga dapat melihat riwayat transaksi masa lalu Anda di MetaMask.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.16.png" alt="gambar" width="580"/>
+</p>
+
+Dengan fungsionalitas penarikan dana yang telah selesai, aplikasi Anda seharusnya terlihat seperti Gambar 11-17.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-11.17.png" alt="gambar" width="580"/>
+</p>
+
+Kita ingin menambahkan satu kasus penggunaan lagi untuk penggalangan dana kita: kemampuan untuk mengedit penggalangan dana guna mengubah penerima manfaat (*beneficiary*).
+
+## Menambahkan Edit Penerima Manfaat ke Kontrak
+
+Bagaimana jika kita ingin mengubah penerima manfaat dan melakukan pembaruan pada *blockchain*? Kita perlu memanggil fungsi `setBeneficiary` dan memperbarui alamat pengguna yang akan menjadi penerima manfaat dari kontrak tersebut. Mari kita mulai dengan memperbarui file `FundraiserCard.js` kita. Sama seperti *input* kita sebelumnya, kita akan menggunakan `useState` di React untuk *input* kita:
+
+```javascript
+// Tambahkan ini ke daftar hook React kita.
+const [ beneficiary, setNewBeneficiary ] = useState(false)
+```
+
+Selanjutnya, tepat setelah daftar donasi kita di-*render* di UI, mari kita tambahkan `div` kedua dengan sebuah *input* dan tombol untuk mengirimkan penerima manfaat yang baru. Kita juga perlu membungkusnya dalam pemeriksaan `isOwner` seperti yang kita lakukan sebelumnya untuk memastikan hanya pemilik yang dapat memanggil fungsi tersebut:
+
+```jsx
+<div>
+  <h3>Donasi Saya</h3>
+  {renderDonationsList()}
+</div>
+
+{isOwner &&
+  <div>
+    <FormControl className={classes.formControl}>
+      Penerima Manfaat:
+      <Input
+        value={beneficiary}
+        onChange={(e) => setNewBeneficiary(e.target.value)}
+        placeholder="Set Beneficiary"
+      />
+    </FormControl>
+    <Button variant="contained" style={{ marginTop: 20 }} color="primary"
+            onClick={setBeneficiary}>
+      Set Beneficiary
+    </Button>
+  </div>
+}
+```
+
+Dan terakhir, mari kita buat fungsi untuk memanggil kontrak kita dan mengubah penerima manfaat:
+
+```javascript
+const setBeneficiary = async () => {
+  await contract.methods.setBeneficiary(beneficiary).send({
+    from: accounts[0],
+  })
+  alert(`Penerima Manfaat Penggalangan Dana Telah Diubah`)
+}
+```
+
+Mari kita uji coba. Kembali ke halaman utama dan coba ubah alamat penerima manfaat. Impor akun tes lain dari `truffle develop` dan beralih ke akun tersebut di MetaMask. Selanjutnya, salin dan tempel alamat tersebut ke *input* yang telah kita buat. Anda seharusnya melihat *alert* dan dapat melihat metode penarikan (*withdraw*) sekarang di alamat tersebut.
+
+**Selamat\! Anda telah menyelesaikan DApp besar pertama Anda\!**
+
+## Ringkasan
+
+Kerja bagus\! Sekarang Anda memiliki aplikasi Web3 yang memungkinkan pengguna membuat dan berdonasi ke penggalangan dana. Dari sini, Anda dapat memikirkan ide untuk aplikasi Web3 Anda sendiri dan menggunakan kerangka kerja di sini untuk memulainya.
+
+Dalam bab ini, kita belajar cara berinteraksi dengan *smart contract* kita dengan pertama-tama menampilkan dialog untuk menunjukkan kepada pengguna aplikasi kita informasi lebih lanjut tentang penggalangan dana. Kita menghitung nilai tukar dan menggunakan *add-on* npm kita di beberapa tempat untuk membuat aplikasi kita lebih mudah digunakan bagi mereka yang tidak terbiasa dengan Ethereum.
+
+Kita juga mengerjakan interaksi dengan *smart contract* kita dengan membuat serangkaian *input* yang dapat digunakan pengguna untuk mengirimkan data dan berdonasi melalui Web3. Kita membuat fungsi JavaScript yang terhubung dengan *blockchain* untuk mengirimkan donasi pengguna.
+Tentu, ini adalah terjemahan bagian terakhirnya.
+
+Dan terakhir, kita membuat tanda terima untuk pengguna kita yang akan membuktikan bahwa mereka telah berdonasi ke penggalangan dana tertentu. Membuka kartu akan menampilkan setiap donasi yang telah dibuat oleh pengguna ke penggalangan dana tertentu.
+
+Di bab terakhir kita, kita akan membahas keamanan dan cara-cara umum bagi para pengembang untuk menemukan masalah keamanan di dalam kontrak mereka. Setelah sebuah kontrak di-*deploy*, kita tidak dapat mengeditnya seperti yang kita bisa lakukan pada aplikasi web 2.0 biasa. Masalah keamanan menjadi perhatian yang jauh lebih besar pada sebuah DApp.
+
+---
+
+# BAGIAN IV
+## Mengamankan Smart Contract Anda
+
+Di bagian terakhir buku kita, kita akan membahas secara singkat keamanan *smart contract* dan berbagai sumber daya gratis yang tersedia secara daring untuk audit keamanan *smart contract*.
+
+Kita juga akan memberikan beberapa saran tentang di mana Anda dapat menggali lebih dalam tentang pengembangan Ethereum, seperti kursus daring dan buku-buku lainnya.
+
+Tentu, ini adalah terjemahan dan perapian format untuk bab terakhir buku ini. 🛡️
+
+# BAB 12
+## Keamanan Smart Contract
+
+Mampu menulis *smart contract* hanyalah salah satu aspek dari pengembangan *blockchain*. Dalam pengembangan Ethereum, menulis kode yang aman yang telah diuji dan diaudit secara menyeluruh adalah hal yang esensial. Jika kontrak Anda diretas, Anda tidak bisa dengan mudah menonaktifkannya dan memperbaikinya. Keamanan *smart contract* adalah masalah serius dan bisa sangat merugikan jika terjadi kesalahan.
+
+Dalam bab ini, kita akan berbicara tentang keamanan *smart contract* dan berbagai teknik yang dapat kita gunakan untuk mengamankan kontrak kita.
+
+## Mengapa Kita Perlu Khawatir Tentang Keamanan?
+
+Salah satu alasan mengapa memiliki *smart contract* yang aman begitu penting adalah karena Anda **tidak dapat mengedit** kontrak Anda setelah berada di *blockchain*. Begitu sudah ada di sana, tidak mungkin untuk menambal perbaikan seperti yang bisa kita lakukan pada jenis pengembangan perangkat lunak lainnya. *Ether* bisa terjebak di dalam *blockchain* dan mustahil untuk dilepaskan.
+
+Sebagai contoh, kontrak Multi-Sig Parity diretas pada 6 November 2017. Seorang peretas menemukan *bug* kecil di dalam kontrak dan menonaktifkannya. Seluruh dana sebesar **$300 juta** hilang selamanya.
+
+Pada tahun 2016, terjadi peretasan besar terhadap **Decentralized Autonomous Organization (DAO)**, yang dibuat sebagai dana investasi terdesentralisasi. Sekelompok peretas tak dikenal menemukan masalah keamanan yang dapat dieksploitasi di dalam kontrak. Kontrak seharusnya terlebih dahulu menghapus kemampuan untuk memanggil kontrak lagi, tetapi sebaliknya, kontrak tersebut memungkinkan pengguna untuk memanggil kontrak secara rekursif, dan peretas berhasil mengambil **3,6 juta ether**.
+
+Mari kita bahas beberapa cara *smart contract* Anda bisa diretas.
+
+## Jenis-Jenis Kerentanan Smart Contract
+
+Ada banyak cara berbeda di mana *smart contract* Anda bisa rentan terhadap serangan. Kita akan membahas beberapa serangan umum di bagian ini.
+
+### Fungsi yang Tidak Terlindungi (*Unprotected Function*)
+
+Saat Anda menulis *smart contract*, Anda harus selalu bertanya pada diri sendiri peran apa saja yang seharusnya diizinkan untuk memanggil fungsi tersebut. Jika hanya alamat tertentu atau alamat dengan peran spesifik yang dapat menjalankan suatu fungsi, maka pastikan untuk menggunakan pernyataan `require` atau *modifier* yang sesuai untuk mencegah akses yang tidak sah.
+
+Selain alamat mana yang dapat menjalankan fungsi tertentu, Anda harus mempertimbangkan konteks apa yang dapat memanggil fungsi tersebut dan kemudian menggunakan *visibility modifier* yang sesuai. Untuk penyegaran, rujuk kembali ke Bab 4 di mana kita membahas *visibility modifier* saat pembuatan kontrak `Greeter` kita.
+
+Sebagai contoh bagaimana melindungi fungsi Anda, mari kita periksa kontrak `Ownable` dari OpenZeppelin. Potongan kode berikut adalah untuk fungsi `transferOwnership`:
+
+```solidity
+function transferOwnership(address newOwner) public onlyOwner {
+  _transferOwnership(newOwner);
+}
+```
+
+Perhatikan visibilitas fungsi `public` dan *modifier* `onlyOwner`. Ini berarti fungsi tersebut dapat dipanggil dari mana saja, tetapi ini dibatasi hanya untuk pemilik kontrak. Fungsi tersebut kemudian mendelegasikan ke `_transferOwnership`, yang ditunjukkan pada potongan kode berikutnya:
+
+```solidity
+function _transferOwnership(address newOwner) internal {
+  require(newOwner != address(0), "Ownable: new owner is the zero address");
+  emit OwnershipTransferred(_owner, newOwner);
+  _owner = newOwner;
+}
+```
+
+Visibilitas fungsi telah ditandai sebagai `internal`, yang berarti dapat dipanggil dari dalam kontrak atau salah satu turunannya. Ini adalah praktik yang bagus untuk mengunci siapa yang bisa memanggil sebuah fungsi.
+
+Sekarang setelah kita bisa melindungi fungsi kita, mari kita bicarakan tentang ketergantungan urutan transaksi.
+
+### Ketergantungan Urutan Transaksi (*Transaction Ordering Dependence*)
+
+Ketergantungan urutan transaksi adalah serangan *race condition* di mana penyerang menaikkan harga *gas* dari sebuah transaksi dalam upaya agar transaksi mereka dieksekusi terlebih dahulu. Semakin banyak Anda membayar *gas*, semakin tinggi prioritas transaksi Anda yang diterima oleh para penambang. Ini berarti seseorang yang mengamati *mempool* dari transaksi yang tertunda bisa saja menyerobot antrean jika mereka melihat transaksi masuk yang akan merugikan kepentingan mereka.
+
+Serangan ini sangat sulit untuk dilawan dan umumnya menargetkan aplikasi di mana waktu sangat penting, seperti lelang atau pasar (*marketplace*). Untuk memitigasi serangan ini, coba lakukan *batching* transaksi atau pisahkan detail menjadi permintaan terpisah.
+
+### Integer Overflow dan Underflow
+
+*Integer overflow* dan *underflow* adalah masalah di mana hasil yang diproduksi lebih besar dari nilai maksimum atau lebih kecil dari nilai minimum sebuah *integer*. Misalnya, jika kita memiliki variabel dengan tipe data `uint8`, nilai maksimumnya adalah 255. Jika Anda menambahkan 1 ke 255, akan terjadi *overflow* dan hasilnya menjadi 0. Sekarang setelah kita memiliki 0, jika kita mengurangi 1 darinya, kita akan mengalami *underflow* dan hasilnya kembali menjadi 255. Alih-alih mengizinkan *overflow* dan *underflow*, kami merekomendasikan penggunaan **SafeMath** saat melakukan operasi aritmatika.
+
+Untuk contoh cara menggunakan SafeMath, rujuk kembali ke Bab 6, Contoh 6-15, di mana kita menambahkan fungsionalitas donasi ke kontrak `Fundraiser` kita.
+
+Kerentanan berikutnya yang akan kita lihat adalah *reentrancy*.
+
+### Reentrancy
+
+Serangan *reentrancy* terjadi ketika variabel *state* penting diubah **setelah** sebuah kontrak memanggil fungsi dari kontrak lain atau memanggil fungsi *fallback* dari kontrak lain. Dalam kasus ini, kontrak jahat dapat memanggil kembali ke kontrak asli, memanggil fungsi yang sama lagi sebelum *state*-nya diperbarui.
+
+Untuk menghindari serangan ini, **perbarui *state* kontrak Anda sebelum memanggil fungsi pada kontrak apa pun yang tidak Anda miliki** atau sebelum mengirim atau mentransfer ke alamat mana pun yang mungkin ditambahkan oleh pengguna Anda. Juga lebih baik untuk menghindari penggunaan fungsi tingkat rendah pada alamat seperti `call` ketika berhadapan dengan alamat yang tidak dikenal atau tidak tepercaya.
+
+Berikut adalah contoh *reentrancy*. Penyerang menemukan kerentanan dalam kontrak di mana dua fungsi bergantung pada *state* yang sama. Dan peretas dapat memanggil fungsi itu lagi sebelum saldo diatur ke 0. Ini adalah serangan yang digunakan oleh peretas dalam serangan DAO pada tahun 2016. Penyerang secara rekursif memanggil fungsi-fungsi tertentu untuk meretas kontrak, sehingga mengeksploitasi kerentanan *reentrancy* dalam kontrak.
+
+Mari kita lihat *cross-function race conditions*, yang merupakan jenis lain dari *reentrancy*.
+
+### Cross-Function Race Conditions
+
+Salah satu serangan yang menarik adalah ketika beberapa fungsi berbagi *state* yang sama. Contohnya adalah kontrak di mana saldo Anda diatur ulang ke 0 hanya **setelah** transfer terjadi, sehingga peretas dapat terus memanggil ini bahkan setelah mereka menerima penarikan untuk meretas lebih banyak *ether* dari kontrak. Pada dasarnya, mereka dapat memanggil fungsi lain di tengah eksekusi fungsi pertama untuk meretas kontrak Anda.
+
+Berikut adalah contohnya:
+
+```solidity
+function withdrawFunds() external {
+  uint256 withdrawAmount = balances[msg.sender];
+  require(msg.sender.call.value(withdrawAmount)());
+  balances[msg.sender] = 0;
+}
+```
+
+Saldo tidak diatur ke 0 sampai **setelah** fungsi lain dipanggil. Penyerang dapat memanggil ini secara rekursif dan berhasil meretas *smart contract*. Salah satu cara untuk melindungi dari serangan ini adalah dengan memperbarui saldo **sebelum** mengeksekusi `call.value` pada alamat pengirim:
+
+```solidity
+function withdrawFunds() external {
+  uint256 withdrawAmount = balances[msg.sender];
+  balances[msg.sender] = 0;
+  require(msg.sender.call.value(withdrawAmount)());
+}
+```
+
+Mungkin terlihat sederhana, tetapi pengurutan ulang baris ini bisa menyelamatkan cukup banyak *smart contract* dari kompromi.
+
+Selanjutnya, kita akan berbicara tentang kehabisan *gas*.
+
+### Batas Gas Blok (*Block Gas Limit*)
+
+Jaringan Ethereum, khususnya EVM, hanya dapat memproses beban komputasi tertentu pada satu waktu. Pembatasan ini dikonsepkan dalam bentuk batas *gas* blok, seperti yang dibahas di Bab 1. Jika Anda melampaui batas, transaksi akan gagal. Ini bisa terjadi ketika sebuah fungsi memproses sejumlah besar perubahan *state* seperti saat melakukan iterasi pada *array* yang besar.
+
+Untuk menghindari melebihi batas *gas*, pecah operasi yang besar—atau berpotensi besar—menjadi beberapa *batch*. Fungsi paginasi yang kita implementasikan di Bab 7, Contoh 7-12, bisa menjadi contoh yang bagus tentang cara memecah hal-hal menjadi potongan-potongan yang lebih kecil.
+
+### Ketergantungan Timestamp
+
+Karena *blockchain* terdesentralisasi, ia bergantung pada kekuatan komputasi dari *node* terdistribusi (penambang) alih-alih server terpusat untuk memproses transaksi. Oleh karena itu, *timestamp* dari penambang dapat dimanipulasi oleh pemiliknya dalam upaya untuk mengakali logika apa pun yang berbasis *timestamp* di dalam kontrak.
+
+Untuk menghindari kerentanan ini, pastikan kontrak Anda tidak menggunakan *timestamp* sebagai benih pengacakan (*randomization seed*). Juga merupakan ide yang baik untuk memastikan bahwa logika kondisional Anda dapat mentolerir varians **15 detik** dan masih memberikan perilaku yang diinginkan. Jika Anda bertanya-tanya mengapa 15 detik diperlukan, itu karena Parity dan Geth akan menolak blok yang lebih dari 15 detik di masa depan.
+
+### Dan Masih Banyak Lagi
+
+Ini hanyalah beberapa serangan umum terhadap *smart contract*. Penting untuk tetap terbarui tentang jenis-jenis peretasan terbaru dan menjaga keamanan kontrak Anda. **ConsenSys** menyediakan daftar serangan *smart contract* umum yang harus Anda tinjau saat menulis *smart contract* Anda.
+
+Jika Anda berniat merilis *smart contract* Anda ke publik, penting untuk melakukan **audit *smart contract***.
+
+## Mempersiapkan Kontrak Anda untuk Audit Eksternal
+
+Sebelum Anda mengalihdayakan ke perusahaan eksternal untuk audit *smart contract* Anda, Anda harus terlebih dahulu mencoba mengamankannya sebanyak mungkin dan kemudian mencoba meretasnya sendiri. Mari kita bahas beberapa cara kita bisa mencoba menemukan kerentanan dalam sebuah kontrak.
+
+1.  Kontrak Anda harus memiliki **cakupan kode tes 100%**. *Smart contract* harus selalu memiliki tes. *Test-driven development* (TDD) adalah pilihan yang bagus untuk menjaga keamanan kontrak Anda.
+2.  Jalankan tes Anda. Coba rusak setiap tes dan lihat informasi apa yang bisa Anda peroleh dari itu.
+3.  Periksa serangan *reordering*, *replay*, atau *short address*.
+4.  Kompilasi kontrak Anda dan periksa peringatan.
+5.  Verifikasi bahwa kontrak Anda tidak memiliki *race condition*, masalah *reentrancy*, atau *cross-function race condition*.
+6.  Periksa ketergantungan urutan transaksi atau *timestamp*.
+7.  Periksa *integer overflow* dan *underflow*.
+8.  Periksa *revert* yang tidak terduga.
+9.  Periksa *denial of service* (DoS) dengan batas *gas* blok.
+10. Periksa izin eksekusi metode.
+11. Verifikasi bahwa OpenZeppelin dan versi Solidity Anda sudah yang terbaru.
+12. Jika Anda menggunakan pustaka di *smart contract* Anda, verifikasi bahwa Anda menggunakannya dengan benar.
+13. Periksa bahwa kontrak menggunakan SafeMath.
+14. Verifikasi bahwa Anda tidak memiliki peringatan kompiler.
+
+Ini hanyalah beberapa contoh cara Anda dapat mengamankan *smart contract* Anda. Hal terbaik yang bisa dilakukan untuk membuat *smart contract* yang aman adalah mencari auditor eksternal. Tidak selalu mudah untuk melihat potensi masalah pada kode yang telah Anda kerjakan sendiri.
+
+## Audit Eksternal
+
+Salah satu cara terbaik untuk memitigasi kerentanan keamanan di *smart contract* Anda adalah dengan menyewa auditor eksternal atau perusahaan audit *smart contract*. Perusahaan audit eksternal akan melihat kontrak Anda dengan mata yang segar dan menjalankannya melalui berbagai program audit untuk menemukan masalah keamanan apa pun. Auditor *smart contract* akan memberi Anda daftar masalah yang ditemukan di kontrak Anda dan cara-cara untuk memperbaikinya. Mengamankan *smart contract* telah menjadi masalah yang begitu besar sehingga sekarang ada perusahaan-perusahaan yang sepenuhnya berfokus pada audit dan penyediaan cara untuk mengamankan *smart contract*.
+
+### Perusahaan Audit
+
+Beberapa perusahaan besar yang berfokus pada audit *smart contract* menyediakan audit publik dari *smart contract* yang pernah mereka kerjakan. Salah satu contohnya adalah **Authio** di mana Anda dapat melihat contoh kerentanan yang mereka temukan dan rekomendasi cara memperbaikinya. Jika Anda tertarik pada keamanan *smart contract*, banyak perusahaan audit yang mempublikasikan audit ini, dan Anda dapat membacanya untuk menjadi lebih baik dalam mengenali potensi masalah keamanan di *smart contract* Anda sendiri.
+
+### Solidified
+
+Cara lain untuk memeriksa apakah *smart contract* Anda aman adalah dengan mempostingnya di **Solidified**. Solidified adalah platform di mana Anda dapat memposting *smart contract* Anda dan sekelompok ahli Solidity, pemburu *bounty*, dan pengembang akan bekerja sama untuk mencari kerentanan. Jika Anda tertarik untuk menjadi auditor, Anda juga bisa menjadi salah satunya di Solidified.io. Solidified bagus karena pertama-tama menyediakan tim ahli Solidity untuk menemukan kerentanan di kontrak Anda. Setelah mereka menyelesaikan laporan mereka, mereka akan memberikan saran tentang cara memperbaiki masalah di *smart contract* Anda. Setelah Anda memperbaiki masalah di kontrak, kontrak Anda diposting di platform Solidified Bounty di mana itu bersifat publik bagi seluruh komunitas Solidified.
+
+Ada juga sejumlah sumber daya gratis yang tersedia untuk membantu Anda menjaga keamanan *smart contract* Anda.
+
+## Sumber Daya Audit Gratis
+
+Ada berbagai sumber daya audit *smart contract* yang tersedia secara daring secara gratis. **Echidna** adalah alat populer dari Trail of Bits yang menyediakan *unit test* dan memungkinkan Anda menulis tes untuk kontrak Anda. Trail of Bits juga menyediakan daftar panjang sumber daya untuk audit *smart contract*.
+
+Lihat daftar alat keamanan dari ConSensys.
+
+Anda dapat menggunakan sumber daya daring gratis ini untuk mulai mengaudit kontrak Anda sendiri secara internal sebelum Anda mendapatkan audit eksternal. Mari kita pelajari cara lain untuk mengembangkan keterampilan Anda di bagian selanjutnya.
+
+## Mengembangkan Keterampilan Audit Anda
+
+Jika Anda ingin menjadi auditor ahli, ada banyak cara untuk mengasah keterampilan audit Anda.
+
+**Solidified** menawarkan program *bug bounty* di mana Anda dapat mengikuti wawancara, dan jika diterima, Anda bisa menjadi auditor profesional di Solidified. Anda akan diberi akses ke platform *bounty*, dan diberi kesempatan untuk mengaudit kontrak dan menuai imbalan jika Anda dapat menemukan kerentanan keamanan di dalam kontrak.
+
+Solidified juga menawarkan kursus audit. Mereka telah bermitra dengan perusahaan lain, **B9 Academy**, untuk menawarkan kursus tentang audit. Pada saat penulisan ini, Solidified juga menawarkan magang berbayar kepada individu yang memiliki skor tertinggi setelah menyelesaikan kursus. Kursus ini akan membahas kerentanan keamanan umum di *smart contract*, cara menulis audit, cara memulai karier sebagai auditor, cara memperbaiki masalah keamanan, dan banyak lagi.
+
+## Ringkasan
+
+Dalam bab ini, kita membahas berbagai cara di mana *smart contract* kita bisa rentan terhadap kerentanan. Kita belajar tentang beberapa jenis serangan yang berbeda, seperti *reentrancy* dan *integer underflow*. Mengamankan *smart contract* Anda penting karena peretas dapat mengeksploitasi kontrak Anda dan membekukan dana atau mencurinya.
+
+Mengaudit kontrak secara eksternal sangat penting untuk keamanan *smart contract* Anda. Dalam bab ini, kita membahas bagaimana Anda dapat menemukan auditor eksternal atau menggunakan Solidified, sebuah situs di mana Anda bisa mendapatkan audit kontrak dan mempostingnya ke komunitas besar para pemburu *bounty*. Kita juga belajar bagaimana kita dapat mengaudit *smart contract* dan berbagai sumber daya gratis yang tersedia.
+
+Kami menciptakan buku ini untuk membantu Anda mengambil langkah pertama dalam pengembangan *smart contract*—mulai dari membangun *smart contract* dan men-*deploy*-nya hingga menghubungkan kontrak Anda ke *frontend*. Buku ini dapat digunakan sebagai kerangka kerja untuk memperluas kontrak dan kode yang kami sediakan untuk memungkinkan Anda menulis DApp Anda sendiri.
+
+**Semoga berhasil dalam petualangan pengembangan *smart contract* Anda\!**
