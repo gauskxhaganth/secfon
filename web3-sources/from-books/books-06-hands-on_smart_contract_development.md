@@ -4935,3 +4935,27 @@ Kita menghabiskan banyak waktu menguji kasus paginasi kita untuk memastikan kita
 
 ---
 
+# BAGIAN III
+## Berinteraksi dengan Smart Contract Kita Melalui Web3
+
+Dalam bagian ini, kita akan belajar cara menggunakan Web3 dan menghubungkan *smart contract* kita ke sebuah aplikasi agar pengguna dapat berinteraksi dengan *blockchain* secara mudah. Dengan Web3, kita memiliki solusi yang jauh lebih sederhana untuk masalah yang rumit. Dengan menggunakan Web3, kita dapat dengan mudah menghubungkan kontrak kita ke *frontend* serta membaca dan menulis data.
+
+---
+
+# BAB 8
+## Apa Itu Web3?
+
+Web3 adalah kumpulan pustaka (*library*) JS yang memungkinkan Anda berinteraksi dengan *node* Ethereum dari jarak jauh atau secara lokal. Sederhananya, Web3 menyediakan kita sebuah API untuk digunakan sehingga kita dapat dengan mudah bekerja dengan *blockchain*. Web3 berfungsi sebagai *wrapper* untuk JSON RPC untuk terhubung ke *node* Ethereum jarak jauh atau lokal dengan koneksi HTTP atau IPC. Pada dasarnya, Web3 adalah koneksi antara *blockchain* Ethereum dan *smart contract* Anda.
+
+Di balik layar, Web3 menggunakan JSON RPC. RPC digunakan dalam berbagai jenis bahasa pemrograman. Anda dapat mempelajari lebih lanjut tentang JSON RPC di sini. Bab ini berfokus pada Web3 karena Web3 membuat koneksi ke *node* Ethereum menjadi tidak terlalu rumit dan jauh lebih mudah dipahami daripada RPC.
+
+### Frontend, Web3, dan Blockchain
+
+Dalam aplikasi web 2.0 tradisional, pengguna Anda akan berinteraksi dengan *frontend* aplikasi seperti React atau Ember untuk membuat permintaan (*request*) ke *backend* yang akan memiliki basis data, API, dan model, yang kemudian akan mengembalikan respons (*response*) dari *backend*. *Frontend* akan menyajikan data dari *backend* ke *frontend*, dan *frontend* akan menampilkannya kepada pengguna Anda.
+
+Alur aplikasi web 2.0 diilustrasikan pada Gambar 8-1.
+
+<p align="center">
+  <img src="images/books-06-hands-on_smart_contract_development/figure-8.1.png" alt="gambar" width="580"/>
+</p>
+
