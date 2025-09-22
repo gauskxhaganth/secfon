@@ -1578,5 +1578,181 @@ Kita akan melanjutkan perjalanan protokol berlapis kita di Jam ke-15, "Menghubun
 Jam ini menjelaskan fitur-fitur utama dari sebuah WAN dan mengapa ia berbeda dari LAN. Komponen-komponen kunci dari sebuah WAN telah diperiksa, begitu pula tiga antarmuka WAN utama. Juga dijelaskan adalah sistem operator $L_1$ WAN utama dan yang membentuk Lapisan 2. Pro dan kontra dari pengalihan alamat dan label disorot. Jam ini diakhiri dengan melihat bagaimana sebuah paket dikirim melalui WAN antara dua LAN dan bagaimana sistem operator serta protokol WAN berkontribusi pada transport ini.
 
 ---
+# JAM ke 7
+## Jaringan Nirkabel Bergerak 📶
 
+**Apa yang Akan Anda Pelajari dalam Jam Ini:**
+* Konsep dasar jaringan nirkabel bergerak
+* Standar nirkabel bergerak yang terkemuka
+* Sistem seluler
+* Wi-Fi (*Wireless Fidelity*)
+* Bluetooth
+* Dasar-dasar isu keamanan
+* Pertimbangan implementasi
+
+Selama enam jam terakhir, kita sering kali memberikan komentar umum tentang jaringan nirkabel. Karena jaringan nirkabel merupakan komponen utama dalam jaringan modern dan karena Anda kemungkinan akan menggunakannya di internet Anda sendiri, sudah sepantasnya kami memberikan detail lebih lanjut tentangnya.
+
+Penekanan pada jam ini adalah pada **jaringan nirkabel bergerak**. Jaringan tetap, seperti sistem gelombang mikro suatu negara, memang penting, tetapi tidak dibahas di sini karena transparansinya terhadap jaringan Anda. Misalnya, Anda mungkin telah menyewa jalur DS3 di seluruh Amerika Serikat, tetapi Anda tidak akan tahu apakah AT&T menempatkan muatan DS3 Anda melalui gelombang mikro atau kabel. Di sisi lain, jaringan nirkabel seperti **Wi-Fi**, **Bluetooth**, dan **seluler** kemungkinan besar akan sangat terlihat dalam operasi Anda.
+
+## Memahami Jaringan Nirkabel
+
+Pilihan untuk jaringan nirkabel telah sangat meningkat selama beberapa tahun terakhir. Sebagai salah satu contoh, ribuan jaringan nirkabel publik kini terpasang di hotel, kedai kopi, dan bandara—**"hot spot"** yang tersedia untuk kita gunakan. Sebagai contoh lain, komunikasi nirkabel jarak jauh dapat dilakukan melalui teknologi telepon seluler dan sistem satelit. Ini adalah kabar baik bagi pengguna, terutama dengan ledakan standar dan produk nirkabel jaringan area lokal (LAN) baru-baru ini, karena sebagian besar berpusat pada **Wi-Fi** dan **Bluetooth**, yang tersedia untuk kita semua.
+
+> **Tahukah Anda?**
+>
+> ### Interferensi Sinyal
+> Konektivitas radio menyediakan cara mudah untuk memperluas LAN kabel atau nirkabel. Peralatan LAN nirkabel (WLAN) beroperasi di sebagian rentang frekuensi yang telah dicadangkan oleh FCC untuk penggunaan tidak teregulasi pada **2,4 gigahertz (GHz)**. Perlu diketahui bahwa "tidak teregulasi" berarti persis seperti itu: ada kemungkinan mengalami **interferensi** dari sinyal tidak teregulasi milik orang lain. Untungnya, FCC telah memberlakukan batasan jarak sejauh mana sinyal-sinyal ini dapat dipropagasi. Jadi, tetangga sebelah Anda mungkin "menangkap" email nirkabel Anda dari jaringan lokal Anda, tetapi mertua Anda di seberang kota tidak akan memiliki akses ke sana. Bagaimanapun, Jam ke-20, "Keamanan," akan menjelaskan cara mengamankan lalu lintas Anda.
+
+Perbedaan utama antara jaringan kabel dan jaringan nirkabel adalah bagaimana komputer atau perangkat lain, seperti asisten digital pribadi (PDA), terhubung ke jaringan di **Lapisan 1** dari model Internet/OSI. Instalasi nirkabel menggunakan sinyal **radio** atau **inframerah** untuk mengirim dan menerima data. Penggunaan spektrum radio lebih umum, jadi mari kita pusatkan diskusi kita pada jaringan radio.
+
+Sebuah komputer harus dilengkapi dengan **kartu antarmuka jaringan (NIC)** yang dapat mengirim (dan menerima) data sebagai gelombang radio (bukan sebagai sinyal listrik melalui kabel). Untuk terhubung ke jaringan, sebuah perangkat harus dipasang untuk menghubungkan komputer dan mesin lainnya. Di jaringan kabel, perangkat tersebut adalah hub, bridge, router, atau switch. Di jaringan nirkabel, perangkat penghubung pusat disebut **titik akses nirkabel (Wireless Access Point atau WAP)**.
+
+WAP juga bisa menjadi hub, bridge, router, atau switch dengan porta nirkabel dan berbasis kabel. Jadi, sebagian besar titik akses menyediakan konektivitas nirkabel serta koneksi porta ke jaringan kabel, seperti Internet.
+
+Jaringan yang menggabungkan konektivitas kabel dan nirkabel sering disebut sebagai **jaringan hibrida**. Gambar 7.1 menunjukkan tata letak untuk jaringan hibrida.
+
+Biasanya, router nirkabel mencakup **WAP**, **switch Ethernet**, dan *firmware* untuk **penerusan IP**, **Network Address Translation (NAT)**, dan **Domain Name System (DNS)** untuk bekerja sama dengan gateway WAN. Router nirkabel memungkinkan perangkat Ethernet kabel dan nirkabel untuk terhubung ke perangkat WAN seperti modem DSL. Modem ini sering kali berupa kartu jaringan di dalam router.
+
+Router nirkabel dapat dikonfigurasi melalui utilitas pusat. Jika Anda memasang WLAN untuk terhubung ke Internet, ISP Anda akan menyediakan layanan ini untuk Anda, kemungkinan besar dari server web ISP.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-7.1.png" alt="gambar" width="580"/>
+</p>
+
+Ketika Anda tidak akan berkomunikasi dengan WAN, Anda mungkin memilih **jembatan jaringan nirkabel** (*wireless network bridge*). Perangkat ini beroperasi pada lapisan $L_1$ dan $L_2$ dari model berlapis. Konfigurasi ini dapat berguna untuk menghubungkan dua jaringan Ethernet, katakanlah, di dua rumah atau kantor yang terpisah. Jembatan jaringan nirkabel ini mudah digunakan.
+
+Mari kita bahas satu poin umum lagi mengenai subjek ini. **Pengulang nirkabel** (*wireless repeaters*) dapat memperluas jangkauan jaringan nirkabel yang sudah ada. Pengulang memungkinkan sinyal untuk merambat melewati penghalang dan koridor. Perlu diketahui bahwa setiap pengulang akan menambah latensi untuk setiap lompatan (*hop*), dan *throughput* dari ujung ke ujung (*end-to-end*) akan dibatasi oleh tautan berkapasitas terendah dalam rantai tersebut.
+
+## Sejarah Singkat Jaringan Nirkabel Seluler
+
+Jaringan nirkabel seluler di Amerika muncul 80 tahun yang lalu. Pada 7 April 1928, sistem radio seluler pertama mulai beroperasi di Detroit, Michigan. Sistem-sistem awal ini memerlukan *bandwidth* yang sangat besar. Spektrum sebesar 120 kilohertz (KHz) diperlukan untuk mentransmisikan sinyal suara yang hanya sebesar 3KHz. Pada tahun 1960-an, teknologi mendukung saluran suara "sederhana" sebesar 30KHz.
+
+Ponsel yang kemungkinan ada di dekat Anda saat membaca kalimat ini adalah teknologi yang relatif baru. Di Amerika Serikat, layanan ini pertama kali diimplementasikan sebagai layanan nasional pada tahun 1983. Ponsel generasi pertama (1G) ini—*Advanced Mobile Phone System*, atau AMPS—menggunakan *bandwidth* sebesar 30KHz. Terlebih lagi, AMPS dibangun dengan teknologi analog. Sinyal suara dikirim melalui gelombang analog—tidak ada angka diskret 0 atau 1 pada masa itu. AMPS juga tidak memiliki kemampuan signifikan untuk mengirim data antar komputer. Beberapa perangkat khusus memungkinkan beberapa aplikasi data, tetapi kemampuannya terbatas.
+
+Pada awal 1990-an, industri mulai beralih ke sistem generasi kedua (2G). Fitur-fitur utama yang diperkenalkan saat itu adalah yang kita miliki di ponsel generasi ketiga (3G) saat ini, seperti yang dijelaskan dalam daftar berikut. (Sebagai informasi, 1G sekarang sudah usang, dan penggunaan 2G menurun dengan cepat.)
+
+* Semua gambar didigitalkan menjadi aliran bit biner yang terdiri dari angka 1 dan 0.
+* Menggunakan *bandwidth* lebih sedikit daripada jaringan 1G.
+* Mendukung aplikasi video dan data.
+* Memungkinkan penggunaan perangkat telepon yang kecil.
+* Menyediakan sinyal berkualitas lebih tinggi.
+* Menyediakan keamanan yang lebih baik.
+* Mungkin menyediakan antarmuka ke Internet (dan Web) menggunakan protokol Internet.
+* Mungkin mendukung email.
+* Menyediakan layanan pesan teks.
+
+Dibandingkan dengan *broadband* berbasis kabel, *bandwidth* 2G dan 3G lebih terbatas. Laju bit (*bit rate*) bervariasi, tergantung pada kondisi jaringan dan implementasi spesifik, tetapi pengguna ponsel tidak akan mendapatkan *throughput* dan waktu respons seperti pada koneksi DSL dan modem kabel konvensional.
+
+Seperti yang disebutkan, industri nirkabel seluler (biasanya disebut industri ponsel) sedang memasuki teknologi 3G. Salah satu tujuan 3G adalah menyediakan laju transfer yang lebih tinggi untuk setiap pengguna. Standar 3G menetapkan laju data yang berbeda, tergantung pada teknologi Lapisan 1. Sebagai contoh, standar internasional CDMA2000 mendefinisikan laju data maksimum sebesar 307 kilobit per detik (Kbps).
+
+Apakah ini kabar buruk? Ya, jika kita harus bergantung pada saluran ponsel konvensional untuk dukungan kapasitas tinggi. Untungnya, teknologi nirkabel lain sudah tersedia yang menawarkan lebih banyak *bandwidth* dan akan dibahas lebih lanjut dalam jam ini.
+
+## Konsep Sel
+
+Banyak sistem nirkabel, termasuk yang baru saja dijelaskan, diimplementasikan dengan **konsep sel**. Sel adalah area geografis yang menggunakan pemancar frekuensi radio berdaya rendah. Perangkat berdaya rendah tidak dapat mengirim sinyal dalam jarak jauh, yang memungkinkan frekuensi untuk digunakan kembali di sel-sel yang tidak bersebelahan. Mengingat spektrum frekuensi yang terbatas dan persaingan terus-menerus untuk mendapatkan *bandwidth* radio di antara penyedia layanan nirkabel, **penggunaan ulang frekuensi** (*frequency reuse*) adalah kemampuan yang penting. Tanpa penggunaan ulang frekuensi, pasar ponsel akan memiliki kapasitas yang sangat kecil sehingga basis pelanggan yang terbatas tidak akan mampu membayar biaya pembangunan dan pemeliharaan jaringan.
+
+Ponsel berkomunikasi dengan **stasiun pangkalan** (*base station*) sel (fasilitas kontrol dengan antena pengirim dan penerima) melalui **saluran kontrol** (*control channels*). Saluran-saluran ini adalah pita frekuensi yang telah ditentukan sebelumnya dan dicadangkan untuk lalu lintas manajemen panggilan. Menggunakan saluran kontrol, stasiun pangkalan (dengan panduan dari pusat kendali jarak jauh) menugaskan frekuensi spesifik kepada ponsel untuk digunakan dalam panggilan. Untuk sistem 2G dan 3G, ponsel juga diberi slot waktu spesifik yang dapat digunakannya pada frekuensi tersebut. Dengan demikian, 2G dan 3G memungkinkan banyak pengguna untuk dimultipleks ke dalam satu saluran radio fisik.
+
+Menggunakan saluran kontrol, pengguna telepon dapat menghubungi pihak lain dan kemudian menggunakan saluran pengguna untuk komunikasi yang sedang berlangsung. Selama ponsel berada dalam satu sel, stasiun pangkalan memantau sinyal ponsel tersebut. Jika stasiun pangkalan mendeteksi bahwa sinyal semakin lemah, ia meminta stasiun kontrol untuk menentukan apakah unit ponsel tersebut bergerak keluar dari jangkauan sel stasiun pangkalan. Jika ya, jaringan akan menyiapkan prosedur agar sel yang berdekatan mengambil alih panggilan tersebut—sebuah operasi yang biasanya transparan bagi pengguna ponsel.
+
+Sistem ponsel seluler di seluruh dunia adalah seperangkat jaringan yang sangat sederhana. Lokasi pengguna ponsel dijaga (secara terus-menerus, jika ponsel dihidupkan) oleh para penyedia jaringan seluler yang bekerja sama untuk bertukar informasi tentang lokasi semua ponsel. Selain nomor telepon, pengenal lain dan informasi lokasi dipertukarkan antar penyedia untuk melacak pelanggan seluler.
+
+Oleh karena itu, jaringan ponsel seluler tidak hanya dapat menyerahkan panggilan antar sel di dalam satu jaringan, tetapi juga dapat menyerahkan panggilan antar sel di lintas jaringan. Ketika Anda pertama kali menyalakan ponsel Anda, penyedia layanan di sel lokal akan menangkap sinyal ponsel Anda di saluran kontrol, yang membawa nomor telepon, ID-nya, dan ID penyedia layanan Anda. Dalam hitungan detik, penyedia lokal ini telah mengirimkan paket ke penyedia Anda tentang lokasi baru Anda. Lokasi Anda kemudian terus diperbarui.
+
+Ketika Anda mematikan dan kemudian menyalakan kembali ponsel Anda, lokasinya akan diperbarui kembali. Tidak suka "Big Brother" mengawasi? Kalau begitu jangan gunakan ponsel.
+
+Jaringan telepon seluler adalah teknologi yang luar biasa. Seiring industri beralih ke 3G, ponsel akan semakin banyak digunakan untuk aplikasi video, data, dan grafis berkualitas lebih tinggi. Selain itu, semakin banyak ponsel yang dilengkapi dengan kemampuan Internet mode-asli (*native-mode*).
+
+Sekarang mari kita periksa beberapa standar dan produk jaringan nirkabel terkemuka dan lihat bagaimana kita dapat menggunakannya untuk meningkatkan jaringan Anda.
+
+## Wi-Fi
+
+Teknologi **Wi-Fi** (dipublikasikan dalam standar IEEE 802.11) digunakan sebagai koneksi berbiaya rendah dengan jarak terbatas. Namun, tidak ada yang menghalangi penggunaan Wi-Fi untuk jarak yang lebih jauh dengan daya yang lebih tinggi dan komponen yang lebih mahal. Untuk diskusi ini, penekanannya adalah pada teknologi yang pertama.
+
+Wi-Fi menggunakan teknologi radio **spektrum tersebar** (*spread spectrum*). Spektrum tersebar dikembangkan oleh militer untuk melindungi dari gangguan (*jamming*) dan penyadapan frekuensi radio musuh. Spektrum tersebar menyebarkan sinyal ke seluruh rentang frekuensi dalam *bandwidth* publik.
+
+* **Spektrum Tersebar Lompatan Frekuensi (FHSS – *Frequency Hopping Spread Spectrum*)**—Sesuai namanya, dengan menggunakan pola yang telah ditentukan, perangkat seluler yang berpasangan secara bersamaan melompat dari satu frekuensi ke frekuensi lainnya. Penerima hanya dapat menerima data FHSS jika pengirim dan penerima menggunakan pola lompatan yang sama (yang dikendalikan oleh algoritma urutan lompatan yang ditetapkan selama *handshake* sesi awal). Menurut aturan FCC, tidak ada pemancar yang boleh berada pada satu pita frekuensi selama lebih dari 0,4 detik dalam periode 30 detik untuk pita 2.4GHz. Setiap pemancar juga harus berputar melalui 50–75 pita radio sebelum memulai kembali algoritma urutan lompatan.
+* **Spektrum Tersebar Urutan Langsung (DSSS – *Direct Sequence Spread Spectrum*)**—Dalam DSSS, pemancar memodifikasi data dengan "chip", atau bit data tambahan yang disisipkan ke dalam aliran data. Hanya penerima yang mengetahui algoritma penyisipan chip yang dapat menguraikan kode tersebut. Karena efek dari chip ini, *throughput* efektif DSSS saat ini terbatas hingga 11 megabit per detik (Mbps) di pita 2.4GHz.
+
+Implementasi Wi-Fi 802.11b dan 802.11g menggunakan DSSS. Bluetooth (yang akan dibahas di bagian berikutnya) menggunakan FHSS.
+
+Meskipun standar 802.11 menyediakan sejumlah spesifikasi berbeda untuk jaringan nirkabel, spesifikasi $L_1$ berikut ini adalah yang lebih menonjol:
+
+* **802.11a**—Standar ini menyediakan *throughput* hingga 54Mbps dan beroperasi di pita 5GHz dari spektrum radio. (Karena adanya *overhead*, pengguna secara wajar dapat mengharapkan *throughput* sekitar 25Mbps.) Pita 2.4GHz lebih populer; oleh karena itu, 802.11a mungkin mengalami lebih sedikit interferensi. Perlu diingat bahwa frekuensi yang lebih tinggi ini lebih rentan terhadap kesalahan dan tidak dapat menembus dinding serta benda padat lainnya dengan mudah. Selain itu, saat tulisan ini dibuat, jaringan publik ("hotspot" publik) menggunakan pita 2.4GHz.
+* **802.11b**—Spesifikasi ini menyediakan laju data maksimum 11Mbps dan beroperasi di pita 2.4GHz, dengan memanfaatkan DSSS. Namun, perangkat 802.11b diketahui mengalami gangguan dari mesin lain yang beroperasi di pita ini. Sebagai contoh, monitor bayi Anda mungkin mengganggu komponen Wi-Fi ini. Meskipun demikian—dan interferensi ini jarang terjadi—802.11b telah diterapkan secara luas di seluruh dunia.
+* **802.11g**—Spesifikasi ini menyediakan 54Mbps (dengan *throughput* bersih sekitar 20–25Mbps) di pita 2.4GHz. Saat ini, ini adalah implementasi spesifikasi nirkabel 802.11 yang paling cepat berkembang untuk jaringan rumah dan LAN kecil.
+
+Spesifikasi nirkabel 802.11 secara kolektif disebut sebagai Wi-Fi (*Wireless Fidelity*). Untuk mempromosikan 802.11 sebagai standar nirkabel (ada kemungkinan lain yang akan dibahas sebentar lagi), **Aliansi Wi-Fi** (*Wi-Fi Alliance*), sebuah organisasi nirlaba, dibentuk oleh sejumlah perusahaan yang menyediakan teknologi dan layanan nirkabel 802.11.
+
+Satu poin lagi tentang 802.11a. Teknologi ini tidak menggunakan FHSS atau DSSS. Ia menggunakan skema *multiplexing* yang disebut **Orthogonal Frequency Division Multiplexing (OFDM)**. OFDM membagi sinyal radio menjadi banyak subsinyal yang ditransmisikan secara bersamaan pada frekuensi yang berbeda. Hal ini memungkinkan sejumlah besar data digital dipecah menjadi bagian-bagian kecil dan kemudian ditransmisikan.
+
+### Jangan Abaikan 802.11n
+
+Selama evaluasi opsi WLAN Anda, pastikan Anda memeriksa penawaran terbaru untuk **802.11n**. Saat tulisan ini dibuat, produk 802.11n mulai muncul di pasaran. Pastikan Anda dan tim Anda mempertimbangkan teknologi ini karena ia menawarkan laju transmisi hingga 600Mbps—peningkatan yang signifikan dibandingkan teknologi Wi-Fi lainnya.
+
+Tapi berhati-hatilah. Untuk tujuan pengujian dan penelitian untuk buku ini, saya membeli sebuah *router* yang sesuai dengan IEEE 802.11n (seperti yang diiklankan dalam literatur vendor *router*). Saya menemukan bahwa mesin tersebut belum mendukung spesifikasi Wi-Fi ini. "Meja bantuan" teknis memberitahu saya bahwa perusahaan mengalami beberapa masalah dengan 802.11n. Saya menyarankan agar mereka mempertimbangkan agar tim teknis sesekali bertemu dengan departemen pemasaran.
+
+## Bluetooth
+
+Meskipun saat ini bukan pesaing untuk implementasi WLAN, ada spesifikasi nirkabel lain yang berbagi rentang *bandwidth* 2.4GHz yang sama dengan 802.11: **Bluetooth**. Bluetooth diciptakan pada tahun 1998 sebagai standar untuk menghubungkan perangkat seluler (seperti PDA) oleh sejumlah perusahaan (seperti IBM, Nokia, dan Toshiba) yang tertarik pada strategi komputasi seluler. Bluetooth pada awalnya dirancang sebagai strategi untuk mengimplementasikan **jaringan area pribadi**, atau **PAN** (*personal area network*)—artinya spesifikasi Bluetooth ditujukan untuk digunakan pada perangkat yang kita gunakan sehari-hari, seperti ponsel dan printer; serta perangkat kenyamanan pribadi, seperti PDA.
+
+Para visioner Bluetooth membayangkan lingkungan nirkabel yang akan mengelilingi kita saat kita melakukan pekerjaan sehari-hari, memungkinkan kita (dan peralatan kita) terbebas dari dunia kabel yang membatasi. Telepon nirkabel, disk nirkabel, pembuat kopi nirkabel, wajan, dan pemanggang roti—semuanya dikendalikan oleh "server" nirkabel yang berisi banyak perangkat lunak pembuat sarapan di lapisan aplikasi OSI. Dapur otomatis futuristik ini belum menjadi kenyataan, tetapi di dunia kita yang serba cepat dan serba instan, mungkin ini sudah ada dalam denah para kontraktor bangunan.
+
+Bagaimanapun, Bluetooth adalah standar terbuka (seperti halnya 802.11) dan dapat menyediakan laju transfer sebesar 1Mbps. Laju data bersihnya tergantung pada protokol lain yang Anda gunakan dengan Bluetooth. Versi yang lebih baru mendukung laju data yang lebih tinggi. Jika masalah ini penting bagi Anda, periksa hal berikut: Versi 1.2: 1Mbps; Versi 2.0: 3Mbps. Anda mungkin juga ingin memeriksa proposal baru yang disebut sebagai Aliansi WiMedia, yang sedang dalam proses mendefinisikan laju data yang jauh lebih tinggi. Saat tulisan ini dibuat, laju bit spesifiknya belum ditentukan.
+
+Bluetooth memberikan banyak kemungkinan untuk menyediakan tautan komunikasi antara perangkat komputasi genggam, ponsel, dan perangkat lain, seperti *headset* nirkabel, papan ketik, printer, pemindai kode batang, PlayStation, dan pena grafis. Ada juga pembicaraan tentang pengembangan Bluetooth menjadi medium infrastruktur LAN penuh (yang akan menjadikannya pesaing 802.11).
+
+Bluetooth dirancang untuk konsumsi daya yang rendah, yang tentu saja menghasilkan area sinyal jarak pendek. Dengan demikian, jangkauannya bergantung pada kelas daya: Kelas 3: sekitar 1 meter, Kelas 2: sekitar 10 meter, dan Kelas 1: sekitar 100 meter.
+
+Selama sinyal yang diterima cukup kuat untuk diterjemahkan, perangkat Bluetooth dapat berada di ruangan yang berbeda. Selama proses penyalaan, *node-node* menjalankan **Protokol Manajer Tautan (LMP – *Link Manager Protocol*)** untuk mengatur tautan nirkabel (sebuah protokol $L_2$). Selama fase ini, perangkat saling mengautentikasi dan menegosiasikan ukuran paket yang akan dipertukarkan. **Protokol Penemuan Layanan (SDP – *Service Discovery Protocol*)** juga digunakan untuk melakukan *handshake* guna menentukan jenis perangkat dan jenis layanan yang didukung oleh masing-masing perangkat.
+
+Anda tidak perlu khawatir dengan detail protokol Bluetooth. Mereka disebutkan untuk memberi Anda apresiasi yang lebih baik tentang kekuatan dan fleksibilitas Bluetooth, dan sekali lagi untuk menunjukkan betapa bergunanya model berlapis OSI/Internet dalam menjelaskan teknologi jaringan komputer.
+
+## Apakah Wi-Fi dan Bluetooth Bersaing?
+
+Wi-Fi dan Bluetooth bukanlah pesaing. "Tempat" mereka dalam skema jaringan—berdasarkan karakteristiknya—telah dipikirkan dengan matang oleh para pengembangnya. **Wi-Fi** lebih mahal, namun menyediakan area sinyal yang lebih luas dan *throughput* data yang lebih tinggi. Keduanya menggunakan spektrum frekuensi yang sama, tetapi, seperti yang disebutkan sebelumnya, mereka menggunakan teknik yang berbeda di lapisan $L_1$ untuk mengirim dan menerima sinyal.
+
+Wi-Fi adalah alternatif yang menarik untuk LAN berbasis kabel. Banyak rumah dan perusahaan menggunakannya untuk menghindari penarikan kabel Ethernet antar ruangan. **Bluetooth** dapat digunakan untuk menggantikan koneksi tipe USB, seperti pada papan ketik, RAM kilat (*flash RAM*), printer, dan kamera.
+
+## Interferensi Frekuensi Antara Wi-Fi dan Bluetooth?
+
+Seperti yang telah disebutkan sebelumnya, 802.11 dan Bluetooth menggunakan pita 2.4GHz sebagaimana didefinisikan dalam Bagian 15 dari Aturan dan Regulasi Komisi Komunikasi Federal AS (FCC). Perangkat Bluetooth seharusnya tidak mengganggu perangkat Wi-Fi karena Bluetooth menggunakan FHSS dan 802.11 menggunakan DSSS.
+
+Namun, peralatan ini dapat terpengaruh oleh interferensi dari oven *microwave* dan telepon nirkabel. Kemungkinannya kecil, tetapi ingatlah kemungkinan itu saat Anda memanaskan kopi di pagi hari sambil berbicara di telepon Bluetooth.
+
+## Pertimbangan Keamanan pada Jaringan Nirkabel
+
+Prosedur umum untuk melindungi lalu lintas melalui saluran nirkabel adalah dengan **mengenkripsi** data pengguna. Jam ke-20 memberikan informasi tentang enkripsi secara umum. Untuk diskusi ini, fokusnya adalah secara spesifik pada saluran nirkabel.
+
+Jaringan nirkabel membuat banyak orang merasa was-was karena masalah keamanan. Bagaimanapun, kita mengirimkan data kita ke udara, menjadikannya target yang memungkinkan bagi para **penyadap** (*eavesdroppers*).
+
+Sensitivitas data menjadi semakin penting bagi mereka di bidang medis karena peraturan **HIPAA** (*Health Insurance Portability and Accountability Act*) yang terkait dengan perlindungan informasi pasien. Bahkan seorang dokter gigi dengan praktik kecil mungkin akan berpikir dua kali untuk mengimplementasikan jaringan nirkabel di kantor giginya karena data pasien mungkin berisiko, Karena kerentanan "data di udara," jaringan nirkabel memiliki strategi keamanan.
+
+**WEP** (*Wired Equivalent Privacy*) adalah sebuah protokol yang berjalan di sublapisan MAC dari lapisan taut data (*data link layer* atau $L_2$) pada model Internet/OSI. WEP mengenkripsi data yang dikirim dari satu titik ke titik lain di WLAN menggunakan kunci rahasia bersama (*shared secret key*). Ini berarti WEP berlaku saat data bergerak dari klien nirkabel ke titik akses atau ke klien nirkabel lainnya. Perlu diingat: Jika data memasuki LAN berkabel, perlindungan WEP berakhir.
+
+Pada awal tahun 2000-an, WEP digunakan di banyak produk, tetapi ditemukan rentan terhadap peretasan. Oleh karena itu, **WPA-2** (*Wi-Fi Protected Access*) kini ada di banyak produk dan menawarkan perlindungan yang lebih baik. Meskipun demikian, Anda harus memeriksa sistem Anda untuk menentukan apakah data dienkripsi, karena beberapa produk memiliki pengaturan default ke mode jernih (*clear mode*) atau bebas enkripsi. Jika produk Wi-Fi itu sendiri tidak menyediakan tingkat keamanan ini, Anda dapat mengamankan data Anda dengan cara lain. Di Jam ke-20, kita akan menjelajahi alternatif-alternatif ini.
+
+## Pertimbangan Implementasi
+
+Mengimplementasikan jaringan nirkabel tidak jauh berbeda dengan mengimplementasikan jaringan berkabel. Anda harus merencanakan tata letak jaringan Anda dan kemudian memperoleh perangkat keras yang diperlukan untuk menjalankan jaringan tersebut. Anda harus merencanakan pertumbuhan, keamanan, dan semua masalah lain yang akan Anda rencanakan jika Anda mengimplementasikan jaringan berkabel. Kita tidak akan terlalu jauh membahas subjek ini, karena Jam ke-9 hingga ke-19 berisi banyak informasi tentang implementasi jaringan. Namun, beberapa komentar khusus untuk jaringan nirkabel perlu disampaikan.
+
+Dalam hal ukuran dan pertumbuhan jaringan, perlu diingat bahwa implementasi Wi-Fi seperti 802.11b tidak mahal dan cukup mudah diatur. Namun, mereka menyediakan *bandwidth* yang terbatas. Selain itu, semakin banyak pengguna di jaringan, semakin rendah *throughput* dan semakin lama waktu responsnya (yang tentu saja berlaku untuk jaringan apa pun). Jadi, Wi-Fi tidak boleh dipertimbangkan untuk mendukung basis pengguna yang besar. Untuk komunitas ini, Anda sebaiknya menggunakan Ethernet berkabel.
+
+Jumlah **titik akses** (*access points*) yang Anda putuskan untuk dipasang bergantung pada jumlah pengguna. Setiap titik akses memberikan spesifikasi mengenai jumlah pengguna yang dapat terhubung ke titik akses tanpa mengalami penurunan kinerja dan keandalan.
+
+Saat Anda merencanakan jaringan Wi-Fi Anda, ingatlah jangkauan medium tersebut. Di dalam ruangan, jangkauannya berkisar antara 150 hingga 300 kaki (jarak maksimum dari klien ke titik akses), kecuali jika Anda memasang **pengulang** (*repeaters*). Konstruksi bangunan juga dapat memengaruhi jangkauan, jadi pertimbangkan untuk menyiapkan peralatan uji sebelum Anda melengkapi semua pengguna dengan perangkat keras Wi-Fi.
+
+Anda harus menentukan batas jangkauan titik akses di gedung Anda dan di antara gedung-gedung Anda, yang akan membantu Anda menentukan jumlah titik akses yang Anda perlukan untuk mengakomodasi pengguna Anda. Selain itu, berikan sedikit tumpang tindih (*overlap*) antara batas jangkauan titik akses sehingga pengguna dapat menjelajah (*roam*) di dalam gedung atau di antara gedung.
+
+Mengenai perangkat keras, banyak produk tersedia baik untuk titik akses maupun **kartu antarmuka jaringan (NIC)** Wi-Fi. Untuk jaringan kecil, perusahaan seperti Linksys dan D-Link menyediakan titik akses dan NIC nirkabel. Banyak titik akses menyediakan kemampuan *firewall*, dan beberapa (yang dirancang untuk penggunaan rumahan) memiliki kemampuan kontrol orang tua untuk koneksi Internet.
+
+Untuk jaringan yang lebih besar, perusahaan seperti 3Com dan Cisco menyediakan titik akses kelas atas untuk jaringan perusahaan. Sebagai contoh, Cisco menawarkan produk yang secara bersamaan mendukung standar Wi-Fi 802.11a, 802.11b, dan 802.11g.
+
+Pastikan Anda meneliti dan menguji perangkat keras Wi-Fi Anda seperti halnya Anda melakukan hal yang sama untuk perangkat keras jaringan berkabel. Titik awal yang baik untuk informasi lebih lanjut tentang Wi-Fi adalah Aliansi Wi-Fi (*Wi-Fi Alliance*) di `www.wi-fi.org`. Organisasi ini menyediakan informasi tentang standar Wi-Fi dan informasi tentang produk bersertifikasi Wi-Fi, implementasi jaringan Wi-Fi, dan berita terkait Wi-Fi lainnya.
+
+## Ringkasan
+
+Pada bagian ini, kita telah membahas jaringan nirkabel. Dimulai dengan sejarah singkat sistem seluler, kita membahas efisiensi elegan dari konsep sel nirkabel. Kita telah memeriksa standar nirkabel seperti spesifikasi IEEE 802.11 dan Bluetooth. Kita melihat berbagai implementasi 802.11 dan Bluetooth, serta metode untuk mengamankan jaringan nirkabel. Kita mengakhiri bagian ini dengan beberapa rekomendasi mengenai strategi implementasi.
+
+---
 
