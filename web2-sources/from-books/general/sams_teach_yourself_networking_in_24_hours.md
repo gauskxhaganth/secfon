@@ -430,7 +430,6 @@ Internet juga menggunakan model protokol, yang mirip dengan model OSI. Namun, in
 
 Pada jam-jam berikutnya, kita akan memeriksa banyak aspek penggunaan model ini oleh Internet, serta standar dan protokol yang diterbitkan oleh **Internet Engineering Task Force (IETF)**. Spesifikasi ini sekarang tertanam di hampir semua produk vendor. Hanya dalam dua dekade, mereka telah mengubah industri jaringan komputer.
 
----
 ### Alamat: Alamat Jaringan atau Lapisan 3
 
 Melanjutkan analogi layanan pos kita, sekarang kita fokus pada alamat-alamat yang sangat penting itu. Jaringan komputer memiliki alamat sumber dan tujuan yang ditambahkan ke setiap *header* paket, mirip dengan amplop pos yang ditunjukkan pada Gambar 2.1 (Jam ke-2, "Manfaat Jaringan Komputer"). Alamat-alamat ini tertanam dalam *header* $L_3$, seperti yang terlihat pada Gambar 3.2. Tugas utama sebuah *router* (sesuai namanya) adalah menggunakan alamat tujuan untuk **merutekan** paket menuju tujuan akhirnya. Karena operasi ini terjadi di Lapisan 3 model OSI, pengidentifikasi ini disebut **alamat jaringan**.
@@ -497,7 +496,6 @@ Juga, perhatikan bahwa PC C dan D menggunakan protokol dan antarmuka nirkabel (W
 
 PC A dan B serta *router* menggunakan alamat MAC untuk memastikan lalu lintas dikirim ke *node* yang benar di jaringan lokal ini. Mari kita asumsikan PC A mengirim data, melalui *router*, ke PC B. PC A membuat *frame* dengan alamat sumber MAC A dan alamat tujuan MAC B. *Router* dikonfigurasi untuk meneruskan unit data ini ke PC B dengan memeriksa alamat tujuan MAC PC B. *Router* tidak meneruskan data ke atas ke $L_3$-nya.¹
 
----
 > ¹ Beberapa orang mengidentifikasi mesin yang melakukan perutean berdasarkan alamat MAC (dan bukan alamat IP) sebagai sebuah **bridge**. *Router* canggih dapat dikonfigurasi untuk beroperasi dengan alamat MAC atau IP.
 
 <p align="center">
@@ -522,7 +520,6 @@ Untuk mengakhiri pengenalan tentang bagaimana data bergerak melalui jaringan kom
 
 Untungnya, Anda tidak perlu khawatir dengan detail-detail ini. Tentu, ketika Anda membangun jaringan Anda sendiri, Anda akan menemukan istilah-istilah seperti IP, alamat MAC, dan ATM. Oleh karena itu, mengetahui fungsi-fungsi mereka akan membantu Anda untuk lebih baik dalam mengoperasikan dan mengelola jaringan Anda sendiri. Tetapi dengan beberapa pengecualian, penyedia layanan bertanggung jawab untuk menginstal dan mengkonfigurasi semua protokol dan alamat ini, semua untuk keuntungan Anda.
 
----
 ### Tinjauan Protokol Utama
 
 Pada Jam ke-8, 14, dan 15, kita akan kembali ke protokol-protokol utama yang digunakan untuk "memindahkan data dari sini ke sana." Untuk sisa jam ini, kita akan memeriksa beberapa aspek kunci dari protokol-protokol ini, yang akan memungkinkan kita untuk melanjutkan ke jam-jam berikutnya.
@@ -1075,7 +1072,6 @@ Selain tugas-tugas penting yang baru saja dijelaskan, router kelas atas menyedia
 >
 > Router adalah salah satu dari beberapa mesin yang dirancang untuk menyampaikan lalu lintas melalui jaringan. Anda mungkin menemukan istilah **switch**, **bridge**, dan **hub**. Perangkat-perangkat ini juga menyampaikan paket dan menghubungkan server serta komputer lain. Pada tahun 1990-an, istilah router, switch, bridge, dan hub dapat didefinisikan untuk mengidentifikasi jenis perangkat keras tertentu dan perangkat lunak terkaitnya. Sekarang tidak lagi demikian. Misalnya, sebuah router dapat melakukan fungsi dari apa yang disebut *ATM switch*, *MAC bridge*, atau *wiring hub*. Jangan khawatir dengan istilah-istilah ini sendiri. Selama Anda tahu apa yang bisa atau tidak bisa mereka lakukan, nama yang terkait dengannya tidaklah begitu penting.
 
----
 ### Model Klien/Server
 
 Pada masa-masa awal jaringan komputer—kembali ke tahun 1960-an—sebagian besar mesin yang terhubung ke komputer memiliki kapasitas yang sangat terbatas. Mereka disebut terminal "bodoh" (*dumb terminals*) karena alasan yang bagus. Mereka tidak punya CPU; tidak ada memori; tidak ada disk. Mereka bergantung pada komputer "mainframe" besar, seringkali dengan "pengontrol terminal" terkait untuk menyediakan layanan. Seorang pengguna terminal mengetikkan respons untuk data, surat, dan sebagainya dan menerima respons dari mainframe terpusat.
@@ -1137,7 +1133,6 @@ Dengan **toleransi kesalahan**, setiap komponen diduplikasi; ada dua dari setiap
 
 Baik toleransi kesalahan maupun ketersediaan tinggi tidak lebih baik dari yang lain. Keduanya berguna, dan penggunaan yang tepat tergantung pada kriteria yang dibawa ke desain jaringan. Kita akan membahas desain jaringan nanti di buku ini, termasuk cara mendefinisikan kriteria untuk membangun jaringan.
 
----
 ### Sistem Operasi Server
 
 Sama seperti klien jaringan harus memiliki sistem operasi yang dimuat agar mesin klien berfungsi, server jaringan harus memiliki sistem operasi. (Lihat Jam ke-4, "Konsep Komputer," untuk penjelasan tentang OS klien yang umum.) Perbedaan utama antara sistem operasi desktop dan **Sistem Operasi Server (SOS)** adalah, tidak mengherankan, skala dan sumber daya.
@@ -1214,7 +1209,6 @@ Untuk kisah pengembangan dan kebangkitan Linux, bacalah *Just for Fun: The Story
 
 Cukup sekian untuk SOS saat ini. Kita telah menyentuh permukaan kemampuan dan operasinya, tetapi kita belum menjelaskan cara menggunakannya dan cara mendapatkan kinerja terbaik darinya. Kita akan melakukan hal itu pada Jam ke-16 dan 17.
 
----
 ### Media
 
 Untuk instalasi jaringan Anda, Anda mungkin dapat menentukan media yang akan digunakan untuk mengangkut lalu lintas Anda. Kata "mungkin" dicatat, karena beberapa produk dan protokol jaringan memerlukan media tertentu. Misalnya, switched Ethernet menetapkan penggunaan kabel tembaga atau serat optik. Meskipun seorang insinyur yang giat dapat menginstal, katakanlah, kabel koaksial, alih-alih pasangan tembaga terpilin di LAN, itu bukanlah ide yang baik. Pertama, lapisan fisik model OSI harus dibuat ulang, yang memerlukan perubahan perangkat keras. Kedua, *line driver* harus ditulis ulang. Ketiga, lapisan data link, meskipun sebagian besar tetap utuh, masih memerlukan beberapa perubahan.
@@ -1280,4 +1274,309 @@ Selama jam ini, kita telah belajar tentang komponen perangkat keras dan perangka
 > ¹ Kabel dipilin (diplintir/twisted) untuk meningkatkan kualitas sinyal listrik. Apa itu sinyal listrik? Sinyal listrik adalah suatu bentuk transmisi energi melalui muatan listrik, seperti aliran tegangan atau arus, yang membawa informasi dari satu titik ke titik lain. Sinyal ini bisa berupa variasi yang berubah seiring waktu, seperti sinyal analog, atau memiliki nilai diskrit tertentu, seperti sinyal digital.
 
 ---
+
+# JAM ke 6
+## Memperluas LAN dengan Jaringan Area Luas (WAN)
+
+**Apa yang Akan Anda Pelajari dalam Jam Ini:**
+* Definisi jaringan area luas (WAN)
+* Komponen-komponen sebuah WAN
+* Antarmuka jaringan utama
+* Menggunakan penyedia operator untuk antarmuka lokal: telepon (sistem T-carrier dan *digital subscriber line*, atau DSL), layanan kabel, dan satelit
+* Sistem operator WAN broadband
+* Bagaimana Internet dapat membantu Anda merakit WAN Anda
+
+Jaringan sering kali tersebar di wilayah geografis yang luas, yang mungkin mencakup jarak yang terlalu jauh untuk dihubungkan dengan perangkat keras dan perangkat lunak jaringan area lokal (LAN). Jika LAN yang terletak di lokasi yang jauh perlu dihubungkan, mereka dihubungkan dengan sebuah WAN. Tentu saja, konsep ini mengasumsikan komponen-komponen WAN dipilih, dirakit, dan diintegrasikan dengan benar dengan komponen LAN, yang akan mulai kita lakukan pada jam ini.
+
+### Apa Itu WAN?
+
+Pada jam-jam sebelumnya, kita telah memperkenalkan WAN dan alasan umum keberadaannya. Sekarang kita akan beralih ke detailnya. Pertama, sebagian besar media LAN, seperti kabel tembaga atau serat optik, dipasang, dimiliki, dan dioperasikan oleh individu (seperti Anda dan saya) atau perusahaan (seperti bank dan toko kelontong). Lapisan fisik Open Systems Interconnection (OSI) ini terletak di rumah kita atau di kantor perusahaan. Mungkin berada di antara ruangan-ruangan di rumah kita, atau di antara gedung-gedung perkantoran perusahaan—sebuah kampus, misalnya.
+
+Namun, ketika menghubungkan LAN yang terletak di satu bagian negara dengan LAN di lokasi lain, kita (dan sebagian besar perusahaan) tidak diizinkan untuk menarik kabel tembaga melintasi negara. Bahkan jika kita mendapatkan lisensi pemerintah untuk melakukannya, itu akan menjadi usaha yang terlalu mahal. Memang, usulan tersebut tidak masuk akal. Jika semua orang "menarik kabel," jutaan tautan komunikasi akan diletakkan untuk menghubungkan jutaan LAN.
+
+Jadi, seperti jaringan telepon publik, yang mendukung koneksi jaringan telepon privat (*private branch exchanges* [PBX], misalnya), jaringan data publik—yang tersebar di area yang luas—mendukung koneksi LAN privat dan komputer individual. Salah satu jaringan data publik tersebut adalah Internet, induk dari semua jaringan komputer area luas.
+
+Pada titik ini, kita perlu menekankan hal-hal berikut tentang jaringan telepon publik dan jaringan data publik. Mereka:
+* Sekarang mampu mengangkut gambar apa pun (suara, video, data, foto, dan grafis)
+* Telah bermigrasi ke teknologi *packet-switching* untuk membawa lalu lintas ini
+* Mulai mengaburkan perbedaan mereka sebelumnya sebagai jaringan "telepon" atau jaringan "data"
+* Telah mengubah peran mereka; penyedia layanan Internet (ISP) mungkin adalah perusahaan telepon, seperti Verizon, atau perusahaan non-telepon, seperti AOL
+
+Untuk memahami situasi ini, pertimbangkan jaringan telepon konvensional sekitar 40 tahun yang lalu. AT&T dan Bell System adalah operator umum Amerika. Mereka membangun jaringan fantastis yang membawa lalu lintas suara dan video kita. Sistem mereka tidak dirancang untuk data, tetapi dengan penemuan salah satu mesin terpenting dalam sejarah, modem, data dapat ditempatkan di jalur telepon. (Modem akan dibahas di Jam ke-8, "Jaringan Jarak Jauh.")
+
+Internet awal dibentuk dengan menggunakan jaringan telepon dan menambahkan modem serta *packet switch* untuk pengangkutan data. Seiring dengan evolusi operator telepon ini dan munculnya Internet, fasilitas mereka mulai terlihat sama. Demikian pula, peran mereka mulai menyatu. Saat ini, perusahaan "telepon," seperti Verizon, tidak membatasi diri pada panggilan telepon. Verizon adalah ISP sekaligus penyedia jaringan konvensional. Situasi inilah yang menjadi alasan komentar saya tentang "pengaburan" peran antara sistem telepon, jaringan data, dan ISP.
+
+Meskipun ada migrasi ini, WAN memerlukan seseorang untuk membangun dan memasang fasilitas komunikasi yang mahal. AT&T, perusahaan telepon regional yang direkonstitusi, dan perusahaan lain berada dalam bisnis ini. Mereka menyewakan tautan komunikasi area luas mereka kepada siapa saja yang mau membayar sewa, seperti AOL. Sebagai imbalannya, AOL mungkin memilih untuk menambah nilai pada tautan tersebut dengan memasang router Cisco dan server Hewlett-Packard untuk menciptakan internet privat. AOL kemudian akan masuk ke dalam perjanjian yang disebut **perjanjian peering** dengan perusahaan lain untuk menghubungkan fasilitas mereka ke Internet publik. Misalnya, AOL mungkin setuju untuk bekerja sama dengan MSN dengan mengizinkan lalu lintas pelanggan masing-masing untuk melewati jalur komunikasi WAN yang telah mereka sewa dari, katakanlah, AT&T.
+
+Hasilnya adalah ketersediaan WAN publik dan privat untuk menghubungkan LAN kita atau modem *dial-up* biasa kita. Salah satu hasilnya juga adalah Internet yang luar biasa, sebuah kolase dari jutaan komputer, ribuan ISP, dan ratusan perusahaan WAN. Internet adalah fenomena yang menakjubkan. Yang lebih menakjubkan lagi, ia berfungsi.
+
+Berikut adalah tiga contoh WAN:
+* Mesin anjungan tunai mandiri (ATM) yang tersebar di sekitar kota dan terhubung ke fasilitas pemrosesan pusat sebuah bank. Untuk tujuan kontrol, bank menyewa jalur dari operator dan menambahkan perangkat lunak keamanan dan aplikasi sendiri.
+* Sebuah perusahaan internasional dengan instalasi *groupware* (perangkat lunak kolaboratif bersama) di lokasi-lokasi jarak jauhnya di seluruh dunia. Untuk memastikan pesan email dan *groupware* beroperasi dengan andal, perusahaan menggunakan jalur sewaan alih-alih Internet sebagai tulang punggungnya. Oleh karena itu, WAN ini dianggap sebagai jaringan privat.
+* Sebuah perusahaan internasional dengan instalasi *groupware* di lokasi-lokasi jarak jauhnya di seluruh dunia. Perusahaan ini memilih untuk menggunakan Internet sebagai tulang punggung WAN-nya. Oleh karena itu, WAN ini disebut **jaringan privat virtual (VPN)**: Ia tampak seperti jaringan privat, tetapi sebenarnya tidak karena menggunakan Internet publik.
+
+### Komponen-komponen sebuah WAN
+
+Tugas utama dari jaringan komputer area luas adalah mentransfer lalu lintas pengguna secepat dan seaman mungkin. Jaringan tidak menyadari isi dari lalu lintas karena tidak berinteraksi langsung dengan pengguna dan perangkat lunak aplikasi pengguna. Jadi, ia tidak peduli dengan antarmuka pengguna grafis (GUI) yang ramah pengguna, server surat, atau server file. Layanan-layanan ini disediakan hanya ketika lalu lintas tiba di *node* (katakanlah, sebuah server) di mana aplikasi tujuan terhubung secara langsung.
+
+Gagasan untuk melepaskan WAN dari komunikasi langsung dengan pengguna sangatlah penting, karena hal itu membebaskan jaringan dari eksekusi berulang-ulang jutaan baris kode perangkat lunak. Untuk melihat alasannya, silakan merujuk pada Gambar 6.1. Paket pengguna dikirim langsung dari komputer melalui koneksi *dial-up*, LAN, atau tautan *broadband* ke sebuah mesin yang ditunjukkan di sini sebagai **gateway LAN/WAN**. Dalam praktiknya, perangkat ini kemungkinan besar adalah router konvensional yang terletak di rumah kita, kantor kita, atau situs ISP kita. Di mana pun ia ditempatkan, ia disebut gateway karena memang menyediakan "gerbang" dari area lokal ke area luas (dan sebaliknya di ujung lain jalur).
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-6.1.png" alt="gambar" width="580"/>
+</p>
+
+Garis putus-putus di dalam WAN menandakan perjalanan paket melalui jaringan. Diagram di dalam WAN yang berlabel "$L_1$" dan "$L_2$" menandakan dua lapisan bawah dari model OSI yang beroperasi di mesin-mesin pada *node* WAN. Seperti yang Anda lihat, hanya dua lapisan bawah dari model yang dipanggil untuk memproses paket pengguna. Dengan pengecualian kecil, lapisan-lapisan atas tidak dieksekusi di dalam WAN untuk lalu lintas pengguna akhir.
+
+Sekali lagi, desain ini sangat signifikan karena menjaga WAN tetap "ramping dan efisien." WAN cepat karena (a) peralatan dan perangkat lunaknya dioptimalkan untuk kecepatan dan bukan interaksi pengguna; (b) *node-node* perangkat keras terhubung dengan tautan berkecepatan sangat tinggi—jauh lebih cepat daripada tautan yang Anda miliki di rumah atau kantor Anda. Hasilnya adalah penundaan yang rendah dan *throughput* yang tinggi.
+
+Ya, tetapi apa yang terjadi pada semua layanan luar biasa yang kita peroleh dari jaringan komputer? Ke mana perginya jendela email kita? Layar rekening bank kita? Di mana templat pesan teks? Bagaimana WAN memutar video dan musik kita? Jawaban untuk semua pertanyaan ini sama: Data di dalam paket mungkin berisi semua informasi ini, tetapi WAN tidak memprosesnya sama sekali. Tugasnya adalah mengangkut data ini dengan andal dan cepat ke komputer akhir, server surat tujuan, manajer file tujuan, penerima pesan teks, dan seterusnya. Di tujuan akhir, lapisan-lapisan atas akhirnya dipanggil di server dan klien untuk menyediakan layanan-layanan ini kepada kita.
+
+Dengan demikian, email atau pesan teks kita diangkut secara transparan melalui WAN hanya untuk digunakan di tujuan akhir. Tentu saja, WAN mengeksekusi perangkat lunak lapisan atas untuk operasi internalnya sendiri, seperti manajemen jaringan, tetapi tidak mengeksekusi kode ini untuk lalu lintas pengguna.
+
+Sebuah solusi yang sederhana dan elegan untuk masalah yang sangat menantang: mengangkut jutaan paket melalui WAN ini dalam beberapa milidetik. Mengingat jumlah data yang terlibat, besarnya basis pengguna, dan persyaratan untuk waktu respons yang sangat cepat serta penundaan yang sangat rendah, operasi-operasi ini tidak dapat dilakukan dengan memuaskan jika *node-node* jaringan mengeksekusi lapisan-lapisan atas dari model tersebut. Untungnya, WAN tidak perlu memeriksa *header* dan data lapisan atas.
+
+Benar, tetapi bagaimana *node-node* WAN pada Gambar 6.1 tahu cara merutekan lalu lintas? Lagi pula, di Jam ke-3, "Mengirim Data dari Sini ke Sana: Cara Kerja Jaringan Komputer," kita belajar bahwa alamat IP dalam paket IP (datagram) diproses di Lapisan 3. Kita juga belajar bahwa alamat Ethernet Lapisan 2 dalam *frame* Ethernet dihilangkan sebelum mencapai WAN karena hanya memiliki signifikansi lokal. Apakah WAN itu peramal dan entah bagaimana dapat menyimpulkan alamat tujuan dari eter Ethernet di sekitarnya? Tidak. Mari kita letakkan beberapa kepingan lagi ke dalam teka-teki kita dengan memeriksa komponen-komponen utama di dalam WAN; kemudian kita bisa menjawab pertanyaan-pertanyaan ini.
+
+### Antarmuka Pengguna-Jaringan, Antarmuka Dalam-Jaringan, dan Antarmuka Jaringan-Jaringan
+
+Untuk mengatur analisis kita, kita mulai dengan Lapisan 1, diikuti dengan Lapisan 2. Kita mengawali tugas-tugas ini dengan sebuah jalan memutar penting untuk memeriksa antarmuka komunikasi yang kita miliki dari rumah, kantor rumah, dan lokasi perusahaan kita ke dan dari WAN. Ini disebut **antarmuka pengguna-jaringan (UNI)**. Sama pentingnya, kita memeriksa antarmuka antara *node-node* jaringan di dalam WAN, yang disebut **antarmuka dalam-jaringan (INI)**. Selain itu, kita akan melihat antarmuka antara WAN, yang dikenal sebagai **antarmuka jaringan-jaringan (NNI)**. Posisi dari antarmuka-antarmuka ini ditunjukkan pada Gambar 6.2.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-6.2.png" alt="gambar" width="580"/>
+</p>
+
+Antarmuka WAN UNI, INI, dan NNI yang terkemuka tercantum dalam Tabel 6.1, bersama dengan lapisan atau lapisan-lapisan model Internet/OSI yang mereka tempati; di antarmuka mana mereka berada; dan jam atau jam-jam di buku ini di mana mereka dijelaskan. Harap dicatat bahwa tidak semua opsi antarmuka dijelaskan dalam buku ini, tetapi kami akan membahas dasar-dasar untuk yang mungkin Anda temui.
+
+**TABEL 6.1 Antarmuka WAN Terkemuka**
+
+| Nama | Lapisan¹ | UNI? | INI?² | NNI?² | Jam |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **BB Residensial** | $L_1$ | Ya | Tidak | Tidak | 6 |
+| **Sistem T-Carrier** | $L_1$ | Ya | Ya, tapi berkurang | Ya, tapi berkurang | 6 |
+| **SONET³** | $L_1$ | Ya, tapi tidak luas | Ya | Ya | 6 |
+| **ATM⁴** | $L_2$ | Ya | Ya | Ya | 6 |
+| **MPLS⁵** | $L_2/L_3$ | Ya, tapi tidak luas | Ya | Ya | 6 |
+| **Modem Dial-Up** | $L_1$ | Ya | Tidak | Tidak | 7 |
+| **Ponsel** | $L_1, L_2, L_3$ | Ya | Ya | Ya | 7 |
+
+¹ Kolom ini hanya mencantumkan Lapisan 1–3. Beberapa antarmuka ini mengeksekusi Lapisan 4–7, tetapi tidak relevan dengan diskusi ini.
+² Biasanya transparan bagi pengguna.
+³ SONET = Synchronous Optical Network
+⁴ ATM = Asynchronous Transfer Mode
+⁵ MPLS = Multiprotocol Label Switching
+
+---
+Juga, ingatlah bahwa fokus diskusi ini adalah pada antarmuka WAN. Akibatnya, Ethernet tidak termasuk tetapi dibahas di beberapa bagian buku ini. Selain itu, Bluetooth dianggap sebagai antarmuka lokal dan tidak ada dalam tabel ini tetapi dijelaskan di Jam ke-7, "Jaringan Nirkabel Bergerak." Wi-Fi, yang juga dibahas di Jam ke-7, dapat digunakan sebagai LAN atau WAN.
+
+Kebutuhan Anda untuk memahami operasi komunikasi di UNI, INI, dan NNI akan bergantung pada ukuran perusahaan Anda, persyaratan jaringan perusahaan Anda, serta cakupan dan skala geografisnya. Untuk banyak instalasi, Anda tidak akan pernah terlibat dengan antarmuka-antarmuka ini dan Anda tidak akan memiliki cara untuk mengaksesnya untuk dimanipulasi. Satu-satunya akses Anda ke sana adalah penggunaan pasif dari layanan mereka. Berikut adalah empat kemungkinan penggunaan operasi UNI, INI, dan NNI oleh Anda:
+* Sebagai salah satu contoh, mungkin yang Anda butuhkan hanyalah layanan DSL dari rumah Anda ke Internet. Dengan skenario ini, Anda tidak perlu menggunakan atau memahami sistem seperti SONET atau MPLS.
+* Sebagai contoh lain, Anda mungkin memilih untuk menyewa jalur T-Carrier dari perusahaan telepon lokal dari klinik Anda ke fasilitas rumah sakit yang terletak di luar kota. UNI ini mungkin satu-satunya yang perlu Anda beli, karena perusahaan telepon kemudian bertanggung jawab atas INI dan NNI apa pun yang mungkin digunakan untuk layanan ujung-ke-ujung.
+* Sebagai contoh ketiga, perusahaan Anda mungkin memerlukan kombinasi sirkuit DSL untuk koneksi ke Internet publik serta tautan T-Carrier untuk membuat jaringan privat Anda sendiri, dengan kemampuan untuk menghubungkan kedua set sistem ini. Dalam situasi ini, Anda harus memahami kemampuan INI dan NNI.
+* Pada tingkat ekstrem, mungkin Anda berafiliasi dengan perusahaan Fortune 500, dengan kantor, toko, dan sebagainya yang tersebar di seluruh dunia. Skenario ini kemungkinan besar menempatkan Anda dalam situasi di mana Anda perlu mengetahui (dan menggunakan) serangkaian perangkat keras dan perangkat lunak di ketiga antarmuka tersebut.
+
+Apapun situasi Anda, jam ini akan memulai Anda ke arah yang benar.
+
+### Broadband Residensial
+
+Istilah *broadband* residensial diciptakan beberapa dekade yang lalu untuk menggambarkan sekumpulan teknologi UNI untuk mengatasi kecepatan lambat modem *dial-up*. Kata "residensial" tidak akurat, karena sistem ini beroperasi baik di rumah maupun di kantor. Kata "*broadband*" akurat, karena menggambarkan kemampuan berkecepatan tinggi. Namun, tautan "*broadband*" juga ditemukan di INI dan NNI.
+
+Selama 20 tahun terakhir, perusahaan telepon, perusahaan kabel, dan perusahaan satelit telah bersaing satu sama lain untuk merebut pasar ini dan pada akhirnya menempatkan modem berkapasitas rendah ke dalam tong sampah. Bagian dari jam ini memberikan gambaran umum tentang mereka. Perlu diketahui bahwa sebagian besar penyedia ini menawarkan layanan tambahan seperti akun email, pencadangan file data, opsi alamat IP, dan keamanan.
+
+#### DSL
+
+DSL adalah penawaran dari perusahaan telepon, menggunakan kabel telepon saat ini yang diletakkan di seluruh lingkungan. DSL menggunakan perangkat keras canggih serta teknik pensinyalan dan pengkodean yang canggih untuk meningkatkan kapasitas jalur dari 256 kilobit per detik (Kbps) menjadi beberapa megabit per detik (Mbps), tergantung pada penawaran spesifik (dan harga). Selain itu, DSL membagi *bandwidth* (rentang frekuensi) untuk memungkinkan penggunaan tautan secara bersamaan untuk lebih dari satu panggilan telepon, sesi faks, selancar Internet, dan sebagainya. Kapasitas pastinya lagi-lagi tergantung pada penawaran spesifik dan harga terkait.
+
+Ketika DSL masuk ke pasar pada 1990-an, banyak pelanggan menganggapnya rumit, tidak praktis, dan rentan kesalahan. Saya pikir masalah DSL terutama adalah masalah perusahaan telepon yang sedang men-debug produk mereka, melatih staf mereka dengan meja bantuan, dan mencetak dokumentasi yang ramah pengguna. Saat ini, DSL dapat diinstal oleh hampir siapa saja yang bisa membaca brosur dua halaman. Oleh karena, kita tidak akan menghabiskan waktu yang tidak perlu untuk DSL.
+
+Tanpa pertanyaan, DSL sangat dibutuhkan. Keberhasilannya telah memacu penggunaan jaringan komputer hampir di luar dugaan. Satu-satunya rekomendasi saya kepada Anda jika Anda adalah pengguna kantor kecil atau residensial adalah memastikan Anda mengikuti instruksi mengenai penempatan filter pada semua perangkat telepon. (Filter tersebut mencegah sinyal yang tidak diinginkan saling mengganggu.)
+
+Untuk instalasi yang lebih besar, Anda kemungkinan akan diberi lebih banyak opsi untuk menggunakan tautan DSL. Salah satu opsi yang mungkin tersedia di area Anda disebut **Asymmetric DSL (ADSL)**. Variasi ini dinamakan demikian karena mendukung kecepatan data yang berbeda (dalam bps) di kedua arah tautan DSL. Jika Anda memiliki lebih banyak data yang mengalir turun ke situs Anda daripada yang naik dari situs Anda, ADSL kemungkinan akan menjadi opsi yang efektif untuk koneksi UNI Anda. Juga, ATM (dibahas sebentar lagi) memberikan potensi untuk layanan yang ditingkatkan secara substansial. Router DSL dapat meningkatkan keamanan dan alternatif konfigurasi (dengan menggunakan Point-to-Point Protocol [PPP] dan Challenge Handshake Authentication Protocol [CHAP], dibahas di Jam ke-8 dan 20). Router DSL juga menjalankan IP dan dengan demikian memberi Anda pengalamatan IP, yang dikelola oleh ISP Anda untuk Anda.
+
+#### Layanan Modem Kabel
+
+Perusahaan TV kabel menawarkan layanan yang kompetitif dengan DSL. Seperti DSL, produk modem kabel telah sangat sukses. Sebagian besar informasi yang baru saja ditulis tentang DSL juga berlaku untuk layanan modem kabel. Satu pengecualian penting adalah bagaimana TV kabel menyediakan layanan telepon konvensional.
+
+Comcast dan perusahaan CATV lainnya tidak memiliki akses ke kabel telepon dan kantor ujung. Untuk mendapatkan layanan telepon, pelanggan dapat berlangganan pihak ketiga untuk **Voice over IP (VoIP)**. Perusahaan kabel lain menyediakan produk VoIP berdasarkan **PacketCable**, dengan satu peralatan tambahan bernama **Embedded Multimedia Terminal Adapter (EMTA)**. Jika Anda memilih jaringan komputer melalui kabel, periksalah kedua teknologi ini, baik dari segi harga maupun kualitas layanan (QoS). Dan jika Anda ingin tahu lebih banyak tentang VoIP, lihat buku saya yang lain, *Voice over IP*.
+
+#### Layanan Satelit
+
+Layanan satelit tersedia dalam berbagai produk dan kecepatan. Dua operator satelit AS berada dalam bisnis ini: HughesNet dan Wild Blue. Mereka menyediakan beberapa kecepatan dari jaringan ke situs Anda (unduh) dengan kecepatan dari 1Mbps hingga 3Mbps dan kecepatan unggah berkisar dari 128Kbps hingga 300Kbps. Perbedaan kapasitas di setiap arah transmisi ini disebut **bandwidth asimetris**.
+
+Kecepatan unggah berkapasitas lebih rendah dari situs Anda ke Internet seharusnya tidak menjadi masalah jika Anda cocok dengan pola pengguna komunikasi data rata-rata (menerima lebih banyak lalu lintas daripada yang Anda kirim). Namun, jika Anda memiliki aplikasi yang membutuhkan *throughput* tinggi dan penundaan rendah, saluran uplink mungkin terlalu lambat.
+
+> **Buat Sendiri**
+>
+> Di Jam ke-7, kita akan melihat opsi nirkabel lain, di luar saluran asimetris konvensional ini, yang mungkin dapat Anda instal tanpa campur tangan operator komunikasi.
+
+### Sistem Operator WAN Lapisan 1: T1 dan SONET
+
+Komponen paling menonjol di lapisan fisik WAN secara kolektif dikenal sebagai sistem operator "T1" dan "SONET". (Teknologi ini memiliki implementasi dan nama yang sedikit berbeda di negara-negara non-Amerika Utara.) Mereka dapat digunakan sebagai tautan pengguna ke WAN di UNI, tetapi lebih umum digunakan di dalam jaringan antara *node* jaringan (INI) atau antar jaringan (NNI). Kedua teknologi dirancang untuk menyediakan layanan berikut:
+* Mendefinisikan spesifikasi untuk media, seperti dimensi kabel tembaga, sifat reflektif cahaya dari serat optik, dan frekuensi yang akan digunakan untuk saluran nirkabel.
+* Mendefinisikan karakteristik sinyal yang merepresentasikan data (1 dan 0) dalam bentuk citra listrik, elektromagnetik, atau optik. Contohnya adalah voltase yang diizinkan untuk kabel tembaga, pita frekuensi untuk tautan nirkabel, dan intensitas cahaya untuk kabel optik.
+* Menetapkan aturan untuk sinkronisasi sinyal antara *node* pengirim dan *node* penerima, sehingga penerima "tahu" persis kapan 1 atau 0 tiba.
+* Menyediakan konvensi tentang bagaimana ribuan paket pengguna digabungkan (*multiplexed*) menjadi sebuah muatan (*payload* - nama keren untuk paket yang lebih besar) di media, bagaimana mereka ditambahkan ke muatan, dan bagaimana mereka diturunkan di *node* tujuan WAN akhir.
+* Menetapkan prosedur untuk pemulihan dari jalur yang rusak (seperti *backhoe* yang memutus kabel) dan mengalihkan muatan yang terpengaruh ke tautan yang berfungsi. Muatan ini tidak dialihkan berdasarkan alamat IP individu. Sebaliknya, pengalihan dan pemulihan didasarkan pada ratusan paket pengguna, yang telah di-*multiplex* menjadi paket yang lebih besar.
+* Memberitahu personel jaringan tentang masalah dan tingkat keparahannya (seperti mengirim paket "alarm" ke pusat kontrol jaringan tentang sinyal radio yang mengalami distorsi karena badai listrik).
+
+Layanan-layanan ini sangat penting untuk kesehatan jaringan komunikasi. Tanpanya, bisnis berbasis komputer dan korespondensi pribadi akan berhenti beroperasi. Kita menganggapnya biasa saja, tetapi mereka sangat penting bagi kehidupan profesional dan pribadi kita.
+
+Kecuali jika Anda bertanggung jawab atas jaringan besar, Anda tidak akan terlibat dalam operasi ini. Jika Anda bertanggung jawab atas tautan komunikasi perusahaan Anda ke, katakanlah, AT&T, Anda harus memiliki pemahaman tentang sistem operator fisik WAN ini. Untuk jaringan rumah dan kantor kecil, perhatian utama Anda adalah integritas tautan Anda ke gateway WAN terdekat. Tautan itu biasanya koneksi *broadband* ke operator lokal (DSL; mungkin jalur T1). Merupakan tanggung jawab operator ini, seperti Verizon, untuk menyediakan Anda, seorang pelanggan yang membayar, tautan dengan integritas tinggi.
+
+Bagian selanjutnya memberikan gambaran umum tentang T1 dan SONET. Untuk detail lebih lanjut, lihat *SONET and T1: Architectures for Digital Transport Networks*, yang ditulis oleh saya sendiri dan Sharleen Waters.
+
+#### T1
+
+Keluarga operator T1 telah menjadi andalan Amerika Utara untuk jalur sewaan (privat) selama lebih dari 40 tahun, yang merupakan rentang waktu yang luar biasa bagi sebuah teknologi untuk tetap relevan di era informasi ini. Kata "keluarga" digunakan karena istilah T1 adalah pegangan yang digunakan untuk menggambarkan beberapa opsi, yang akan dijelaskan sebentar lagi.
+
+T1 dipasang di banyak perusahaan, mulai dari bank besar hingga rumah sakit kecil. Ini adalah teknologi yang terbukti dan dipahami dengan baik. Daya tahan T1 juga disebabkan oleh penyediaan tautan berkecepatan tinggi dan andal dari kantor perusahaan (katakanlah, fasilitas medis) ke kantor lain (katakanlah, rumah sakit).
+
+Satu poin lagi tentang T1. Beberapa vendor dan literatur menggunakan inisial "DS" (untuk *digital signaling*) sebagai pengganti "T." Misalnya, DS1 digunakan alih-alih T1. Sebenarnya, aspek T dari teknologi mengacu pada sinyal itu sendiri, dan DS mengacu pada cara mereka diformat untuk membuat unit lalu lintas—yaitu, bagaimana mereka "dibingkai" di saluran. Jadi, Anda mungkin menemukan istilah *T1 frame*. Itu tidak lebih dari sebuah paket bit, tetapi dengan nama lain.
+
+> **Sinkronisasi Sinyal**
+>
+> Salah satu fungsi terpenting dari Lapisan 1 OSI adalah menyinkronkan sinyal dari mesin pengirim ke mesin penerima. Dengan sinkronisasi (atau pengaturan waktu) yang tepat, penerima tahu persis kapan harus memeriksa jalur untuk keberadaan 1 atau 0 yang masuk. Sistem T1 dirancang dengan harapan bahwa *node* dalam jaringan digital (seperti *multiplexer*) mungkin menggunakan sumber clock yang berbeda untuk mengatur waktu sinkronisasi mereka. Misalnya, satu jaringan mungkin beroperasi dengan clock yang berbeda dari jaringan lain. Sebagai konsekuensi dari pendekatan ini, jaringan T1 dikatakan sebagai sistem asinkron, yang berarti sinyal di jaringan tidak selalu beroperasi pada tingkat clock yang sama.
+>
+> Karena desain ini, jaringan T1 menghabiskan banyak sumber daya untuk merancang cara-cara cerdas untuk menyinkronkan lalu lintas yang mengalir di antara mesin-mesin jaringan. Dengan demikian, T1 mungkin menambah atau mengurangi bit ekstra untuk mengkompensasi perbedaan clock. Skema-skema ini membuat manajemen muatan menjadi canggung. Karena sifat asinkron dari teknologi T1, industri sedang bermigrasi ke skema yang lebih baik, SONET, yang dijelaskan di bagian selanjutnya.
+
+**Hierarki T1**
+Tabel 6.2 memberikan ringkasan tentang keluarga sistem operator T1. Sekali lagi, istilah yang lebih akurat untuk sinyal adalah "DS," yang digunakan dalam tabel ini. Perhatikan jumlah saluran suara "konvensional" yang dapat didukung oleh setiap hierarki T1. Istilah "konvensional" digunakan karena, di masa lalu, 64Kbps adalah kecepatan nominal untuk suara digital. Teknologi digitalisasi suara canggih saat ini dapat menghasilkan sinyal suara berkualitas tinggi dengan 16Kbps. Untuk menghormati warisan, T1 masih dikutip dengan kecepatan 64Kbps.
+
+**TABEL 6.2 Keluarga T-Carrier**
+
+| Sinyal | Kecepatan Bit | Saluran DS Konvensional |
+| :--- | :--- | :--- |
+| DS0 | 64Kbps | 1 |
+| DS1 | 1.544Mbps | 24 |
+| DS2 | 6.312Mbps | 96 |
+| DS3 | 44.736Mbps | 28 |
+
+**Kemungkinan Penggunaan Jalur T1**
+Meskipun jalur T1 dirancang untuk layanan telepon digital, tidak semua *trunk* membawa data. Jalur T1, misalnya, dapat membawa hingga 24 jalur telepon suara terpisah (atau bahkan lebih, jika teknik pengkodean canggih digunakan). Sebagai alternatif, ia dapat membawa data hingga 1.544Mbps. Kemungkinan lain adalah penggunaan 12 saluran suara (setengah dari saluran yang tersedia); *bandwidth* yang tersisa (sekitar 768Kbps) digunakan untuk data.
+
+Kemungkinan-kemungkinan ini dan lainnya tersedia melalui penyedia telepon lokal Anda. Perbedaan antara jenis-jenis layanan didasarkan pada penggunaannya, bukan dari perbedaan inheren dalam implementasi T1. Semua layanan yang disebutkan di atas dapat dibawa melalui jenis jalur yang sama. Itulah mengapa mengetahui sedikit tentang teknologi T1 berguna sebelum Anda mulai memesan jalur komunikasi untuk WAN Anda.
+
+**Penyediaan Trunk**
+Ketika Anda memesan sebuah jalur (juga disebut *trunk*) dari perusahaan telepon lokal Anda, staf teknis akan menanyakan bagaimana Anda ingin **menyediakannya (*provision*)**. Tergantung pada aplikasi Anda, Anda mungkin menginginkan *trunk* untuk lalu lintas suara, data, video, atau beberapa kombinasi dari ketiganya. Untuk operasi skala kecil hingga menengah, Anda biasanya akan menggunakan sebagian dari T1 (*fractional T1*) atau T1 penuh. WAN atau kantor yang lebih besar dengan kebutuhan *bandwidth* tinggi sering memerlukan jalur T3 (DS3), yang dapat mendukung kecepatan transfer hampir 45Mbps.
+
+**Jalur Sewaan**
+Ketika Anda membeli layanan data T1 fraksional atau penuh dari perusahaan telepon, Anda mungkin akan disediakan dengan sirkuit yang membawa data antara dua titik spesifik. Titik-titik tersebut bisa jadi dua kantor Anda; sebagai alternatif, satu ujung bisa jadi kantor Anda dan yang lain bisa jadi ISP. Seperti yang disebutkan, fasilitas ini sering disebut **jalur sewaan (*leased lines*)** karena kita menyewanya dari operator, dan tidak ada lalu lintas orang lain yang diizinkan untuk diangkut melintasi jalur "privat" ini.
+
+#### SONET
+
+T1 terus melayani industri dengan baik. Tetapi ini adalah teknologi lama dan didasarkan pada konsep komunikasi yang dirancang pada tahun 1960-an. **SONET** dirancang untuk meningkatkan (dan pada akhirnya menggantikan) T1. Anggap T1 sebagai sistem operator WAN generasi pertama dan SONET sebagai sistem generasi kedua. Saya menggunakan istilah "WAN," tetapi tidak ada yang menghalangi T1 atau SONET untuk digunakan di lingkungan lokal, seperti kampus bisnis atau rumah sakit.
+
+Selain menyediakan layanan T-Carrier, SONET melakukan hal berikut:
+* Menggunakan clock yang dirujuk ke referensi yang umum dan stabil, yang menghilangkan skema rumit untuk mencoba menyinkronkan sistem waktu yang berbeda.
+* Menggunakan metode "grooming" yang sangat efisien untuk menambah, memisahkan, dan menurunkan muatan pengguna di dalam super-paket SONET. ("Super" berarti berisi muatan dari banyak pengguna.)
+* Telah berhasil mendorong vendor untuk menggunakan konvensi yang sama, sehingga jaringan dapat diatur dengan peralatan dari produsen yang berbeda. Secara konseptual, T1 bisa melakukan hal yang sama, tetapi sejarahnya menghalangi konvergensi ini.
+* Menyediakan serangkaian alat manajemen jaringan yang kaya serta prosedur ekstensif untuk pemulihan jaringan. Sekali lagi, T1 bisa melakukan hal yang sama, tetapi vendor mengembangkan skema proprietary mereka sebelum badan "standar" T1 dapat menerbitkan konvensi semacam itu.
+* Memanfaatkan kecepatan transmisi tinggi dari serat optik.
+
+Seperti T1, SONET diatur oleh hierarki *multiplexing*, berdasarkan kecepatan bps dan jumlah muatan pengguna yang digabungkan menjadi sebuah *frame* SONET—istilah yang digunakan untuk super-paket. Tabel 6.3 memberikan ringkasan hierarki SONET. (Catatan: Sinyal *optical carrier* (OC) juga bisa menjadi sinyal listrik atau elektromagnetik, dalam hal ini inisial OC dapat diganti dengan STS [Synchronous Transport Signal]).
+
+**TABEL 6.3 Hierarki SONET**
+
+| Sinyal | Kecepatan Bit | Saluran DS Konvensional |
+| :--- | :--- | :--- |
+| OC-1 | 51.840Mbps | 28 |
+| OC-3 | 155.520Mbps | 84 |
+| OC-12 | 622.080Mbps | 336 |
+| OC-48 | 2488.320Mbps | 1,344 |
+| OC-192 | 9953.280Mbps | 5,376 |
+| OC-768 | 389813.12Mbps | 21,504 |
+
+Karena keterbatasan T1, SONET sekarang menjadi teknologi operator WAN yang umum digunakan di dalam awan jaringan WAN. Biasanya, jika Anda menyewa jalur T1 atau T3 dari operator, lalu lintas ini dikemas ulang di situs operator dan di-*multiplex* ke dalam *frame* SONET untuk diangkut melintasi WAN.
+
+### Lapisan 2 untuk WAN: ATM dan MPLS
+
+Komponen paling menonjol di lapisan data link (Lapisan 2) WAN adalah ATM dan MPLS.
+
+#### ATM
+
+Untuk memahami mengapa **ATM** digunakan di jaringan komputer, dan untuk memahami mengapa ia telah mencapai penggunaan yang luas, silakan merujuk kembali ke Gambar 5.2 di Jam ke-5, "Konsep Jaringan." Ingat bahwa alamat IP Lapisan 3 adalah alamat yang paling banyak digunakan di industri komunikasi data. Juga, alamat Ethernet Lapisan 2 hanya digunakan di LAN dan oleh karena itu tidak berguna di WAN. Jadi, seperti yang disarankan oleh Gambar 5.2, paket IP dengan alamat sumber dan tujuannya adalah satu-satunya cara yang tersedia untuk merutekan lalu lintas dari satu komputer ke komputer lain. Jika Anda tidak diberi alamat IP oleh ISP Anda (yang tentu saja, Anda diberi), Anda sama tak berdayanya seperti pelanggan pos tanpa alamat pos.
+
+Namun, seperti yang dijelaskan di Jam ke-3, alamat IP 32 bit terbukti rumit dan tidak efisien. Karena ratusan ribu alamat IP sekarang digunakan (dengan basis teoretis sekitar empat miliar), menjadi tugas yang mustahil bagi sebuah router untuk menyimpan bahkan sebagian kecil dari alamat IP ini di tabel peruteannya. Bahkan dengan pengalamatan IP tanpa kelas, yang juga dijelaskan di Jam ke-3, perutean dengan alamat IP terlalu lambat dan canggung.
+
+Menariknya, ATM mengatasi masalah pengalamatan IP dengan tidak menggunakan alamat! Sebaliknya, ATM menempatkan paket IP di dalam *field* data pengguna dari unit data protokol (PDU) ATM, yang disebut **sel** (*cell*) (jangan bingung dengan sel ponsel; mereka tidak memiliki hubungan satu sama lain). Kemudian ATM merutekan paket IP melalui WAN dengan menggunakan **label** yang telah ditempatkan di *header* sel ATM. Tidak seperti alamat IP, label ATM tidak memiliki asosiasi jaringan, maupun *node* yang terkait dengan jaringan. Faktanya, ia tidak memiliki hubungan dengan lokasi mana pun, sampai WAN mengasosiasikannya dengan lokasi tersebut. Ikuti saya; saya janji konsep yang tampaknya aneh ini sangat masuk akal.
+
+Mari kita gunakan alamat pos sebagai contoh label. Pertama, alamat jalan dan kota serta negara bagian memiliki signifikansi lokasi. Mereka terikat pada geografi. Tetapi Kode Pos tidak terikat pada suatu lokalitas, sampai kantor pos menentukannya demikian. Misalnya, nomor ZIP untuk, katakanlah, Los Angeles, dapat dengan mudah dikaitkan dengan lokasi lain. Jadi, sebuah label bebas dari asosiasi dengan *node* fisik tertentu sampai sebuah *node* pengalih label telah memetakan nomor label ke *node* ini. Kedua, dengan penggunaan hanya satu label, lalu lintas untuk semua komputer di sebuah kantor dapat dijangkau, karena jaringan telah mengasosiasikan sebuah nomor label (mungkin label 334944) dengan router gateway di kompleks kantor tertentu.
+
+Mengambil sistem hipotetis ini sebagai contoh, meskipun ribuan pengguna IP mungkin berada di LAN Anda di kantor pusat Anda, masing-masing dengan alamat IP, sebuah router WAN mungkin hanya menyimpan satu entri di tabel penerusannya: yaitu nomor label 334944. Akibatnya, alih-alih router harus menyimpan ribuan alamat IP tentang perusahaan Anda di router gateway Los Angeles, ia hanya perlu menyimpan satu label. Konsep ini **mengagregasi** beberapa alamat menjadi satu label. Ini adalah teknik yang kuat untuk meningkatkan operasi penyampaian lalu lintas melalui jaringan.
+
+Inilah keindahan lain dari penerusan label versus penerusan alamat IP: Setelah lalu lintas mencapai *node* WAN akhir, seperti router, perangkat lunak melepaskan *header* ATM dan labelnya. Ia telah melakukan tugasnya dengan membawa lalu lintas ke router gateway yang terhubung ke LAN di organisasi Anda. Ingat bahwa yang berada di *field* data ATM adalah paket IP, dengan alamat IP tujuan dan sumbernya yang utuh. Setelah itu, IP mengambil alih dan Lapisan 3 (bersama dengan Ethernet Lapisan 2) sekarang digunakan untuk merutekan data ke komputer yang terpasang pada salah satu LAN di kantor Anda. Jika Anda memiliki tautan T1 atau jalur DSL yang menuju ke kantor atau rumah Anda, kemungkinan besar ATM bertanggung jawab untuk membawa paket IP sampai ke router yang ada di kantor Anda—mungkin di meja Anda. Jika Anda meluangkan waktu untuk memeriksa manual pengguna untuk layanan DSL atau T1 Anda, kemungkinan besar mereka akan merujuk pada label ATM. Mereka disebut dengan nama-nama samar (VPI atau VCI), tetapi julukan ini tidak lebih dari nama-nama keren untuk sebuah label.
+
+> **Membuat Koneksi di WAN**
+>
+> ATM membuat jalur dua arah di WAN agar paket pengguna dapat melintas selama sesi pengguna. Ide ini mirip dengan jaringan telepon yang membuat koneksi untuk panggilan telepon. Namun, *node* jaringan ATM cukup cerdas dan memiliki kapasitas untuk menemukan jalur ujung-ke-ujung yang paling efisien dan andal untuk kebutuhan spesifik pengguna. Meskipun pembuatan koneksi ini mungkin memerlukan penundaan singkat sebelum pengguna dapat memulai transmisi masing-masing, sebuah "sirkuit" dapat dipetakan sebelumnya dan diatur secara permanen. Idenya mirip dengan jalur sewaan di dunia T1, yang sering disebut "sirkuit permanen." Di jaringan ATM, sumber daya yang dijamin selalu ada. Mungkin bukan koneksi ujung-ke-ujung yang mapan seperti layanan jalur sewaan titik-ke-titik. Tetapi penyedia jaringan wajib memberikan ilusi sirkuit permanen kepada pengguna. (Dan penyedia sebaiknya memastikan bahwa ia memiliki kapasitas yang cukup untuk memenuhi permintaan *bandwidth* yang tidak terduga!) Konsep ini disebut **sirkuit virtual permanen**.
+
+Dalam diskusi sebelumnya, kita belajar bagaimana alamat IP diiklankan dan kemudian digunakan oleh router untuk meneruskan lalu lintas. Untuk jaringan pengalih label, tugas tambahan mengkorelasikan label dengan alamat IP dan lokasi *node* dengan alamat ini. Setelah itu, ketika router menerima paket IP, ia memetakan alamat IP tujuan ke label yang sesuai. Kemudian hanya label yang digunakan untuk penerusan sampai paket IP mencapai tujuan akhir.
+
+### Bahan Jaringan Kritis: Quality of Service (QoS) dan Traffic Engineering (TE)
+
+Sejak awal, ATM dirancang untuk menyediakan manajer jaringan dengan operasi **kualitas layanan (QoS)** dan **rekayasa lalu lintas (TE)** yang luas. Sebagian besar jaringan pengalih label WAN telah mengimplementasikan fitur rekayasa lalu lintas ATM untuk mengontrol jumlah lalu lintas yang diizinkan dikirim oleh pengguna ke dalam jaringan. Misalnya, ISP saya memantau jumlah *byte* yang dikirim oleh jaringan saya selama rentang waktu tertentu. Jika jaringan saya melebihi batas yang telah ditentukan, lalu lintas akan "dicekik" di situs LAN saya. Alat pemantauan ini mencegah WAN menjadi padat. Idenya mirip dengan lampu lalu lintas yang dipasang di ramp lalu lintas menuju jalan bebas hambatan. Perbedaannya adalah bahwa perangkat ramp lalu lintas mengontrol aliran semua pengguna ramp lalu lintas (sebagai sebuah kelompok), sedangkan rekayasa lalu lintas ATM mengontrol setiap pengguna. Dengan kata lain, paket setiap pengguna dikendalikan oleh lampu lalu lintas dan ramp lalu lintas yang spesifik.
+
+Selain itu, ATM mengizinkan pengguna untuk meminta QoS tertentu dari jaringan. Misalnya, jika Tommy dan saya sedang menyusun sebuah acara video mewah, dengan persyaratan penundaan rendah dan *throughput* tinggi, saya dapat meminta penyedia jaringan ATM saya untuk menjamin Tommy dan saya tingkat layanan tertentu untuk memenuhi persyaratan program kami.
+
+Meskipun semua fitur bagus ini, jika jaringan Anda akan berinteraksi dengan jaringan ATM area luas, dan Anda berpikir Anda atau pengguna Anda akan memerlukan fitur QoS, pastikan penyedia jaringan Anda telah menyediakan kemampuan ini dalam produknya. ATM cukup kuat dari sudut pandang TE dan QoS. Tetapi sebagian besar operasi ATM bersifat opsional, dan sebuah jaringan mungkin tidak memiliki kode tersebut dalam perangkat lunaknya.
+
+#### Sel ATM
+
+PDU ATM (sel) cukup kecil—hanya 53 *byte*, dengan 5 *byte* digunakan oleh jaringan ATM untuk label dan fungsi kontrol lainnya. Akibatnya, sebagian besar lalu lintas pengguna harus disegmentasi dan ditempatkan di lebih dari satu sel ATM untuk diangkut melintasi WAN. Muatan pengguna yang kecil dibandingkan dengan *overhead* ini hanyalah puncak gunung es, karena *byte overhead* lainnya mengonsumsi sebagian dari 48 *byte* yang tersisa untuk mengidentifikasi segmen lalu lintas pengguna dengan benar di setiap sel. Akibatnya, ATM mengonsumsi banyak *bandwidth* jaringan. Selain itu, sebagian besar layanan QoS dan TE, meskipun sangat kuat, mengonsumsi banyak *byte overhead*.
+
+Ide "sel kecil" masuk akal ketika ATM pertama kali dirancang (sekitar 15 tahun yang lalu). Paket konvensional 1.500 *byte* menimbulkan penundaan antrean yang berlebihan di *node* jaringan dan berdampak buruk pada aplikasi yang memerlukan penundaan singkat, seperti transmisi suara. Tetapi sekarang, dengan peningkatan kecepatan CPU dan memori, paket yang lebih besar dapat ditangani tanpa memengaruhi kualitas transmisi.
+
+Meskipun demikian, ATM banyak digunakan. Terlepas dari *overhead*-nya, ATM menyediakan industri jaringan komputer dengan serangkaian lengkap operasi TE dan QoS serta metode cepat untuk merutekan lalu lintas antar pengguna akhir.
+
+### Frame Relay
+
+Sebelum diperkenalkannya ATM ke pasar, protokol Lapisan 2 yang dominan untuk WAN adalah **Frame Relay**. Untuk sementara waktu (pada awal 1990-an), Frame Relay memegang posisi penting di pasar WAN. Meskipun sedang digantikan oleh ATM, operator area luas Anda mungkin menyediakan penawaran frame relay yang menarik. Misalnya, AT&T menawarkan produk frame relay di 22 negara bagian. Frame Relay adalah teknologi yang sehat dan efisien. Simpan di daftar hal-hal yang perlu Anda periksa saat berbelanja layanan WAN.
+
+### MPLS
+
+**MPLS** mirip dengan ATM karena menggunakan label untuk membuat keputusan perutean. MPLS juga mendukung berbagai operasi QoS. Bersama dengan standar Internet lainnya, MPLS menawarkan serangkaian alat TE yang beragam. Mengingat karakteristik ini, Anda mungkin bertanya mengapa MPLS ada. Tampaknya ini adalah teknologi yang berlebihan dibandingkan dengan ATM.
+
+Jika MPLS telah dirancang sebelum ATM muncul, kemungkinan besar ATM tidak akan menjadi faktor di WAN. Tetapi MPLS tidak diterbitkan sebagai standar sampai ATM memulai penyebaran komersialnya. Jadi, pada saat tulisan ini dibuat, ATM memiliki kehadiran yang lebih kuat di pasar daripada MPLS. Tetapi saya pikir MPLS pada akhirnya akan menggantikan ATM. Inilah alasannya:
+* MPLS mengizinkan paket dengan panjang variabel. PDU MPLS dapat bervariasi dari beberapa *byte* hingga beberapa ribu *byte*. Akibatnya, ia memanfaatkan *bandwidth* yang berharga dengan lebih baik daripada ATM.
+* Seperti ATM, MPLS memerlukan operasi pengaturan koneksi (dan dapat menggunakan ide sirkuit virtual permanen). Namun, MPLS menyediakan fitur tambahan di luar ATM untuk operasi ini.
+* MPLS telah dirancang untuk beroperasi dengan arsitektur dan protokol Internet, seperti IP. Tentu saja, ATM juga bekerja sama dengan IP, tetapi tidak seanggun MPLS.
+
+### Menyusun Lebih Banyak Kepingan
+
+Mari kita masukkan beberapa kepingan lagi ke dalam teka-teki jaringan. Kita akan menggunakan Gambar 6.3 dan singkatan-singkatan ini untuk membantu kita. Juga, perhatikan legenda di bagian bawah Gambar 6.3, yang menunjukkan urutan pemanggilan lapisan-lapisan. Panah ke bawah berarti mengirim; panah ke atas berarti menerima.
+
+**IP**: Internet Protocol
+**E**: Ethernet
+**A**: ATM
+**D**: DSL
+**M**: MPLS
+**S**: SONET
+**T**: T1
+**ULP**: Protokol lapisan atas
+
+Saat saya mengetik paragraf ini dan kemudian mengirimkannya ke server cadangan di suatu tempat di Internet, tulisan cemerlang saya dikirim ke router lokal (sangat lokal—mungkin di kantor saya, atau di meja saya) melalui Ethernet lokal saya dan paket IP. Pada Gambar 6.3, komputer lokal saya mengeksekusi semua lapisan model Internet, tetapi kita hanya peduli dengan Lapisan 1–3. Mesin saya mengeksekusi IP di $L_3$, dan mengeksekusi Ethernet di $L_2$ dan $L_1$.
+
+Di router lokal saya, *frame* Ethernet diterima melalui tautan Ethernet router dan dikirim ke modul IP-nya. Setelah itu, Ethernet tidak dieksekusi sampai lalu lintas tiba di server jarak jauh. Alamat IP tujuan dalam paket IP (alamat IP dari server jarak jauh) diperiksa, dan tabel penerusan router lokal saya mengungkapkan bahwa paket tersebut akan dikirim ke "*node* berikutnya," yaitu ISP saya (ditunjukkan pada gambar sebagai "Gateway LAN/WAN Lokal"), untuk akhirnya mencapai server jarak jauh.
+
+Perhatikan bahwa router lokal saya dan router ISP saya beroperasi dengan ATM di $L_2$ dan DSL di $L_1$. Akibatnya, paket IP ditempatkan ke dalam sel-sel ATM dan dikirim melintasi tautan DSL ke ISP saya. Di *node* ini, ia mungkin mengeksekusi $L_3$ dan melihat alamat tujuan dalam paket IP. Untuk contoh ini, ia tidak melakukannya karena router lokal saya telah membuat korelasi alamat IP tujuan (server jarak jauh di ujung lain gambar) dengan sebuah label ATM. Dengan demikian, pekerjaan router ISP saya disederhanakan karena tidak harus berurusan dengan IP.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-6.3.png" alt="gambar" width="580"/>
+</p>
+
+Dalam contoh ini, ISP saya telah bermigrasi ke MPLS untuk pertukaran lalu lintas antar *node* jaringan. Seperti yang terlihat di sisi kirimnya, ia mengkorelasikan label ATM dengan label MPLS (dan, tentu saja, ia menghilangkan semua *overhead* ATM tersebut).
+
+Perhatikan bahwa $L_1$ sekarang adalah SONET dan tetap demikian selama operasi di dalam jaringan. Jika Anda sekarang menelusuri konfigurasi Lapisan 1 di sisi kanan gambar, Anda akan melihat bahwa gateway LAN/WAN jarak jauh memetakan *frame* SONET ke dalam *frame* T1 untuk dikirim ke router jarak jauh server. Kemudian T1 dihilangkan, dan Ethernet diciptakan kembali untuk digunakan di LAN antara router jarak jauh dan server jarak jauh.
+
+Akhirnya (meskipun semua operasi ini kemungkinan besar terjadi dalam waktu kurang dari setengah detik), server jarak jauh memproses paket IP, yang berisi alamat IP sumber saya dan alamat IP tujuan server jarak jauh. Data telah tiba!...dan biasanya dengan cepat dan bebas dari kesalahan.
+
+Tapi sekarang apa? Sejauh ini, semua sistem luar biasa ini telah mengangkut lalu lintas saya (paragraf teks saya) ke server jarak jauh. Tetapi server ini belum mengeksekusi lapisan-lapisan atas dari model tersebut. Ketika ia melakukannya, paragraf saya memang akan disimpan di disk server cadangan. Perhatikan melalui garis putus-putus bahwa data, *header*, dan *trailer* dari protokol lapisan atas (ULP) hanya diproses di komputer lokal saya dan server jarak jauh.
+
+Kita akan melanjutkan perjalanan protokol berlapis kita di Jam ke-15, "Menghubungkan ke Internet: Operasi Pendukung Utama," dengan pemeriksaan lapisan-lapisan teratas, terutama Lapisan 4 (TCP) dan 7 (DNS). Untuk Jam ke-7 hingga 14, kita akan merakit lebih banyak blok bangunan untuk jaringan dan menambahkan lebih banyak kepingan ke dalam teka-teki jaringan.
+
+### Ringkasan
+
+Jam ini menjelaskan fitur-fitur utama dari sebuah WAN dan mengapa ia berbeda dari LAN. Komponen-komponen kunci dari sebuah WAN telah diperiksa, begitu pula tiga antarmuka WAN utama. Juga dijelaskan adalah sistem operator $L_1$ WAN utama dan yang membentuk Lapisan 2. Pro dan kontra dari pengalihan alamat dan label disorot. Jam ini diakhiri dengan melihat bagaimana sebuah paket dikirim melalui WAN antara dua LAN dan bagaimana sistem operator serta protokol WAN berkontribusi pada transport ini.
+
+---
+
 
