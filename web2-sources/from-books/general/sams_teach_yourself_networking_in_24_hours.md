@@ -1010,3 +1010,274 @@ Gambar 1.3 di Jam ke-1 adalah contoh situasi router sederhana: satu yang menghub
 <p align="center">
   <img src="images/book-sams_teach_yourself_networking/figure-5.1.png" alt="gambar" width="580"/>
 </p>
+
+Untuk mempermudah, kita akan memeriksa alamat **Internet Protocol (IP)** dan **Media Access Control (MAC)** dari empat *node* dengan nilai simbolis yang disingkat ini. Ingat dari Jam ke-3, "Mengirim Data dari Sini ke Sana: Cara Kerja Jaringan Komputer," bahwa alamat IP memiliki panjang 32 bit dan alamat MAC memiliki panjang 48 bit.
+* **Node A** memiliki alamat IP A dan alamat MAC AAA.
+* **Node Y** memiliki alamat IP Y dan alamat MAC YYY.
+* **Node Z** memiliki alamat IP Z dan alamat MAC ZZZ.
+* **Node H** memiliki alamat IP H dan alamat MAC HHH.
+
+Router dengan alamat Y mengetahui tentang *node* A–D karena mesin-mesin ini terpasang pada antarmuka jaringan area lokal (LAN) di router ini. Saat Anda menyalakan komputer, salah satu operasi awal yang dilakukan oleh perangkat lunaknya adalah mengirimkan paket ke router yang terpasang secara lokal untuk memberitahu router bahwa komputer Anda sudah aktif dan berjalan serta memberikan alamat IP PC Anda kepada router. Mari kita asumsikan alamat IP tersebut adalah A. Demikian pula, router memberitahu PC Anda tentang alamat IP-nya. Selain itu, router dan PC saling bertukar alamat MAC Ethernet mereka. Sebentar lagi kita akan lihat mengapa.
+
+Operasi inisiasi lain terjadi di router Y. Router Y harus memberitahu semua perangkat yang terpasang langsung, seperti komputer, server, dan router lain, tentang keberadaan aktifnya (sudah menyala!) dan tentang alamat IP-nya Y. Konvensi ini secara tepat disebut "**Hello**" di industri.
+
+Selanjutnya, router Y wajib **mengiklankan** alamat IP A ke router-router jaringan lain yang terhubung langsung dengannya melalui tautan komunikasi.
+
+Dalam contoh ini, router Y memberitahu router Z bahwa *node* dengan alamat A dapat dijangkau di alamat Y. Router penerima (Z) menyimpan informasi ini di dalam **tabel perutean**. Router Z juga menyimpan jalur komunikasi mana (porta fisik mana) yang dapat digunakan untuk mencapai A. Lagi pula, sebuah router kelas atas mungkin memiliki puluhan tautan komunikasi yang beroperasi ke jaringan lain, seperti yang terlihat pada Gambar 5.1. Router Z harus mengetahui tautan spesifik yang harus digunakan untuk mengirim paket ke A.
+
+Router Z kemudian meneruskan iklan ini ke semua jaringan yang terhubung dengannya, tetapi ia sedikit mengubah iklan tersebut. Router Z memberitahu jaringan tetangganya dan komputer yang terpasang bahwa alamat A dapat dijangkau **melalui router Z** dan bukan router Y. Perhatikan kehalusan yang elegan ini. Dengan hanya mengiklankan jaringan berikutnya yang dapat mencapai *node* A, jaringan yang tidak bersebelahan "disembunyikan" dari jaringan lain. Yang dipedulikan oleh router dan *node* hanyalah **lompatan berikutnya (*next hop*)** menuju tujuan. Teknik ini menyederhanakan perutean dan juga memberikan sedikit privasi.
+
+Dalam beberapa milidetik, iklan tentang A dari router Y mencapai router Z, yang kemudian memberitahu *node-node* "di belakangnya" tentang kemampuan untuk mencapai *node* A, melalui *node* Z. Komputer-komputer ini menyimpan informasi tersebut di tabel perutean mereka sendiri.
+
+Dalam hitungan detik (biasanya sepersekian detik), alamat komputer Anda diberitahukan, setidaknya secara konseptual, ke komputer mana pun di dunia. Saya mengatakan secara konseptual karena kebijakan keamanan dan privasi—serta masalah efisiensi—membatasi bagaimana iklan ini disebarluaskan. Meskipun demikian, operasi dasarnya tidak jauh lebih rumit dari penjelasan ini.
+
+### Penerusan (*Forwarding*)
+
+Setelah entri untuk tabel perutean dibuat, operasi-operasi berikut terjadi. Silakan merujuk pada Gambar 5.2 selama diskusi ini. Komputer H ingin mengirim data ke komputer A. Berkat penemuan rute, komputer H memiliki informasi yang cukup di tabel peruteannya untuk mengetahui bahwa *node* A dapat dijangkau melalui *node* Z. Komputer H membentuk sebuah paket IP dengan *header* paket yang berisi hal berikut:
+
+**Alamat IP Sumber** = H
+**Alamat IP Tujuan** = A
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-5.2.png" alt="gambar" width="580"/>
+</p>
+
+Namun, ingat dari Jam ke-3 bahwa Ethernet (LAN) Lapisan 2 tidak memproses alamat IP Lapisan 3. Oleh karena itu, komputer H juga harus menempatkan alamat MAC dari router Z di *field* alamat tujuan pada *header* Ethernet. Katakanlah alamatnya ZZZ, meskipun kita tahu sebenarnya itu adalah nilai 48-bit. Komputer H juga menempatkan alamat MAC-nya sendiri di bagian pengirim alamat Ethernet. Katakanlah HHH. Dengan demikian, *frame* Ethernet berisi hal berikut:
+
+**Alamat MAC Sumber:** HHH
+**Alamat MAC Tujuan:** ZZZ
+
+Kita akan memeriksa apa yang terjadi di antara router-router pada jam berikutnya. Untuk saat ini, mari kita lihat di sisi penerima. Alamat MAC dalam *frame* Ethernet yang berjalan dari router Y ke *node* A telah berubah. Alamat-alamat tersebut adalah:
+
+**Alamat MAC Sumber:** YYY
+**Alamat MAC Tujuan:** AAA
+
+Namun, alamat IP tidak berubah. Alamat-alamat tersebut tetap:
+
+**Alamat IP Sumber** = H
+**Alamat IP Tujuan** = A
+
+Apa yang terjadi di sini? Lihat lagi. Alamat MAC hanya memiliki signifikansi lokal. Alamat-alamat tersebut tidak diangkut melalui jaringan area luas (WAN, atau dalam situasi ini, Internet). Sebaliknya, alamat IP memiliki signifikansi ujung-ke-ujung. Kita melihat sekali lagi mengapa Ethernet dianggap sebagai LAN. Bukan hanya karena beberapa landasan teknisnya, tetapi juga struktur alamatnya.
+
+Tautan komunikasi antara router Y dan Z tidak dikonfigurasi dengan Ethernet, karena untuk analisis ini, kita asumsikan ini adalah koneksi area luas. Jadi apa yang terjadi pada Ethernet? Router pengirim menghapusnya untuk transportasi area luas, dan router penerima menyusunnya kembali di ujung lain dengan alamat MAC lokal yang relevan.
+
+Itu bagus, tetapi Anda bisa bertanya dengan wajar: Apa yang menggantikan Ethernet di antara router-router area luas? Jika jawabannya tidak ada, situasi ini tampaknya bertentangan dengan model OSI yang dibahas di Jam ke-3. Jawabannya adalah protokol lain yang disebut **Asynchronous Transfer Mode (ATM)** mengambil alih peran Ethernet untuk tautan area luas. Subjek ini dibahas pada Jam ke-6, "Memperluas LAN dengan Jaringan Area Luas (WAN)."
+
+Untungnya, kecuali jika Anda bertanggung jawab atas jaringan privat yang besar, Anda tidak perlu khawatir tentang bagaimana alamat-alamat ini diatur dan dipelihara oleh router. Namun, jaringan perusahaan dan personel manajemen jaringannya harus memiliki pengetahuan yang tajam tentang perilaku router dalam hal perutean dan penerusan. Ratusan parameter konfigurasi harus dimasukkan ke dalam sistem operasi (OS) router agar mesin tersebut dapat menjalankan tugasnya dengan benar.
+
+#### Fungsi Lain dari Router
+
+Selain tugas-tugas penting yang baru saja dijelaskan, router kelas atas menyediakan dukungan luas untuk manajemen integritas jaringan, manajemen lalu lintas, dan manajemen keamanan, yang merupakan subjek untuk jam-jam berikutnya. Sekarang kita akan mengalihkan perhatian kita ke mesin khusus lainnya—**server**—dan kerangka kerja di mana server beroperasi: **model klien/server**.
+
+> **Ngoming-ngomong**
+>
+> **Switch, Bridge, dan Hub Melakukan Operasi "Penerusan"**
+>
+> Router adalah salah satu dari beberapa mesin yang dirancang untuk menyampaikan lalu lintas melalui jaringan. Anda mungkin menemukan istilah **switch**, **bridge**, dan **hub**. Perangkat-perangkat ini juga menyampaikan paket dan menghubungkan server serta komputer lain. Pada tahun 1990-an, istilah router, switch, bridge, dan hub dapat didefinisikan untuk mengidentifikasi jenis perangkat keras tertentu dan perangkat lunak terkaitnya. Sekarang tidak lagi demikian. Misalnya, sebuah router dapat melakukan fungsi dari apa yang disebut *ATM switch*, *MAC bridge*, atau *wiring hub*. Jangan khawatir dengan istilah-istilah ini sendiri. Selama Anda tahu apa yang bisa atau tidak bisa mereka lakukan, nama yang terkait dengannya tidaklah begitu penting.
+
+---
+### Model Klien/Server
+
+Pada masa-masa awal jaringan komputer—kembali ke tahun 1960-an—sebagian besar mesin yang terhubung ke komputer memiliki kapasitas yang sangat terbatas. Mereka disebut terminal "bodoh" (*dumb terminals*) karena alasan yang bagus. Mereka tidak punya CPU; tidak ada memori; tidak ada disk. Mereka bergantung pada komputer "mainframe" besar, seringkali dengan "pengontrol terminal" terkait untuk menyediakan layanan. Seorang pengguna terminal mengetikkan respons untuk data, surat, dan sebagainya dan menerima respons dari mainframe terpusat.
+
+Ketika komputer mulai banyak digunakan di banyak perusahaan pada tahun 1970-an, dan ketika komputer pribadi mulai masuk ke sebagian besar rumah pada tahun 1980-an, tugas mainframe untuk melayani mungkin ribuan komputer yang terpasang menciptakan masalah penyumbatan (*bottleneck*) dan kinerja. Dan, lagi pula, tidak masuk akal untuk menghalangi komputer pribadi yang kini sangat mampu untuk melakukan lebih banyak komputasi.
+
+Namun, distribusi lengkap semua pekerjaan ke setiap komputer—termasuk tanggung jawab atas integritas data perusahaan (misalnya, file piutang)—dipandang terlalu berisiko. Saat industri swasta bermigrasi ke data elektronik dan informasi berbasis komputer, industri tersebut menghasilkan sebuah kompromi: Alihkan sebagian tanggung jawab komputasi ke komputer terdistribusi, tetapi tidak semuanya. Berikan kebebasan kepada pengguna jaringan komputer, tetapi bukan kebebasan tanpa batas.
+
+Apa yang berevolusi dari situasi ini adalah **model klien/server**, yang sekarang digunakan di banyak lingkungan jaringan.
+
+Jika Anda menggunakan Web atau email, mesin Anda memiliki perangkat lunak klien yang menyediakan layanan ini. Misalnya, ketika Anda mengklik ikon halaman web, program klien Anda meminta layanan dari program server, yang terletak di komputer lain di dalam jaringan. Biasanya, perangkat lunak server memenuhi permintaan tersebut dan mengembalikan responsnya. Jenis operasi yang sama terjadi dengan permintaan untuk mentransfer dana dari rekening bank Anda, atau mengirim email, dan seterusnya.
+
+Model klien/server menyediakan metode yang nyaman untuk menempatkan fungsi-fungsi di komputer terdistribusi dalam satu atau banyak jaringan. Server tidak menghabiskan sumber daya sampai diminta untuk melakukannya. Selain itu, di banyak perusahaan, semua data dan perangkat lunak kritis disimpan di server, yang berarti keamanan dan kontrol yang lebih baik atas sumber daya vital.
+
+Sistem klien/server tidak kebal dari masalah. Karena server (atau kelompok server, yang disebut *server farms*) harus memproses semua permintaan klien, sistem ini rentan terhadap penyumbatan selama periode aktivitas tinggi. Pendekatan lain, yang disebut **jaringan peer-to-peer**, menghindari masalah ini dengan mendistribusikan beban kerja di antara beberapa mesin. Meskipun ini menghindari penyumbatan, memperbarui file—menjaganya tetap sinkron dalam lingkungan nanodetik—bukanlah hal yang sepele. Bagaimanapun, fokus kita di sini adalah pada server yang beroperasi dengan model klien/server.
+
+### Server
+
+Sebuah **server** dapat melakukan berbagai operasi, tergantung pada produk vendor spesifik dan perangkat lunak yang dimuat di mesin. Beberapa produk dikhususkan untuk melakukan satu atau beberapa fungsi. Misalnya, satu-satunya tugas server waktu jaringan adalah menyediakan jam yang akurat untuk jaringan. Di ujung lain spektrum layanan, beberapa server menyediakan serangkaian operasi yang luas, seperti menampung aplikasi pengguna; menyediakan layanan surat; mendukung aplikasi teleponi, seperti *voice over IP* (VoIP) dan operasi PBX; menyediakan direktori yang menerjemahkan antara nama email dan alamat terkaitnya; menyediakan layanan otentikasi dan keamanan; mengelola grup pengguna; menyediakan pencadangan dan pemulihan untuk file perangkat lunak dan data; menawarkan layanan web; dan mengelola kumpulan printer.
+
+#### RAID
+
+Salah satu pekerjaan terpenting server di perusahaan adalah merawat sumber daya otomatis perusahaan: data dan perangkat lunaknya. Sebagian besar server menjalankan perangkat lunak untuk mengelola basis data Anda. Itu kabar baik. Kabar yang lebih baik lagi adalah jika Anda benar-benar menggunakan perangkat lunak tersebut. Tidak ada gunanya jika Anda tidak meluangkan waktu dan upaya untuk mencadangkan data Anda. Tandai kata-kata ini: Cepat atau lambat, jika Anda tidak mengambil tindakan untuk melindungi data Anda, Anda akan kehilangan sebagian atau seluruhnya. Untuk itu, mari kita periksa sebuah operasi yang disebut **redundant arrays of inexpensive disks**, atau **RAID**.
+
+RAID beroperasi menggunakan berbagai metode yang biasa disebut sebagai "level" 0, 1, 5, dan 6.
+
+**RAID 0**
+RAID 0 paling baik digambarkan sebagai beberapa *hard drive* yang terhubung ke komputer tanpa redundansi. Tujuan RAID 0 adalah untuk meningkatkan *throughput* dan waktu respons. Jika data disebar di beberapa drive, data dapat dibaca dari dan ditulis ke drive lebih cepat. Namun, tidak ada salinan data ganda. Jika data rusak, data tersebut hilang.
+
+**RAID 1**
+RAID 1 melakukan **pencerminan (*mirroring*)** atau **duplikasi (*duplexing*)** disk. Dalam pencerminan disk, dua drive *small computer system interface* (SCSI) dengan ukuran yang sama terhubung ke kartu pengontrol RAID, tetapi OS melihatnya sebagai satu drive. Misalnya, dalam konfigurasi RAID 1, jika Anda menghubungkan dua drive 40-gigabyte (GB) ke komputer, komputer hanya melihat ruang disk 40GB daripada 80GB. Ini terjadi karena pengontrol RAID mengatur disk sehingga semua data ditulis secara identik ke kedua disk. Dalam konfigurasi RAID 1, satu drive bisa gagal dan drive lainnya dapat terus bekerja; pengguna tidak pernah tahu bahwa sebuah drive telah gagal. Di beberapa sistem, dimungkinkan untuk menghubungkan setiap drive ke pengontrol SCSI terpisah sehingga tidak ada satu titik kegagalan pun; baik disk maupun pengontrol dalam set cermin bisa rusak, dan tidak ada data atau fungsi yang akan hilang.
+
+**RAID 5**
+RAID 5 membutuhkan minimal tiga disk dengan kapasitas yang sama (dibandingkan dengan RAID 1, yang membutuhkan dua disk), tetapi peningkatan bersihnya sepadan dengan biayanya. Dalam konfigurasi RAID 5, semua data disebar di beberapa disk dalam proses yang disebut **striping**, yaitu operasi di mana kartu pengontrol drive RAID menulis data di beberapa disk. Selain itu, informasi tentang file yang disebut **data paritas** disimpan di ketiga disk. Dengan demikian, satu drive dalam set RAID 5 dapat gagal, dan data paritas di dua drive lainnya dapat digunakan untuk merekonstruksi data di drive yang gagal.
+RAID 5 menawarkan keuntungan lain: kecepatan mentah. Karena setiap file dibagi menjadi potongan-potongan yang lebih kecil dan disimpan di beberapa disk, setiap kali pengguna meminta file dari server, tiga disk membacanya secara bersamaan. Ini berarti file dibaca ke memori dan keluar ke jaringan lebih cepat, yang membuat pengguna Anda senang.
+
+**RAID 6**
+RAID 6 menyediakan pencadangan dan pemulihan dari kegagalan dua drive. Fitur ini penting untuk sistem berkapasitas besar karena jumlah ruang disk meningkatkan waktu untuk pulih dari kegagalan satu drive. RAID 6 adalah versi RAID terbaru dan terkadang disebut **Advanced Data Guarding (ADG)**.
+
+Kemampuan pengontrol RAID sangat bervariasi. Beberapa memerlukan banyak interaksi manusia untuk operasi konfigurasi, dan beberapa (seperti unit AutoRAID HP) sebagian besar dapat mengelola dirinya sendiri setelah diberi beberapa parameter dasar. Produk HP dapat diatur dalam beberapa menit.
+
+Produk vendor mungkin menawarkan variasi level RAID 0, 1, dan 5. Jika Anda terlibat dengan aspek jaringan ini, tanyakan kepada calon vendor Anda tentang level RAID 0+1 dan 5+1. RAID 6 mungkin menjadi preferensi Anda jika Anda memiliki sistem file yang sangat besar dan khawatir tentang waktu yang dibutuhkan untuk melakukan pencadangan dan pemulihan. Mereka berada di luar deskripsi umum kita, tetapi ingatlah ide ini untuk referensi di masa depan.
+
+#### Ketersediaan Tinggi dan Toleransi Kesalahan
+
+Sistem RAID redundan beroperasi tanpa gangguan ketika satu atau lebih disk gagal. Jika disk yang rusak diganti, data di perangkat baru akan dibangun kembali sementara sistem terus beroperasi secara normal. Beberapa sistem RAID harus dimatikan saat mengganti disk; yang lain memungkinkan drive diganti saat sistem sedang berjalan, sebuah teknik yang disebut ***hot swapping***.
+
+*Hot swapping* penting dalam aplikasi yang membutuhkan ketersediaan berkelanjutan. Sistem kontrol lalu lintas udara terlintas di benak. Jaringan Anda mungkin tidak memerlukan RAID atau *hot swapping*, tetapi Anda harus cukup tahu tentang sifat sumber daya otomatis Anda untuk membuat opini yang terinformasi. Juga, sadarilah bahwa RAID akan mengatasi beberapa masalah pencadangan data Anda, tetapi tidak semuanya. Mungkin saja data redundan bisa hilang. Di acara TV *24*, Jack Bauer dan rekan-rekannya secara teratur meledakkan seluruh instalasi komputer.
+
+Lepas dari lelucon, banyak perusahaan mengarsipkan data mereka ke situs jarak jauh, bahkan menyimpan file data dan komputer pendukung di brankas ber-AC yang aman. Terlebih lagi, beberapa perusahaan telah mengadopsi dua program untuk memastikan pelanggan dan pengguna mereka tidak pernah (hampir tidak pernah) ditolak layanannya oleh server. Program-program tersebut berkisar pada **ketersediaan tinggi** dan **toleransi kesalahan**.
+
+Beberapa server komputer menjalankan aplikasi yang sangat penting sehingga *downtime* bukanlah pilihan. Contoh sistem semacam itu termasuk sistem 911, sistem perbankan, dan sistem kontrol lalu lintas udara yang disebutkan sebelumnya. Sistem-sistem ini harus beroperasi sepanjang waktu; ketika tidak, hal-hal buruk terjadi.
+
+Tetapi semua orang tahu bahwa komputer bisa mengalami malfungsi. Jadi bagaimana administrator jaringan dan sistem mengatasi keniscayaan kegagalan komputer? Jawabannya adalah **toleransi kesalahan (*fault tolerance*)** dan **ketersediaan tinggi (*high availability*)**. Kedua istilah ini mengacu pada dua metode untuk memastikan bahwa sistem dapat tetap online dan aktif dalam menghadapi kegagalan perangkat keras dan terkadang perangkat lunak.
+
+Dengan **toleransi kesalahan**, setiap komponen diduplikasi; ada dua dari setiap perangkat. Jika satu komponen gagal, perangkat keras lainnya mengambil alih beban dan memastikan pengguna tidak melihat *downtime*. Sistem yang toleran terhadap kesalahan memiliki harga premium, yang bersedia dibayar oleh banyak pelanggan sistem kritis demi ketenangan pikiran dan pelanggan yang puas.
+
+**Ketersediaan tinggi**, juga disebut **clustering**, adalah sebuah pengaturan yang menggunakan beberapa komputer untuk memastikan sebuah aplikasi tidak pernah mati karena kegagalan komputer. Dalam klaster ini, biasanya dua atau lebih komputer terhubung ke disk bersama. Pada titik tertentu, salah satu komputer menjalankan aplikasi yang disimpan di disk bersama. Jika komputer yang menjalankan aplikasi gagal, kontrol atas disk bersama beralih ke komputer lain, yang memulai aplikasi sehingga pengguna dapat terus bekerja. Berbeda dengan sistem yang toleran terhadap kesalahan, sistem yang sangat tersedia tidak berjalan terus menerus melalui kegagalan komponen. Sistem yang sangat tersedia menunjukkan gangguan singkat dalam layanan dan kemudian berlanjut.
+
+Baik toleransi kesalahan maupun ketersediaan tinggi tidak lebih baik dari yang lain. Keduanya berguna, dan penggunaan yang tepat tergantung pada kriteria yang dibawa ke desain jaringan. Kita akan membahas desain jaringan nanti di buku ini, termasuk cara mendefinisikan kriteria untuk membangun jaringan.
+
+---
+### Sistem Operasi Server
+
+Sama seperti klien jaringan harus memiliki sistem operasi yang dimuat agar mesin klien berfungsi, server jaringan harus memiliki sistem operasi. (Lihat Jam ke-4, "Konsep Komputer," untuk penjelasan tentang OS klien yang umum.) Perbedaan utama antara sistem operasi desktop dan **Sistem Operasi Server (SOS)** adalah, tidak mengherankan, skala dan sumber daya.
+
+Biasanya, SOS dioptimalkan secara berbeda dari sistem operasi desktop. Sistem operasi desktop dirancang untuk memberikan pengguna di stasiun kerja desktop ini kinerja terbaik untuk aplikasi yang sedang digunakan. Sebaliknya, tugas SOS adalah menyeimbangkan kebutuhan semua pengguna yang mengakses server daripada memberikan prioritas pada salah satu dari mereka.
+
+Fitur-fitur menonjol dari SOS adalah:
+* Mendukung antarmuka porta untuk Ethernet dan protokol lainnya
+* Mengelola lalu lintas yang masuk dan keluar dari mesin
+* Menyediakan filter otentikasi, otorisasi, dan logon
+* Menyediakan layanan nama dan direktori
+* Mendukung file, cetak, layanan web, dan mekanisme pencadangan untuk data (sistem toleransi kesalahan yang dibahas sebelumnya)
+
+Perlu diketahui bahwa SOS tidak sama dengan OS, seperti DOS, Windows XP, dan Vista. SOS adalah perangkat lunak yang lebih terspesialisasi. Tentu, Windows dan OS lain menawarkan beberapa fitur dukungan dari SOS, tetapi tidak sejauh yang ditawarkan oleh SOS. Juga, beberapa literatur dan vendor menggunakan istilah **Sistem Operasi Jaringan (NOS)** dan SOS untuk menggambarkan perangkat lunak yang sama. Yang lain menggunakan NOS untuk menggambarkan OS khusus lainnya: yang lebih peduli dengan manajemen lalu lintas LAN dan WAN. Contohnya adalah Internet Operating System (IOS) dari Cisco, yang berjalan di router Cisco. Dari sudut pandang model tujuh lapis OSI, fokus SOS adalah pada lapisan atas, sedangkan IOS peduli dengan lapisan bawah—terutama Lapisan 3, di mana operasi perutean dan penerusan berlangsung. Sebagai salah satu contoh, IOS membuat tabel perutean; SOS tidak. Di bagian berikut, kita akan memeriksa SOS yang menonjol.
+
+#### Novell NetWare
+
+Novell NetWare adalah produk berbasis PC tertua dalam kategori SOS. Pada awal 1980-an, Novell (didirikan dan dipimpin oleh Raymond Noorda) memimpin terjun ke dunia jaringan komputer pribadi. NetWare adalah produk yang kaya dan kompleks. Berbeda dengan SOS lain yang lebih baru seperti Microsoft Windows XP, NetWare kurang intuitif.
+Di arena layanan file, cetak, dan direktori, NetWare adalah pemain yang tangguh, menawarkan rangkaian lengkap layanan file, cetak, dan web. Novell juga telah merambah ke arena Linux, sebuah langkah penting yang akan dibahas sebentar lagi.
+
+NetWare tidak dirancang dengan mempertimbangkan Internet. Sebagian besar pilihan desain yang dibuat Novell tampaknya merupakan upaya untuk menyederhanakan jaringan agar dapat diterima oleh pengguna PC. Pertama, Novell tidak membangun dukungan asli untuk **Transmission Control Protocol/Internet Protocol (TCP/IP)**, protokol dasar yang digunakan komputer untuk berkomunikasi di seluruh Internet. Novell punya alasan bagus untuk pendekatan ini: Ketika NetWare dikembangkan, TCP/IP adalah standar protokol yang relatif baru dan belum matang; ia memerlukan konfigurasi manual, dan memeliharanya sulit.
+Mengingat kompleksitas TCP/IP dan keterampilan teknis target pasar mereka, Novell memutuskan untuk mengembangkan protokol yang lebih sederhana. Protokol jaringan proprietary Novell disebut **Internetworking Packet Exchange/Sequenced Packet Exchange (IPX/SPX)**; dalam banyak hal, ini ideal untuk jaringan PC. IPX dulu dan sekarang sebagian besar dapat mengkonfigurasi sendiri, mudah diinstal, dan sederhana untuk dipelihara.
+
+Seiring dengan meningkatnya revolusi Internet (dan TCP/IP bersamanya), posisi Novell sedikit menderita karena NetWare asli didirikan di atas jaringan IPX. Namun, versi NetWare saat ini secara native menggunakan IP, dan ini telah membantu popularitas NetWare. Logikanya, seperti yang dinyatakan di Jam ke-3, basis pengguna IPX NetWare semakin berkurang seiring pelanggan bermigrasi ke penggunaan IP oleh NetWare.
+
+Produk NetWare telah digantikan oleh **Open Enterprise Server (OES)**. Sistem ini menyediakan semua layanan dari SOS tipikal, dan dapat berjalan di atas Linux atau platform inti NetWare. Tampaknya komunitas NetWare mungkin akan bermigrasi ke Linux, tetapi pada saat tulisan ini dibuat, masih terlalu dini untuk membaca daun teh ini. Saat ini, NetWare memiliki basis pelanggan yang besar, dan Novell tidak mungkin melakukan apa pun untuk mengasingkan populasi ini. Ada alasan bagus untuk popularitas NetWare: Ini adalah produk yang bagus.
+
+#### Microsoft Windows Server 2003
+
+Mulai akhir 1980-an, Microsoft memutuskan perlu SOS kelas atas untuk bersaing dengan NetWare dan UNIX. Setelah perjuangan tiga hingga empat tahun (dijelaskan dalam buku Pascal Zachary *Showstopper*), Microsoft memiliki apa yang ingin mereka ciptakan: Windows NT.
+
+Awalnya, Windows NT versi 3.1 (versi pertama, tetapi dinomori ulang agar sesuai dengan versi Windows 16-bit yang ada) adalah satu produk; awalnya ada sedikit perbedaan antara versi yang digunakan untuk server dan versi yang digunakan untuk stasiun kerja. Pada saat Microsoft merilis Windows NT 3.5 pada tahun 1995, Microsoft telah menciptakan dua versi sistem operasi: Windows NT Workstation dan Windows NT Server.
+Hingga saat ini, produk-produk ini telah berevolusi menjadi Windows XP Professional untuk pasar stasiun kerja dan Windows Server 2003 untuk pasar server. Kedua sistem operasi dibangun di atas platform yang sama, tetapi produk Server Microsoft memiliki serangkaian utilitas dan alat yang kaya yang tidak dimiliki oleh produk Workstation. Kemampuan untuk menghubungkan berbagai jaringan dibangun ke dalam Windows XP sejak awal. Selain itu, Windows Server 2003 dapat menangani bagian server dari pekerjaan aplikasi jaringan, yang menjadikannya platform server aplikasi yang ideal. Ia menggunakan antarmuka Windows yang familiar yang menyederhanakan administrasi. Windows XP sangat cocok untuk organisasi kecil karena fitur tunjuk-dan-kliknya.
+
+Bagi sebagian besar pemula jaringan, Windows Server 2003 kemungkinan adalah OS jaringan kelas enterprise yang paling mudah untuk diinstal dan dipelihara. Jangan menafsirkan pernyataan itu berarti bahwa SOS Windows itu sederhana; tidak. Tetapi dibandingkan dengan SOS lain, Windows Server 2003 memiliki tingkat keakraban tertentu karena menggunakan antarmuka Windows yang ada di mana-mana.
+
+#### Microsoft Windows Server 2008
+
+Microsoft bermaksud agar Windows Server 2008 pada akhirnya menggantikan platform 2003-nya. Ia menggabungkan fitur-fitur Windows Server 2003 (Rilis 2) dan OS baru Microsoft, Vista. Ini adalah SOS yang kompleks dan kaya, dan pendatang baru akan menemukan kurva belajarnya curam, tetapi sepadan dengan usahanya. Ia memiliki banyak fitur yang ditingkatkan relatif terhadap Server 2003, termasuk peningkatan langkah-langkah keamanan, penjadwalan tugas, firewall, dan jaringan nirkabel. Juga, diagnostiknya cukup bagus. Microsoft telah membuat kemajuan lebih lanjut dengan Server 2008 dengan sepenuhnya mengadaptasi standar Internet, terutama TCP/IP, Dynamic Host Configuration Protocol (DHCP), dan Domain Name System (DNS).
+
+Untuk Windows Server 2003 dan 2008, jaringan Anda harus memiliki administrator sistem yang berpengalaman untuk menangani manajemen perangkat lunak ini. Kompleksitasnya membuatnya tidak cocok untuk pengguna biasa atau administrator sistem paruh waktu, tetapi di tangan administrator sistem yang berpengetahuan, SOS Microsoft cukup efektif.
+
+#### UNIX
+
+Seperti yang disebutkan di Jam ke-4, UNIX dikembangkan di Bell Labs AT&T. UNIX adalah SOS preemptif dengan antarmuka pengguna yang kaya. Namun, dengan kekayaan ini datanglah tingkat kompleksitas. UNIX dapat menyelesaikan banyak tugas dengan mudah dan efisien, tetapi kompleksitas awal antarmuka pengguna membuat UNIX dicap sebagai "tidak ramah pengguna."
+
+Seperti halnya produk server Windows, UNIX dapat beroperasi baik sebagai klien maupun server di jaringan. Sebagian besar, ada sedikit perbedaan antara sistem UNIX klien dan sistem UNIX server kecuali kekuatan perangkat keras—server harus lebih kuat daripada stasiun kerja—dan ketatnya keamanan. UNIX hadir dengan serangkaian fitur yang begitu kaya sehingga jarang membutuhkan perangkat lunak pihak ketiga untuk mengelola penggunanya.
+
+UNIX dirancang untuk lingkungan multitasking, multipengguna. Ia menyediakan inventaris besar alat perangkat lunak untuk melengkapi OS-nya. Meskipun memiliki reputasi yang tidak pantas sebagai sulit (setidaknya untuk programmer profesional), UNIX menyediakan operasi server file dan cetak yang cepat.
+
+Sistem operasi UNIX terdiri dari banyak modul perangkat lunak dan sebuah program master, **kernel**. Kernel memulai dan menghentikan program dan menangani sistem file dan printer. Kernel juga memainkan peran kunci dalam menjadwalkan akses ke komponen perangkat keras untuk menghindari potensi konflik antara program yang bersaing.
+
+Karena usianya, UNIX adalah platform yang stabil. Namun, UNIX tidak diproduksi oleh satu vendor tunggal; sebaliknya, sejumlah vendor menyediakan UNIX, dan setiap versi sedikit berbeda. Akibatnya, ada kekurangan aplikasi siap pakai atau aplikasi yang siap diinstal langsung dari kotak. Dalam beberapa tahun terakhir, vendor UNIX telah mencoba membuat standar untuknya. Upaya ini hanya bertemu dengan keberhasilan terbatas karena beberapa versi UNIX didukung oleh berbagai vendor dan kelompok standar.
+
+UNIX paling cocok untuk jaringan di mana seorang administrator sistem yang berpengalaman bertanggung jawab. Kompleksitasnya membuatnya tidak cocok untuk pengguna biasa atau administrator sistem paruh waktu, tetapi di tangan administrator sistem yang berpengetahuan, UNIX dapat menyelesaikan tugasnya dengan andal dan cepat.
+
+#### Linux
+
+Pada akhir 1980-an dan awal 1990-an, UNIX menjadi kekuatan dominan di industri komputer. Namun, biaya UNIX berada di luar anggaran banyak individu dan biasanya membatasinya untuk berjalan hanya di mesin perusahaan. Beberapa sistem operasi mirip UNIX dengan biaya yang wajar (seperti Minix, sistem operasi yang dirancang oleh seorang profesor Belanda untuk tujuan pengajaran) dinilai tidak memadai oleh komunitas pengguna.
+
+Pada tahun 1991, Linus Torvalds menciptakan sistem operasi mirip UNIX baru yang dengan jenaka ia sebut **Linux**. Sistem operasi yang masih baru ini dengan cepat diadopsi oleh komunitas Internet, yang memperluas ciptaan Linus.
+
+Linux beroperasi di berbagai perangkat keras komputer, termasuk desktop, komputer mainframe besar, ponsel, router, E-book, dan sistem video game, seperti PlayStation. TiVo juga menggunakan Linux.
+
+Linux tidak mahal, bersifat **sumber terbuka (*open source*)** (artinya, ketika Anda membeli program, Anda juga mendapatkan kode sumber dan hak untuk memodifikasi dan membangun kembali, atau mengkompilasi ulang program untuk membuatnya melakukan apa yang Anda inginkan), dan didukung oleh sejumlah besar programmer yang tak terhitung jumlahnya yang secara sukarela menyumbangkan ide dan waktu mereka. Selain itu, **Kelompok Pengguna Linux (LUGs)** berlokasi di banyak kota untuk mempromosikan penggunaan sistem operasi ini. Kelompok-kelompok ini menyediakan pelatihan, demonstrasi, dan dukungan teknis bagi pengguna baru. Ruang obrolan dan newsgroup juga merupakan bagian dari komunitas Linux.
+
+Jika memungkinkan, Linux mematuhi standar International Organization for Standardization (ISO), Institute of Electronic and Electrical Engineers (IEEE), dan American National Standards Institute (ANSI). Linux juga memiliki semua alat yang dimiliki UNIX: skrip shell, C, C++, Java, Expect, Perl, dan Eiffel. Dari perspektif jaringan, Linux memiliki alat untuk terhubung ke sebagian besar jaringan yang ada. Linux dapat berjejaring menggunakan TCP/IP. Linux dapat menggunakan SMB (server message block) dan bertindak seperti server Windows. Linux dapat menjalankan IPX dan bertindak seperti server NetWare. Linux bisa dibilang platform server web dan surat paling populer di Internet, sebagian besar karena tidak mahal dan terbuka.
+
+Seperti yang disebutkan, Linux bukanlah produk proprietary yang tersedia hanya dari satu vendor. Linux biasanya tersedia dalam **distribusi** dari vendor yang mengemas perangkat lunak dan kode sumber dengan beberapa perbaikan mereka sendiri. Sering kali, perangkat lunak yang dikompilasi pada satu distribusi Linux dapat berjalan di distribusi lain tanpa *porting*, atau mengerjakan kode sumber untuk memastikan kompatibilitas. Bahkan jika tidak, alat pengembangan perangkat lunak Linux tidak ada duanya, dan memecahkan masalah relatif mudah.
+
+Untuk mendapatkan gambaran tentang dampak dan nilai Linux, pertimbangkan statistik ini, yang diambil dari beberapa situs web: Sebuah studi tentang Linux 7.1 dari Red Hat memperkirakan bahwa jika OS ini (dengan 30 juta baris kode sumber) telah dikembangkan dengan metode proprietary vendor konvensional, sekitar 8.000 jam kerja manusia akan dihabiskan dengan biaya sekitar \$1 miliar (dalam dolar tahun 2000). Studi ini mencerminkan perkiraan konservatif. Studi lain mengklaim OS Linux yang lebih besar, di bawah pengembangan konvensional, akan menelan biaya \$6 atau \$7 miliar! Pengembang perangkat lunak tidaklah murah, dan memiliki masukan gratis dari ribuan programmer memberikan Linux pengaruh yang signifikan di pasar SOS server.
+
+Untuk kisah pengembangan dan kebangkitan Linux, bacalah *Just for Fun: The Story of an Accidental Revolutionary* oleh Linus Torvalds dan David Diamond. Ini adalah perspektif orang pertama Torvalds dan merupakan bacaan yang cepat dan menghibur.
+
+Cukup sekian untuk SOS saat ini. Kita telah menyentuh permukaan kemampuan dan operasinya, tetapi kita belum menjelaskan cara menggunakannya dan cara mendapatkan kinerja terbaik darinya. Kita akan melakukan hal itu pada Jam ke-16 dan 17.
+
+---
+### Media
+
+Untuk instalasi jaringan Anda, Anda mungkin dapat menentukan media yang akan digunakan untuk mengangkut lalu lintas Anda. Kata "mungkin" dicatat, karena beberapa produk dan protokol jaringan memerlukan media tertentu. Misalnya, switched Ethernet menetapkan penggunaan kabel tembaga atau serat optik. Meskipun seorang insinyur yang giat dapat menginstal, katakanlah, kabel koaksial, alih-alih pasangan tembaga terpilin di LAN, itu bukanlah ide yang baik. Pertama, lapisan fisik model OSI harus dibuat ulang, yang memerlukan perubahan perangkat keras. Kedua, *line driver* harus ditulis ulang. Ketiga, lapisan data link, meskipun sebagian besar tetap utuh, masih memerlukan beberapa perubahan.
+
+Di sisi lain, Anda sering memiliki pilihan tentang kualitas (dan biaya) media. Coba bandingkan; carilah harga yang bagus, tetapi jangan kompromikan kualitas demi beberapa dolar yang dihemat. Perbedaan harga antara kabel berkualitas tinggi dan berkualitas rendah kecil, dan Anda mungkin menyelamatkan diri dari beberapa sakit kepala di kemudian hari dengan membayar sedikit lebih di muka.
+
+Saya akui bahwa menghabiskan beberapa sen lebih per meter kabel dapat berubah menjadi item anggaran besar jika sebuah perusahaan sedang menarik kabel di gedung pencakar langit baru. Tetap saja, berhati-hatilah dalam menarik kabel berkualitas rendah. Ingat pepatah lama, "Hemat sen, boros rupiah."
+
+#### Kabel Tembaga
+
+Dalam sebagian besar kondisi, keputusan Anda tentang media akan berfokus pada kategori kabel tembaga yang akan dipasang untuk jaringan Anda. Kabel pasangan terpilin¹ hadir dalam beberapa tingkatan, mulai dari Level 1 (atau Kategori 1), yang sebelumnya digunakan untuk aplikasi telepon lama, hingga Level 6 (atau Kategori 6), yang disertifikasi untuk transmisi data hingga 350 megabit per detik (Mbps).
+
+Kabel pasangan terpilin dijelaskan lebih detail sebentar lagi. Sebelum kita memeriksa kategori-kategori ini, mari kita mengambil jalan memutar singkat untuk membahas teknologi LAN yang kemungkinan akan Anda temui: **10BASE-T**. (Kita akan membahas variasi teknologi ini di Jam ke-11, "Memilih Perangkat Keras dan Perangkat Lunak Jaringan.") Istilah ini dibangun sebagai berikut:
+* **10**—Kecepatan dalam Mbps
+* **BASE**—Menggunakan teknik pensinyalan baseband (citra biner, digital)
+* **T**—Menggunakan kabel pasangan terpilin (*twisted-pair*) untuk media
+
+Banyak produk Ethernet didasarkan pada teknologi 10BASE-T. Yang lain menggunakan serat optik. Sekali lagi, di Jam ke-11, kita akan memeriksa Ethernet lain. Untuk saat ini, mari kita periksa kategori pasangan terpilin:
+* **Kategori 1** tidak dinilai kinerjanya dan tidak lagi dinilai oleh kelompok standar. Sebelumnya, ini digunakan untuk sistem telepon dan bel pintu.
+* **Kategori 2** juga tidak lagi dinilai oleh kelompok standar. Di masa lalu, ini digunakan pada LAN token-ring.
+* **Kategori 3** adalah tingkat terendah yang dapat digunakan untuk jaringan. Ini digunakan untuk Ethernet 10BASE-T dan memiliki kecepatan data maksimum 16Mbps. Meskipun Kategori 3 dinilai untuk 10BASE-T, Kategori 5 sekarang jauh lebih umum karena mendukung baik 10BASE-T maupun kecepatan lebih tinggi seperti 100BASE-T.
+* **Kategori 4** digunakan untuk jaringan token-ring 16Mbps dan Ethernet 10BASE-T. Kecepatan data maksimumnya adalah 20Mbps.
+* **Kategori 5 (dan 5e)** digunakan untuk Ethernet 100BASE-T dan memiliki kecepatan data maksimum 155Mbps. Ini saat ini adalah kabel yang paling umum. Faktanya, banyak perusahaan memasang kabel Kategori 5 untuk semua di kantor mereka (baik telepon maupun data) karena dapat digunakan untuk semuanya mulai dari layanan telepon dua kawat dasar hingga ATM.
+* **Kategori 6** digunakan untuk Ethernet 1000BASE-T (gigabit Ethernet). Ini dinilai untuk 350Mbps di atas kabel pasangan terpilin tak berpelindung 4 pasang. Dan Kategori 6a, pendatang yang relatif baru, cocok untuk Ethernet 10GBASE-T.
+
+Untuk mempertahankan kecepatan data maksimum, Anda harus merangkai dan menghentikan kabel sesuai dengan standar Electronics Industries Association (EIA) 568B. Jika kabel tidak dipasang dengan benar, potensi kecepatan datanya dapat terancam. Umumnya, vendor memberikan panduan tentang instalasi produk mereka, seperti jarak yang disarankan untuk rentang kabel. Spesifikasi mereka cenderung berhati-hati. Ikuti pedoman mereka, dan Anda akan berada dalam standar EIA.
+
+> **Pasang Kabel Terbaik**
+>
+> Jika Anda membangun jaringan berbasis kabel tembaga, tidak masuk akal untuk memasang kabel kurang dari Kategori 5 karena memasang kabel Kategori 5 dapat memperpanjang umur media Anda. Standar Kategori 5 menetapkan bahwa kabel dalam kabel pasangan terpilin mempertahankan pilinannya dalam jarak setengah inci dari titik terminasi akhir. Kategori 5 juga memiliki standar ketat untuk radius tikungan pada kabel Kategori 5 dan ketentuan lain yang mengarah pada peningkatan kinerja.
+
+#### Serat Optik
+
+Karena kesuksesan besar switched Ethernet dan penggunaannya atas kabel tembaga, kecil kemungkinan Anda akan dihadapkan pada pemasangan, penggunaan, atau pemeliharaan kabel serat optik. Pengecualian untuk pernyataan terakhir ini mungkin berlaku untuk beberapa aktivitas non-jaringan Anda. Anda mungkin ditugaskan untuk merakit pohon Natal kabel optik Anda, atau anak-anak Anda mungkin sedang melempar Frisbee yang diterangi dengan serat optik. Tetapi produk-produk optik ini datang dalam kotak siap pakai dan tidak memerlukan keahlian jaringan Anda untuk penggunaannya.
+
+Lepas dari lelucon, serat optik telah menggantikan sebagian besar media berbasis kawat di jaringan "inti" di seluruh dunia, seperti jaringan telepon. Selain itu, Anda mungkin ingin mempertimbangkan menggunakan serat optik jika Anda membutuhkan tautan komunikasi yang sangat aman untuk jaringan Anda atau Anda membutuhkan kecepatan data yang luar biasa tinggi—jauh di atas kecepatan Gbps yang dikutip sebelumnya.
+
+Untuk keamanan, citra cahaya yang membawa pulsa 1 dan 0 terkandung di dalam kabel. Berbeda dengan sinyal elektromagnetik, media ini tidak melepaskan energi liar. Dengan demikian, kabel optik tidak rentan terhadap penyadap yang mendeteksi "intelijen sisa" yang berasal dari kabel. Secara umum diterima bahwa kabel serat optik dapat disadap tanpa terdeteksi, tetapi diskusi ini mengasumsikan Anda tidak berkecimpung dalam bisnis mata-mata. Bagaimanapun, Jam ke-20, "Keamanan," akan menjelaskan bagaimana Anda dapat mengamankan transmisi Anda.
+
+Untuk kapasitas, kemungkinan besar LAN Anda akan berkinerja baik dengan perangkat keras dan perangkat lunak Ethernet standar. Untuk mengangkut data Anda melalui internet atau Internet, sebagian besar tautan beroperasi dalam rentang gigabit, menggunakan serat optik. Misalnya, pada Jam ke-6, kita akan memeriksa teknologi Synchronous Optical Network (SONET), yang dapat menyediakan tautan optik yang beroperasi pada 389,813.12Mbps. Terlebih lagi, sistem-sistem baru keluar dari laboratorium yang mentransmisikan pada 14 terabit per detik (Tbps). Mengacu pada Gambar 4.1 di Jam ke-4, dalam istilah visual, ini adalah 14.000.000.000.000 bit per detik; sebuah kapasitas yang (akhirnya?) dibutuhkan untuk jaringan inti, tetapi tentu saja tidak untuk LAN dan sistem perusahaan lainnya.
+
+Oleh karena itu, selain pohon Natal optik dan Frisbee tersebut, kemungkinan besar Anda tidak perlu menjadi ahli dalam teknologi ini.
+
+#### Kabel Koaksial
+
+Kita dapat membuat klaim yang sama dengan kabel koaksial. Selain kehadirannya di jaringan TV kabel, kabel ini telah berhenti menjadi faktor penting dalam jaringan secara umum, dan jaringan data secara khusus. Dulu saya berurusan dengan kabel koaksial ketika spesifikasi Ethernet asli menetapkannya. Tidak lagi. Sekarang adalah kabel tembaga.
+
+#### Media Nirkabel
+
+Berbeda dengan kabel koaksial, seorang manajer jaringan harus menguasai teknologi media nirkabel—jika bukan sistem seluler area luas, maka tentu saja standar dan produk Bluetooth dan Wi-Fi yang lebih terlokalisasi. Di banyak kantor dan rumah, mereka menawarkan alternatif yang menarik selain kabel tembaga. Kita akan menyinggung Bluetooth dan Wi-Fi dengan pengenalan, dan memberikan detail lebih lanjut di Jam ke-7, "Jaringan Nirkabel Bergerak."
+
+**Bluetooth**
+Bluetooth adalah teknologi yang waktunya (untuk datang) sudah lama tertunda. Industri jaringan membutuhkan Bluetooth bertahun-tahun yang lalu. Bluetooth menawarkan media berkapasitas tinggi yang murah dan perangkat dengan konsumsi daya rendah untuk jarak pendek, tanpa perlu menarik kabel di sekitar ruangan. Selain itu, Bluetooth bukan media *line-of-sight*. Jika perangkat cukup dekat, gelombang radio akan menyediakan komunikasi yang benar. Juga, Bluetooth berisi rangkaian protokol yang luas, memungkinkan perangkat untuk saling menemukan, serta menemukan atribut satu sama lain.
+Karena fitur-fitur ini, Bluetooth sekarang digunakan di headset ponsel, laptop, printer, kamera digital, video game, telepon, dan banyak perangkat lainnya.
+
+**Wi-Fi**
+Wi-Fi lebih mahal daripada Bluetooth karena beroperasi pada kapasitas yang lebih tinggi, mengkonsumsi lebih banyak daya, dan mencakup jarak yang lebih jauh. Beberapa orang menyebut Wi-Fi sebagai "Ethernet nirkabel" karena menyediakan banyak layanan dari Ethernet berbasis kabel konvensional. Wi-Fi akan memberi Anda lebih banyak tantangan sebagai manajer jaringan, tetapi seperti yang akan kita lihat di Jam ke-20, Wi-Fi memiliki lebih banyak fitur daripada Bluetooth.
+
+### Ringkasan
+
+Selama jam ini, kita telah belajar tentang komponen perangkat keras dan perangkat lunak utama yang membentuk jaringan berbasis komputer. Kita telah memeriksa router dan pekerjaan penting yang mereka lakukan terkait dengan penemuan rute dan penerusan. Sistem operasi server diperkenalkan, dengan sorotan pada yang mendominasi pasar. Pentingnya "kecepatan" ditekankan karena pengaruhnya terhadap *throughput* dan waktu respons. Jam ini diakhiri dengan survei media yang paling banyak digunakan untuk saluran komunikasi.
+
+> ¹ Kabel dipilin untuk meningkatkan kualitas sinyal listrik.
+
+---
+
