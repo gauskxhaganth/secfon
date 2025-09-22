@@ -504,3 +504,104 @@ PC A dan B serta *router* menggunakan alamat MAC untuk memastikan lalu lintas di
   <img src="images/book-sams_teach_yourself_networking/figure-3.3.png" alt="gambar" width="580"/>
 </p>
 
+Setelah menerima *frame* ini, PC B menentukan alamat MAC tujuan di *header* $L_2$ dari *frame* tersebut sama dengan alamat PC B, jadi PC B menerima lalu lintas tersebut dan meneruskan paket ke IP di $L_3$. (Karena beberapa *field* kontrol lain di *header frame*, PC B tahu bahwa ia harus meneruskan paket ini ke $L_3$-nya, yang kemudian dilakukannya.)
+
+IP di PC B kemudian melihat alamat tujuan $L_3$ di *header* IP. Ternyata, alamat ini adalah alamat yang sama dengan alamat IP PC B. Dengan demikian, PC B tahu bahwa ia harus melakukan sejumlah layanan IP. Kemudian ia meneruskan data ke Lapisan 4. Akhirnya—sebenarnya hampir seketika—data disajikan ke aplikasi pengguna akhir di Lapisan 7, seperti email.
+
+Sebagai alternatif, mari kita asumsikan bahwa PC A ingin mengirim paket ke komputer jarak jauh, di suatu tempat di Internet. Dalam situasi ini, alamat MAC tujuan bukanlah alamat PC B, melainkan alamat *router*. Berdasarkan kesepakatan sebelumnya, PC A dan *router* telah setuju bahwa setiap lalu lintas non-lokal akan dikirim ke *router* ini, tetapi alamat tujuan IP akhir telah ditempatkan di *field* alamat tujuan IP $L_3$ oleh PC A. Dengan demikian, *router* memeriksa *header* $L_3$ dan alamat IP tujuannya. *Router* mengetahui bahwa paket ini ditujukan untuk komputer non-lokal.
+
+*Router* kemudian membuat beberapa keputusan penerusan, yang mengakibatkan paket dikirim ke jaringan area luas (WAN)—yaitu, Internet—menuju perjalanannya ke pengguna tujuan.
+
+Dalam situasi ini, *router* tidak lagi berurusan dengan alamat MAC $L_2$, yang secara ketat merupakan alamat lokal. Ia melepaskan $L_1$ dan $L_2$ Ethernet dan mengirimkan paket IP $L_3$ ke tautan eksternalnya ke Internet (awan WAN pada Gambar 3.3) melalui DSL, kabel *broadband*, satelit, atau *dial-up* konvensional. (Untuk opsi *dial-up*, dan tidak ditunjukkan pada Gambar 3.3, sebuah *router* tidak dipasang di situs lokal. Perusahaan telepon di kantor ujungnya mengambil tanggung jawab untuk menyediakan antarmuka *router* ke Internet.)
+
+MAC Ethernet tidak dirancang untuk beroperasi pada tautan WAN. Oleh karena itu, di antarmuka WAN ini, unit data IP ditempatkan di dalam unit data ATM (ditunjukkan sebagai "ATM2" pada gambar). ATM dirancang untuk digunakan di berbagai jenis jaringan komputer. ATM telah menemukan ceruk pasar yang luas di WAN karena ia menentukan prosedur untuk menegosiasikan layanan seperti *throughput* yang lebih tinggi dan waktu respons yang lebih cepat. Ini adalah protokol $L_2$ yang umum pada *router* yang terpasang secara lokal, seperti yang terlihat pada Gambar 3.3.
+
+Notasi "BB 1" (*broadband* di $L_1$) berarti Lapisan 1 adalah DSL, kabel, satelit, atau *dial-up* non-*broadband*. IP dan ATM tidak peduli dengan media fisik di $L_1$. Tentu saja, perancang jaringan harus mempertimbangkan opsi-opsi ini ketika mereka menempatkan berbagai protokol $L_2$ di atas berbagai antarmuka $L_1$.
+
+Untuk mengakhiri pengenalan tentang bagaimana data bergerak melalui jaringan komputer, selanjutnya, lalu lintas IP diteruskan melalui Internet, menggunakan alamat IP $L_3$ untuk membantu operasi ini. ATM juga memainkan peran utama dalam kemitraan ini, yang akan kita periksa pada Jam ke-6, "Memperluas LAN dengan Jaringan Area Luas (WAN)." Di ujung lain dari sesi ini, proses dalam contoh ini dibalik, semua dengan tujuan mengirimkan email (data) kepada pengguna akhir.
+
+Untungnya, Anda tidak perlu khawatir dengan detail-detail ini. Tentu, ketika Anda membangun jaringan Anda sendiri, Anda akan menemukan istilah-istilah seperti IP, alamat MAC, dan ATM. Oleh karena itu, mengetahui fungsi-fungsi mereka akan membantu Anda untuk lebih baik dalam mengoperasikan dan mengelola jaringan Anda sendiri. Tetapi dengan beberapa pengecualian, penyedia layanan bertanggung jawab untuk menginstal dan mengkonfigurasi semua protokol dan alamat ini, semua untuk keuntungan Anda.
+
+---
+### Tinjauan Protokol Utama
+
+Pada Jam ke-8, 14, dan 15, kita akan kembali ke protokol-protokol utama yang digunakan untuk "memindahkan data dari sini ke sana." Untuk sisa jam ini, kita akan memeriksa beberapa aspek kunci dari protokol-protokol ini, yang akan memungkinkan kita untuk melanjutkan ke jam-jam berikutnya.
+
+#### Ethernet
+
+Standar Ethernet dirancang untuk LAN. Protokol Ethernet asli dikembangkan di Xerox Palo Alto Research Center (PARC) pada awal hingga pertengahan 1970-an.² Awalnya, Ethernet berjalan di atas kabel koaksial bersama, seperti yang terlihat pada Gambar 1.1(c) di Jam ke-1. *Node-node* LAN diizinkan untuk mengirim *frame* kapan saja, tanpa proses arbitrasi sebelumnya. Akibatnya, lalu lintas di saluran bersama dapat menyebabkan "tabrakan." Setiap *node* mampu memantau transmisinya sendiri. Oleh karena itu, ketika sebuah *node* menyadari adanya gangguan, ia memulai prosedur untuk memastikan semua *node* lain menyadari masalah tersebut, dan kemudian ia mengirim ulang *frame* tersebut.
+
+Prosedur semacam itu mengakibatkan pemborosan sumber daya selama periode aktivitas tinggi, yang menghasilkan lebih banyak tabrakan. Selain itu, putusnya kabel, atau kerusakan titik terminasi kabel, akan meruntuhkan jaringan. Akibatnya, industri telah bermigrasi ke topologi Ethernet Bintang (Gambar 1.1(a), Jam ke-1). Berbagai standar dan produk "Switched Ethernet" tersedia, yang akan kita periksa pada Jam ke-11, "Memilih Perangkat Keras dan Perangkat Lunak Jaringan."
+
+Untuk mengakhiri pengenalan Ethernet ini dan untuk mempersiapkan jam-jam berikutnya, fakta-fakta berikut relevan. Ethernet:
+* Tidak memerlukan asosiasi (koneksi logis) untuk dibuat sebelum *frame* (data) dipertukarkan
+* Tidak memberikan konfirmasi untuk penerimaan *frame* yang berhasil
+* Tidak memeriksa *frame* yang tidak berurutan atau duplikat
+* Melakukan pemeriksaan kesalahan untuk data yang rusak; jika rusak, *frame* akan dibuang
+* Tidak menyediakan negosiasi layanan
+* Tidak dirancang untuk WAN
+
+> **Penggunaan FDDI dan Token Rings Berkurang**
+>
+> Selama tahun 1970-an dan 1980-an, Ethernet memiliki persaingan dari **Fiber Distributed Data Interface (FDDI)** dan **Token Ring** dari IBM. LAN-LAN ini telah tersisih oleh produk-produk Ethernet dan tidak lagi menjadi faktor utama dalam industri.
+
+#### Internet Protocol (IP)
+
+IP adalah protokol Lapisan 3 yang paling banyak digunakan di industri jaringan komputer. Awalnya dikembangkan untuk digunakan di WAN, saat ini ia beroperasi di atas Lapisan 1 dan 2 di hampir setiap perangkat komunikasi data (dan bahkan suara) yang ada. Bahkan ponsel, jika mampu terhubung ke Internet, menggunakan IP. Seperti yang disebutkan sebelumnya, IP membawa alamat IP yang ada di mana-mana di dalam *header*-nya, yang merupakan alasan utama popularitasnya. Perlu diketahui bahwa implementasi IP tertentu mungkin tidak menggunakan *field header* untuk melakukan layanan ini:
+* **Type of Service (TOS)**—Meminta berbagai tingkat penundaan dan *throughput* pengiriman paket.
+* **Time to Live (TTL)**—Waktu paket dapat tetap aktif saat mencari jalan ke tujuan. Sering diimplementasikan dengan jumlah lompatan maksimum yang diizinkan (*hop count*) (jumlah *node* yang dapat dilalui). Opsi ini digunakan untuk memastikan paket IP tidak "berputar-putar" di jaringan tanpa batas waktu.
+* **Fragmentasi**—Memungkinkan paket IP yang lebih besar dari ukuran *frame* $L_2$ yang diizinkan untuk dikurangi agar pas di dalam *frame* dan kemudian dirakit kembali di *node* IP penerima.
+* **Opsi**—Menyediakan layanan opsional lainnya; beberapa didefinisikan dalam standar IP.
+
+> **Ngomong-ngomong**
+>
+> **Paket = Datagram**
+>
+> Demi akurasi dan untuk menghindari kebingungan, kita harus memperkenalkan istilah lain untuk PDU $L_3$ (paket). Banyak literatur saat ini, serta spesifikasi asli, menyebut PDU IP sebagai "**datagram**." Pada tahun 1970-an, istilah *paket* dikaitkan dengan protokol Lapisan 3 yang membuat koneksi sebelum pertukaran lalu lintas. Istilah *datagram* dikaitkan dengan protokol Lapisan 3 yang mengirim lalu lintas kapan saja, tanpa pengaturan koneksi sebelumnya. Saat ini, kebanyakan orang menggunakan istilah tersebut secara bergantian.
+
+Untuk mengakhiri pengenalan IP ini dan untuk mempersiapkan jam-jam berikutnya, fakta-fakta berikut relevan. IP:
+* Tidak memerlukan asosiasi (koneksi logis) untuk dibuat sebelum paket dipertukarkan
+* Tidak memberikan konfirmasi untuk penerimaan paket yang berhasil
+* Tidak memeriksa *frame* yang tidak berurutan atau duplikat, kecuali jika opsi IP didukung
+* Melakukan pemeriksaan kesalahan untuk data yang rusak; jika rusak, paket akan dibuang
+* Menyediakan negosiasi layanan yang terbatas
+* Tidak menyadari sifat Lapisan 1 dan 2 yang mendasarinya
+
+#### The Asynchronous Transfer Mode (ATM)
+
+ATM adalah pendatang yang relatif baru di dunia protokol jaringan. ATM belum banyak digunakan di LAN, setidaknya jika dibandingkan dengan Ethernet. Namun, ATM digunakan secara luas di WAN. Jika Anda memiliki jaringan rumah dengan tautan DSL ke Internet, kemungkinan besar *router* Anda menjalankan ATM di Lapisan 2 untuk berkomunikasi dengan penyedia layanan Internet (ISP) Anda.
+
+Untuk pengangkutan lalu lintas melalui Internet, penggunaan alamat IP terbukti terlalu rumit dan memakan waktu. Di sinilah ATM berperan. Sebelum paket IP diangkut ke Internet, alamat IP mereka dikorelasikan dengan pengidentifikasi lain yang disebut **ID sirkuit/jalur virtual**. Nilai-nilai ini bukan alamat, melainkan label sederhana yang mengidentifikasi lalu lintas. Tabel "perutean" (yang disebut **tabel pengalihan label**) dari nilai-nilai ini dapat diakses dengan cepat, tanpa harus menggunakan operasi IP yang tidak efisien. Memang, paket IP diangkut secara transparan melalui jaringan berbasis ATM. Dengan demikian, jaringan ATM dikenal karena efisiensi dan penundaannya yang rendah. Sebagian besar logika ATM dapat dieksekusi dalam perangkat keras, yang selanjutnya mengurangi waktu untuk memproses lalu lintas. Selain itu, ATM dirancang untuk memungkinkan penyedia jaringan dan pengguna jaringan untuk menegosiasikan dan menyediakan berbagai layanan.
+
+> **PDU ATM Disebut Sel**
+>
+> ATM tidak menggunakan istilah *frame*, *packet*, atau *datagram*. ATM menggunakan istilah **sel (*cell*)** untuk menggambarkan unit datanya. Karena ini adalah protokol Lapisan 2, ATM membawa paket IP Lapisan 3 di dalam selnya. Jangan bingung antara sel jaringan seluler, yang merupakan area geografis yang ditentukan, dengan sel ATM, yang merupakan unit lalu lintas. Tidak jarang sel ATM dikirim melalui sel-sel jaringan seluler.
+
+Untuk mengakhiri pengenalan ATM ini dan untuk mempersiapkan jam-jam berikutnya, fakta-fakta berikut relevan. ATM:
+* Memerlukan asosiasi (koneksi logis, yang disebut jalur virtual atau sirkuit virtual) untuk dibuat sebelum sel dipertukarkan
+* Tidak memberikan konfirmasi untuk penerimaan sel yang berhasil
+* Tidak memeriksa sel yang tidak berurutan atau duplikat. Protokol di lapisan yang lebih tinggi mengambil alih fungsi ini (misalnya, TCP, dibahas pada Jam ke-14, "Menghubungkan ke Internet: Operasi Awal")
+* Melakukan pemeriksaan kesalahan untuk data yang rusak; jika rusak, sel akan dibuang
+* Menyediakan serangkaian layanan yang kaya dan alat manajemen lalu lintas yang luas
+* Tidak menyadari sifat Lapisan 1 yang mendasarinya
+
+#### IPX
+
+Protokol IPX berasal dari produk Xerox Network Services (XNS) dan merupakan bagian dari sistem operasi NetWare Novell. IPX menggunakan alamat yang mirip dengan alamat berkelas IP konvensional, tetapi melakukan beberapa penyesuaian demi efisiensi. IPX banyak digunakan pada 1980-an dan 1990-an, tetapi penggunaannya semakin berkurang seiring dengan migrasi industri ke IP. Sebuah survei di Internet³ mengungkapkan bahwa 44% perusahaan yang menggunakan Windows Server tidak menjalankan IPX; 34% menjalankan IPX tetapi sedang dalam proses migrasi darinya. Selain itu, Windows Vista tidak mendukung IPX, begitu pula Mac OS versi setelah 9.2.2. Kita mengucapkan selamat tinggal kepada IPX, tetapi kami juga meyakinkan pelanggan IPX bahwa Novell sekarang mendukung mereka dengan migrasi ke TCP/IP.
+
+> **Dan Selamat Tinggal NetBIOS dan NetBEUI**
+>
+> Mari kita juga mengistirahatkan dua sistem lain. **Network Basic Input/Output System (NetBIOS)** adalah—dalam waktu jaringan komputer—protokol kuno. Dikembangkan pada tahun 1983 untuk jaringan IBM PC, NetBIOS menyediakan layanan yang mirip dengan lapisan sesi model OSI. Jika digunakan, NetBIOS berjalan di atas TCP/IP terutama untuk beberapa layanan penamaan.
+>
+> **Network BIOS Extended User Interface (NetBEUI)** telah digunakan di LAN kecil, LANManager lama; serta Windows 3.x. Ini tidak dapat dirutekan. Komputer yang terhubung ke jaringan non-lokal tidak dapat menggunakannya. Dengan demikian, IP telah menggantikan sebagian besar instalasi NetBEUI.
+
+### Ringkasan
+
+Kita telah membahas banyak materi dalam jam ini. Informasi ini penting dan akan sangat membantu untuk memahami banyak konsep dalam 21 jam berikutnya. Topik-topik dalam jam ini sangat penting untuk jaringan atau jaringan yang Anda miliki di kantor dan rumah Anda. Dengan konsep-konsep yang disajikan dalam jam ini, Anda seharusnya memiliki alat dasar untuk mulai membangun jaringan Anda sendiri.
+
+> ² Saya berkesempatan mengunjungi PARC pada awal 1980-an untuk mengevaluasi Ethernet untuk kemungkinan penggunaan oleh Federal Reserve Board. Kami tidak memilih LAN ini pada saat itu, tetapi saya terkesan dengan arsitektur Ethernet. Saya bahkan lebih terkesan dengan penggunaan ikon layar komputer oleh PARC (tempat sampah, dan sebagainya) yang kemudian dimasukkan oleh Apple dan Microsoft ke dalam produk mereka.
+>
+>³ Kunjungi [http://articles.techrepublic.com.com/5100-10878_11-5026038.html](http://articles.techrepublic.com.com/5100-10878_11-5026038.html).
+
+---
+
