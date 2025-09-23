@@ -11,7 +11,8 @@ Repo ini berisi materi belajar seputar dunia keamanan siber, berdasarkan pemaham
 [Hands-on smart contract development](web3-sources/from-books/books-06-hands-on_smart_contract_development.md)<br>
 
 ## Web2
-#### From-Books:
+### Bug Hunting Quickpreps:
+##### From-Books:
 [linux notes professional](web2-sources/from-books/professional_notes/books-01-linux_notes_professional.md)<br>
 [bash notes professional](web2-sources/from-books/professional_notes/books-02-bash_notes_professional.md)<br>
 [sql notes professional](web2-sources/from-books/professional_notes/books-03-sql_notes_professional.md)<br>
