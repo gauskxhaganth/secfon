@@ -1788,3 +1788,88 @@ Meja bantuan (*Help desk*) dari penyedia layanan internet (ISP) atau perusahaan 
 ## Modem dan Akses Jarak Jauh
 
 Kita telah menyinggung subjek modem di beberapa bagian dari Jam 1–7. Sekarang adalah waktunya untuk menjelaskannya karena mereka adalah bagian penting dari persamaan akses jarak jauh. Istilah **modem** adalah singkatan dari **modulasi-demodulasi**. Sebuah modem menerima data digital dalam bentuk tegangan positif atau negatif dari komputer dan memodulasinya menjadi bentuk analog yang dapat berjalan melalui saluran telepon konvensional. Di ujung lain koneksi, modem lain menerjemahkan sinyal analog kembali ke format digital sehingga komputer di ujung lain dapat memprosesnya. Gambaran umum prosesnya digambarkan pada Gambar 8.1.
+
+<ap align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-8.1.png" alt="gambar" width="580"/>
+</p>
+
+Tentu, ini adalah kelanjutan terjemahan dan perapian format dari teks sebelumnya.
+
+***
+
+Anda mungkin bertanya, “Mengapa modem вообще diperlukan? Mengapa tidak langsung mengirimkan data secara digital?” Modem diperlukan bagi mayoritas pengguna yang perlu mengakses jaringan karena instalasi telepon konvensional dirancang untuk membawa sinyal analog. Bagaimanapun, kita manusia berbicara dalam sinyal analog, bukan dalam biner 1 dan 0.
+
+Kecuali pengguna telah beralih ke layanan digital, seperti *digital subscriber line* (DSL), modem tetap menjadi alat vital untuk komunikasi akses jarak jauh. Saya telah memilih akses digital berkecepatan tinggi jika memungkinkan, tetapi saya masih menggunakan modem saat bepergian ke berbagai belahan dunia di mana fasilitas digital tidak tersedia. Sebagai contoh, saya telah menggunakan modem *dial-up* di tempat-tempat seperti Karibia, Versailles, Prancis, dan Beijing, Cina, karena *dial-up* adalah satu-satunya cara yang saya miliki untuk terhubung ke jaringan rumah dan kantor saya serta Internet.
+
+---
+## Standar Modem dan Konektivitas Universal
+
+Untungnya, bagi industri jaringan data, semua produsen modem telah menyepakati seperangkat spesifikasi umum untuk membuat mesin mereka. Standar-standar tersebut, yang biasa disebut modem “**V-Series**”, diterbitkan oleh **International Telecommunications Union (ITU)** dan berkisar dari perangkat “kuno” yang mengirimkan data pada 300 bit per detik (bps) hingga modem *broadband* modern, yang mampu mencapai kecepatan transmisi dalam rentang megabit per detik (Mbps).¹
+
+Untuk sementara waktu, pada tahun 1960-an dan 1970-an, beberapa perusahaan perangkat keras membangun modem *proprietary*, terutama AT&T. Selain itu, Smartmodem dari Hayes Communications menambahkan set perintah pada modem AT&T untuk menginstruksikan modem cara memutar nomor, menjawab panggilan, dan melakukan “*on-hook*” serta “*off-hook*.” Karena produk AT&T tidak menemukan kesuksesan yang luas di Asia dan Eropa, tahun 1970-an menjadi awal migrasi ke modem **V-Series** (bersama dengan set perintah Hayes).
+
+> ¹ Jika Anda ingin mengetahui detailnya (sekarang sebagian besar adalah sejarah), lihat buku saya *The V Series Recommendations: Protocols for Data Communications over the Telephone Network*.
+
+---
+## Modem Seluler dan Broadband
+
+Ponsel menggunakan modem, begitu juga koneksi *broadband* pada sistem kabel, satelit, dan telepon. Semuanya diklasifikasikan sebagai modem karena mereka melakukan modulasi dan demodulasi frekuensi analog. Namun, modem-modem ini menggunakan teknik pengkodean dan kompresi yang kompleks untuk memungkinkan laju data megabit. Selain itu, mereka cukup “cerdas” untuk memperbaiki distorsi tertentu pada transmisi dan bahkan menyesuaikan laju transmisi mereka berdasarkan kondisi koneksi saat ini. Banyak dari modem ini ditempatkan dalam cangkang yang sama dengan *router*. Koneksi *broadband* yang berada di sebelah PC saya didukung oleh apa yang disebut *modem/router DSL*.
+
+> **Seputar Istilah**
+>
+> **Bit Rate dan Baud**
+>
+> Anda mungkin mendengar seseorang merujuk pada laju transmisi modem dengan istilah “baud,” tetapi penggunaan ini tidak benar. Baud mengacu pada laju perubahan keadaan sinyal analog. Model AT&T (Bell) 103 asli mentransmisikan 1 bit untuk setiap perubahan keadaan; dengan demikian, laju bit (*bit rate*) sama dengan baud. Setelah itu, teknik modulasi yang cerdas digunakan untuk mengkodekan beberapa bit per baud. Sebagai contoh, modem 2.400 baud merepresentasikan 8 bit per baud dan memiliki laju transmisi 19.200 bps. Saat ini, modem *broadband* tidak hanya menggunakan operasi pengkodean dan modulasi canggih, mereka juga mengompres bit menjadi aliran yang lebih kecil untuk diangkut melintasi media.
+
+## Protokol dan Prosedur Akses Jarak Jauh Modern
+
+Selama beberapa tahun terakhir, berbagai teknologi telah tersedia untuk memungkinkan komputer bergabung dengan jaringan dari lokasi terpencil, sebagai lawan dari mengendalikan komputer jarak jauh di suatu jaringan (*remote-controlling*). Faktor-faktor ini meliputi:
+* Peningkatan kekuatan pemrosesan komputer laptop
+* Peningkatan besar penggunaan Internet dan penerimaan universal terhadap protokol akses jarak jauh Internet
+* Peningkatan jumlah instalasi saluran telepon analog berkualitas lebih tinggi
+* Peningkatan akses data berkecepatan tinggi yang disediakan oleh modem kabel dan DSL
+* Peningkatan jumlah implementasi TCP/IP
+* Pengenalan fitur keamanan yang disempurnakan untuk memungkinkan penggunaan Internet publik sebagai media untuk menghubungkan jaringan area lokal (*local area networks* - LAN) pribadi## The Point-to-Point Protocol (PPP)
+
+**Point-to-Point Protocol (PPP)** dikembangkan untuk menyelesaikan beberapa masalah yang muncul seiring semakin banyaknya orang yang mulai menggunakan jaringan komputer. Beberapa vendor dan organisasi standar mengembangkan protokol lapisan jaringan (*network layer*) ($L_3$ dari model OSI), seperti IP, IPX, $L_3$ dari AppleTalk, dan $L_3$ SNA dari IBM. Akibatnya, mesin (seperti *router* dan *server*) harus mendukung lebih dari satu protokol Layer 3.
+
+Diakui bahwa negosiasi berbagai opsi antara dua pengguna akan sangat membantu dan efisien. Misalnya, mengompresi bagian dari sebuah paket akan menghasilkan *throughput* yang lebih baik. Sebagai contoh lain, ISP mungkin ingin menetapkan alamat IP kepada pengguna *dial-up*. Sampai PPP dikembangkan (serta pendahulunya, **Serial Link Interface Protocol [SLIP]**), operasi-operasi ini dilakukan dengan protokol *proprietary*; atau lebih buruk lagi, tidak dilakukan sama sekali.
+
+Selain itu, industri jaringan tidak memiliki metode standar untuk “enkapsulasi” berbagai tumpukan protokol (*protocol stacks*) vendor ke dalam sebuah paket. Jadi, jika sebuah paket tiba di *router*, mesin ini harus entah bagaimana mencari tahu apakah paket itu adalah paket Internet Protocol (IP), Internetwork Packet Exchange (IPX), Systems Network Architecture (SNA), Xerox, atau AppleTalk. Meskipun *router* memang bisa mengetahuinya, prosesnya lambat dan rumit.
+
+**PPP** memecahkan masalah ini. Meskipun sebagian besar vendor telah beralih ke IP, **PPP** masih banyak digunakan untuk mengatur alamat, menegosiasikan beberapa opsi, dan (terutama) mengautentikasi pengguna jarak jauh. Sama pentingnya, **PPP** juga digunakan untuk memastikan kedua pihak yang berkomunikasi secara *point-to-point* memiliki koneksi fisik yang andal satu sama lain sebelum data dikirim. Jadi, IP tidak dapat mengirim paket sampai **PPP** berhasil melakukan *handshake* dengan mesin lain, seperti *router* ISP. Lebih lanjut, **PPP** tidak akan melakukan *handshake* ini jika kedua modem tidak berkomunikasi dengan benar. Artinya, **PPP** akan diaktifkan untuk beroperasi hanya jika kanal fisik ($L_1$) dan **Link Control Protocol** ($L_2$, atau LCP) beroperasi dengan benar.
+
+## Protokol Pendukung untuk PPP
+
+Setelah ditentukan bahwa, katakanlah, klien dan ISP klien memiliki koneksi modem yang dapat diterima (baik *dial-up* atau *broadband*) dan protokol tautan $L_2$ sudah ada, **PPP** menjalankan LCP-nya untuk mengatur hubungan **PPP** antara kedua pihak. Selama prosedur ini, LCP mungkin juga mengirimkan paket “*Configure*” untuk menegosiasikan opsi (seperti ukuran paket IP yang akan digunakan selama transfer data) dan prosedur autentikasi apa pun. Untuk fitur yang terakhir, sistem yang lebih tua menggunakan **Password Authentication Protocol (PAP)**, sedangkan koneksi *dial-up* yang lebih baru telah beralih ke **Challenge Handshake Authentication Protocol (CHAP)**, yang akan dibahas pada Jam ke-20.
+
+Setelah LCP menyelesaikan *handshake* kunci ini, **PPP** menjalankan **Network Control Protocol (NCP)** untuk menegosiasikan opsi yang spesifik untuk protokol $L_3$ tertentu. Misalnya, dengan IP, kompresi dan alamat IP dapat dinegosiasikan. Sebagai contoh lain, dengan AppleTalk, informasi zona jaringan dapat dipertukarkan.
+
+Akhirnya, setelah NCP menyelesaikan tugas-tugas ini, lalu lintas pengguna dapat dipertukarkan antara kedua belah pihak. Tetapi “akhirnya” mungkin merupakan karakterisasi yang tidak adil dari operasi **PPP**, karena negosiasi ini terjadi hampir seketika. Juga, bahkan jika Anda tidak memiliki operasi *dial-up* konvensional di jaringan Anda, kemungkinan *broadband* atau ISP Anda masih menggunakan **PPP** untuk memastikan tautan antara jaringan Anda dan jaringan penyedia layanan beroperasi dengan benar.
+
+## Fitur Bermanfaat Lainnya dari PPP
+
+Seperti yang mungkin telah Anda perhatikan, fitur-fitur tertentu, seperti menegosiasikan protokol $L_3$ mana yang akan digunakan selama sesi, agak kuno karena IP sebagian besar telah mengambil alih peran ini. Fitur lain yang dimasukkan ke dalam **PPP** untuk menangani keragaman protokol tetapi masih berguna hingga saat ini disebut *auto-detection* (deteksi otomatis), sebuah layanan yang disediakan pada lapisan tautan data (*data link layer*) ($L_2$) dari model OSI.
+
+Saat ini, industri komunikasi data telah beralih ke seperangkat prosedur dan protokol yang lebih terbatas yang digunakan untuk operasi $L_2$. Meskipun demikian, prosedur tautan data untuk Wi-Fi, Ethernet, Seluler, ATM, Bluetooth, modem *dial-up*, dan sebagainya tidaklah sama. Mereka mungkin hanya sedikit berbeda, atau mungkin sangat berbeda. Situasi ini bisa membuat hidup kita cukup rumit. Lagi pula, bagaimana kita bisa mengetahui detail-detail kecil dari setiap bit yang membentuk bidang kontrol dari protokol tautan data? Bahkan jika kita mengetahuinya, bagaimana kita bisa memilih perangkat keras dan perangkat lunak yang benar untuk mengakomodasi unit data protokol (PDU) ini?
+
+**PPP** membantu dalam tugas ini. Ini menyediakan prosedur untuk mendeteksi dan menafsirkan format *frame* dari protokol tautan data tertentu (tidak semua). Sekali lagi, operasi-operasi ini seharusnya tetap transparan bagi Anda, tetapi mengetahui kemampuan ini mungkin akan membantu Anda suatu hari nanti.
+
+Berikut adalah daftar layanan lain yang merupakan bagian dari platform **PPP**. Periksa vendor jaringan Anda untuk menentukan apakah opsi-opsi ini didukung:
+* **Ekstensi Vendor**—Memungkinkan dukungan prosedur *proprietary* vendor pada tautan **PPP**.
+* **Unit Penerima Maksimum (*Maximum receive unit*)**—Memungkinkan kedua pihak untuk menegosiasikan ukuran paket yang akan digunakan selama sesi.
+* **Kontrol Kualitas (*Quality control*)**—Menyediakan sarana untuk memantau kualitas tautan, khususnya kapan dan seberapa sering tautan kehilangan paket.
+* **Kompresi**—Mendukung kompresi beberapa bidang kontrol dari paket **PPP**.
+* ***Loop back***—Memungkinkan pemeriksaan sinyal yang secara keliru dilingkarkan kembali ke pengirimnya.
+
+## The Layer 2 Tunneling Protocol (L2TP)
+
+**PPP** dirancang untuk dua titik akhir (*endpoint*) untuk berkomunikasi satu sama lain, seperti dalam koneksi *dial-up point-to-point*. **Layer 2 Tunneling Protocol (L2TP)** memperluas **PPP** untuk beroperasi di antara mesin-mesin terpisah melintasi satu atau lebih jaringan.
+
+Protokol *tunneling* menggunakan konsep enkapsulasi, di mana konten satu protokol (paketnya) ditempatkan (dienkapsulasi) di dalam paket protokol lain; yang terakhir disebut protokol pengiriman (*delivery protocol*). *Tunneling* sangat berguna jika lalu lintas perlu dikirim melalui jaringan yang tidak kompatibel atau perlu ditempatkan pada jalur yang aman (sebuah *tunnel*) untuk transportasi melalui jaringan yang tidak aman, mungkin tidak tepercaya.
+
+Untuk penjelasan ini, paket **PPP** dienkapsulasi di dalam **L2TP** (lihat Gambar 8.2). Seorang pengguna melakukan *dial-in* (atau terhubung melalui tautan *broadband*) ke **L2TP Access Concentrator (LAC)**. Mesin ini, yang bisa jadi merupakan *server* akses jaringan milik vendor, biasanya merupakan inisiator dari *tunnel* tersebut. Koneksi telepon tidak dibawa melalui Internet; panggilan fisik dihentikan di LAC.
+
+<ap align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-8.2.png" alt="gambar" width="580"/>
+</p>
