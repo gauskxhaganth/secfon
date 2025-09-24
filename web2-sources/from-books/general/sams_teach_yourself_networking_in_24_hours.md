@@ -1789,7 +1789,7 @@ Meja bantuan (*Help desk*) dari penyedia layanan internet (ISP) atau perusahaan 
 
 Kita telah menyinggung subjek modem di beberapa bagian dari Jam 1–7. Sekarang adalah waktunya untuk menjelaskannya karena mereka adalah bagian penting dari persamaan akses jarak jauh. Istilah **modem** adalah singkatan dari **modulasi-demodulasi**. Sebuah modem menerima data digital dalam bentuk tegangan positif atau negatif dari komputer dan memodulasinya menjadi bentuk analog yang dapat berjalan melalui saluran telepon konvensional. Di ujung lain koneksi, modem lain menerjemahkan sinyal analog kembali ke format digital sehingga komputer di ujung lain dapat memprosesnya. Gambaran umum prosesnya digambarkan pada Gambar 8.1.
 
-<ap align="center">
+<p align="center">
   <img src="images/book-sams_teach_yourself_networking/figure-8.1.png" alt="gambar" width="580"/>
 </p>
 
@@ -1864,6 +1864,76 @@ Protokol *tunneling* menggunakan konsep enkapsulasi, di mana konten satu protoko
 
 Untuk penjelasan ini, paket **PPP** dienkapsulasi di dalam **L2TP** (lihat Gambar 8.2). Seorang pengguna melakukan *dial-in* (atau terhubung melalui tautan *broadband*) ke **L2TP Access Concentrator (LAC)**. Mesin ini, yang bisa jadi merupakan *server* akses jaringan milik vendor, biasanya merupakan inisiator dari *tunnel* tersebut. Koneksi telepon tidak dibawa melalui Internet; panggilan fisik dihentikan di LAC.
 
-<ap align="center">
+<p align="center">
   <img src="images/book-sams_teach_yourself_networking/figure-8.2.png" alt="gambar" width="580"/>
 </p>
+
+**LAC** bertanggung jawab untuk mengonfigurasi *tunnel*; ia membangun tabel untuk kata sandi dan melakukan kontak dengan mesin yang sesuai untuk membentuk ujung lain dari *tunnel* (di mana pihak lain berada). Mesin lain ini adalah **L2TP Network Server (LNS)**. Ini adalah sisi *server* dari *tunnel*; jadi, ia menunggu panggilan (dan *tunnel* baru). Setelah *tunnel* diatur, lalu lintas bergerak dua arah di antara kedua belah pihak. Operasi-operasi ini adalah bagian dari layanan jaringan pribadi virtual (**VPN**). Layanan **VPN** lainnya akan dibahas nanti dalam jam ini.
+
+Ketika seorang pengguna jaringan mengakses *server* akses ISP (*access server*, yaitu **LAC**), ISP menggunakan **CHAP** untuk menantang keaslian pengguna ini, sebuah bagian penting dari keseluruhan operasi **PPP** dan **L2TP**. Setelah pengguna diautentikasi, **LAC** menjalani operasi untuk menempatkan lalu lintas pengguna ke *tunnel* yang ada (menggunakan parameter dan pengidentifikasi yang diberikan pengguna), atau, jika diperlukan, membuat *tunnel* untuk sesi ini. Sebuah *tunnel* diidentifikasi dengan *tunnel ID*, dan sesi-sesi melalui *tunnel* diidentifikasi dengan *session ID*.
+
+Sekali lagi, keamanan adalah perhatian utama saat menggunakan **PPP** dan **L2TP**. Oleh karena itu, **CHAP** dan standar Internet lainnya, **RADIUS (Remote Authentication Dial-In Service)**, sangat berperan dalam menjalankan jaringan yang aman. Kita tinggalkan topik ini untuk saat ini dan akan kembali lagi pada Jam ke-20.
+
+## Ide untuk Meningkatkan Keamanan Dial-In
+
+Untuk subjek akses jarak jauh, berikut adalah beberapa langkah yang dapat Anda ambil untuk meningkatkan keamanan jaringan Anda:
+* Pastikan sistem mencatat semua panggilan masuk dan upaya *login*. Prosedur ini dapat membantu menemukan pengguna yang mencoba menebak kata sandi.
+* Batasi upaya *login* hingga tiga kali atau kurang, dan kunci pengguna mana pun yang belum memberikan kata sandi yang benar untuk ID pengguna tertentu setelah beberapa kali gagal mencoba *login*.
+* Gunakan *token akses* selain ID pengguna dan kata sandi. *Token akses* sangat sulit untuk diretas karena siapa pun yang *login* harus memiliki akses ke *token* pengguna yang diketahui dan tepercaya selain ID pengguna dan kata sandi yang valid.
+* Ubah pengaturan **PPP** sehingga pengguna jarak jauh memiliki proses *login* yang aman. Protokol keamanan seperti **CHAP** dapat membantu mengamankan proses *login*.
+* Anjurkan (paksa?) pengguna untuk sering mengganti kata sandi mereka.
+
+Tidak peduli seberapa aman Anda membuat jaringan Anda, jangan pernah berhenti berusaha membuatnya lebih aman. **Keamanan adalah sebuah proses, bukan tujuan akhir.**
+
+## Menggunakan Internet untuk Akses Jarak Jauh: VPN
+
+Di masa lalu, strategi *dial-up* adalah satu-satunya metode untuk membangun koneksi jarak jauh dengan LAN atau WAN pribadi. Internet sekarang menyediakan **VPN** bagi pengguna. **VPN** adalah koneksi aman yang dibuat melalui Internet antara pengguna jarak jauh dan, katakanlah, jaringan perusahaan. **VPN** adalah saluran (sebuah *tunnel*) yang memindahkan data pribadi melintasi Internet publik, sebuah konsep yang ditunjukkan pada Gambar 8.2. Untuk memanfaatkan **VPN** untuk akses jarak jauh, sebuah organisasi menyediakan infrastruktur yang sesuai:
+* Berinvestasi dalam kontrak dengan ISP *dial-up* nasional atau internasional untuk menyediakan nomor telepon *dial-up* lokal.
+* Menyediakan layanan modem kabel atau DSL kepada pengguna yang memerlukan akses jarak jauh berkecepatan tinggi. Memang, beralih dari layanan *dial-up* konvensional akan menghasilkan operasi yang lebih produktif bagi semua pihak yang terlibat.
+* Menyiapkan perangkat keras *server*/VPN di antara jaringan organisasi dan Internet untuk mengautentikasi pengguna yang menggunakan perangkat lunak **VPN**. Produsen di bisnis jaringan menjual perangkat keras dan lunak **VPN** dan menyediakan pelatihan ekstensif untuk pelanggan mereka. Jika jaringan Anda akan memiliki pengguna yang tersebar di wilayah yang luas di suatu negara atau dunia, Anda kemungkinan akan memerlukan bantuan dari spesialis, karena konfigurasi mesin jaringan jarak jauh bisa rumit dan kompleks. Manfaatkan keahlian staf vendor Anda; tidak lama kemudian, Anda akan dapat mengambil alih dan menjalankan operasi sendiri. Jika Anda tidak ingin terlibat dalam tingkat detail ini, bicarakan dengan vendor Anda tentang kontrak layanan untuk membantu Anda mengelola jaringan.
+
+Sekali lagi, vendor jaringan sangat akrab dengan interoperabilitas perangkat keras dan perangkat lunak **VPN** mereka. Anda mungkin menemukan bahwa menggunakan Internet alih-alih membangun jaringan sendiri lebih murah dan tidak terlalu rumit.
+
+Jika organisasi Anda diatur untuk melakukan semuanya secara lokal, *server dial-in* yang mengelola koneksi **PPP** dan autentikasi adalah cara yang efektif untuk memastikan keamanan yang efektif di jaringan Anda. Tetapi jika Anda memiliki pengguna yang berjauhan—dari Boston ke San Francisco, misalnya—Anda mungkin mempertimbangkan untuk menggunakan Internet sebagai media untuk menghubungkan kantor-kantor jarak jauh Anda.
+
+**VPN** menawarkan fleksibilitas lebih daripada pengguna yang mencoba melakukan *dial-in* ke jaringan perusahaan. Meskipun baik akses jarak jauh *dial-in* maupun **VPN** memerlukan *server* akses jarak jauh untuk mengautentikasi pengguna jarak jauh ke jaringan perusahaan, *dial-in* memerlukan kumpulan modem (*modem pools*) perusahaan untuk melayani pelanggan *dial-in*. Dalam kasus **VPN**, satu-satunya perangkat keras tambahan yang perlu digunakan adalah **L2TP LAC** dan **LNS**. (Untuk perusahaan besar, Anda mungkin juga ingin menggunakan *server* **RADIUS**, sebuah topik untuk Jam ke-20.)
+
+Dengan pengaturan ini, setiap pengguna di dunia yang dapat terhubung ke Internet dapat mengakses jaringan perusahaan. Tentu saja, pengguna ini harus memiliki nama pengguna dan kata sandi yang akan memungkinkan koneksi melalui *server* akses jarak jauh **VPN**. Cisco Systems, Microsoft, dan sejumlah perusahaan lain menyediakan perangkat lunak **VPN** yang menggunakan **IPSec (IP security)** untuk autentikasi dan keamanan. Dalam jangka panjang, ini mungkin terbukti menjadi metode yang paling efisien untuk menyediakan akses bagi pengguna jarak jauh ke jaringan yang aman.
+
+Dalam kasus berbagai produk *server* Microsoft, kapabilitas *server* **VPN** dibangun di dalam **Remote Access Service (RAS)** dari **Network Operating System (NOS)**. Gambar 8.3 menunjukkan *snap-in* **RAS** yang merupakan bagian dari Microsoft Windows Server 2003, yang digunakan untuk mengelola dan mengonfigurasi akses **VPN** ke LAN.
+
+<p align="center">
+  <img src="images/book-sams_teach_yourself_networking/figure-8.3.png" alt="gambar" width="580"/>
+</p>
+
+## Perangkat Keras Akses Jarak Jauh: Rakit atau Beli?
+
+Meskipun akses jarak jauh berbasis Internet menjadi semakin umum, beberapa organisasi akan membangun solusi akses jarak jauh mereka sendiri. Pembahasan berikut ini berkaitan dengan konsekuensi dari tindakan tersebut dan memberikan beberapa wawasan tentang apa saja yang terlibat dalam membangun arsitektur akses jarak jauh yang tangguh.
+
+Perangkat keras akses jarak jauh hadir dalam berbagai pilihan dari banyak produsen. Tidak ada gunanya mencoba mendaftar semuanya di sini. Sebaliknya, bagian ini berfokus pada pertanyaan **rakit atau beli** yang dihadapi oleh orang-orang yang harus membeli dan mengimplementasikan solusi akses jarak jauh.
+
+Apakah akan merakit atau membeli solusi akses jarak jauh adalah pertanyaan yang sulit. Jawabannya tergantung pada berbagai variabel, termasuk ukuran perusahaan Anda, seberapa cepat perusahaan Anda berkembang, berapa banyak orang yang akan menggunakan sistem akses jarak jauh, dan seberapa mudah atau sulit sistem tersebut untuk ditingkatkan.
+
+Proses memilih perangkat keras untuk basis pengguna yang berkembang pesat telah dibandingkan dengan membeli pakaian untuk seorang anak. Pada saat Anda membawa pulang pakaian itu dan memakaikannya pada anak, sering kali, anak itu sudah lebih besar dari ukuran pakaiannya. Alternatifnya, jika pakaiannya pas, anak itu tidak menyukainya dan tidak mau memakainya. Seiring waktu, sebuah pedoman umum—sedikit lelucon, tetapi tidak sepenuhnya—telah muncul untuk peralatan akses jarak jauh: **Hitung berapa banyak pengguna simultan yang akan Anda miliki, lalu setidaknya gandakan kapasitas itu** (kecuali, tentu saja, Anda tidak berada di industri yang sedang bertumbuh. Pasar *real estate* saat ini terlintas di benak).
+
+## Membangun Solusi Akses Jarak Jauh
+
+Jika Anda hanya memiliki beberapa pengguna, dimungkinkan untuk membuat solusi akses jarak jauh berdasarkan koneksi dua atau lebih modem ke komputer *server*. Sebagian besar sistem operasi *server* menawarkan solusi untuk akses *node* jarak jauh, termasuk **Remote Access Service (RAS)** dari Microsoft dan layanan koneksi jarak jauh NetWare dari Novell. Distribusi UNIX dan Linux juga menyediakan layanan akses jarak jauh.
+
+Sistem-sistem ini menawarkan beberapa atribut positif, termasuk kemampuan untuk menggunakan keamanan bawaan dan penanganan *login* dari sistem operasi. Biasanya, sistem akses jarak jauh rakitan sendiri memberikan kinerja yang baik dengan biaya yang wajar. Sisi negatif dari membangun solusi *server* akses jarak jauh Anda sendiri adalah bisa jadi sulit untuk mendapatkan dukungan jika Anda mengalami masalah. Terlalu sering, vendor sistem operasi menyalahkan masalah pada vendor kartu *multiport* dan sebaliknya, yang tidak membawa Anda ke mana-mana.
+
+## Membeli Solusi Akses Jarak Jauh Siap Pakai (*Turnkey*)
+
+Alternatif untuk membangun sistem akses jarak jauh dari perangkat keras dan komponen standar adalah dengan membeli sistem khusus (*dedicated system*). Sistem khusus biasanya tidak mengikuti konvensi dan mungkin atau mungkin tidak berinteraksi langsung dengan sistem operasi Anda. Terlepas dari arsitektur *proprietary* mereka, atau desain non-standar yang bergantung pada vendor, banyak solusi akses jarak jauh khusus yang tersedia di pasar menawarkan nilai yang besar untuk apa yang mereka lakukan.
+
+Dalam kasus **VPN**, beberapa perusahaan juga menyediakan perangkat keras **VPN**, termasuk Cisco dan Nortel. Dalam kasus Cisco, tersedia serangkaian *router* **VPN** yang menyediakan enkripsi data dan manajer perangkat berbasis web. Banyak *router* **VPN** yang tersedia dapat diimplementasikan langsung setelah dikeluarkan dari kotak dan memberikan alternatif yang baik daripada mencoba mengimplementasikan **VPN** sebagai layanan dari NOS tertentu.
+
+## Ringkasan
+
+Dalam jam ini, kita membahas apa itu akses jarak jauh dan mengapa hal itu menjadi begitu penting selama beberapa tahun terakhir. **PPP** disorot karena penggunaannya yang luas. **L2TP** juga diperiksa karena penggunaannya yang semakin meningkat. Jam ini diakhiri dengan analisis alternatif untuk mengimplementasikan sistem akses jarak jauh.
+
+Ini adalah akhir dari Bagian II buku ini, “Dasar-Dasar.” Anda sekarang seharusnya sudah familiar dengan konsep-konsep jaringan fundamental. Bagian III, “Membangun Jaringan,” memberikan panduan tentang membangun sebuah jaringan, dimulai dari tahap perencanaan, dan berakhir dengan sistem yang akan menangani kebutuhan jaringan Anda.
+
+---
+
+
