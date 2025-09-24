@@ -1755,3 +1755,36 @@ Pada bagian ini, kita telah membahas jaringan nirkabel. Dimulai dengan sejarah s
 
 ---
 
+# JAM ke 8
+## Jaringan Jarak Jauh
+
+**Apa yang Akan Anda Pelajari dalam Jam Ini:**
+* Alasan untuk jaringan jarak jauh
+* Sejarah akses jarak jauh
+* Persyaratan akses jarak jauh
+* Akses jarak jauh dengan SLIP, PPP, dan L2TP
+* Menggunakan VPN dan Internet untuk akses jarak jauh
+
+Dalam dunia perdagangan saat ini, bisnis sering kali dilakukan sambil bepergian karena para karyawan berpindah dari satu lokasi ke lokasi lain untuk menjalankan urusan mereka. Orang-orang merasa lebih mudah untuk mengakses jaringan perusahaan mereka dari rumah, kantor cabang, dan lokasi lainnya. Berjalanlah melintasi lobi hotel, ruang tunggu bandara, atau bahkan kafe, dan Anda akan bertemu dengan para peselancar jaringan, yang sibuk bekerja berkomunikasi dengan sistem informasi perusahaan mereka... atau mungkin sibuk bermain Scrabble online.
+
+Apa pun sesi jaringannya, akses jarak jauh menggunakan beberapa strategi konektivitas untuk menyediakan koneksi bagi pengguna dari lokasi terpencil ke jaringan perusahaan, institusi, dan rumah. Sejak tahun 1970-an, modem *dial-up* telah menyediakan salah satu cara untuk mengakses jaringan perusahaan. Selama dekade terakhir, koneksi berkecepatan lebih tinggi dan standar jaringan jarak jauh yang baru telah memperluas pilihan, termasuk penggunaan jaringan pribadi virtual (VPN) melalui Internet. Dalam jam ini, kita akan menjelajahi strategi-strategi untuk koneksi jarak jauh ini.
+
+## “Remote Control” Awal
+
+Sistem akses jarak jauh pertama yang digunakan secara luas adalah **Telnet**. Salah satu contoh **Telnet** adalah kemitraannya dengan **UNIX**. Pengguna perlu terhubung ke sistem *host* **UNIX** mereka ketika mereka tidak terhubung langsung ke unit prosesor pusat (CPU) sistem. Oleh karena itu, pada tahun 1969 standar **Telnet** diterbitkan untuk memberikan panduan dalam membangun perangkat lunak bagi klien jarak jauh untuk berkomunikasi dengan komputer *host*. Bagi pengguna, tidak akan ada perbedaan antara sesi **Telnet** yang berjarak 1.000 mil dan sesi dengan terminal yang berada di sebelah *host* **UNIX**. (Pada masa itu, *host* ini disebut **mainframe**.)
+
+Solusi akses jarak jauh PC pertama dibangun menggunakan perilaku *remote control* dari **Telnet**. Tidak mengherankan bahwa *remote control* adalah metode akses jarak jauh pertama yang digunakan untuk komputer pribadi karena pada awalnya, komputer pribadi tidak dianggap cukup kuat untuk melakukan banyak pemrosesan lokal. Karena usianya dan kurangnya fitur keamanan, penggunaan **Telnet** telah berkurang, dan banyak implementasi telah digantikan oleh **Secure Shell (SSH)**, yang akan dibahas pada Jam ke-20, “Keamanan.”
+
+## Remote Control untuk Administrasi Sistem
+
+Pada masa-masa awal akses jarak jauh PC, ketika karyawan memerlukan akses ke aplikasi dan file mereka saat sedang dalam perjalanan, seorang staf sistem informasi (SI) akan datang ke meja mereka dengan membawa *floppy disk*. Teknisi SI tersebut kemudian akan menginstal perangkat lunak *remote control* di komputer desktop dan laptop pengguna. Staf SI kemudian akan menginstruksikan pengguna untuk menempatkan sistem desktop dalam mode di mana komputer menunggu panggilan saat pengguna berada di luar kantor. Pengguna akan membawa laptopnya yang beratnya delapan pon itu dalam perjalanan, dan jika ia perlu membaca email, memeriksa jadwal, atau mendapatkan akses untuk alasan lain, ia akan melakukan *dial-in* ke komputer desktop.
+
+Layar komputer desktop akan muncul di laptop, dan pengguna dapat perlahan-lahan membaca email atau bekerja dengan aplikasi lain. Ketika sesi selesai, pengguna akan memutuskan modem laptop, dan itulah akhir dari akses data untuk sesi tersebut. Cara berkomunikasi ini tampaknya tidak masuk akal sekarang, tetapi belum lama ini, ini adalah metode yang umum untuk akses jarak jauh.
+
+Salah satu area di mana *remote control* telah meningkat dan, faktanya, telah menjadi salah satu metode yang lebih disukai untuk akses jarak jauh ke komputer adalah administrasi sistem. Beberapa organisasi telah memilih untuk menghindari dukungan telepon bagi para pekerjanya, dan lebih memilih untuk sekadar menginstal agen *remote control* manajemen sistem pada setiap PC pengguna akhir. Dengan adanya agen tersebut, pengguna dapat melaporkan masalah dengan komputernya, dan seorang administrator dapat menggunakan agen tersebut untuk mengambil alih desktop pengguna untuk sementara waktu melalui jaringan.
+
+Meja bantuan (*Help desk*) dari penyedia layanan internet (ISP) atau perusahaan seperti Microsoft dan Dell banyak menggunakan sistem administrasi *remote control*. Pusat-pusat teknis ini juga mengambil kendali atas komputer pelanggan dari jarak jauh untuk mendiagnosis dan memperbaiki masalah.
+
+## Modem dan Akses Jarak Jauh
+
+Kita telah menyinggung subjek modem di beberapa bagian dari Jam 1–7. Sekarang adalah waktunya untuk menjelaskannya karena mereka adalah bagian penting dari persamaan akses jarak jauh. Istilah **modem** adalah singkatan dari **modulasi-demodulasi**. Sebuah modem menerima data digital dalam bentuk tegangan positif atau negatif dari komputer dan memodulasinya menjadi bentuk analog yang dapat berjalan melalui saluran telepon konvensional. Di ujung lain koneksi, modem lain menerjemahkan sinyal analog kembali ke format digital sehingga komputer di ujung lain dapat memprosesnya. Gambaran umum prosesnya digambarkan pada Gambar 8.1.
