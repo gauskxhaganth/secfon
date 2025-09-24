@@ -1576,6 +1576,7 @@ Kita akan melanjutkan perjalanan protokol berlapis kita di Jam ke-15, "Menghubun
 Jam ini menjelaskan fitur-fitur utama dari sebuah WAN dan mengapa ia berbeda dari LAN. Komponen-komponen kunci dari sebuah WAN telah diperiksa, begitu pula tiga antarmuka WAN utama. Juga dijelaskan adalah sistem operator $L_1$ WAN utama dan yang membentuk Lapisan 2. Pro dan kontra dari pengalihan alamat dan label disorot. Jam ini diakhiri dengan melihat bagaimana sebuah paket dikirim melalui WAN antara dua LAN dan bagaimana sistem operator serta protokol WAN berkontribusi pada transport ini.
 
 ---
+
 # JAM ke 7
 ## Jaringan Nirkabel Bergerak 📶
 
