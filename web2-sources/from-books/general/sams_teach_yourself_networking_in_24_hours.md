@@ -1793,15 +1793,10 @@ Kita telah menyinggung subjek modem di beberapa bagian dari Jam 1–7. Sekarang 
   <img src="images/book-sams_teach_yourself_networking/figure-8.1.png" alt="gambar" width="580"/>
 </p>
 
-Tentu, ini adalah kelanjutan terjemahan dan perapian format dari teks sebelumnya.
-
-***
-
 Anda mungkin bertanya, “Mengapa modem вообще diperlukan? Mengapa tidak langsung mengirimkan data secara digital?” Modem diperlukan bagi mayoritas pengguna yang perlu mengakses jaringan karena instalasi telepon konvensional dirancang untuk membawa sinyal analog. Bagaimanapun, kita manusia berbicara dalam sinyal analog, bukan dalam biner 1 dan 0.
 
 Kecuali pengguna telah beralih ke layanan digital, seperti *digital subscriber line* (DSL), modem tetap menjadi alat vital untuk komunikasi akses jarak jauh. Saya telah memilih akses digital berkecepatan tinggi jika memungkinkan, tetapi saya masih menggunakan modem saat bepergian ke berbagai belahan dunia di mana fasilitas digital tidak tersedia. Sebagai contoh, saya telah menggunakan modem *dial-up* di tempat-tempat seperti Karibia, Versailles, Prancis, dan Beijing, Cina, karena *dial-up* adalah satu-satunya cara yang saya miliki untuk terhubung ke jaringan rumah dan kantor saya serta Internet.
 
----
 ## Standar Modem dan Konektivitas Universal
 
 Untungnya, bagi industri jaringan data, semua produsen modem telah menyepakati seperangkat spesifikasi umum untuk membuat mesin mereka. Standar-standar tersebut, yang biasa disebut modem “**V-Series**”, diterbitkan oleh **International Telecommunications Union (ITU)** dan berkisar dari perangkat “kuno” yang mengirimkan data pada 300 bit per detik (bps) hingga modem *broadband* modern, yang mampu mencapai kecepatan transmisi dalam rentang megabit per detik (Mbps).¹
@@ -1810,7 +1805,6 @@ Untuk sementara waktu, pada tahun 1960-an dan 1970-an, beberapa perusahaan peran
 
 > ¹ Jika Anda ingin mengetahui detailnya (sekarang sebagian besar adalah sejarah), lihat buku saya *The V Series Recommendations: Protocols for Data Communications over the Telephone Network*.
 
----
 ## Modem Seluler dan Broadband
 
 Ponsel menggunakan modem, begitu juga koneksi *broadband* pada sistem kabel, satelit, dan telepon. Semuanya diklasifikasikan sebagai modem karena mereka melakukan modulasi dan demodulasi frekuensi analog. Namun, modem-modem ini menggunakan teknik pengkodean dan kompresi yang kompleks untuk memungkinkan laju data megabit. Selain itu, mereka cukup “cerdas” untuk memperbaiki distorsi tertentu pada transmisi dan bahkan menyesuaikan laju transmisi mereka berdasarkan kondisi koneksi saat ini. Banyak dari modem ini ditempatkan dalam cangkang yang sama dengan *router*. Koneksi *broadband* yang berada di sebelah PC saya didukung oleh apa yang disebut *modem/router DSL*.
